@@ -14,5 +14,7 @@ namespace TaskManager.Data.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
+        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+
     }
 }

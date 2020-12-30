@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace TaskManager.Data.Models
@@ -11,15 +12,8 @@ namespace TaskManager.Data.Models
         public int EmployeeId { get; set; }
 
         [Required]
-        [MaxLength(50)]
-        public string FirstName { get; set; }
-
-        [MaxLength(50)]
-        public string MiddleName { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string LastName { get; set; }
+        [MaxLength(150)]
+        public string FullName { get; set; }
 
         public string JobTitleId { get; set; }
 
@@ -41,8 +35,15 @@ namespace TaskManager.Data.Models
         //[RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Entered phone format is not valid.")]
         public string TelephoneNumber {get; set;}
 
+        public string MobileNumber { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string DaeuAccaunt { get; set; }
 
 
 
-}
+
+    }
 }

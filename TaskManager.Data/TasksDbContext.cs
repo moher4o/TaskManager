@@ -24,6 +24,10 @@ namespace TaskManager.Data
 
         public DbSet<Employee> Employees { get; set; }
 
+        public DbSet<Task> Tasks { get; set; }
+
+        public DbSet<EmployeesTasks> EmployeesTasks { get; set; }
+
         public TasksDbContext(DbContextOptions<TasksDbContext> options)
              : base(options)
         {
@@ -43,10 +47,86 @@ namespace TaskManager.Data
                 .HasForeignKey(t => t.DirectorateId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Directorate>()
+                .HasMany(tt => tt.Employees)
+                .WithOne(t => t.Directorate)
+                .HasForeignKey(t => t.DirectorateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Directorate>()
+                .HasMany(tt => tt.Tasks)
+                .WithOne(t => t.Directorate)
+                .HasForeignKey(t => t.DirectorateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             builder.Entity<Department>()
                 .HasMany(tt => tt.Sectors)
                 .WithOne(t => t.Department)
                 .HasForeignKey(t => t.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Department>()
+                .HasMany(tt => tt.Employees)
+                .WithOne(t => t.Department)
+                .HasForeignKey(t => t.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Department>()
+                .HasMany(tt => tt.Tasks)
+                .WithOne(t => t.Department)
+                .HasForeignKey(t => t.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Sector>()
+                .HasMany(tt => tt.Employees)
+                .WithOne(t => t.Sector)
+                .HasForeignKey(t => t.SectorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Sector>()
+                .HasMany(tt => tt.Tasks)
+                .WithOne(t => t.Sector)
+                .HasForeignKey(t => t.SectorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<TasksType>()
+                .HasMany(tt => tt.Tasks)
+                .WithOne(t => t.TaskType)
+                .HasForeignKey(t => t.TypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<TasksStatus>()
+                .HasMany(tt => tt.Tasks)
+                .WithOne(t => t.TaskStatus)
+                .HasForeignKey(t => t.StatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Priority>()
+                .HasMany(tt => tt.Tasks)
+                .WithOne(t => t.TaskPriority)
+                .HasForeignKey(t => t.PriorityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<JobTitle>()
+                .HasMany(tt => tt.Employees)
+                .WithOne(t => t.JobTitle)
+                .HasForeignKey(t => t.JobTitleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<EmployeesTasks>()
+                .HasKey(pc => new { pc.EmployeeId, pc.TaskId });
+
+            builder.Entity<EmployeesTasks>()
+                .HasMany(tt => tt.Employees)
+                .WithOne(t => t.JobTitle)
+                .HasForeignKey(t => t.JobTitleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<EmployeesTasks>()
+                .HasMany(tt => tt.Employees)
+                .WithOne(t => t.JobTitle)
+                .HasForeignKey(t => t.JobTitleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

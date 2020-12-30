@@ -22,6 +22,8 @@ namespace TaskManager.Data.Models
 
         public ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
+        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+
         public bool isDeleted { get; set; } = false;
 
     }
