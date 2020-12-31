@@ -20,6 +20,7 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult Index()
         {
+            var userName = this.User.Identities.FirstOrDefault().Name;
             return View();
         }
 

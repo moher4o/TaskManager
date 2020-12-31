@@ -42,8 +42,15 @@ namespace TaskManager.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string DaeuAccaunt { get; set; }
 
+        public ICollection<Task> TasksCreator { get; set; } = new List<Task>();
 
+        public ICollection<Task> TasksAssigner { get; set; } = new List<Task>();
 
+        public ICollection<EmployeesTasks> Tasks { get; set; } = new List<EmployeesTasks>();
+
+        public ICollection<WorkedHours> WorkedHoursByTask { get; set; } = new List<WorkedHours>();
+
+        public ICollection<TaskNote> Notes { get; set; } = new List<TaskNote>();
 
     }
 }

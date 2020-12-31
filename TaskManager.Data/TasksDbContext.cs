@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TaskManager.Data.Models;
 
 namespace TaskManager.Data
@@ -27,6 +24,10 @@ namespace TaskManager.Data
         public DbSet<Task> Tasks { get; set; }
 
         public DbSet<EmployeesTasks> EmployeesTasks { get; set; }
+
+        public DbSet<WorkedHours> WorkedHours { get; set; }
+
+        public DbSet<TaskNote> Notes { get; set; }
 
         public TasksDbContext(DbContextOptions<TasksDbContext> options)
              : base(options)
@@ -117,119 +118,60 @@ namespace TaskManager.Data
             builder.Entity<EmployeesTasks>()
                 .HasKey(pc => new { pc.EmployeeId, pc.TaskId });
 
-            builder.Entity<EmployeesTasks>()
-                .HasMany(tt => tt.Employees)
-                .WithOne(t => t.JobTitle)
-                .HasForeignKey(t => t.JobTitleId)
+            builder.Entity<Task>()
+                .HasMany(tt => tt.AssignedExperts)
+                .WithOne(t => t.Task)
+                .HasForeignKey(t => t.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Employee>()
+                .HasMany(tt => tt.Tasks)
+                .WithOne(t => t.Employee)
+                .HasForeignKey(t => t.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Employee>()
+                .HasMany(tt => tt.TasksCreator)
+                .WithOne(t => t.Owner)
+                .HasForeignKey(t => t.OwnerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Employee>()
+                .HasMany(tt => tt.TasksAssigner)
+                .WithOne(t => t.Assigner)
+                .HasForeignKey(t => t.AssignerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+            builder.Entity<WorkedHours>()
+                .HasKey(pc => new { pc.TaskId, pc.EmployeeId, pc.WorkDate });
+
+            builder.Entity<Employee>()
+                .HasMany(tt => tt.WorkedHoursByTask)
+                .WithOne(t => t.Employee)
+                .HasForeignKey(t => t.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<EmployeesTasks>()
-                .HasMany(tt => tt.Employees)
-                .WithOne(t => t.JobTitle)
-                .HasForeignKey(t => t.JobTitleId)
+            builder.Entity<Task>()
+                .HasMany(tt => tt.WorkedHours)
+                .WithOne(t => t.Task)
+                .HasForeignKey(t => t.TaskId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<TaskNote>()
+                .HasKey(pc => new { pc.TaskId, pc.EmployeeId, pc.NoteDate });
 
+            builder.Entity<Employee>()
+                .HasMany(tt => tt.Notes)
+                .WithOne(t => t.Employee)
+                .HasForeignKey(t => t.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<Department>()
-            //    .HasMany(tt => tt.Employies)
-            //    .WithOne(t => t.Department)
-            //    .HasForeignKey(t => t.DepartmentId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<User>()
-            //    .HasMany(u => u.UsersCreated)
-            //    .WithOne(u => u.CreateUser)
-            //    .HasForeignKey(t => t.CreateUserId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Vers>()
-            //    .HasKey(pc => new { pc.Classif, pc.Version });
-
-            //builder.Entity<TC_Classifications>()
-            //    .HasMany(c => c.Versions)
-            //    .WithOne(cl => cl.Classification)
-            //    .HasForeignKey(t => t.Classif)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Items>()
-            //    .HasKey(pc => new { pc.Classif, pc.Version, pc.ItemCode });
-
-            //builder.Entity<TC_Classif_Vers>()
-            //    .HasMany(v => v.Items)
-            //    .WithOne(c => c.ClassifVersion)
-            //    .HasForeignKey(ci => new { ci.Classif, ci.Version })
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Items>()
-            //    .HasOne(p => p.ParentItem)
-            //    .WithMany(ch => ch.ChildItems)
-            //    .HasForeignKey(f => new { f.Classif, f.Version, f.ParentItemCode })
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Rel_Types>()
-            //    .HasOne(s => s.SourceClassification)
-            //    .WithMany(sc => sc.AsSourceClassification)
-            //    .HasForeignKey(f => f.SrcClassifId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Rel_Types>()
-            //    .HasOne(s => s.DestClassification)
-            //    .WithMany(sc => sc.AsDestClassification)
-            //    .HasForeignKey(f => f.DestClassifId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Rel_Types>()
-            //    .HasOne(s => s.SourceClassificationVersion)
-            //    .WithMany(sc => sc.AsSourceClassificationVersion)
-            //    .HasForeignKey(f => new { f.SrcClassifId, f.SrcVersionId })
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Rel_Types>()
-            //    .HasOne(s => s.DestClassificationVersion)
-            //    .WithMany(sc => sc.AsDestClassificationVersion)
-            //    .HasForeignKey(f => new { f.DestClassifId, f.DestVersionId })
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-
-            //builder.Entity<TC_Classif_Rels>()
-            //    .HasKey(pc => new { pc.SrcClassif, pc.SrcVer, pc.SrcItemId, pc.DestClassif, pc.DestVer, pc.DestItemId, pc.RelationTypeId });
-
-            //builder.Entity<TC_Classif_Rels>()
-            //    .HasOne(rt => rt.RelationType)
-            //    .WithMany(rt => rt.Relations)
-            //    .HasForeignKey(f => f.RelationTypeId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Rels>()
-            //    .HasOne(rs => rs.SrcItem)
-            //    .WithMany(ri => ri.SrcRelations)
-            //    .HasForeignKey(f => new { f.SrcClassif, f.SrcVer, f.SrcItemId })
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Rels>()
-            //    .HasOne(rs => rs.DestItem)
-            //    .WithMany(ri => ri.DestRelations)
-            //    .HasForeignKey(f => new { f.DestClassif, f.DestVer, f.DestItemId })
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Rels>()
-            //    .HasOne(tr => tr.CreateUser)
-            //    .WithMany(tr => tr.RelsCreated)
-            //    .HasForeignKey(tr => tr.EnteredByUserId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Items>()
-            //    .HasOne(tr => tr.CreateUser)
-            //    .WithMany(tr => tr.ItemsCreated)
-            //    .HasForeignKey(tr => tr.EnteredByUserId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<TC_Classif_Items>()
-            //    .HasOne(tr => tr.ModifyUser)
-            //    .WithMany(tr => tr.ItemsModified)
-            //    .HasForeignKey(tr => tr.ModifiedByUserId)
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Task>()
+                .HasMany(tt => tt.Notes)
+                .WithOne(t => t.Task)
+                .HasForeignKey(t => t.TaskId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             base.OnModelCreating(builder);

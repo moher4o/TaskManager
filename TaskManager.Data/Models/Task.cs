@@ -56,6 +56,12 @@ namespace TaskManager.Data.Models
         public int PriorityId { get; set; }
         public Priority TaskPriority { get; set; }
 
+        public ICollection<EmployeesTasks> AssignedExperts { get; set; } = new List<EmployeesTasks>();
+
+        public ICollection<WorkedHours> WorkedHours { get; set; } = new List<WorkedHours>();
+
+        public ICollection<TaskNote> Notes { get; set; } = new List<TaskNote>();
+
 
     }
 }

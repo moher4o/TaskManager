@@ -4,14 +4,19 @@ using System.Text;
 
 namespace TaskManager.Data.Models
 {
-    public class EmployeesTasks
+    public class TaskNote
     {
+        public string TaskId { get; set; }
+
+        public Task Task { get; set; }
+
         public int EmployeeId { get; set; }
 
         public Employee Employee { get; set; }
 
-        public string TaskId { get; set; }
+        public DateTime NoteDate { get; set; }
 
-        public Task Task { get; set; }
+        public string Text { get; set; }
+
     }
 }
