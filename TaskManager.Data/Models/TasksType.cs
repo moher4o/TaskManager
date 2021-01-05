@@ -14,6 +14,8 @@ namespace TaskManager.Data.Models
         [MaxLength(200)]
         public string Name { get; set; }
 
+        public bool isDeleted { get; set; } = false;
+
         public ICollection<Task> Tasks { get; set; } = new List<Task>();
 
     }

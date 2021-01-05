@@ -17,5 +17,7 @@ namespace TaskManager.Data.Models
         public DateTime WorkDate { get; set; }
 
         public int HoursSpend { get; set; }
+
+        public bool isDeleted { get; set; } = false;
     }
 }

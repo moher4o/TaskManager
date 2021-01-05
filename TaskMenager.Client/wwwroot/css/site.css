@@ -1,6 +1,119 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+/* Копирано от Убд */
+
+.button-invisible {
+    display: none;
+}
+
+body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.danni {
+    padding-top: 100px;
+    background: url('../images/banner1.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+}
+
+.PrimeBox {
+    border: 1px solid #2a67ac;
+    border-right: 2px solid #2a67ac;
+    border-bottom: 3px solid #2a67ac;
+    box-shadow: 2px 2px 8px rgba(42, 103, 172, 0.5);
+    background: #fff;
+    width: 400px;
+    margin: 10% auto 0 auto;
+    padding: 1em;
+    padding-bottom: 1em;
+    text-align: center;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.logo-text-wrapper {
+    display: inline-block;
+    vertical-align: top;
+    width: 45%;
+    width: 70%;
+    padding: 20px 0 0 0;
+    text-align: center;
+}
+
+.logo-text {
+    font-size: 27px;
+    line-height: 26px;
+    /* display: inline-block; */
+    vertical-align: middle;
+    width: 100%;
+    font-family: "Roboto",sans-serif;
+}
+
+.logo-text-secondary {
+    font-size: 20px;
+    font-family: "Roboto",sans-serif;
+    line-height: 17px;
+    width: 100%;
+    padding: 10px 0 0 0;
+}
+
+#block_container {
+    text-align: left;
+}
+
+#bloc1, #bloc2 {
+    display: inline;
+}
+
+hr {
+    height: 8px;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    background-color: #006cc7;
+    border: 0 none;
+    margin-top: 8px;
+    margin-bottom: 5px;
+}
+
+/* Копирано от Убд */
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;

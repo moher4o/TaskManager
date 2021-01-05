@@ -18,5 +18,7 @@ namespace TaskManager.Data.Models
 
         public string Text { get; set; }
 
+        public bool isDeleted { get; set; } = false;
+
     }
 }

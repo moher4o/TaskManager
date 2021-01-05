@@ -42,6 +42,8 @@ namespace TaskManager.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string DaeuAccaunt { get; set; }
 
+        public bool isDeleted { get; set; } = false;
+
         public ICollection<Task> TasksCreator { get; set; } = new List<Task>();
 
         public ICollection<Task> TasksAssigner { get; set; } = new List<Task>();
