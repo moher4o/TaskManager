@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskMenager.Client.Models.InsertDataFromFile;
 using static TaskManager.Common.DataConstants;
 
 namespace TaskMenager.Client.Controllers
@@ -12,14 +14,27 @@ namespace TaskMenager.Client.Controllers
     {
         public IActionResult SelectFileWithData()
         {
-            return View();
+            var FileTypeSelected = new SelectedFileToInsertViewModel();
+            FileTypeSelected.FileTypes.Insert(0, new SelectListItem
+            {
+                Text = ChooseValue,
+                Value = ChooseValue,
+                Selected = true
+            });
+            FileTypeSelected.FileTypes.Insert(1, new SelectListItem
+            {
+                Text = "Длъжности",
+                Value = "Длъжности"
+            });
+
+            return View(FileTypeSelected);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SelectFileType(IFormFile newItems, string metaData)
+        public async Task<IActionResult> SelectFileType(IFormFile newItems, string filetypeselected)
         {
-            if (metaData == null)
+            if (filetypeselected == null)
             {
                 TempData["Error"] = "Не е избран вид на входния файл";
             }

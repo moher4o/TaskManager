@@ -1,36 +1,52 @@
-﻿@{
+﻿@model SelectedFileToInsertViewModel
+@{
     ViewData["Title"] = "Импорт на данни";
 }
 
 @*<div class="text-center">
-    <p>JobTitles от файл - <a asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileType" asp-route-metaData="jobtitles">Избор на файл</a></p>
-</div>*@
+        <p>JobTitles от файл - <a asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileType" asp-route-metaData="jobtitles">Избор на файл</a></p>
+    </div>*@
 
 <form method="post" asp-controller="InsertDataFromFile" asp-action="SelectFileType" enctype="multipart/form-data">
-    <div class="row">
-        <div class="text-center">
-            <div>
-                @*<label>Избрана класификация : @Model.ClassCode</label>
-                <br />
-                <label id="versionName">Не е избрана версия на @Model.ClassCode</label>*@
-                <br />
-                <label id="fileName">Не е избран файл</label>
+    <div class="row PrimeBox" style="margin-top:15px;">
+        <div class="container" style="margin:15px;">
+
+        
+            <div class="center-block text-center">
+                <div class="row">
+                    <select name="filetypeselected" asp-items="@Model.FileTypes" class="form-control" id="selectedVersion"></select>
+                </div>
+                @*<input name="metaData" value="jobtitles" class="hidden" style="display:none;" />*@
+                <div class="row" style="padding-bottom:15px; padding-top:20px;">
+                    <input type="file" name="newItems" style="display:none" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="fileSelected" onchange="checkfile(this);" />
+                    <button type="button" class="button search" onclick="document.getElementsByName('newItems')[0].click()">Избор на файл с елементи</button>
+                    <button type="button" class="button save" id="send">Зареждане</button>
+                    <a class="button btncansel" asp-controller="Home" asp-action="Index">Отказ</a>
+                    <button type="button" class="button search" id="btnHelp">Помощ</button>
+                </div>
+
+                <div class="row">
+                    <label id="fileName">Не е избран файл с данни за импорт</label>
+                </div>
             </div>
 
         </div>
     </div>
-    <div class="row PrimeBox" style="margin-top:15px;">
-        <div class="center-block text-center">
-            <input name="metaData" value="jobtitles" class="hidden" style="display:none;" />
-            <input type="file" name="newItems" style="display:none" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="fileSelected" onchange="checkfile(this);" />
-            <button type="button" class="button search" onclick="document.getElementsByName('newItems')[0].click()">Избор на файл с елементи</button>
-            <button type="button" class="button save" id="send">Зареждане</button>
-            <a class="button btncansel" asp-controller="Home" asp-action="Index">Отказ</a>
-            <button type="button" class="button search" id="btnHelp">Помощ</button>
+    <div class="row center-block text-center">
+        <div>
+            <div>
+                @*<label>Избрана класификация : @Model.ClassCode</label>
+                    <br />
+                    <label id="versionName">Не е избрана версия на @Model.ClassCode</label>*@
+                <br />
+
+            </div>
+
         </div>
     </div>
+
     <div class="row">
-        <img src="~/jpg/ItemsExample.jpg" alt="example_image" style="padding:40px;" id="helpImage" hidden>
+        <img src="~/jpg/ItemsExample.jpg" alt="example_image" style="padding:40px; display:none;" id="helpImage">
     </div>
     <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
 
@@ -41,9 +57,10 @@
 <script src="~/js/SelectFileWithData.js"></script>
 <script type="text/javascript" language="javascript">
     function checkfile(sender) {
+        $(':focus').blur()
         var validExts = new Array(".xlsx", ".xls");
         var fileExt = sender.value;
-        var fullName = fileExt.substring(fileExt.lastIndexOf('\\')+1);
+        var fullName = fileExt.substring(fileExt.lastIndexOf('\\') + 1);
         fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
         if (validExts.indexOf(fileExt) < 0) {
             notify.showError("Избран е невалиден тип файл, валидните типове са " +
@@ -51,7 +68,7 @@
             return false;
         }
         else {
-            $("#fileName").text("Избран файл : "+fullName);
+            $("#fileName").text("Избран файл : " + fullName);
             return true;
         }
     }

@@ -20,7 +20,8 @@ namespace TaskManager.Common
 
 
         //Developer Data
-        public const string DeveloperUsername = "avukov@e-gov.bg";
+        public const string DeveloperUsername = "avukov";
+        public const string DeveloperEmail = "avukov@e-gov.bg";
         public const string DeveloperFirstName = "Ангел";
         public const string DeveloperLastName = "Вуков";
         public const string DeveloperPassword = "Q!23daeubg"; //for first use

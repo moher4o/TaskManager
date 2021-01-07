@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TaskManager.Data;
+using TaskMenager.Client.Infrastructure.Extensions;
 
 namespace TaskMenager.Client
 {
@@ -30,6 +31,8 @@ namespace TaskMenager.Client
 
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
+            services.AddTransient<IUbdUsersActions, UbdUsersActions>();
+
             services.AddDbContext<TasksDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -39,6 +42,7 @@ namespace TaskMenager.Client
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //app.MigrateDatabase();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
