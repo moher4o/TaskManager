@@ -3,7 +3,7 @@ using TaskManager.Common.Mapping;
 using System;
 using System.Linq;
 
-namespace TaskManager.Client.Infrastructure.Mapping
+namespace TaskMenager.Client.Infrastructure.Mapping
 {
     public class AutoMapperProfile : Profile
     {
@@ -12,7 +12,7 @@ namespace TaskManager.Client.Infrastructure.Mapping
             var allTypes = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
-                .Where(a => a.GetName().Name.Contains("TaskMenager") || a.GetName().Name.Contains("TaskManager"))
+                .Where(a => (a.GetName().Name.Contains("TaskMenager") || a.GetName().Name.Contains("TaskManager")))
                 .SelectMany(a => a.GetTypes());
 
             allTypes

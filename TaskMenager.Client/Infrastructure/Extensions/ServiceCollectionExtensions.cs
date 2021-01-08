@@ -1,9 +1,9 @@
-﻿using Nsiclass.Services;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Reflection;
+using TaskManager.Services;
 
-namespace Nsiclass.Client.Infrastructure.Extensions
+namespace TaskMenager.Client.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {

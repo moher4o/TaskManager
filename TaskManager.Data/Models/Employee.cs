@@ -15,6 +15,9 @@ namespace TaskManager.Data.Models
         [MaxLength(150)]
         public string FullName { get; set; }
 
+        [EmailAddress]
+        public string Email { get; set; }
+
         public string JobTitleId { get; set; }
 
         public JobTitle JobTitle { get; set; }
