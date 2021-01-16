@@ -1,30 +1,111 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using TaskManager.Common;
+using TaskManager.Services;
+using TaskManager.Services.Models;
+using TaskMenager.Client.Infrastructure.Extensions;
 using TaskMenager.Client.Models;
+
 
 namespace TaskMenager.Client.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IEmployeesService employees;
+        private readonly IRolesService roles;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles)
         {
             _logger = logger;
+            this.employees = employees;
+            this.roles = roles;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var userName = this.User.Identities.FirstOrDefault().Name;
+            string result = string.Empty;
+            if (this.roles.RolesCount() != DataConstants.RolesCount)
+            {
+               result = await this.roles.CreateRolesAsync();
+                if (!result.Equals("success"))
+                {
+                    TempData["Error"] = "След опит за инициализиране на ролите : "+result;
+                    return RedirectToAction("NotAuthorized");
+                }
+                else
+                {
+                    TempData["Success"] = "Бяха заредени ролите и създаден админ акаунт";
+                    return RedirectToAction("NotAuthorized");
+                }
+            }
+
+            var logedUser = this.User.Identities.FirstOrDefault().Name.ToLower();
+            var userForCoocy = this.employees.GetUserDataForCooky(logedUser);
+            
+            //var clTr = new ClaimsTransformer();
+            //var br = this.User.Claims.Count();
+            //this.User.Identities.FirstOrDefault().AddClaim(new Claim("permission", "DepartmentAdmin"));
+            //br = this.User.Claims.Count();
+            //if (userForCoocy == null)
+            //{
+            //    var claims = this.User.Claims.ToList();
+            //    //this.User.Claims.Append(new System.Security.Claims.Claim())
+            //    foreach (var cookie in Request.Cookies.Keys)
+            //    {
+            //        Response.Cookies.Delete(cookie);
+            //    }
+
+
+            //    await HttpContext.AuthenticateAsync();
+            //    // await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            //    Response.Cookies.Append("EdgeAccessCookie", "", new Microsoft.AspNetCore.Http.CookieOptions()
+            //    {
+            //        Path = "/",
+            //        HttpOnly = true,
+            //        SameSite = SameSiteMode.Lax,
+            //        Expires = DateTime.Now.AddDays(-1)
+            //    });
+
+            //    TempData["Error"] = "Потребител: " + logedUser + " няма конфигуриран достъп!";
+            //    return RedirectToAction("NotAuthorized");
+            //}
+
+            //var userFromCoocy = new UserCookyServiceModel();
+            //if (this.HttpContext.Request.Cookies.ContainsKey("daeuuser"))
+            //{
+            //    try
+            //    {
+            //        this.HttpContext.Request.Cookies.TryGetValue("daeuuser", out string userSerialized);
+            //        userFromCoocy = JsonConvert.DeserializeObject<UserCookyServiceModel>(userSerialized);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        throw;
+            //    }
+            //}
+
+            //Response.Cookies.Append("user", JsonConvert.SerializeObject(model.SearchPatern))
             return View();
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult NotAuthorized()
         {
             return View();
         }

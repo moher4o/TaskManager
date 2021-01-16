@@ -11,11 +11,10 @@ using TaskManager.Services.Models;
 
 namespace TaskManager.Services.Implementations
 {
-    public class TitleService : ITitleService
+    public class SectorsService : ISectorsService
     {
-
         private readonly TasksDbContext db;
-        public TitleService(TasksDbContext db, IConfiguration configuration)
+        public SectorsService(TasksDbContext db, IConfiguration configuration)
         {
             this.db = db;
             this.Configuration = configuration;
@@ -23,7 +22,7 @@ namespace TaskManager.Services.Implementations
 
         private IConfiguration Configuration { get; }
 
-        public async Task<string> AddTitlesCollection(List<AddNewJobTitlesServiceModel> jobTypes)
+        public async Task<string> AddSectorsCollection(List<AddNewSectorServiceModel> sectors)
         {
             var connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
             SqlConnection con = new SqlConnection(connectionString);
@@ -39,16 +38,19 @@ namespace TaskManager.Services.Implementations
             await this.db.Database.BeginTransactionAsync();
             try
             {
-                for (i = 0; i <= jobTypes.Count() - 1; i++)
+                for (i = 0; i <= sectors.Count() - 1; i++)
                 {
 
-                    var newJobTypeDB = new JobTitle()
+                    var newSectorDB = new Sector()
                     {
-                        //Id = jobTypes[i].JobTitleId,
-                        Name = jobTypes[i].Name,
-                        isDeleted = jobTypes[i].isDeleted
+                        DepartmentId = sectors[i].DepartmentId,
+                        Name = sectors[i].Name,
+                        isDeleted = sectors[i].isDeleted
                     };
-                    await this.db.JobTitles.AddAsync(newJobTypeDB);
+
+                    newSectorDB.DirectorateId = this.db.Departments.Where(d => d.Id == sectors[i].DepartmentId).Select(d => d.DirectorateId).FirstOrDefault();
+
+                    await this.db.Sectors.AddAsync(newSectorDB);
                 }
                 await this.db.SaveChangesAsync();
             }
@@ -57,7 +59,7 @@ namespace TaskManager.Services.Implementations
                 this.db.Database.RollbackTransaction();
                 //comend.ExecuteNonQuery();
                 con.Close();
-                return string.Concat($"Ред N:{i}", " ", jobTypes[i].Name, " има грешка (плюс минус един ред!)");
+                return string.Concat($"Ред N:{i}", " ", sectors[i].Name, " има грешка (плюс минус един ред!)");
             }
             this.db.Database.CommitTransaction();
             //transaction.Commit();

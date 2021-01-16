@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TaskManager.Data.Models
 {
-    public class TasksType
+    public class Role
     {
         public int Id { get; set; }
 
@@ -15,7 +15,6 @@ namespace TaskManager.Data.Models
 
         public bool isDeleted { get; set; } = false;
 
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
-
+        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
     }
 }

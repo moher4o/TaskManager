@@ -29,6 +29,8 @@ namespace TaskManager.Data
 
         public DbSet<TaskNote> Notes { get; set; }
 
+        public DbSet<Role> Roles { get; set; }
+
         public TasksDbContext(DbContextOptions<TasksDbContext> options)
              : base(options)
         {
@@ -171,6 +173,12 @@ namespace TaskManager.Data
                 .HasMany(tt => tt.Notes)
                 .WithOne(t => t.Task)
                 .HasForeignKey(t => t.TaskId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Role>()
+                .HasMany(tt => tt.Employees)
+                .WithOne(t => t.Role)
+                .HasForeignKey(t => t.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

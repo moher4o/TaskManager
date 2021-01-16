@@ -7,8 +7,7 @@ namespace TaskManager.Data.Models
 {
     public class Task
     {
-        [Key]
-        public string TaskId { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(250)]
@@ -17,15 +16,15 @@ namespace TaskManager.Data.Models
         [MaxLength(500)]
         public string Description { get; set; }
 
-        public string SectorId { get; set; }
+        public int? SectorId { get; set; }
 
         public Sector Sector { get; set; }
 
-        public string DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
 
         public Department Department { get; set; }
 
-        public string DirectorateId { get; set; }
+        public int? DirectorateId { get; set; }
 
         public Directorate Directorate { get; set; }
 
@@ -37,7 +36,7 @@ namespace TaskManager.Data.Models
 
         public DateTime? EndDatePrognose { get; set; }
 
-        public string ParentTaskId { get; set; }
+        public int? ParentTaskId { get; set; }
 
         public Task ParentTask { get; set; }
 

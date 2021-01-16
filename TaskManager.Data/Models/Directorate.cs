@@ -7,8 +7,8 @@ namespace TaskManager.Data.Models
 {
     public class Directorate
     {
-        [Key]
-        public string DirectorateId { get; set; }
+        
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(200)]

@@ -7,8 +7,7 @@ namespace TaskManager.Data.Models
 {
     public class Priority
     {
-        [Key]
-        public int PriorityId { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(100)]

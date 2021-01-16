@@ -6,12 +6,12 @@ namespace TaskManager.Common
     public static class DataConstants
     {
 
-        public const string AdministratorRole = "Администратор";
-        public const string DeveloperRole = "Програмист";
-        public const string MethodologistsExRole = "Методолог външен";
-        public const string MethodologistsInRole = "Методолог вътрешен";
-        public const string TsbRole = "ТСБ";
-        public const string DaeuUser = "ДАЕУ Потребител";
+        public const string SuperAdmin = "SuperAdmin";
+        public const string DirectorateAdmin = "DirectorateAdmin";
+        public const string DepartmentAdmin = "DepartmentAdmin";
+        public const string SectorAdmin = "SectorAdmin";
+        public const string Employee = "Employee";
+        public const int RolesCount = 5;  // броя на ролите по-горе   !!!!!
 
 
         public const string SuccessMessageKey = "SuccessMessage";
@@ -20,15 +20,14 @@ namespace TaskManager.Common
 
 
         //Developer Data
-        public const string DeveloperUsername = "avukov";
+        public const string DeveloperUsername = "ryzen7\\samso";
         public const string DeveloperEmail = "avukov@e-gov.bg";
         public const string DeveloperFirstName = "Ангел";
         public const string DeveloperLastName = "Вуков";
-        public const string DeveloperPassword = "Q!23daeubg"; //for first use
+        public const string DeveloperJobTitle = "Employee"; //for first use
 
         public const string FirmName = "ДАЕУ";
         public const bool IsoActive = false;
-        public const string ClassFilesSubDirectory = "ClassFiles";
 
         private static readonly Dictionary<string, string> MIMETypesDictionary = new Dictionary<string, string>
   {

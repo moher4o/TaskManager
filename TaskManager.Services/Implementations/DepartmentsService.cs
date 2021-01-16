@@ -11,11 +11,10 @@ using TaskManager.Services.Models;
 
 namespace TaskManager.Services.Implementations
 {
-    public class TitleService : ITitleService
+    public class DepartmentsService : IDepartmentsService
     {
-
         private readonly TasksDbContext db;
-        public TitleService(TasksDbContext db, IConfiguration configuration)
+        public DepartmentsService(TasksDbContext db, IConfiguration configuration)
         {
             this.db = db;
             this.Configuration = configuration;
@@ -23,7 +22,7 @@ namespace TaskManager.Services.Implementations
 
         private IConfiguration Configuration { get; }
 
-        public async Task<string> AddTitlesCollection(List<AddNewJobTitlesServiceModel> jobTypes)
+        public async Task<string> AddDepartmentsCollection(List<AddNewDepartmentServiceModel> departments)
         {
             var connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
             SqlConnection con = new SqlConnection(connectionString);
@@ -39,16 +38,16 @@ namespace TaskManager.Services.Implementations
             await this.db.Database.BeginTransactionAsync();
             try
             {
-                for (i = 0; i <= jobTypes.Count() - 1; i++)
+                for (i = 0; i <= departments.Count() - 1; i++)
                 {
 
-                    var newJobTypeDB = new JobTitle()
+                    var newDepartmentDB = new Department()
                     {
-                        //Id = jobTypes[i].JobTitleId,
-                        Name = jobTypes[i].Name,
-                        isDeleted = jobTypes[i].isDeleted
+                        DirectorateId = departments[i].DirectorateId,
+                        Name = departments[i].Name,
+                        isDeleted = departments[i].isDeleted
                     };
-                    await this.db.JobTitles.AddAsync(newJobTypeDB);
+                    await this.db.Departments.AddAsync(newDepartmentDB);
                 }
                 await this.db.SaveChangesAsync();
             }
@@ -57,7 +56,7 @@ namespace TaskManager.Services.Implementations
                 this.db.Database.RollbackTransaction();
                 //comend.ExecuteNonQuery();
                 con.Close();
-                return string.Concat($"Ред N:{i}", " ", jobTypes[i].Name, " има грешка (плюс минус един ред!)");
+                return string.Concat($"Ред N:{i}", " ", departments[i].Name, " има грешка (плюс минус един ред!)");
             }
             this.db.Database.CommitTransaction();
             //transaction.Commit();

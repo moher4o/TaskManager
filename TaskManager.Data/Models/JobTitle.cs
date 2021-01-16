@@ -7,8 +7,7 @@ namespace TaskManager.Data.Models
 {
     public class JobTitle
     {
-        [Key]
-        public string JobTitleId { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(200)]

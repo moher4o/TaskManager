@@ -10,8 +10,8 @@ using TaskManager.Data;
 namespace TaskManager.Data.Migrations
 {
     [DbContext(typeof(TasksDbContext))]
-    [Migration("20201231091423_firstFullDb_1")]
-    partial class firstFullDb_1
+    [Migration("20210115125956_NullableJobTitle")]
+    partial class NullableJobTitle
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,11 +23,13 @@ namespace TaskManager.Data.Migrations
 
             modelBuilder.Entity("TaskManager.Data.Models.Department", b =>
                 {
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("DirectorateId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DirectorateId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -37,7 +39,7 @@ namespace TaskManager.Data.Migrations
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("DepartmentId");
+                    b.HasKey("Id");
 
                     b.HasIndex("DirectorateId");
 
@@ -46,8 +48,10 @@ namespace TaskManager.Data.Migrations
 
             modelBuilder.Entity("TaskManager.Data.Models.Directorate", b =>
                 {
-                    b.Property<string>("DirectorateId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -57,14 +61,14 @@ namespace TaskManager.Data.Migrations
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("DirectorateId");
+                    b.HasKey("Id");
 
                     b.ToTable("Directorates");
                 });
 
             modelBuilder.Entity("TaskManager.Data.Models.Employee", b =>
                 {
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -75,36 +79,48 @@ namespace TaskManager.Data.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("DirectorateId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DirectorateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(150)")
                         .HasMaxLength(150);
 
-                    b.Property<string>("JobTitleId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("JobTitleId")
+                        .HasColumnType("int");
 
                     b.Property<string>("MobileNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SectorId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SectorId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TelephoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("EmployeeId");
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("DirectorateId");
 
                     b.HasIndex("JobTitleId");
+
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("SectorId");
 
@@ -116,8 +132,8 @@ namespace TaskManager.Data.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("TaskId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
 
                     b.HasKey("EmployeeId", "TaskId");
 
@@ -128,46 +144,10 @@ namespace TaskManager.Data.Migrations
 
             modelBuilder.Entity("TaskManager.Data.Models.JobTitle", b =>
                 {
-                    b.Property<string>("JobTitleId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
-
-                    b.HasKey("JobTitleId");
-
-                    b.ToTable("JobTitles");
-                });
-
-            modelBuilder.Entity("TaskManager.Data.Models.Priority", b =>
-                {
-                    b.Property<int>("PriorityId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.HasKey("PriorityId");
-
-                    b.ToTable("Priorities");
-                });
-
-            modelBuilder.Entity("TaskManager.Data.Models.Sector", b =>
-                {
-                    b.Property<string>("SectorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DirectorateId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -177,7 +157,73 @@ namespace TaskManager.Data.Migrations
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("SectorId");
+                    b.HasKey("Id");
+
+                    b.ToTable("JobTitles");
+                });
+
+            modelBuilder.Entity("TaskManager.Data.Models.Priority", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Priorities");
+                });
+
+            modelBuilder.Entity("TaskManager.Data.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("TaskManager.Data.Models.Sector", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DirectorateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
@@ -188,21 +234,23 @@ namespace TaskManager.Data.Migrations
 
             modelBuilder.Entity("TaskManager.Data.Models.Task", b =>
                 {
-                    b.Property<string>("TaskId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AssignerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(500)")
                         .HasMaxLength(500);
 
-                    b.Property<string>("DirectorateId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DirectorateId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
@@ -218,8 +266,8 @@ namespace TaskManager.Data.Migrations
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ParentTaskId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("ParentTaskId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PriorityId")
                         .HasColumnType("int");
@@ -227,8 +275,8 @@ namespace TaskManager.Data.Migrations
                     b.Property<DateTime>("RegCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SectorId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("SectorId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -239,7 +287,10 @@ namespace TaskManager.Data.Migrations
                     b.Property<int>("TypeId")
                         .HasColumnType("int");
 
-                    b.HasKey("TaskId");
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("AssignerId");
 
@@ -264,8 +315,8 @@ namespace TaskManager.Data.Migrations
 
             modelBuilder.Entity("TaskManager.Data.Models.TaskNote", b =>
                 {
-                    b.Property<string>("TaskId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -276,6 +327,9 @@ namespace TaskManager.Data.Migrations
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("TaskId", "EmployeeId", "NoteDate");
 
                     b.HasIndex("EmployeeId");
@@ -285,7 +339,7 @@ namespace TaskManager.Data.Migrations
 
             modelBuilder.Entity("TaskManager.Data.Models.TasksStatus", b =>
                 {
-                    b.Property<int>("TasksStatusId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -295,14 +349,17 @@ namespace TaskManager.Data.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.HasKey("TasksStatusId");
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
 
                     b.ToTable("TasksStatuses");
                 });
 
             modelBuilder.Entity("TaskManager.Data.Models.TasksType", b =>
                 {
-                    b.Property<int>("TasksTypeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -312,15 +369,18 @@ namespace TaskManager.Data.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.HasKey("TasksTypeId");
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
 
                     b.ToTable("TasksTypes");
                 });
 
             modelBuilder.Entity("TaskManager.Data.Models.WorkedHours", b =>
                 {
-                    b.Property<string>("TaskId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -330,6 +390,9 @@ namespace TaskManager.Data.Migrations
 
                     b.Property<int>("HoursSpend")
                         .HasColumnType("int");
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
 
                     b.HasKey("TaskId", "EmployeeId", "WorkDate");
 
@@ -343,7 +406,8 @@ namespace TaskManager.Data.Migrations
                     b.HasOne("TaskManager.Data.Models.Directorate", "Directorate")
                         .WithMany("Departments")
                         .HasForeignKey("DirectorateId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TaskManager.Data.Models.Employee", b =>
@@ -362,6 +426,12 @@ namespace TaskManager.Data.Migrations
                         .WithMany("Employees")
                         .HasForeignKey("JobTitleId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TaskManager.Data.Models.Role", "Role")
+                        .WithMany("Employees")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("TaskManager.Data.Models.Sector", "Sector")
                         .WithMany("Employees")

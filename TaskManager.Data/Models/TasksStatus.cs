@@ -7,8 +7,7 @@ namespace TaskManager.Data.Models
 {
     public class TasksStatus
     {
-        [Key]
-        public int TasksStatusId { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(100)]

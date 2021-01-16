@@ -10,7 +10,7 @@ namespace TaskManager.Data.Models
 
         public Employee Employee { get; set; }
 
-        public string TaskId { get; set; }
+        public int TaskId { get; set; }
 
         public Task Task { get; set; }
     }

@@ -7,18 +7,17 @@ namespace TaskManager.Data.Models
 {
     public class Sector
     {
-        [Key]
-        public string SectorId { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(200)]
         public string Name { get; set; }
 
-        public string DirectorateId { get; set; }
+        public int? DirectorateId { get; set; }
 
         public Directorate Directorate { get; set; }
 
-        public string DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
 
         public Department Department { get; set; }
 

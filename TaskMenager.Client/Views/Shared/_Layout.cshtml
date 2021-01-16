@@ -29,9 +29,6 @@
                                     <div class="logo-text-secondary">Държавна агенция "Електронно управление"</div>
                                 </div>
                             </td>
-                            <td style="text-align:end; padding-left:50px; padding-top:35px;">
-                                @(User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+2))
-                            </td>
                             <td style="text-align:end; padding-left:10px; padding-top:35px;">
                                 <div id="notifications">
                                     <div id="loadingBox" class="notification"><span>Loading …</span></div>
@@ -39,9 +36,7 @@
                                     <div id="errorBox" class="notification"><span>Error</span></div>
                                 </div>
                             </td>
-
                         </tr>
-
                     </tbody>
                 </table>
             </div>
@@ -71,42 +66,50 @@
             </div>*@
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @*@if (TempData.ContainsKey(DataConstants.SuccessMessageKey))
-            {
-                <div class="alert alert-success">
-                    @TempData[DataConstants.SuccessMessageKey]
-                </div>
-            }
-            @if (TempData.ContainsKey(DataConstants.ErrorMessageKey))
-            {
-                <div class="alert alert-danger">
-                    @TempData[DataConstants.ErrorMessageKey]
-                </div>
-            }*@
+    
+    <div class="row">
+        <div>
+            <a style="position:absolute; left:40px;" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() + "  -  " + User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+1))</a> <br />
+            <a style="position:absolute; left:40px;" asp-controller="Home" asp-action="Index">Начало</a> <br />
+        </div>
+        <div class="container">
+            <div>
+                <main role="main" class="pb-3">
+                    @*@if (TempData.ContainsKey(DataConstants.SuccessMessageKey))
+                    {
+                        <div class="alert alert-success">
+                            @TempData[DataConstants.SuccessMessageKey]
+                        </div>
+                    }
+                    @if (TempData.ContainsKey(DataConstants.ErrorMessageKey))
+                    {
+                        <div class="alert alert-danger">
+                            @TempData[DataConstants.ErrorMessageKey]
+                        </div>
+                    }*@
 
-            @RenderBody()
-            @if (TempData["Success"] != null)
-            {
-                <p class="alert alert-success" id="successMessage" style="text-align:center; margin-top: 15px;">@TempData["Success"]</p>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <p class="alert alert-danger" id="errorMessage" style="text-align:center; margin-top: 15px;">@TempData["Error"]</p>
-            }
-        </main>
-        @*<div id="notifications">
-            <div id="loadingBox" class="notification"><span>Loading …</span></div>
-            <div id="infoBox" class="notification"><span>Info</span></div>
-            <div id="errorBox" class="notification"><span>Error</span></div>
-        </div>*@
-
+                    @RenderBody()
+                    @if (TempData["Success"] != null)
+                    {
+                        <p class="alert alert-success" id="successMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <p class="alert alert-danger" id="errorMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
+                    }
+                </main>
+            </div>
+            @*<div id="notifications">
+                <div id="loadingBox" class="notification"><span>Loading …</span></div>
+                <div id="infoBox" class="notification"><span>Info</span></div>
+                <div id="errorBox" class="notification"><span>Error</span></div>
+            </div>*@
+        </div>
     </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - TaskMenager - <a asp-area="" asp-controller="Home" asp-action="Home">Начало</a>
+            &copy; 2021 - TaskMenager
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

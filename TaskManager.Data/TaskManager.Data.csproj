@@ -9,6 +9,16 @@
     <Compile Remove="Migrations\20201231085039_FirstFullDb.Designer.cs" />
     <Compile Remove="Migrations\20201231090201_FirstFullDb2.cs" />
     <Compile Remove="Migrations\20201231090201_FirstFullDb2.Designer.cs" />
+    <Compile Remove="Migrations\20201231091423_firstFullDb_1.cs" />
+    <Compile Remove="Migrations\20201231091423_firstFullDb_1.Designer.cs" />
+    <Compile Remove="Migrations\20210104114255_IsDeletedAdded.cs" />
+    <Compile Remove="Migrations\20210104114255_IsDeletedAdded.Designer.cs" />
+    <Compile Remove="Migrations\20210108100033_AddEmailAdnDaeuAccaunt.cs" />
+    <Compile Remove="Migrations\20210108100033_AddEmailAdnDaeuAccaunt.Designer.cs" />
+    <Compile Remove="Migrations\20210111100628_RolesAdded.cs" />
+    <Compile Remove="Migrations\20210111100628_RolesAdded.Designer.cs" />
+    <Compile Remove="Migrations\20210111200330_IntsIds.cs" />
+    <Compile Remove="Migrations\20210111200330_IntsIds.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
