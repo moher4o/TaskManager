@@ -57,6 +57,8 @@ namespace TaskManager.Data.Models
 
         public bool isDeleted { get; set; } = false;
 
+        public int HoursLimit { get; set; }
+
         public ICollection<EmployeesTasks> AssignedExperts { get; set; } = new List<EmployeesTasks>();
 
         public ICollection<WorkedHours> WorkedHours { get; set; } = new List<WorkedHours>();

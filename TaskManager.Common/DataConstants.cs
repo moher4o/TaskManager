@@ -13,6 +13,10 @@ namespace TaskManager.Common
         public const string Employee = "Employee";
         public const int RolesCount = 5;  // броя на ролите по-горе   !!!!!
 
+        public const string TaskStatusNew = "Нова";
+        public const string TaskStatusInProgres = "В изпълнение";
+        public const string TaskStatusClosed = "Приключена";
+        public const int TasksStatusCount = 3; // броя на статусите по-горе  !!!
 
         public const string SuccessMessageKey = "SuccessMessage";
         public const string ErrorMessageKey = "ErrorMessage";

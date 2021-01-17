@@ -43,23 +43,14 @@ namespace TaskMenager.Client
             {
                 options.AddPolicy(DataConstants.Employee, policy =>
                                   policy.RequireClaim("permission", DataConstants.Employee));
-                options.AddPolicy(DataConstants.SectorAdmin, policy =>
-                                policy.RequireClaim("permission", DataConstants.SectorAdmin));
-                options.AddPolicy(DataConstants.DepartmentAdmin, policy =>
-                                policy.RequireClaim("permission", DataConstants.DepartmentAdmin));
-                options.AddPolicy(DataConstants.DirectorateAdmin, policy =>
-                                policy.RequireClaim("permission", DataConstants.DirectorateAdmin));
+                options.AddPolicy("Admin", policy =>
+                                policy.RequireClaim("permission", "Admin"));
                 options.AddPolicy(DataConstants.SuperAdmin, policy =>
-                                policy.RequireClaim("permission", DataConstants.SuperAdmin));
-
+                                policy.RequireClaim("permissionType", DataConstants.SuperAdmin));
             });
-
-
 
             services.AddDbContext<TasksDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            
 
             services.AddControllersWithViews();
 
@@ -76,7 +67,6 @@ namespace TaskMenager.Client
             services.AddDistributedMemoryCache();
 
             services.AddSession();
-
            
         }
 

@@ -24,12 +24,14 @@ namespace TaskMenager.Client.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IEmployeesService employees;
         private readonly IRolesService roles;
+        private readonly ITasksService tasks;
 
-        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles)
+        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles, ITasksService tasks)
         {
             _logger = logger;
             this.employees = employees;
             this.roles = roles;
+            this.tasks = tasks;
         }
 
         public async Task<IActionResult> Index()
@@ -49,6 +51,22 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction("NotAuthorized");
                 }
             }
+
+            if (this.tasks.TasksStatusCount() != DataConstants.TasksStatusCount)
+            {
+                result = await this.tasks.CreateTasksStatusesAsync();
+                if (!result.Equals("success"))
+                {
+                    TempData["Error"] = "След опит за инициализиране на статусите на задачите : " + result;
+                    return RedirectToAction("NotAuthorized");
+                }
+                else
+                {
+                    TempData["Success"] = "Бяха заредени статусите на задачите";
+                    return RedirectToAction("NotAuthorized");
+                }
+            }
+
 
             var logedUser = this.User.Identities.FirstOrDefault().Name.ToLower();
             var userForCoocy = this.employees.GetUserDataForCooky(logedUser);

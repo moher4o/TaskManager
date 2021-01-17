@@ -29,13 +29,6 @@
                                     <div class="logo-text-secondary">Държавна агенция "Електронно управление"</div>
                                 </div>
                             </td>
-                            <td style="text-align:end; padding-left:10px; padding-top:35px;">
-                                <div id="notifications">
-                                    <div id="loadingBox" class="notification"><span>Loading …</span></div>
-                                    <div id="infoBox" class="notification"><span>Info</span></div>
-                                    <div id="errorBox" class="notification"><span>Error</span></div>
-                                </div>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -69,8 +62,23 @@
     
     <div class="row">
         <div>
-            <a style="position:absolute; left:40px;" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() + "  -  " + User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+1))</a> <br />
-            <a style="position:absolute; left:40px;" asp-controller="Home" asp-action="Index">Начало</a> <br />
+            <div class="menuspace">
+                <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() + "  -  " + User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+1))</a><br />
+
+
+                <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">Начало</a><br />
+
+                @if (User.Claims.Any(u => u.Value == "Admin"))
+                {
+
+                    <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">Създаване на задача</a><br />
+
+                }
+                @if (User.Claims.Any(c => c.Value == DataConstants.SuperAdmin))
+                {
+                    <a style="position:absolute; left:40px; font-size:1.2em;" asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Импорт на данни</a><br />
+                }
+            </div>
         </div>
         <div class="container">
             <div>
@@ -105,11 +113,17 @@
                 <div id="errorBox" class="notification"><span>Error</span></div>
             </div>*@
         </div>
+        <div id="notifications">
+            <div id="loadingBox" class="notification"  style="position:absolute; right:20px;"><span>Loading …</span></div>
+            <div id="infoBox" class="notification" style="position:absolute; right:20px;"><span>Info</span></div>
+            <div id="errorBox" class="notification" style="position:absolute; right:20px;"><span>Error</span></div>
+        </div>
+
     </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - TaskMenager
+            &copy; 2021 - ПРИЛОЖЕНИЕ ЗА ПЛАНИРАНЕ И ОТЧИТАНЕ НА ЗАДАЧИ
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

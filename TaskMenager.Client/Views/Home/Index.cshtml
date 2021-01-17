@@ -2,15 +2,3 @@
     ViewData["Title"] = "Начална страница";
 }
 
-@if (User.Claims.Any(c => c.Value == DataConstants.SuperAdmin))
-{
-    <div class="text-center">
-        <h4>Планиране и отчитане на задачи в ДАЕУ</h4>
-        <p>Добавяне на данни от файл - <a asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Избор на файл</a></p>
-    </div>
-}
-else
-{
-    <p>Не сте суперадмин</p>
-}
-

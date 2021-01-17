@@ -9,5 +9,7 @@ namespace TaskManager.Services
     public interface IDirectorateService
     {
         Task<string> AddDirectoratesCollection(List<AddNewDirectorateServiceModel> directorates);
+
+        IEnumerable<string> GetDirectoratesNames();
     }
 }
