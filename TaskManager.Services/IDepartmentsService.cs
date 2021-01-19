@@ -9,5 +9,12 @@ namespace TaskManager.Services
     public interface IDepartmentsService
     {
         Task<string> AddDepartmentsCollection(List<AddNewDepartmentServiceModel> departments);
+
+        IEnumerable<string> GetDepartmentsNames();
+
+        IEnumerable<string> GetDepartmentsNames(int? departmentId);
+
+        IEnumerable<string> GetDepartmentsNamesByDirectorate(int? directorateId);
+
     }
 }

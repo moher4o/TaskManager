@@ -32,37 +32,39 @@ namespace TaskMenager.Client.Infrastructure.Extensions
 
             var currentEmployee = this.employees.GetUserDataForCooky(logedUser);
 
-            var roleName = await this.roles.UserRoleNameByRoleIdAsync(currentEmployee.RoleId);
-
-            ci.AddClaim(new Claim("fullName", currentEmployee.FullName));
-
-            if (roleName != DataConstants.Employee)
+            if (currentEmployee != null)
             {
-                ci.AddClaim(new Claim("permission", "Admin"));
+                var roleName = await this.roles.UserRoleNameByRoleIdAsync(currentEmployee.RoleId);
 
-                if (roleName == DataConstants.SectorAdmin)
+                ci.AddClaim(new Claim("fullName", currentEmployee.FullName));
+
+                if (roleName != DataConstants.Employee)
                 {
-                    ci.AddClaim(new Claim("permissionType", DataConstants.SectorAdmin));
+                    ci.AddClaim(new Claim("permission", "Admin"));
+
+                    if (roleName == DataConstants.SectorAdmin)
+                    {
+                        ci.AddClaim(new Claim("permissionType", DataConstants.SectorAdmin));
+                    }
+                    else if (roleName == DataConstants.DepartmentAdmin)
+                    {
+                        ci.AddClaim(new Claim("permissionType", DataConstants.DepartmentAdmin));
+                    }
+                    else if (roleName == DataConstants.DirectorateAdmin)
+                    {
+                        ci.AddClaim(new Claim("permissionType", DataConstants.DirectorateAdmin));
+                    }
+                    else if (roleName == DataConstants.SuperAdmin)
+                    {
+                        ci.AddClaim(new Claim("permissionType", DataConstants.SuperAdmin));
+                    }
                 }
-                else if (roleName == DataConstants.DepartmentAdmin)
+                else
                 {
-                    ci.AddClaim(new Claim("permissionType", DataConstants.DepartmentAdmin));
-                }
-                else if (roleName == DataConstants.DirectorateAdmin)
-                {
-                    ci.AddClaim(new Claim("permissionType", DataConstants.DirectorateAdmin));
-                }
-                else if (roleName == DataConstants.SuperAdmin)
-                {
-                    ci.AddClaim(new Claim("permissionType", DataConstants.SuperAdmin));
+                    ci.AddClaim(new Claim("permission", DataConstants.Employee));
+                    ci.AddClaim(new Claim("permissionType", DataConstants.Employee));
                 }
             }
-            else
-            {
-                ci.AddClaim(new Claim("permission", DataConstants.Employee));
-                ci.AddClaim(new Claim("permissionType", DataConstants.Employee));
-            }
-
             var cp = new ClaimsPrincipal(ci);
 
             //return Task.FromResult(cp);

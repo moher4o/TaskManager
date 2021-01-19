@@ -11,5 +11,14 @@ namespace TaskManager.Services
         Task<string> AddEmployeesCollection(List<AddNewEmployeeServiceModel> employees);
 
         UserCookyServiceModel GetUserDataForCooky(string daeuAccaunt);
+
+        IEnumerable<string> GetEmployeesNames();
+
+        IEnumerable<string> GetEmployeesNamesBySector(int? sectorId);
+
+        IEnumerable<string> GetEmployeesNamesByDepartment(int? departmentId);
+
+        IEnumerable<string> GetEmployeesNamesByDirectorate(int? directorateId);
+
     }
 }

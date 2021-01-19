@@ -52,7 +52,7 @@ namespace TaskMenager.Client.Models.Tasks
 
 
         [Display(Name = "Лимит на работни часове")]
-        public int HoursLimit { get; set; }
+        public int HoursLimit { get; set; } = 100;
 
 
 

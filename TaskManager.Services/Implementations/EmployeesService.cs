@@ -77,6 +77,58 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
+        public IEnumerable<string> GetEmployeesNames()
+        {
+            var names = this.db.Employees
+                .Where(c => c.isDeleted == false)
+                .OrderBy(e => e.FullName)
+                .Select(c => c.FullName)
+                .ToList();
+            return names;
+        }
+
+        public IEnumerable<string> GetEmployeesNamesByDepartment(int? departmentId)
+        {
+            if (departmentId == null)
+            {
+                return null;
+            }
+            var names = this.db.Employees
+                .Where(c => c.isDeleted == false && c.DepartmentId == departmentId)
+                .OrderBy(e => e.FullName)
+                .Select(c => c.FullName)
+                .ToList();
+            return names;
+        }
+
+        public IEnumerable<string> GetEmployeesNamesByDirectorate(int? directorateId)
+        {
+            if (directorateId == null)
+            {
+                return null;
+            }
+            var names = this.db.Employees
+                .Where(c => c.isDeleted == false && c.DirectorateId == directorateId)
+                .OrderBy(e => e.FullName)
+                .Select(c => c.FullName)
+                .ToList();
+            return names;
+        }
+
+        public IEnumerable<string> GetEmployeesNamesBySector(int? sectorId)
+        {
+            if (sectorId == null)
+            {
+                return null;
+            }
+            var names = this.db.Employees
+                .Where(c => c.isDeleted == false && c.SectorId == sectorId)
+                .OrderBy(e => e.FullName)
+                .Select(c => c.FullName)
+                .ToList();
+            return names;
+        }
+
         public UserCookyServiceModel GetUserDataForCooky(string daeuAccaunt)
         {
             var searchedUser = this.db.Employees

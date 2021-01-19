@@ -64,5 +64,34 @@ namespace TaskManager.Services.Implementations
             con.Close();
             return "success";
         }
+
+        public IEnumerable<string> GetDepartmentsNames()
+        {
+            var names = this.db.Departments.Where(c => c.isDeleted == false).Select(c => c.Name).ToList();
+            return names;
+        }
+
+        public IEnumerable<string> GetDepartmentsNames(int? departmentId)
+        {
+            if (departmentId == null)
+            {
+                return null;
+            }
+
+            var names = this.db.Departments.Where(c => c.isDeleted == false && c.Id == departmentId).Select(c => c.Name).ToList();
+            return names;
+        }
+
+        public IEnumerable<string> GetDepartmentsNamesByDirectorate(int? directorateId)
+        {
+            if (directorateId == null)
+            {
+                return null;
+            }
+
+            var names = this.db.Departments.Where(c => c.isDeleted == false && c.DirectorateId == directorateId).Select(c => c.Name).ToList();
+            return names;
+        }
+
     }
 }

@@ -39,38 +39,41 @@ namespace TaskMenager.Client.Controllers
             string result = string.Empty;
             if (this.roles.RolesCount() != DataConstants.RolesCount)
             {
-               result = await this.roles.CreateRolesAsync();
+                result = await this.roles.CreateRolesAsync();
                 if (!result.Equals("success"))
                 {
-                    TempData["Error"] = "След опит за инициализиране на ролите : "+result;
-                    return RedirectToAction("NotAuthorized");
+                    TempData["Error"] = "След опит за инициализиране на ролите : " + result + " ";
                 }
                 else
                 {
-                    TempData["Success"] = "Бяха заредени ролите и създаден админ акаунт";
-                    return RedirectToAction("NotAuthorized");
+                    TempData["Success"] = "Бяха заредени ролите и създаден админ акаунт ";
                 }
+                
             }
 
             if (this.tasks.TasksStatusCount() != DataConstants.TasksStatusCount)
-            {
-                result = await this.tasks.CreateTasksStatusesAsync();
-                if (!result.Equals("success"))
                 {
-                    TempData["Error"] = "След опит за инициализиране на статусите на задачите : " + result;
-                    return RedirectToAction("NotAuthorized");
-                }
-                else
-                {
-                    TempData["Success"] = "Бяха заредени статусите на задачите";
-                    return RedirectToAction("NotAuthorized");
-                }
+                    result = await this.tasks.CreateTasksStatusesAsync();
+                    if (!result.Equals("success"))
+                    {
+                        TempData["Error"] = TempData["Error"] + Environment.NewLine + "След опит за инициализиране на статусите на задачите : " + result;
+                    }
+                    else
+                    {
+                        TempData["Success"] = TempData["Success"] + Environment.NewLine + "Бяха заредени статусите на задачите";
+                    }
+                return RedirectToAction("NotAuthorized");
             }
 
 
             var logedUser = this.User.Identities.FirstOrDefault().Name.ToLower();
-            var userForCoocy = this.employees.GetUserDataForCooky(logedUser);
-            
+            var currentEmployee = this.employees.GetUserDataForCooky(logedUser);
+            if (currentEmployee == null)
+            {
+                TempData["Error"] = logedUser + " Няма създаден акаунт в системата";
+                return RedirectToAction("NotAuthorized");
+            }
+
             //var clTr = new ClaimsTransformer();
             //var br = this.User.Claims.Count();
             //this.User.Identities.FirstOrDefault().AddClaim(new Claim("permission", "DepartmentAdmin"));
@@ -134,7 +137,7 @@ namespace TaskMenager.Client.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        
+
 
     }
 }

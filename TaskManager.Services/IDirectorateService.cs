@@ -11,5 +11,7 @@ namespace TaskManager.Services
         Task<string> AddDirectoratesCollection(List<AddNewDirectorateServiceModel> directorates);
 
         IEnumerable<string> GetDirectoratesNames();
+
+        IEnumerable<string> GetDirectoratesNames(int? directorateId);
     }
 }

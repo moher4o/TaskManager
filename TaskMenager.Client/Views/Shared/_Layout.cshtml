@@ -76,7 +76,7 @@
                 }
                 @if (User.Claims.Any(c => c.Value == DataConstants.SuperAdmin))
                 {
-                    <a style="position:absolute; left:40px; font-size:1.2em;" asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Импорт на данни</a><br />
+                    <a style="position:absolute; left:40px; font-size:1.2em; color:red;" asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Импорт на данни</a><br />
                 }
             </div>
         </div>

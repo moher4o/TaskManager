@@ -181,6 +181,14 @@ namespace TaskManager.Data
                 .HasForeignKey(t => t.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Employee>()
+               .HasIndex(p => p.DaeuAccaunt)
+               .IsUnique();
+
+            builder.Entity<Directorate>()
+               .HasIndex(p => p.Name)
+               .IsUnique();
+
 
             base.OnModelCreating(builder);
         }

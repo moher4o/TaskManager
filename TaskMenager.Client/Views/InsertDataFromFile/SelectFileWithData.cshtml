@@ -3,10 +3,6 @@
     ViewData["Title"] = "Импорт на данни";
 }
 
-@*<div class="text-center">
-        <p>JobTitles от файл - <a asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileType" asp-route-metaData="jobtitles">Избор на файл</a></p>
-    </div>*@
-
 <form method="post" asp-controller="InsertDataFromFile" asp-action="SelectFileType" enctype="multipart/form-data">
     <div class="row PrimeBox" style="margin-top:15px;">
         <div class="container" style="margin:15px;">
@@ -35,11 +31,7 @@
     <div class="row center-block text-center">
         <div>
             <div>
-                @*<label>Избрана класификация : @Model.ClassCode</label>
-                    <br />
-                    <label id="versionName">Не е избрана версия на @Model.ClassCode</label>*@
                 <br />
-
             </div>
 
         </div>

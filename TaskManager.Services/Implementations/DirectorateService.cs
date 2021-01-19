@@ -71,5 +71,16 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
-     }
+        public IEnumerable<string> GetDirectoratesNames(int? directorateId)
+        {
+            if (directorateId == null)
+            {
+                return null;
+            }
+            var names = this.db.Directorates.Where(c => c.isDeleted == false && c.Id == directorateId).Select(c => c.Name).ToList();
+            return names;
+        }
+
+
+    }
 }

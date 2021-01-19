@@ -24,7 +24,7 @@ namespace TaskManager.Common
 
 
         //Developer Data
-        public const string DeveloperUsername = "ryzen7\\samso";
+        public const string DeveloperUsername = "dc1\\avukov";
         public const string DeveloperEmail = "avukov@e-gov.bg";
         public const string DeveloperFirstName = "Ангел";
         public const string DeveloperLastName = "Вуков";
