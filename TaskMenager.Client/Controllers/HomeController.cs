@@ -42,28 +42,57 @@ namespace TaskMenager.Client.Controllers
                 result = await this.roles.CreateRolesAsync();
                 if (!result.Equals("success"))
                 {
-                    TempData["Error"] = "След опит за инициализиране на ролите : " + result + " ";
+                    TempData["Error"] = "Грешка след опит за инициализиране на ролите : " + result + " ";
                 }
                 else
                 {
-                    TempData["Success"] = "Бяха заредени ролите и създаден админ акаунт ";
+                    TempData["Success"] = "Заредени ролите";
                 }
-                
-            }
 
-            if (this.tasks.TasksStatusCount() != DataConstants.TasksStatusCount)
+
+                if (this.tasks.TasksStatusCount() != DataConstants.TasksStatusCount)
                 {
                     result = await this.tasks.CreateTasksStatusesAsync();
                     if (!result.Equals("success"))
                     {
-                        TempData["Error"] = TempData["Error"] + Environment.NewLine + "След опит за инициализиране на статусите на задачите : " + result;
+                        TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на статусите на задачите : " + result;
                     }
                     else
                     {
-                        TempData["Success"] = TempData["Success"] + Environment.NewLine + "Бяха заредени статусите на задачите";
+                        TempData["Success"] = TempData["Success"] + "<  >" + "Заредени статусите на задачите";
                     }
+
+                }
+                if (this.tasks.TasksPrioritysCount() != DataConstants.TasksPriorityCount)
+                {
+                    result = await this.tasks.CreateTasksPrioritiesAsync();
+                    if (!result.Equals("success"))
+                    {
+                        TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на приоритетите на задачите : " + result;
+                    }
+                    else
+                    {
+                        TempData["Success"] = TempData["Success"] + "<  >" + "Заредени приоритетите на задачите";
+                    }
+
+                }
+                if (this.tasks.TasksTypesCount() != DataConstants.TasksTypesCount)
+                {
+                    result = await this.tasks.CreateTasksTypesAsync();
+                    if (!result.Equals("success"))
+                    {
+                        TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на типовете задачи : " + result;
+                    }
+                    else
+                    {
+                        TempData["Success"] = TempData["Success"] + "<  >" + "Заредени типовете задачи";
+                    }
+
+                }
+
                 return RedirectToAction("NotAuthorized");
             }
+
 
 
             var logedUser = this.User.Identities.FirstOrDefault().Name.ToLower();

@@ -186,7 +186,7 @@ namespace TaskManager.Data
                .IsUnique();
 
             builder.Entity<Directorate>()
-               .HasIndex(p => p.Name)
+               .HasIndex(p => p.DirectorateName)
                .IsUnique();
 
 

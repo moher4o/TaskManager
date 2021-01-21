@@ -42,22 +42,22 @@ namespace TaskManager.Services.Implementations
 
                 var newStatusDB = new TasksStatus()
                 {
-                    
-                    Name = DataConstants.TaskStatusNew,
+
+                    StatusName = DataConstants.TaskStatusNew,
                     isDeleted = false,
                 };
                 await this.db.TasksStatuses.AddAsync(newStatusDB);
                 newStatusDB = new TasksStatus()
                 {
 
-                    Name = DataConstants.TaskStatusInProgres,
+                    StatusName = DataConstants.TaskStatusInProgres,
                     isDeleted = false,
                 };
                 await this.db.TasksStatuses.AddAsync(newStatusDB);
                 newStatusDB = new TasksStatus()
                 {
 
-                    Name = DataConstants.TaskStatusClosed,
+                    StatusName = DataConstants.TaskStatusClosed,
                     isDeleted = false,
                 };
                 await this.db.TasksStatuses.AddAsync(newStatusDB);
@@ -74,9 +74,110 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
+        public async Task<string> CreateTasksPrioritiesAsync()
+        {
+            await this.db.Database.BeginTransactionAsync();
+            try
+            {
+                var priorities = this.db.Priorities.ToList();
+                this.db.Priorities.RemoveRange(priorities);
+            }
+            catch (Exception)
+            {
+                this.db.Database.RollbackTransaction();
+                return $"Грешка!!! Възникна проблем при изтриването на приоритетите.";
+            }
+            this.db.Database.CommitTransaction();
+
+            await this.db.Database.BeginTransactionAsync();
+            try
+            {
+
+                var newPriorityDb = new Priority()
+                {
+                    PriorityName = DataConstants.TaskPriorityLow
+                };
+                await this.db.Priorities.AddAsync(newPriorityDb);
+                newPriorityDb = new Priority()
+                {
+
+                    PriorityName = DataConstants.TaskPriorityNormal
+                };
+                await this.db.Priorities.AddAsync(newPriorityDb);
+
+                newPriorityDb = new Priority()
+                {
+
+                    PriorityName = DataConstants.TaskPriorityHi
+                };
+                await this.db.Priorities.AddAsync(newPriorityDb);
+
+                await this.db.SaveChangesAsync();
+
+            }
+            catch (Exception)
+            {
+                this.db.Database.RollbackTransaction();
+                return $"Грешка!!! Възникна проблем при създаването на приоритетите.";
+            }
+            this.db.Database.CommitTransaction();
+            return "success";
+        }
+
+        public async Task<string> CreateTasksTypesAsync()
+        {
+            await this.db.Database.BeginTransactionAsync();
+            try
+            {
+                var types = this.db.TasksTypes.ToList();
+                this.db.TasksTypes.RemoveRange(types);
+            }
+            catch (Exception)
+            {
+                this.db.Database.RollbackTransaction();
+                return $"Грешка!!! Възникна проблем при изтриването на типовете задачи.";
+            }
+            this.db.Database.CommitTransaction();
+
+            await this.db.Database.BeginTransactionAsync();
+            try
+            {
+
+                var newTypeDb = new TasksType()
+                {
+                    TypeName = DataConstants.TaskTypeNormal
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+
+                newTypeDb = new TasksType()
+                {
+
+                    TypeName = DataConstants.TaskTypeOverdue
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+
+                await this.db.SaveChangesAsync();
+
+            }
+            catch (Exception)
+            {
+                this.db.Database.RollbackTransaction();
+                return $"Грешка!!! Възникна проблем при създаването на типовете на задачите.";
+            }
+            this.db.Database.CommitTransaction();
+            return "success";
+        }
         public int TasksStatusCount()
         {
             return this.db.TasksStatuses.Count();
+        }
+        public int TasksPrioritysCount()
+        {
+            return this.db.Priorities.Count();
+        }
+        public int TasksTypesCount()
+        {
+            return this.db.TasksTypes.Count();
         }
 
     }

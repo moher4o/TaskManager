@@ -18,6 +18,16 @@ namespace TaskManager.Common
         public const string TaskStatusClosed = "Приключена";
         public const int TasksStatusCount = 3; // броя на статусите по-горе  !!!
 
+        public const string TaskTypeNormal = "В срок";
+        public const string TaskTypeOverdue = "Просрочена";
+        public const int TasksTypesCount = 2; // броя на типовете по-горе  !!!
+
+        public const string TaskPriorityLow = "Нисък";
+        public const string TaskPriorityNormal = "Нормален";
+        public const string TaskPriorityHi = "Висок";
+        public const int TasksPriorityCount = 3; // броя на типовете по-горе  !!!
+
+
         public const string SuccessMessageKey = "SuccessMessage";
         public const string ErrorMessageKey = "ErrorMessage";
         public const string ChooseValue = "Моля изберете...";

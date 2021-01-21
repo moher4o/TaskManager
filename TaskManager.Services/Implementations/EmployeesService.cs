@@ -50,11 +50,11 @@ namespace TaskManager.Services.Implementations
                     var newEmployeeDB = new Employee()
                     {
                         DaeuAccaunt = string.IsNullOrWhiteSpace(employees[i].DaeuAccaunt) ? throw new ArgumentNullException("Акаунта не може да е null") : employees[i].DaeuAccaunt,
-                        JobTitleId = string.IsNullOrWhiteSpace(employees[i].JobTitle) ? throw new ArgumentNullException("Длъжността не може да е null") : this.db.JobTitles.Where(d => d.Name == employees[i].JobTitle).Select(d => d.Id).FirstOrDefault(),
+                        JobTitleId = string.IsNullOrWhiteSpace(employees[i].JobTitle) ? throw new ArgumentNullException("Длъжността не може да е null") : this.db.JobTitles.Where(d => d.TitleName == employees[i].JobTitle).Select(d => d.Id).FirstOrDefault(),
                         RoleId = string.IsNullOrWhiteSpace(employees[i].Role) ? throw new ArgumentNullException("Ролята не може да е null") : this.db.Roles.Where(d => d.Name == employees[i].Role).Select(d => d.Id).FirstOrDefault(),
-                        SectorId = string.IsNullOrWhiteSpace(employees[i].Sector) ? (int?) null : this.db.Sectors.Where(d => d.Name == employees[i].Sector).Select(d => d.Id).FirstOrDefault(),
-                        DepartmentId = string.IsNullOrWhiteSpace(employees[i].Department) ? (int?)null : this.db.Departments.Where(d => d.Name == employees[i].Department).Select(d => d.Id).FirstOrDefault(),
-                        DirectorateId = string.IsNullOrWhiteSpace(employees[i].Directorate) ? (int?)null : this.db.Directorates.Where(d => d.Name == employees[i].Directorate).Select(d => d.Id).FirstOrDefault(),
+                        SectorId = string.IsNullOrWhiteSpace(employees[i].Sector) ? (int?) null : this.db.Sectors.Where(d => d.SectorName == employees[i].Sector).Select(d => d.Id).FirstOrDefault(),
+                        DepartmentId = string.IsNullOrWhiteSpace(employees[i].Department) ? (int?)null : this.db.Departments.Where(d => d.DepartmentName == employees[i].Department).Select(d => d.Id).FirstOrDefault(),
+                        DirectorateId = string.IsNullOrWhiteSpace(employees[i].Directorate) ? (int?)null : this.db.Directorates.Where(d => d.DirectorateName == employees[i].Directorate).Select(d => d.Id).FirstOrDefault(),
                         FullName = employees[i].FullName,
                         isDeleted = employees[i].isDeleted
                     };
@@ -129,11 +129,11 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
-        public UserCookyServiceModel GetUserDataForCooky(string daeuAccaunt)
+        public UserServiceModel GetUserDataForCooky(string daeuAccaunt)
         {
             var searchedUser = this.db.Employees
                 .Where(u => u.DaeuAccaunt == daeuAccaunt.ToLower())
-                .ProjectTo<UserCookyServiceModel>()
+                .ProjectTo<UserServiceModel>()
                 .FirstOrDefault();
 
             return searchedUser;

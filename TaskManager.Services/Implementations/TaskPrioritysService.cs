@@ -16,7 +16,7 @@ namespace TaskManager.Services.Implementations
 
         public IEnumerable<string> GetTaskPrioritysNames()
         {
-            var names = this.db.Priorities.Where(c => c.isDeleted == false).Select(c => c.Name).ToList();
+            var names = this.db.Priorities.Where(c => c.isDeleted == false).Select(c => c.PriorityName).ToList();
             return names;
         }
     }

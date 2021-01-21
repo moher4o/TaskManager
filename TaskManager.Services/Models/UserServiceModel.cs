@@ -7,8 +7,7 @@ using TaskManager.Data.Models;
 
 namespace TaskManager.Services.Models
 {
-    [Serializable]
-    public class UserCookyServiceModel : IMapFrom<Employee>, IHaveCustomMapping
+    public class UserServiceModel : IMapFrom<Employee>, IHaveCustomMapping
     {
         public int Id { get; set; }
 
@@ -30,10 +29,8 @@ namespace TaskManager.Services.Models
 
         public void ConfigureMapping(Profile profile)
         {
-            profile.CreateMap<Employee, UserCookyServiceModel>()
-                   .ForMember(u => u.RoleName, cfg => cfg.MapFrom(t => t.Role.Name));
+            profile.CreateMap<Employee, UserServiceModel>()
+                   .ForMember(u => u.RoleName, cfg => cfg.MapFrom(r => r.Role.Name));
         }
-
-
     }
 }

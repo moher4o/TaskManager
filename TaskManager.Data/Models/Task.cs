@@ -11,7 +11,7 @@ namespace TaskManager.Data.Models
 
         [Required]
         [MaxLength(250)]
-        public string Name { get; set; }
+        public string TaskName { get; set; }
 
         [MaxLength(500)]
         public string Description { get; set; }

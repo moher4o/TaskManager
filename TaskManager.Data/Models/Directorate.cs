@@ -12,7 +12,7 @@ namespace TaskManager.Data.Models
 
         [Required]
         [MaxLength(200)]
-        public string Name { get; set; }
+        public string DirectorateName { get; set; }
 
         public ICollection<Department> Departments { get; set; } = new List<Department>();
 

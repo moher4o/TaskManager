@@ -9,6 +9,16 @@ namespace TaskManager.Services
     {
         Task<string> CreateTasksStatusesAsync();
 
+        Task<string> CreateTasksTypesAsync();
+
+        Task<string> CreateTasksPrioritiesAsync();
+
         int TasksStatusCount();
+
+        int TasksTypesCount();
+
+        int TasksPrioritysCount();
+
+
     }
 }

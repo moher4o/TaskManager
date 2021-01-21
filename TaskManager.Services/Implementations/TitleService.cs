@@ -45,7 +45,7 @@ namespace TaskManager.Services.Implementations
                     var newJobTypeDB = new JobTitle()
                     {
                         //Id = jobTypes[i].JobTitleId,
-                        Name = jobTypes[i].Name,
+                        TitleName = jobTypes[i].Name,
                         isDeleted = jobTypes[i].isDeleted
                     };
                     await this.db.JobTitles.AddAsync(newJobTypeDB);

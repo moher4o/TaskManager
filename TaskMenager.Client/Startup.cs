@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,10 @@ namespace TaskMenager.Client
 
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
+            services.AddHttpContextAccessor();
+
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
             services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 
             services.AddAuthorization(options =>
@@ -48,6 +53,8 @@ namespace TaskMenager.Client
                 options.AddPolicy(DataConstants.SuperAdmin, policy =>
                                 policy.RequireClaim("permissionType", DataConstants.SuperAdmin));
             });
+
+            
 
             services.AddDbContext<TasksDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -67,13 +74,15 @@ namespace TaskMenager.Client
             services.AddDistributedMemoryCache();
 
             services.AddSession();
-           
+
+            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //app.MigrateDatabase();
+            app.MigrateDatabase();
             if (env.IsDevelopment())
             {
                 

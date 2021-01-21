@@ -44,7 +44,7 @@ namespace TaskManager.Services.Implementations
                     var newSectorDB = new Sector()
                     {
                         DepartmentId = sectors[i].DepartmentId,
-                        Name = sectors[i].Name,
+                        SectorName = sectors[i].Name,
                         isDeleted = sectors[i].isDeleted
                     };
 
@@ -70,7 +70,7 @@ namespace TaskManager.Services.Implementations
 
         public IEnumerable<string> GetSectorsNames()
         {
-            var names = this.db.Sectors.Where(c => c.isDeleted == false).Select(c => c.Name).ToList();
+            var names = this.db.Sectors.Where(c => c.isDeleted == false).Select(c => c.SectorName).ToList();
             return names;
         }
 
@@ -80,7 +80,7 @@ namespace TaskManager.Services.Implementations
             {
                 return null;
             }
-            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.Id == sectorId).Select(c => c.Name).ToList();
+            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.Id == sectorId).Select(c => c.SectorName).ToList();
             return names;
         }
         public IEnumerable<string> GetSectorsNamesByDepartment(int? departmentId)
@@ -89,7 +89,7 @@ namespace TaskManager.Services.Implementations
             {
                 return null;
             }
-            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.DepartmentId == departmentId ).Select(c => c.Name).ToList();
+            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.DepartmentId == departmentId ).Select(c => c.SectorName).ToList();
             return names;
         }
 
@@ -99,7 +99,7 @@ namespace TaskManager.Services.Implementations
             {
                 return null;
             }
-            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.DirectorateId == directorateId).Select(c => c.Name).ToList();
+            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.DirectorateId == directorateId).Select(c => c.SectorName).ToList();
             return names;
         }
 

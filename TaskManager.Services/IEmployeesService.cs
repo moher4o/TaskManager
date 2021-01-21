@@ -10,7 +10,7 @@ namespace TaskManager.Services
     {
         Task<string> AddEmployeesCollection(List<AddNewEmployeeServiceModel> employees);
 
-        UserCookyServiceModel GetUserDataForCooky(string daeuAccaunt);
+        UserServiceModel GetUserDataForCooky(string daeuAccaunt);
 
         IEnumerable<string> GetEmployeesNames();
 

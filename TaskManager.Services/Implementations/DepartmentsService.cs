@@ -44,7 +44,7 @@ namespace TaskManager.Services.Implementations
                     var newDepartmentDB = new Department()
                     {
                         DirectorateId = departments[i].DirectorateId,
-                        Name = departments[i].Name,
+                        DepartmentName = departments[i].Name,
                         isDeleted = departments[i].isDeleted
                     };
                     await this.db.Departments.AddAsync(newDepartmentDB);
@@ -67,7 +67,7 @@ namespace TaskManager.Services.Implementations
 
         public IEnumerable<string> GetDepartmentsNames()
         {
-            var names = this.db.Departments.Where(c => c.isDeleted == false).Select(c => c.Name).ToList();
+            var names = this.db.Departments.Where(c => c.isDeleted == false).Select(c => c.DepartmentName).ToList();
             return names;
         }
 
@@ -78,7 +78,7 @@ namespace TaskManager.Services.Implementations
                 return null;
             }
 
-            var names = this.db.Departments.Where(c => c.isDeleted == false && c.Id == departmentId).Select(c => c.Name).ToList();
+            var names = this.db.Departments.Where(c => c.isDeleted == false && c.Id == departmentId).Select(c => c.DepartmentName).ToList();
             return names;
         }
 
@@ -89,7 +89,7 @@ namespace TaskManager.Services.Implementations
                 return null;
             }
 
-            var names = this.db.Departments.Where(c => c.isDeleted == false && c.DirectorateId == directorateId).Select(c => c.Name).ToList();
+            var names = this.db.Departments.Where(c => c.isDeleted == false && c.DirectorateId == directorateId).Select(c => c.DepartmentName).ToList();
             return names;
         }
 

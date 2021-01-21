@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -16,15 +17,15 @@ namespace TaskMenager.Client.Controllers
     
     public class TasksController : Controller
     {
-        //private readonly IEmployeesService employees;
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
         private readonly ITaskTypesService tasktypes;
         private readonly ITaskPrioritysService taskprioritys;
         private readonly IEmployeesService employees;
-        private readonly UserCookyServiceModel currentUser;
-        public TasksController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserServiceModel currentUser;
+        public TasksController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor)
         {
             this.directorates = directorates;
             this.departments = departments;
@@ -32,7 +33,9 @@ namespace TaskMenager.Client.Controllers
             this.tasktypes = tasktypes;
             this.taskprioritys = taskprioritys;
             this.employees = employees;
-            currentUser = employees.GetUserDataForCooky(this.User.Identities.FirstOrDefault().Name.ToLower());
+            this._httpContextAccessor = httpContextAccessor;
+            currentUser = this.employees.GetUserDataForCooky(_httpContextAccessor?.HttpContext?.User?.Identities.FirstOrDefault().Name.ToLower());
+
         }
 
         [Authorize(Policy = "Admin")]
@@ -40,8 +43,7 @@ namespace TaskMenager.Client.Controllers
         {
             try
             {
-
-            var newTask = new AddNewTaskViewModel();
+                var newTask = new AddNewTaskViewModel();
 
             newTask = TasksModelPrepareForView(newTask);
 
@@ -168,6 +170,32 @@ namespace TaskMenager.Client.Controllers
                     Value = ChooseValue,
                     Selected = true
                 });
+                newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a,
+                                                       Value = a
+                                                   })
+                                                   .ToList();
+                newTask.Assigners.Insert(0, new SelectListItem
+                {
+                    Text = ChooseValue,
+                    Value = ChooseValue,
+                    Selected = true
+                });
+                newTask.Employees = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a,
+                                                       Value = a
+                                                   })
+                                                   .ToList();
+                newTask.Employees.Insert(0, new SelectListItem
+                {
+                    Text = ChooseValue,
+                    Value = ChooseValue,
+                    Selected = true
+                });
 
             }
             else if (currentUser.RoleName == DirectorateAdmin)
@@ -205,6 +233,33 @@ namespace TaskMenager.Client.Controllers
                     Value = ChooseValue,
                     Selected = true
                 });
+                newTask.Assigners = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
+                                   .Select(a => new SelectListItem
+                                   {
+                                       Text = a,
+                                       Value = a
+                                   })
+                                   .ToList();
+                newTask.Assigners.Insert(0, new SelectListItem
+                {
+                    Text = ChooseValue,
+                    Value = ChooseValue,
+                    Selected = true
+                });
+                newTask.Employees = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a,
+                                                       Value = a
+                                                   })
+                                                   .ToList();
+                newTask.Employees.Insert(0, new SelectListItem
+                {
+                    Text = ChooseValue,
+                    Value = ChooseValue,
+                    Selected = true
+                });
+
             }
             else if (currentUser.RoleName == SuperAdmin)
             {
@@ -233,21 +288,34 @@ namespace TaskMenager.Client.Controllers
                     Value = ChooseValue,
                     Selected = true
                 });
-            }
+                newTask.Assigners = this.employees.GetEmployeesNames()
+                                   .Select(a => new SelectListItem
+                                   {
+                                       Text = a,
+                                       Value = a
+                                   })
+                                   .ToList();
+                newTask.Assigners.Insert(0, new SelectListItem
+                {
+                    Text = ChooseValue,
+                    Value = ChooseValue,
+                    Selected = true
+                });
+                newTask.Employees = this.employees.GetEmployeesNames()
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a,
+                                                       Value = a
+                                                   })
+                                                   .ToList();
+                newTask.Employees.Insert(0, new SelectListItem
+                {
+                    Text = ChooseValue,
+                    Value = ChooseValue,
+                    Selected = true
+                });
 
-            newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
-                                           .Select(a => new SelectListItem
-                                           {
-                                               Text = a,
-                                               Value = a
-                                           })
-                                           .ToList();
-            newTask.TaskTypes.Insert(0, new SelectListItem
-            {
-                Text = ChooseValue,
-                Value = ChooseValue,
-                Selected = true
-            });
+            }
 
             newTask.TaskPrioritys = this.taskprioritys.GetTaskPrioritysNames()
                                .Select(a => new SelectListItem

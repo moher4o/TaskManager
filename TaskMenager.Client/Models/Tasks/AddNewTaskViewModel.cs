@@ -12,14 +12,14 @@ namespace TaskMenager.Client.Models.Tasks
         [Required]
         [MaxLength(250)]
         [Display(Name = "Име *")]
-        public string Name { get; set; }
+        public string TaskName { get; set; }
 
         [Required]
         [MaxLength(500)]
         [Display(Name = "Описание")]
         public string Description { get; set; }
 
-        [Display(Name = "Дирекция")]
+        [Display(Name = "Дирекция *")]
         public IList<SelectListItem> Directorates { get; set; } = new List<SelectListItem>();
 
         [Display(Name = "Отдел")]
@@ -41,7 +41,7 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Категория")]
         public IList<SelectListItem> TaskTypes { get; set; } = new List<SelectListItem>();
 
-        [Display(Name = "Приоритет")]
+        [Display(Name = "Приоритет *")]
         public IList<SelectListItem> TaskPrioritys { get; set; } = new List<SelectListItem>();
 
         [Display(Name = "Отговорник *")]
@@ -51,7 +51,7 @@ namespace TaskMenager.Client.Models.Tasks
         public IList<SelectListItem> Employees { get; set; } = new List<SelectListItem>();
 
 
-        [Display(Name = "Лимит на работни часове")]
+        [Display(Name = "Лимит на работни часове *")]
         public int HoursLimit { get; set; } = 100;
 
 

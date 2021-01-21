@@ -44,7 +44,7 @@ namespace TaskManager.Services.Implementations
                     var newDirectorateDB = new Directorate()
                     {
                         //DirectorateId = directorates[i].DirectorateId,
-                        Name = directorates[i].Name,
+                        DirectorateName = directorates[i].Name,
                         isDeleted = directorates[i].isDeleted
                     };
                     await this.db.Directorates.AddAsync(newDirectorateDB);
@@ -67,7 +67,7 @@ namespace TaskManager.Services.Implementations
 
         public IEnumerable<string> GetDirectoratesNames()
         {
-            var names = this.db.Directorates.Where(c => c.isDeleted == false).Select(c => c.Name).ToList();
+            var names = this.db.Directorates.Where(c => c.isDeleted == false).Select(c => c.DirectorateName).ToList();
             return names;
         }
 
@@ -77,7 +77,7 @@ namespace TaskManager.Services.Implementations
             {
                 return null;
             }
-            var names = this.db.Directorates.Where(c => c.isDeleted == false && c.Id == directorateId).Select(c => c.Name).ToList();
+            var names = this.db.Directorates.Where(c => c.isDeleted == false && c.Id == directorateId).Select(c => c.DirectorateName).ToList();
             return names;
         }
 

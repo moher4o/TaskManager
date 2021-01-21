@@ -11,7 +11,7 @@ namespace TaskManager.Data.Models
 
         [Required]
         [MaxLength(100)]
-        public string Name { get; set; }
+        public string PriorityName { get; set; }
 
         public bool isDeleted { get; set; } = false;
 

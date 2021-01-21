@@ -16,7 +16,7 @@ namespace TaskManager.Services.Implementations
 
         public IEnumerable<string> GetTaskTypesNames()
         {
-            var names = this.db.TasksTypes.Where(c => c.isDeleted == false).Select(c => c.Name).ToList();
+            var names = this.db.TasksTypes.Where(c => c.isDeleted == false).Select(c => c.TypeName).ToList();
             return names;
         }
     }
