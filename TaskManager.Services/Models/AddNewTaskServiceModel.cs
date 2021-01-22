@@ -12,11 +12,11 @@ namespace TaskManager.Services.Models
 
         public string Description { get; set; }
 
-        public int? SectorId { get; set; }
+        public string SectorName { get; set; }
 
-        public int? DepartmentId { get; set; }
+        public string DepartmentName{ get; set; }
 
-        public int? DirectorateId { get; set; }
+        public string DirectorateName { get; set; }
 
         public DateTime RegCreated { get; set; }
 
@@ -32,11 +32,11 @@ namespace TaskManager.Services.Models
 
         public int AssignerId { get; set; }
 
-        public int StatusId { get; set; }
+        public string StatusValue { get; set; }
 
-        public int TypeId { get; set; }
+        public string TypeValue { get; set; }
 
-        public int PriorityId { get; set; }
+        public string PriorityValue { get; set; }
 
         public bool isDeleted { get; set; } = false;
 

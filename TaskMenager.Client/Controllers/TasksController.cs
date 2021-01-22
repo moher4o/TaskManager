@@ -335,5 +335,42 @@ namespace TaskMenager.Client.Controllers
 
             return newTask;
         }
+
+        [HttpPost]
+        public IActionResult CreateNewTask(AddNewTaskViewModel model, int? directorateId)
+        {
+            AddNewTaskServiceModel newTask = new AddNewTaskServiceModel();
+            List<EmployeesTasks> taskSubjects = new List<EmployeesTasks>();
+
+            if (!ModelState.IsValid || directorateId.HasValue)
+            {
+                
+                    return View(model);
+            }
+
+
+            //newTask.Name = model.TaskName;
+            //newTask.Description = model.Description;
+            //newTask.StartDate = model.Valid_From;
+            //newTask.EndDatePrognose = model.Valid_To;
+            //newTask.OwnerId = currentUser.Id;
+            //newTask.DirectorateId = directorateId;
+            //newTask.DepartmentId = departmentId;
+            
+        //teacher.DateTimeInLocalTime = DateTime.Now;  
+        //teacher.DateTimeInUtc = DateTime.UtcNow;  
+        //if (model.SubjectsIds.Length > 0)  
+        //{  
+        //    foreach (var subjectid in model.SubjectsIds)  
+        //    {  
+        //        teacherSubjects.Add(new TeacherSubjects { SubjectId = subjectid, TeacherId = model.Id });  
+        //    }  
+        //    teacher.TeacherSubjects = teacherSubjects;  
+        //}  
+        //db.Teacher.Add(teacher);  
+        //db.SaveChanges();  
+     
+    return RedirectToAction("index");  
+        }
     }
 }

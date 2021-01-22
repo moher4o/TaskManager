@@ -9,6 +9,9 @@ namespace TaskMenager.Client.Models.Tasks
 {
     public class AddNewTaskViewModel
     {
+        [Display(Name = "Номер на задачата")]
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(250)]
         [Display(Name = "Име *")]
@@ -18,6 +21,10 @@ namespace TaskMenager.Client.Models.Tasks
         [MaxLength(500)]
         [Display(Name = "Описание")]
         public string Description { get; set; }
+
+        public int? ParentTaskId { get; set; }
+
+        public int OwnerId { get; set; }
 
         [Display(Name = "Дирекция *")]
         public IList<SelectListItem> Directorates { get; set; } = new List<SelectListItem>();
