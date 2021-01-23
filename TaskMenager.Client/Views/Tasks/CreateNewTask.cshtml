@@ -4,7 +4,7 @@
     ViewData["Title"] = "Създаване на задача";
 }
 
-<form method="post" asp-controller="InsertDataFromFile" asp-action="SelectFileType" enctype="multipart/form-data">
+<form method="post" asp-controller="Tasks" asp-action="CreateNewTask">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div style="margin-top:15px;">
         <div class="form-group row">
@@ -15,8 +15,8 @@
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Employees, new { @class = "col-md-2 col-form-label" })
-            <div class="col-sm-6">
-                @Html.ListBoxFor(model => model.Employees, new MultiSelectList(Model.Employees, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown" })
+            <div class="col-md-6">
+                @Html.ListBoxFor(model => model.SubjectsIds, new MultiSelectList(Model.Employees, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown" })
             </div>
         </div>
         <div class="form-group row">
@@ -38,7 +38,7 @@
             @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-6">
                 @*@Html.DropDownList("directorates", new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorates" })
-                същото като долното , но с HTML Helper
+                    същото като долното , но с HTML Helper
                 *@
                 <select name="directorateId" asp-items="Model.Directorates" class="form-control" id="directorateId"></select>
             </div>
@@ -64,13 +64,28 @@
         <div class="form-group row">
             @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-6">
-                @Html.TextBoxFor(model => model.HoursLimit, new { @class = "form-control" })
+                @Html.TextBoxFor(model => model.HoursLimit, new { @class = "form-control", id = "hourslimit", name = "hourslimit" })
                 <span asp-validation-for="HoursLimit" class="text-danger"></span>
             </div>
         </div>
+    </div>
+    <div class="form-group row">
+        <button type="button" class="button save" id="send">Зареждане</button>
+        <a class="button btncansel" asp-controller="Home" asp-action="Index">Отказ</a>
+    </div>
+    <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
+</form>
+@section Scripts{
+    <script src="~/js/createNewTask.js" charset="utf-8"></script>
+    <script src="~/js/bootstrap-multiselect.js" charset="utf-8"></script>
+    <script>
+        $(document).ready(function () {
+            $('#Subjects_dropdown').multiselect();
+        });
+    </script>
 
 
-        @*<div class="row">
+    @*<div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     <label asp-for="TaskName"></label>
@@ -116,14 +131,4 @@
 
             </div>
         </div>*@
-    </div>
-    <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
-
-</form>
-@section Scripts{
-    <script>
-        $(document).ready(function () {
-            $('#Subjects_dropdown').multiselect();
-        });
-    </script>
 }

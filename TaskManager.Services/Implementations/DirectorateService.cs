@@ -65,19 +65,32 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
-        public IEnumerable<string> GetDirectoratesNames()
+        public IEnumerable<SelectServiceModel> GetDirectoratesNames()
         {
-            var names = this.db.Directorates.Where(c => c.isDeleted == false).Select(c => c.DirectorateName).ToList();
+            var names = this.db.Directorates
+                .Where(c => c.isDeleted == false)
+                .Select(d => new SelectServiceModel {
+                TextValue = d.DirectorateName,
+                Id = d.Id
+                })
+                .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetDirectoratesNames(int? directorateId)
+        public IEnumerable<SelectServiceModel> GetDirectoratesNames(int? directorateId)
         {
             if (directorateId == null)
             {
                 return null;
             }
-            var names = this.db.Directorates.Where(c => c.isDeleted == false && c.Id == directorateId).Select(c => c.DirectorateName).ToList();
+            var names = this.db.Directorates
+                .Where(c => c.isDeleted == false && c.Id == directorateId)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.DirectorateName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
 

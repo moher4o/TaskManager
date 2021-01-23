@@ -10,8 +10,8 @@ namespace TaskManager.Services
     {
         Task<string> AddDirectoratesCollection(List<AddNewDirectorateServiceModel> directorates);
 
-        IEnumerable<string> GetDirectoratesNames();
+        IEnumerable<SelectServiceModel> GetDirectoratesNames();
 
-        IEnumerable<string> GetDirectoratesNames(int? directorateId);
+        IEnumerable<SelectServiceModel> GetDirectoratesNames(int? directorateId);
     }
 }

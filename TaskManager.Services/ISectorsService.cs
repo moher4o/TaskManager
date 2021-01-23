@@ -10,13 +10,13 @@ namespace TaskManager.Services
     {
         Task<string> AddSectorsCollection(List<AddNewSectorServiceModel> sectors);
 
-        IEnumerable<string> GetSectorsNames();
+        IEnumerable<SelectServiceModel> GetSectorsNames();
 
-        IEnumerable<string> GetSectorsNames(int? sectorId);
+        IEnumerable<SelectServiceModel> GetSectorsNames(int? sectorId);
 
-        IEnumerable<string> GetSectorsNamesByDepartment(int? departmentId);
+        IEnumerable<SelectServiceModel> GetSectorsNamesByDepartment(int? departmentId);
 
-        IEnumerable<string> GetSectorsNamesByDirectorate(int? directorateId);
+        IEnumerable<SelectServiceModel> GetSectorsNamesByDirectorate(int? directorateId);
 
     }
 }

@@ -10,11 +10,11 @@ namespace TaskManager.Services
     {
         Task<string> AddDepartmentsCollection(List<AddNewDepartmentServiceModel> departments);
 
-        IEnumerable<string> GetDepartmentsNames();
+        IEnumerable<SelectServiceModel> GetDepartmentsNames();
 
-        IEnumerable<string> GetDepartmentsNames(int? departmentId);
+        IEnumerable<SelectServiceModel> GetDepartmentsNames(int? departmentId);
 
-        IEnumerable<string> GetDepartmentsNamesByDirectorate(int? directorateId);
+        IEnumerable<SelectServiceModel> GetDepartmentsNamesByDirectorate(int? directorateId);
 
     }
 }

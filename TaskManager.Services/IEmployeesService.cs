@@ -12,13 +12,13 @@ namespace TaskManager.Services
 
         UserServiceModel GetUserDataForCooky(string daeuAccaunt);
 
-        IEnumerable<string> GetEmployeesNames();
+        IEnumerable<SelectServiceModel> GetEmployeesNames();
 
-        IEnumerable<string> GetEmployeesNamesBySector(int? sectorId);
+        IEnumerable<SelectServiceModel> GetEmployeesNamesBySector(int? sectorId);
 
-        IEnumerable<string> GetEmployeesNamesByDepartment(int? departmentId);
+        IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId);
 
-        IEnumerable<string> GetEmployeesNamesByDirectorate(int? directorateId);
+        IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId);
 
     }
 }

@@ -77,17 +77,21 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
-        public IEnumerable<string> GetEmployeesNames()
+        public IEnumerable<SelectServiceModel> GetEmployeesNames()
         {
             var names = this.db.Employees
                 .Where(c => c.isDeleted == false)
                 .OrderBy(e => e.FullName)
-                .Select(c => c.FullName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.FullName,
+                    Id = d.Id
+                })
                 .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetEmployeesNamesByDepartment(int? departmentId)
+        public IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId)
         {
             if (departmentId == null)
             {
@@ -96,12 +100,16 @@ namespace TaskManager.Services.Implementations
             var names = this.db.Employees
                 .Where(c => c.isDeleted == false && c.DepartmentId == departmentId)
                 .OrderBy(e => e.FullName)
-                .Select(c => c.FullName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.FullName,
+                    Id = d.Id
+                })
                 .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetEmployeesNamesByDirectorate(int? directorateId)
+        public IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId)
         {
             if (directorateId == null)
             {
@@ -110,12 +118,16 @@ namespace TaskManager.Services.Implementations
             var names = this.db.Employees
                 .Where(c => c.isDeleted == false && c.DirectorateId == directorateId)
                 .OrderBy(e => e.FullName)
-                .Select(c => c.FullName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.FullName,
+                    Id = d.Id
+                })
                 .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetEmployeesNamesBySector(int? sectorId)
+        public IEnumerable<SelectServiceModel> GetEmployeesNamesBySector(int? sectorId)
         {
             if (sectorId == null)
             {
@@ -124,7 +136,11 @@ namespace TaskManager.Services.Implementations
             var names = this.db.Employees
                 .Where(c => c.isDeleted == false && c.SectorId == sectorId)
                 .OrderBy(e => e.FullName)
-                .Select(c => c.FullName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.FullName,
+                    Id = d.Id
+                })
                 .ToList();
             return names;
         }

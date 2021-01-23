@@ -45,9 +45,9 @@ namespace TaskMenager.Client.Controllers
             {
                 var newTask = new AddNewTaskViewModel();
 
-            newTask = TasksModelPrepareForView(newTask);
+                newTask = TasksModelPrepareForView(newTask);
 
-            return View(newTask);
+                return View(newTask);
             }
             catch (Exception)
             {
@@ -59,262 +59,234 @@ namespace TaskMenager.Client.Controllers
 
         private AddNewTaskViewModel TasksModelPrepareForView(AddNewTaskViewModel newTask)
         {
-
+            List<long> subjectsIds = new List<long>();
+            newTask.SubjectsIds = subjectsIds.ToArray();
             if (currentUser.RoleName == SectorAdmin)
             {
                 newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a,
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
                                                        Selected = true
                                                    })
                                                    .ToList();
                 newTask.Directorates.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue
+                    Value = "0"
                 });
                 newTask.Departments = this.departments.GetDepartmentsNames(currentUser.DepartmentId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a,
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
                                                        Selected = true
                                                    })
                                                    .ToList();
                 newTask.Departments.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue
+                    Value = "0"
                 });
                 newTask.Sectors = this.sectors.GetSectorsNames(currentUser.SectorId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a,
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
                                                        Selected = true
                                                    })
                                                    .ToList();
                 newTask.Sectors.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue
+                    Value = "0"
                 });
                 newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString()
                                                    })
                                                    .ToList();
                 newTask.Assigners.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Employees = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString()
                                                    })
                                                    .ToList();
-                newTask.Employees.Insert(0, new SelectListItem
-                {
-                    Text = ChooseValue,
-                    Value = ChooseValue,
-                    Selected = true
-                });
-
             }
             else if (currentUser.RoleName == DepartmentAdmin)
             {
                 newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a,
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
                                                        Selected = true
                                                    })
                                                    .ToList();
                 newTask.Directorates.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue
+                    Value = "0"
                 });
                 newTask.Departments = this.departments.GetDepartmentsNames(currentUser.DepartmentId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a,
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
                                                        Selected = true
                                                    })
                                                    .ToList();
                 newTask.Departments.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue
+                    Value = "0"
                 });
                 newTask.Sectors = this.sectors.GetSectorsNamesByDepartment(currentUser.DepartmentId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString()
                                                    })
                                                    .ToList();
                 newTask.Sectors.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString()
                                                    })
                                                    .ToList();
                 newTask.Assigners.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Employees = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
                                                    })
                                                    .ToList();
-                newTask.Employees.Insert(0, new SelectListItem
-                {
-                    Text = ChooseValue,
-                    Value = ChooseValue,
-                    Selected = true
-                });
-
             }
             else if (currentUser.RoleName == DirectorateAdmin)
             {
                 newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a,
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
                                                        Selected = true
                                                    })
                                                    .ToList();
                 newTask.Directorates.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue
+                    Value = "0"
                 });
                 newTask.Departments = this.departments.GetDepartmentsNamesByDirectorate(currentUser.DirectorateId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
-                                                       
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString()
                                                    })
                                                    .ToList();
                 newTask.Departments.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Sectors.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Assigners = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
                                    .Select(a => new SelectListItem
                                    {
-                                       Text = a,
-                                       Value = a
+                                       Text = a.TextValue,
+                                       Value = a.Id.ToString()
                                    })
                                    .ToList();
                 newTask.Assigners.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Employees = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString()
                                                    })
                                                    .ToList();
-                newTask.Employees.Insert(0, new SelectListItem
-                {
-                    Text = ChooseValue,
-                    Value = ChooseValue,
-                    Selected = true
-                });
-
             }
             else if (currentUser.RoleName == SuperAdmin)
             {
                 newTask.Directorates = this.directorates.GetDirectoratesNames()
                                                .Select(a => new SelectListItem
                                                {
-                                                   Text = a,
-                                                   Value = a
+                                                   Text = a.TextValue,
+                                                   Value = a.Id.ToString()
                                                })
                                                .ToList();
                 newTask.Directorates.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Departments.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Sectors.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Assigners = this.employees.GetEmployeesNames()
                                    .Select(a => new SelectListItem
                                    {
-                                       Text = a,
-                                       Value = a
+                                       Text = a.TextValue,
+                                       Value = a.Id.ToString()
                                    })
                                    .ToList();
                 newTask.Assigners.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
-                    Value = ChooseValue,
+                    Value = "0",
                     Selected = true
                 });
                 newTask.Employees = this.employees.GetEmployeesNames()
                                                    .Select(a => new SelectListItem
                                                    {
-                                                       Text = a,
-                                                       Value = a
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString()
                                                    })
                                                    .ToList();
-                newTask.Employees.Insert(0, new SelectListItem
-                {
-                    Text = ChooseValue,
-                    Value = ChooseValue,
-                    Selected = true
-                });
-
             }
 
             newTask.TaskPrioritys = this.taskprioritys.GetTaskPrioritysNames()
@@ -327,7 +299,7 @@ namespace TaskMenager.Client.Controllers
             newTask.TaskPrioritys.Insert(0, new SelectListItem
             {
                 Text = ChooseValue,
-                Value = ChooseValue,
+                Value = "0",
                 Selected = true
             });
 
@@ -337,10 +309,13 @@ namespace TaskMenager.Client.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateNewTask(AddNewTaskViewModel model, int? directorateId)
+        public IActionResult CreateNewTask(AddNewTaskViewModel model, int? directorateId, int? priority, int? hourslimit)
         {
             AddNewTaskServiceModel newTask = new AddNewTaskServiceModel();
             List<EmployeesTasks> taskSubjects = new List<EmployeesTasks>();
+            if (model.SubjectsIds != null)
+            {
+            }
 
             if (!ModelState.IsValid || directorateId.HasValue)
             {

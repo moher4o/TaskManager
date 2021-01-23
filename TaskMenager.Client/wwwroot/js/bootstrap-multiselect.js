@@ -426,7 +426,7 @@
             //Търсене
             filterPlaceholder: '\u0422\u044A\u0440\u0441\u0435\u043D\u0435',
             // possible options: 'text', 'value', 'both'
-            filterBehavior: 'value',
+            filterBehavior: 'text',
             includeFilterClearBtn: true,
             preventInputChangeEvent: false,
             //Не е избран изпълнител на задачата

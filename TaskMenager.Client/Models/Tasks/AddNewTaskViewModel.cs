@@ -57,6 +57,9 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Изпълнител")]
         public IList<SelectListItem> Employees { get; set; } = new List<SelectListItem>();
 
+        [Display(Name = "Subjects")]
+        public long[] SubjectsIds { get; set; }
+
 
         [Display(Name = "Лимит на работни часове *")]
         public int HoursLimit { get; set; } = 100;

@@ -65,31 +65,52 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
-        public IEnumerable<string> GetDepartmentsNames()
+        public IEnumerable<SelectServiceModel> GetDepartmentsNames()
         {
-            var names = this.db.Departments.Where(c => c.isDeleted == false).Select(c => c.DepartmentName).ToList();
+            var names = this.db.Departments
+                .Where(c => c.isDeleted == false)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.DepartmentName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetDepartmentsNames(int? departmentId)
+        public IEnumerable<SelectServiceModel> GetDepartmentsNames(int? departmentId)
         {
             if (departmentId == null)
             {
                 return null;
             }
 
-            var names = this.db.Departments.Where(c => c.isDeleted == false && c.Id == departmentId).Select(c => c.DepartmentName).ToList();
+            var names = this.db.Departments
+                .Where(c => c.isDeleted == false && c.Id == departmentId)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.DepartmentName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetDepartmentsNamesByDirectorate(int? directorateId)
+        public IEnumerable<SelectServiceModel> GetDepartmentsNamesByDirectorate(int? directorateId)
         {
             if (directorateId == null)
             {
                 return null;
             }
 
-            var names = this.db.Departments.Where(c => c.isDeleted == false && c.DirectorateId == directorateId).Select(c => c.DepartmentName).ToList();
+            var names = this.db.Departments
+                .Where(c => c.isDeleted == false && c.DirectorateId == directorateId)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.DepartmentName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
 

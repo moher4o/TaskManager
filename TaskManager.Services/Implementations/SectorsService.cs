@@ -68,38 +68,66 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
-        public IEnumerable<string> GetSectorsNames()
+        public IEnumerable<SelectServiceModel> GetSectorsNames()
         {
-            var names = this.db.Sectors.Where(c => c.isDeleted == false).Select(c => c.SectorName).ToList();
+            var names = this.db.Sectors
+                .Where(c => c.isDeleted == false)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.SectorName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetSectorsNames(int? sectorId)
+        public IEnumerable<SelectServiceModel> GetSectorsNames(int? sectorId)
         {
             if (sectorId == null)
             {
                 return null;
             }
-            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.Id == sectorId).Select(c => c.SectorName).ToList();
+            var names = this.db.Sectors
+                .Where(c => c.isDeleted == false && c.Id == sectorId)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.SectorName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
-        public IEnumerable<string> GetSectorsNamesByDepartment(int? departmentId)
+        public IEnumerable<SelectServiceModel> GetSectorsNamesByDepartment(int? departmentId)
         {
             if (departmentId == null)
             {
                 return null;
             }
-            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.DepartmentId == departmentId ).Select(c => c.SectorName).ToList();
+            var names = this.db.Sectors
+                .Where(c => c.isDeleted == false && c.DepartmentId == departmentId )
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.SectorName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
 
-        public IEnumerable<string> GetSectorsNamesByDirectorate(int? directorateId)
+        public IEnumerable<SelectServiceModel> GetSectorsNamesByDirectorate(int? directorateId)
         {
             if (directorateId == null)
             {
                 return null;
             }
-            var names = this.db.Sectors.Where(c => c.isDeleted == false && c.DirectorateId == directorateId).Select(c => c.SectorName).ToList();
+            var names = this.db.Sectors
+                .Where(c => c.isDeleted == false && c.DirectorateId == directorateId)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.SectorName,
+                    Id = d.Id
+                })
+                .ToList();
             return names;
         }
 
