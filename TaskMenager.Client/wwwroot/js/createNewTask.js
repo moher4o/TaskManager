@@ -2,19 +2,22 @@
     attachEvents();
 
     function attachEvents() {
-        $('#assigners').on('click', function () { $("#assigners").css('background-color', '#ffffff'); });
+        $('#assignerId').on('click', function () { $("#assignerId").css('background-color', '#ffffff'); });
         $('#directorateId').on('click', function () { $("#directorateId").css('background-color', '#ffffff'); });
-        $('#priority').on('click', function () { $("#priority").css('background-color', '#ffffff'); });
+        $('#taskPriorityId').on('click', function () { $("#taskPriorityId").css('background-color', '#ffffff'); });
         $('#hourslimit').on('change', function () { $("#hourslimit").css('background-color', '#ffffff'); });
         $('#hourslimit').on('click', function () { $("#hourslimit").css('background-color', '#ffffff'); });
+        $('#taskName').on('change', function () { $("#taskName").css('background-color', '#ffffff'); });
+        $('#taskName').on('click', function () { $("#taskName").css('background-color', '#ffffff'); });
+
         $('#send').on('click', CheckFieldsChoose);
     }
 
     function CheckFieldsChoose() {
         let result = true;
         let errormessage = "";
-        if ($('#assigners :selected').text() === 'Моля изберете...') {
-            $("#assigners").css('background-color', 'rgb(250, 204, 204)');
+        if ($('#assignerId :selected').text() === 'Моля изберете...') {
+            $("#assignerId").css('background-color', 'rgb(250, 204, 204)');
             $(':focus').blur()
             result = false;
         }
@@ -23,16 +26,21 @@
             $(':focus').blur()
             result = false;
         }
-        if ($('#priority :selected').text() === 'Моля изберете...') {
-            $("#priority").css('background-color', 'rgb(250, 204, 204)');
+        if ($('#taskPriorityId :selected').text() === 'Моля изберете...') {
+            $("#taskPriorityId").css('background-color', 'rgb(250, 204, 204)');
             $(':focus').blur()
             result = false;
         }
 
         var num = document.getElementById("hourslimit").value;
-        console.log(num);
         if (!(/^\d+$/.test(num))) {
             $("#hourslimit").css('background-color', 'rgb(250, 204, 204)');
+            result = false;
+        }
+
+        let a = document.getElementById("taskName").value;
+        if (a == null || a == "") {
+            $("#taskName").css('background-color', 'rgb(250, 204, 204)');
             result = false;
         }
 

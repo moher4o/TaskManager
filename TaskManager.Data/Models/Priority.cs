@@ -15,7 +15,7 @@ namespace TaskManager.Data.Models
 
         public bool isDeleted { get; set; } = false;
 
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 
     }
 }

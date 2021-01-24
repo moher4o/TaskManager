@@ -15,6 +15,6 @@ namespace TaskManager.Data.Models
 
         public bool isDeleted { get; set; } = false;
 
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
     }
 }

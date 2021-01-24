@@ -18,9 +18,13 @@ namespace TaskManager.Common
         public const string TaskStatusClosed = "Приключена";
         public const int TasksStatusCount = 3; // броя на статусите по-горе  !!!
 
-        public const string TaskTypeNormal = "В срок";
-        public const string TaskTypeOverdue = "Просрочена";
-        public const int TasksTypesCount = 2; // броя на типовете по-горе  !!!
+        public const string TaskTypeProject = "Проект";
+        public const string TaskTypeDirectorate = "Дирекция";
+        public const string TaskTypeDepartment = "Отдел";
+        public const string TaskTypeSector = "Сектор";
+        public const string TaskTypeEmployee = "Служител";
+        public const string TaskTypeOther = "Друго";
+        public const int TasksTypesCount = 6; // броя на типовете по-горе  !!!
 
         public const string TaskPriorityLow = "Нисък";
         public const string TaskPriorityNormal = "Нормален";
@@ -34,7 +38,7 @@ namespace TaskManager.Common
 
 
         //Developer Data
-        public const string DeveloperUsername = "dc1\\avukov";
+        public const string DeveloperUsername = "ryzen7\\samso";
         public const string DeveloperEmail = "avukov@e-gov.bg";
         public const string DeveloperFirstName = "Ангел";
         public const string DeveloperLastName = "Вуков";

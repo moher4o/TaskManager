@@ -29,11 +29,17 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Дирекция *")]
         public IList<SelectListItem> Directorates { get; set; } = new List<SelectListItem>();
 
+        public string DirectoratesId { get; set; }
+
         [Display(Name = "Отдел")]
         public IList<SelectListItem> Departments { get; set; } = new List<SelectListItem>();
 
+        public string DepartmentsId { get; set; }
+
         [Display(Name = "Сектор")]
         public IList<SelectListItem> Sectors { get; set; } = new List<SelectListItem>();
+
+        public string SectorsId { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
@@ -48,18 +54,23 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Категория")]
         public IList<SelectListItem> TaskTypes { get; set; } = new List<SelectListItem>();
 
+        public string TaskTypesId { get; set; }
+
         [Display(Name = "Приоритет *")]
         public IList<SelectListItem> TaskPrioritys { get; set; } = new List<SelectListItem>();
 
+        public string TaskPriorityId { get; set; }
+
         [Display(Name = "Отговорник *")]
         public IList<SelectListItem> Assigners { get; set; } = new List<SelectListItem>();
+
+        public string AssignerId { get; set; }
 
         [Display(Name = "Изпълнител")]
         public IList<SelectListItem> Employees { get; set; } = new List<SelectListItem>();
 
         [Display(Name = "Subjects")]
-        public long[] SubjectsIds { get; set; }
-
+        public int[] EmployeesIds { get; set; }
 
         [Display(Name = "Лимит на работни часове *")]
         public int HoursLimit { get; set; } = 100;

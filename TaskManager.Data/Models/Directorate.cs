@@ -14,13 +14,13 @@ namespace TaskManager.Data.Models
         [MaxLength(200)]
         public string DirectorateName { get; set; }
 
-        public ICollection<Department> Departments { get; set; } = new List<Department>();
+        public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
 
-        public ICollection<Sector> Sectors { get; set; } = new List<Sector>();
+        public virtual ICollection<Sector> Sectors { get; set; } = new List<Sector>();
 
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 
         public bool isDeleted { get; set; } = false;
 

@@ -21,9 +21,9 @@ namespace TaskManager.Data.Models
 
         public Department Department { get; set; }
 
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 
         public bool isDeleted { get; set; } = false;
 

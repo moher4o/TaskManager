@@ -13,7 +13,7 @@ namespace TaskManager.Data.Models
         [MaxLength(100)]
         public string StatusName { get; set; }
 
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 
         public bool isDeleted { get; set; } = false;
 

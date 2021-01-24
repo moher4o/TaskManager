@@ -145,14 +145,38 @@ namespace TaskManager.Services.Implementations
 
                 var newTypeDb = new TasksType()
                 {
-                    TypeName = DataConstants.TaskTypeNormal
+                    TypeName = DataConstants.TaskTypeProject
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
 
                 newTypeDb = new TasksType()
                 {
 
-                    TypeName = DataConstants.TaskTypeOverdue
+                    TypeName = DataConstants.TaskTypeDirectorate
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+                newTypeDb = new TasksType()
+                {
+
+                    TypeName = DataConstants.TaskTypeDepartment
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+                newTypeDb = new TasksType()
+                {
+
+                    TypeName = DataConstants.TaskTypeSector
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+                newTypeDb = new TasksType()
+                {
+
+                    TypeName = DataConstants.TaskTypeEmployee
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+                newTypeDb = new TasksType()
+                {
+
+                    TypeName = DataConstants.TaskTypeOther
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
 

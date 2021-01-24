@@ -59,8 +59,8 @@ namespace TaskMenager.Client.Controllers
 
         private AddNewTaskViewModel TasksModelPrepareForView(AddNewTaskViewModel newTask)
         {
-            List<long> subjectsIds = new List<long>();
-            newTask.SubjectsIds = subjectsIds.ToArray();
+            List<int> subjectsIds = new List<int>();
+            newTask.EmployeesIds = subjectsIds.ToArray();
             if (currentUser.RoleName == SectorAdmin)
             {
                 newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
@@ -289,11 +289,21 @@ namespace TaskMenager.Client.Controllers
                                                    .ToList();
             }
 
+            newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
+                   .Select(a => new SelectListItem
+                   {
+                       Text = a.TextValue,
+                       Value = a.Id.ToString(),
+                       Selected = a.TextValue == TaskTypeEmployee ? true : false
+                   })
+                   .ToList();
+
             newTask.TaskPrioritys = this.taskprioritys.GetTaskPrioritysNames()
                                .Select(a => new SelectListItem
                                {
-                                   Text = a,
-                                   Value = a
+                                   Text = a.TextValue,
+                                   Value = a.Id.ToString()
+                                   //Selected = a.TextValue == TaskPriorityNormal ? true : false
                                })
                                .ToList();
             newTask.TaskPrioritys.Insert(0, new SelectListItem
@@ -303,25 +313,25 @@ namespace TaskMenager.Client.Controllers
                 Selected = true
             });
 
-            
-
             return newTask;
         }
 
         [HttpPost]
-        public IActionResult CreateNewTask(AddNewTaskViewModel model, int? directorateId, int? priority, int? hourslimit)
+        //public IActionResult CreateNewTask(AddNewTaskViewModel model, int? directorateId, int? departmentId, int? sectorId, int? priorityId, int? hourslimit, string assignerId)
+        public IActionResult CreateNewTask(AddNewTaskViewModel model)
         {
             AddNewTaskServiceModel newTask = new AddNewTaskServiceModel();
             List<EmployeesTasks> taskSubjects = new List<EmployeesTasks>();
-            if (model.SubjectsIds != null)
+            if (model.EmployeesIds != null)
             {
-            }
 
-            if (!ModelState.IsValid || directorateId.HasValue)
-            {
-                
-                    return View(model);
             }
+            
+            //if (!ModelState.IsValid || !directorateId.HasValue || !priorityId.HasValue || !hourslimit.HasValue)
+            //{
+                
+            //        return View(model);
+            //}
 
 
             //newTask.Name = model.TaskName;
@@ -331,21 +341,21 @@ namespace TaskMenager.Client.Controllers
             //newTask.OwnerId = currentUser.Id;
             //newTask.DirectorateId = directorateId;
             //newTask.DepartmentId = departmentId;
-            
-        //teacher.DateTimeInLocalTime = DateTime.Now;  
-        //teacher.DateTimeInUtc = DateTime.UtcNow;  
-        //if (model.SubjectsIds.Length > 0)  
-        //{  
-        //    foreach (var subjectid in model.SubjectsIds)  
-        //    {  
-        //        teacherSubjects.Add(new TeacherSubjects { SubjectId = subjectid, TeacherId = model.Id });  
-        //    }  
-        //    teacher.TeacherSubjects = teacherSubjects;  
-        //}  
-        //db.Teacher.Add(teacher);  
-        //db.SaveChanges();  
-     
-    return RedirectToAction("index");  
+
+            //teacher.DateTimeInLocalTime = DateTime.Now;  
+            //teacher.DateTimeInUtc = DateTime.UtcNow;  
+            //if (model.SubjectsIds.Length > 0)  
+            //{  
+            //    foreach (var subjectid in model.SubjectsIds)  
+            //    {  
+            //        teacherSubjects.Add(new TeacherSubjects { SubjectId = subjectid, TeacherId = model.Id });  
+            //    }  
+            //    teacher.TeacherSubjects = teacherSubjects;  
+            //}  
+            //db.Teacher.Add(teacher);  
+            //db.SaveChanges();  
+
+            return RedirectToAction("index");  
         }
     }
 }
