@@ -9,73 +9,92 @@
     <div style="margin-top:15px;">
         <div class="form-group row">
             @Html.LabelFor(model => model.Assigners, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
+            <div class="col-md-4">
                 @Html.DropDownList(Model.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
                 @*<select name="assigners" asp-items="Model.Assigners" class="form-control" id="assigners"></select>*@
             </div>
+            @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                <div class="col-md-9">
+                    @Html.TextBoxFor(model => model.HoursLimit, new { @class = "form-control", id = "hourslimit", name = "hourslimit" })
+                    <span asp-validation-for="HoursLimit" class="text-danger"></span>
+                </div>
+
+            </div>
+
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Employees, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
+            <div class="col-md-4">
                 @Html.ListBoxFor(model => model.EmployeesIds, new MultiSelectList(Model.Employees, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown" })
             </div>
+
         </div>
         <div class="form-group row">
             @*@Html.HiddenFor(model => model.Id)*@
             @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
-                @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", placeholder = "Въведете име на задачата", id = "taskName", name = "taskName"})
+            <div class="col-md-4">
+                @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", placeholder = "Въведете име на задачата", id = "taskName", name = "taskName" })
                 <span asp-validation-for="TaskName" class="text-danger"></span>
             </div>
-            </div>
+        </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Description, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
+            <div class="col-md-4">
                 @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Въведете описание", rows = "3" })
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
-                @Html.DropDownList(Model.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directoratesId" })
-               
+            <div class="col-md-4">
+                @Html.DropDownList(Model.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directoratesId", onchange = "LoadDepartments(event)" })
+
                 @*<select name="directorateId" asp-items="Model.Directorates" class="form-control" id="directorateId"></select>*@
             </div>
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Departments, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
-                @Html.DropDownList(Model.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", id = "departmentsId", name = "departmentsId" })
+            <div class="col-md-4">
+                @Html.DropDownList(Model.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
                 @*<select name="departments" asp-items="Model.Departments" class="form-control" id="departments"></select>*@
             </div>
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Sectors, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
-                @Html.DropDownList(Model.SectorsId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", name = "sectorsId", id="sectorsId" })
-               @*<select name="sectors" asp-items="Model.Sectors" class="form-control" id="sectors"></select>*@
+            <div class="col-md-4">
+                @Html.DropDownList(Model.SectorsId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
+                @*<select name="sectors" asp-items="Model.Sectors" class="form-control" id="sectors"></select>*@
             </div>
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.TaskTypes, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
+            <div class="col-md-4">
                 @Html.DropDownList(Model.TaskTypesId, new SelectList(Model.TaskTypes, "Value", "Text"), new { @class = "form-control", name = "taskTypesId", id = "taskTypesId" })
                 @*<select name="typeId" asp-items="Model.TaskTypes" class="form-control" id="typeId"></select>*@
             </div>
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.TaskPrioritys, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
+            <div class="col-md-4">
                 @Html.DropDownList(Model.TaskPriorityId, new SelectList(Model.TaskPrioritys, "Value", "Text"), new { @class = "form-control", name = "taskPriorityId", id = "taskPriorityId" })
                 @*<select name="priorityId" asp-items="Model.TaskPrioritys" class="form-control" id="priorityId"></select>*@
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-6">
-                @Html.TextBoxFor(model => model.HoursLimit, new { @class = "form-control", id = "hourslimit", name = "hourslimit" })
-                <span asp-validation-for="HoursLimit" class="text-danger"></span>
+            @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input asp-for="Valid_From" class="form-control" id="validFrom" />
+                    <span asp-validation-for="Valid_From" class="text-warning"></span>
+                </div>
+            </div>
+            @Html.LabelFor(model => model.Valid_To, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input asp-for="Valid_To" class="form-control" id="validTo" />
+                    <span asp-validation-for="Valid_To" class="text-danger"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -85,6 +104,35 @@
     </div>
     <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
 </form>
+
+<script type="text/javascript">
+    function LoadDepartments(event) {
+        $.getJSON('\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
+            if (event.target.id == 'directorateId') {
+                $('#departmentsId').children('option:not(:first)').remove();
+                $.each(data, function (key, value) {
+                    $('#departmentsId')
+                        .append($("<option></option>")
+                            .attr("value", value.id)
+                            .text(value.textValue));
+                });
+            }
+        });
+    }
+
+
+    function LoadSectors(event) {
+        $.getJSON('\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
+            $('#sectorsId').children('option:not(:first)').remove();
+            $.each(data, function (key, value) {
+                $('#sectorsId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+        });
+    }
+</script>
 @section Scripts{
     <script src="~/js/createNewTask.js" charset="utf-8"></script>
     <script src="~/js/bootstrap-multiselect.js" charset="utf-8"></script>
@@ -138,7 +186,6 @@
                     <label asp-for="Employees"></label>
                     <select name="employees" asp-items="Model.Employees" class="form-control" id="employees"></select>
                 </div>
-
             </div>
         </div>*@
 }

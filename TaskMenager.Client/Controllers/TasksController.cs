@@ -38,14 +38,14 @@ namespace TaskMenager.Client.Controllers
 
         }
 
-        [Authorize(Policy = "Admin")]
-        public IActionResult CreateNewTask()
+       // [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> CreateNewTask()
         {
             try
             {
                 var newTask = new AddNewTaskViewModel();
 
-                newTask = TasksModelPrepareForView(newTask);
+                newTask = await TasksModelPrepareForView(newTask);
 
                 return View(newTask);
             }
@@ -57,7 +57,7 @@ namespace TaskMenager.Client.Controllers
 
         }
 
-        private AddNewTaskViewModel TasksModelPrepareForView(AddNewTaskViewModel newTask)
+        private async Task<AddNewTaskViewModel> TasksModelPrepareForView(AddNewTaskViewModel newTask)
         {
             List<int> subjectsIds = new List<int>();
             newTask.EmployeesIds = subjectsIds.ToArray();
@@ -152,6 +152,7 @@ namespace TaskMenager.Client.Controllers
                     Value = "0"
                 });
                 newTask.Sectors = this.sectors.GetSectorsNamesByDepartment(currentUser.DepartmentId)
+                                                   .Result
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -200,13 +201,17 @@ namespace TaskMenager.Client.Controllers
                     Text = ChooseValue,
                     Value = "0"
                 });
-                newTask.Departments = this.departments.GetDepartmentsNamesByDirectorate(currentUser.DirectorateId)
+
+                
+                newTask.Departments = this.departments
+                                                   .GetDepartmentsNamesByDirectorate(currentUser.DirectorateId)
+                                                   .Result
                                                    .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString()
-                                                   })
-                                                   .ToList();
+                                                    {
+                                                        Text = a.TextValue,
+                                                        Value = a.Id.ToString()
+                                                    })
+                                                    .ToList();
                 newTask.Departments.Insert(0, new SelectListItem
                 {
                     Text = ChooseValue,
@@ -326,10 +331,10 @@ namespace TaskMenager.Client.Controllers
             {
 
             }
-            
+            return RedirectToAction("CreateNewTask");
             //if (!ModelState.IsValid || !directorateId.HasValue || !priorityId.HasValue || !hourslimit.HasValue)
             //{
-                
+
             //        return View(model);
             //}
 
@@ -357,5 +362,30 @@ namespace TaskMenager.Client.Controllers
 
             return RedirectToAction("index");  
         }
+
+        public async Task<IActionResult> GetDepartments(string direktorateId)
+        {
+            var idparseResult = int.TryParse(direktorateId, out int id);
+            if (idparseResult)
+            {
+                var result = await this.departments.GetDepartmentsNamesByDirectorate(id);
+                return Json(result);
+            }
+            
+            return Json(null);
+        }
+
+        public async Task<IActionResult> GetSectors(string departmentId)
+        {
+            var idparseResult = int.TryParse(departmentId, out int id);
+            if (idparseResult)
+            {
+                var result = await this.sectors.GetSectorsNamesByDepartment(id);
+                return Json(result);
+            }
+
+            return Json(null);
+        }
+
     }
 }

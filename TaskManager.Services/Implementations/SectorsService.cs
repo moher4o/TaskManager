@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -97,20 +98,20 @@ namespace TaskManager.Services.Implementations
                 .ToList();
             return names;
         }
-        public IEnumerable<SelectServiceModel> GetSectorsNamesByDepartment(int? departmentId)
+        public async Task<IEnumerable<SelectServiceModel>> GetSectorsNamesByDepartment(int? departmentId)
         {
             if (departmentId == null)
             {
                 return null;
             }
-            var names = this.db.Sectors
+            var names = await this.db.Sectors
                 .Where(c => c.isDeleted == false && c.DepartmentId == departmentId )
                 .Select(d => new SelectServiceModel
                 {
                     TextValue = d.SectorName,
                     Id = d.Id
                 })
-                .ToList();
+                .ToListAsync();
             return names;
         }
 
