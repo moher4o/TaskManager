@@ -38,7 +38,7 @@ namespace TaskMenager.Client.Controllers
 
         }
 
-       // [Authorize(Policy = "Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateNewTask()
         {
             try
@@ -325,6 +325,18 @@ namespace TaskMenager.Client.Controllers
         //public IActionResult CreateNewTask(AddNewTaskViewModel model, int? directorateId, int? departmentId, int? sectorId, int? priorityId, int? hourslimit, string assignerId)
         public IActionResult CreateNewTask(AddNewTaskViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("CreateNewTask");
+            }
+
+            if (model.Valid_From < model.Valid_To)
+            {
+                TempData["Error"] = "Невалидни дати";
+                return View(nameof(CreateNewTask));
+            }
+
+
             AddNewTaskServiceModel newTask = new AddNewTaskServiceModel();
             List<EmployeesTasks> taskSubjects = new List<EmployeesTasks>();
             if (model.EmployeesIds != null)

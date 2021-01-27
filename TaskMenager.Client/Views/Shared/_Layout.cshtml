@@ -3,9 +3,21 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
     <title>@ViewData["Title"] - TaskMenager</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    @*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">*@
+    <!-- Bootstrap CSS CDN -->
+    @*<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">*@
+    <!-- Our Custom CSS -->
+    <link rel="stylesheet" href="~/css/style4.css">
+
+    <!-- Font Awesome JS -->
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+
+    @*<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">*@
     <link rel="stylesheet" href="~/css/notifications.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/bootstrap-multiselect.css" rel="stylesheet" />
@@ -60,78 +72,164 @@
                 </nav>
             </div>*@
     </header>
-
-
-    <div class="row">
-        <div>
-            <div class="menuspace">
-                <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() + "  -  " + User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+1))</a><br />
-
-
-                <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">Начало</a><br />
-
-                @if (User.Claims.Any(u => u.Value == "Admin"))
-                {
-
-                    <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a><br />
-
-                }
-                @if (User.Claims.Any(c => c.Value == DataConstants.SuperAdmin))
-                {
-                    <a style="position:absolute; left:40px; font-size:1.2em; color:red;" asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Импорт на данни</a><br />
-                }
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Мениджър задачи</h3>
+                <strong>МЗ</strong>
             </div>
-        </div>
-        <div class="container">
-            <div>
-                <main role="main" class="pb-3">
-                    @*@if (TempData.ContainsKey(DataConstants.SuccessMessageKey))
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a asp-controller="Home" asp-action="Index"><i class="fas fa-home"></i>Начало</a>
+                </li>
+
+                <li>
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-briefcase"></i>
+                        Задачи
+                    </a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        @if (User.Claims.Any(u => u.Value == "Admin"))
                         {
-                            <div class="alert alert-success">
-                                @TempData[DataConstants.SuccessMessageKey]
-                            </div>
+                            <li>
+                                <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
+                            </li>
                         }
-                        @if (TempData.ContainsKey(DataConstants.ErrorMessageKey))
-                        {
-                            <div class="alert alert-danger">
-                                @TempData[DataConstants.ErrorMessageKey]
-                            </div>
-                        }*@
+                        <li>
+                            <a href="#">Home 2</a>
+                        </li>
+                        <li>
+                            <a href="#">Home 3</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-briefcase"></i>
+                        About
+                    </a>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-copy"></i>
+                        Pages
+                    </a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="#">Page 1</a>
+                        </li>
+                        <li>
+                            <a href="#">Page 2</a>
+                        </li>
+                        <li>
+                            <a href="#">Page 3</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-image"></i>
+                        Portfolio
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-question"></i>
+                        FAQ
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-paper-plane"></i>
+                        Contact
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-                    @RenderBody()
-                    @if (TempData["Success"] != null)
-                    {
-                        <p class="alert alert-success" id="successMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
-                    }
-                    @if (TempData["Error"] != null)
-                    {
-                        <p class="alert alert-danger" id="errorMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
-                    }
-                </main>
-            </div>
-            @*<div id="notifications">
-                    <div id="loadingBox" class="notification"><span>Loading …</span></div>
-                    <div id="infoBox" class="notification"><span>Info</span></div>
-                    <div id="errorBox" class="notification"><span>Error</span></div>
+        <!-- Page Content  -->
+        <div id="content">
+            <nav class="navbar navbar-expand-sm navbar-light bg-light" style="max-height:40px !important;">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info">
+                        <i class="fas fa-align-left"></i>
+                        @*<span>Toggle Sidebar</span>*@
+                    </button>
+                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fas fa-align-justify"></i>
+                    </button>
+                    <div class="offset-4" id="notifications">
+                        <div id="loadingBox" class="notification"><span>Loading …</span></div>
+                        <div id="infoBox" class="notification"><span>Info</span></div>
+                        <div id="errorBox" class="notification"><span>Error</span></div>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault())</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </nav>
+
+            @*<div>
+                    <div class="menuspace">
+                        <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() + "  -  " + User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+1))</a><br />
+
+
+                        <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">Начало</a><br />
+
+                        @if (User.Claims.Any(u => u.Value == "Admin"))
+                        {
+
+                            <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a><br />
+
+                        }
+                        @if (User.Claims.Any(c => c.Value == DataConstants.SuperAdmin))
+                        {
+                            <a style="position:absolute; left:40px; font-size:1.2em; color:red;" asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Импорт на данни</a><br />
+                        }
+                    </div>
                 </div>*@
+            <div class="container">
+                <div>
+                    <main role="main" class="pb-3">
+                        @RenderBody()
+                        @if (TempData["Success"] != null)
+                        {
+                            <p class="alert alert-success" id="successMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
+                        }
+                        @if (TempData["Error"] != null)
+                        {
+                            <p class="alert alert-danger" id="errorMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
+                        }
+                    </main>
+                </div>
+            </div>
         </div>
-        <div id="notifications">
-            <div id="loadingBox" class="notification" style="position:absolute; right:20px;"><span>Loading …</span></div>
-            <div id="infoBox" class="notification" style="position:absolute; right:20px;"><span>Info</span></div>
-            <div id="errorBox" class="notification" style="position:absolute; right:20px;"><span>Error</span></div>
-        </div>
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2021 - ПРИЛОЖЕНИЕ ЗА ПЛАНИРАНЕ И ОТЧИТАНЕ НА ЗАДАЧИ
+            </div>
+        </footer>
 
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2021 - ПРИЛОЖЕНИЕ ЗА ПЛАНИРАНЕ И ОТЧИТАНЕ НА ЗАДАЧИ
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Popper.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+            //$('#sidebar').height() = $('#content').height();
+        });
+    </script>
+
 </body>
 </html>

@@ -26,7 +26,7 @@ namespace TaskMenager.Client.Models.Tasks
 
         public int OwnerId { get; set; }
 
-        [Display(Name = "Дирекция *")]
+        [Display(Name = "Дирекция")]
         public IList<SelectListItem> Directorates { get; set; } = new List<SelectListItem>();
 
         public string DirectoratesId { get; set; }
@@ -48,10 +48,10 @@ namespace TaskMenager.Client.Models.Tasks
 
         
         [DataType(DataType.Date)]
-        [Display(Name = "Крайна дата(прознозна)")]
+        [Display(Name = "Крайна дата")]
         public DateTime? Valid_To { get; set; } = DateTime.UtcNow.Date.AddDays(1);
 
-        [Display(Name = "Категория")]
+        [Display(Name = "Обхват")]
         public IList<SelectListItem> TaskTypes { get; set; } = new List<SelectListItem>();
 
         public string TaskTypesId { get; set; }
@@ -72,7 +72,7 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Subjects")]
         public int[] EmployeesIds { get; set; }
 
-        [Display(Name = "Лимит на работни часове *")]
+        [Display(Name = "Лимит часове *")]
         public int HoursLimit { get; set; } = 100;
 
 

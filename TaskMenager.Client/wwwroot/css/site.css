@@ -8,8 +8,9 @@ for details on configuring this project to bundle and minify static web assets. 
 }
 
 body {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    max-width:99.1%;
 }
 
 /* Wrapping element */
@@ -58,15 +59,29 @@ body {
     border-bottom: 3px solid #2a67ac;
     box-shadow: 2px 2px 8px rgba(42, 103, 172, 0.5);
     background: #fff;
-    width:720px;
+    width: 100%;
     margin: 10% auto 0 auto;
     padding: 1em;
     padding-bottom: 1em;
-    text-align: center;
+/*    text-align: center;*/
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+.PrimeBox2 {
+    background-color: rgba(42, 103, 172, 0.9);
+    box-shadow: 2px 2px 8px rgba(42, 103, 172, 0.5);
+    background: #fff;
+    width: 100%;
+    margin: 10% auto 0 auto;
+    padding: 1em;
+    padding-bottom: 1em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 
 .logo-text-wrapper {
     display: inline-block;
@@ -103,14 +118,14 @@ body {
 }
 
 hr {
-    height: 8px;
+    height: 5px;
     margin-left: 0 !important;
     margin-right: 0 !important;
     background-color: #006cc7;
     border: 0 none;
     margin-top: 8px;
-    margin-bottom: 5px;
-}
+    margin-bottom:0px;
+ }
 
 /* Копирано от Убд */
 
@@ -122,7 +137,8 @@ a.navbar-brand {
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    /*color: #0366d6;*/
+    color: #000;
 }
 
 .btn-primary {
@@ -144,8 +160,8 @@ html {
 }
 @media (min-width: 768px) {
   html {
-    font-size: 16px;
-  }
+/*    font-size: 16px;
+*/  }
 }
 
 .border-top {

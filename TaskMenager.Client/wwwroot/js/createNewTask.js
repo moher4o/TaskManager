@@ -3,13 +3,12 @@
 
     function attachEvents() {
         $('#assignerId').on('click', function () { $("#assignerId").css('background-color', '#ffffff'); });
-        $('#directorateId').on('click', function () { $("#directorateId").css('background-color', '#ffffff'); });
+        //$('#directorateId').on('click', function () { $("#directorateId").css('background-color', '#ffffff'); });
         $('#taskPriorityId').on('click', function () { $("#taskPriorityId").css('background-color', '#ffffff'); });
         $('#hourslimit').on('change', function () { $("#hourslimit").css('background-color', '#ffffff'); });
         $('#hourslimit').on('click', function () { $("#hourslimit").css('background-color', '#ffffff'); });
         $('#taskName').on('change', function () { $("#taskName").css('background-color', '#ffffff'); });
         $('#taskName').on('click', function () { $("#taskName").css('background-color', '#ffffff'); });
-
         $('#send').on('click', CheckFieldsChoose);
     }
 
@@ -21,11 +20,11 @@
             $(':focus').blur()
             result = false;
         }
-        if ($('#directorateId :selected').text() === 'Моля изберете...') {
-            $("#directorateId").css('background-color', 'rgb(250, 204, 204)');
-            $(':focus').blur()
-            result = false;
-        }
+        //if ($('#directorateId :selected').text() === 'Моля изберете...') {
+        //    $("#directorateId").css('background-color', 'rgb(250, 204, 204)');
+        //    $(':focus').blur()
+        //    result = false;
+        //}
         if ($('#taskPriorityId :selected').text() === 'Моля изберете...') {
             $("#taskPriorityId").css('background-color', 'rgb(250, 204, 204)');
             $(':focus').blur()
