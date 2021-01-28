@@ -7,19 +7,63 @@ using System.Threading.Tasks;
 using TaskManager.Common;
 using TaskManager.Data;
 using TaskManager.Data.Models;
+using TaskManager.Services.Models;
 
 namespace TaskManager.Services.Implementations
 {
     public class TasksService : ITasksService
     {
         private readonly TasksDbContext db;
-        public TasksService(TasksDbContext db, IConfiguration configuration)
+        public TasksService(TasksDbContext db)
         {
             this.db = db;
-            this.Configuration = configuration;
+
         }
 
-        private IConfiguration Configuration { get; }
+        public async Task<string> AddNewTaskAsync(AddNewTaskServiceModel newTask)
+        {
+            try
+            {
+                List<EmployeesTasks> assignedEmployeesDB = new List<EmployeesTasks>();
+                Data.Models.Task taskDB = new Data.Models.Task()
+                {
+                    TaskName = newTask.Name,
+                    Description = newTask.Description,
+                    AssignerId = newTask.AssignerId,
+                    DirectorateId = newTask.DirectorateId,
+                    DepartmentId = newTask.DepartmentId,
+                    SectorId = newTask.SectorId,
+                    OwnerId = newTask.OwnerId,
+                    HoursLimit = newTask.HoursLimit,
+                    RegCreated = DateTime.UtcNow.Date,
+                    StartDate = newTask.StartDate,
+                    EndDatePrognose = newTask.EndDatePrognose,
+                    PriorityId = newTask.PriorityId,
+                    TypeId = newTask.TypeId,
+                    StatusId = newTask.StatusId
+                };
+
+                if (newTask.EmployeesIds != null && newTask.EmployeesIds.Length > 0)
+                {
+                    foreach (var employee in newTask.EmployeesIds)
+                    {
+                        assignedEmployeesDB.Add(new EmployeesTasks
+                        {
+                            EmployeeId = employee,
+                            Task = taskDB
+                        });
+                    }
+                    taskDB.AssignedExperts = assignedEmployeesDB;
+                }
+                await this.db.Tasks.AddAsync(taskDB);
+                var result = await this.db.SaveChangesAsync();
+                return "success";
+            }
+            catch (Exception)
+            {
+                return "Неуспешен запис. Проверете входните данни.";
+            }
+        }
 
         public async Task<string> CreateTasksStatusesAsync()
         {
@@ -64,7 +108,7 @@ namespace TaskManager.Services.Implementations
 
                 await this.db.SaveChangesAsync();
 
-             }
+            }
             catch (Exception)
             {
                 this.db.Database.RollbackTransaction();

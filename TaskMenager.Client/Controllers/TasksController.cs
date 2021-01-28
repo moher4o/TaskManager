@@ -23,10 +23,14 @@ namespace TaskMenager.Client.Controllers
         private readonly ITaskTypesService tasktypes;
         private readonly ITaskPrioritysService taskprioritys;
         private readonly IEmployeesService employees;
+        private readonly IStatusService statuses;
+        private readonly ITasksService tasks;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserServiceModel currentUser;
-        public TasksController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor)
+        public TasksController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks)
         {
+            this.tasks = tasks;
+            this.statuses = statuses;
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
@@ -323,27 +327,90 @@ namespace TaskMenager.Client.Controllers
 
         [HttpPost]
         //public IActionResult CreateNewTask(AddNewTaskViewModel model, int? directorateId, int? departmentId, int? sectorId, int? priorityId, int? hourslimit, string assignerId)
-        public IActionResult CreateNewTask(AddNewTaskViewModel model)
+        public async Task<IActionResult> CreateNewTask(AddNewTaskViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("CreateNewTask");
+                return View(model);
             }
 
-            if (model.Valid_From < model.Valid_To)
+            if (model.Valid_From > model.Valid_To)
             {
                 TempData["Error"] = "Невалидни дати";
-                return View(nameof(CreateNewTask));
+                return View(model);
             }
-
 
             AddNewTaskServiceModel newTask = new AddNewTaskServiceModel();
-            List<EmployeesTasks> taskSubjects = new List<EmployeesTasks>();
-            if (model.EmployeesIds != null)
+            
+            newTask.Name = model.TaskName;
+            newTask.Description = model.Description;
+            newTask.StartDate = model.Valid_From;
+            newTask.EndDatePrognose = model.Valid_To;
+            newTask.OwnerId = currentUser.Id;
+            newTask.TypeId = int.Parse(model.TaskTypesId);
+            newTask.HoursLimit = model.HoursLimit;
+            if (model.EmployeesIds != null && model.EmployeesIds.Length > 0)
             {
-
+                newTask.EmployeesIds = model.EmployeesIds;
+                newTask.StatusId = await this.statuses.GetStatusIdByNameAsync(TaskStatusInProgres);
             }
-            return RedirectToAction("CreateNewTask");
+            else
+            {
+                newTask.StatusId = await this.statuses.GetStatusIdByNameAsync(TaskStatusNew);
+            }
+           
+            if (int.TryParse(model.DirectoratesId, out int directorateId))
+            {
+                newTask.DirectorateId = (directorateId != 0) ? directorateId : (int?)null;
+            }
+            if (int.TryParse(model.DepartmentsId, out int departmentId))
+            {
+                newTask.DepartmentId = (departmentId != 0) ? departmentId : (int?)null;
+            }
+            if (int.TryParse(model.SectorsId, out int sectorId))
+            {
+                newTask.SectorId = (sectorId != 0) ? sectorId : (int?)null;
+            }
+            if (int.TryParse(model.AssignerId, out int assignerId))
+            {
+                if (assignerId == 0)
+                {
+                    TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                    return View(model);
+                }
+                newTask.AssignerId = assignerId;
+            }
+            else
+            {
+                TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                return View(model);
+            }
+            if (int.TryParse(model.TaskPriorityId, out int priorityId))
+            {
+                if (priorityId == 0)
+                {
+                    TempData["Error"] = "Задачата трябва да има определен приоритет";
+                    return View(model);
+                }
+                newTask.PriorityId = priorityId;
+            }
+            else
+            {
+                TempData["Error"] = "Задачата трябва да има определен приоритет";
+                return View(model);
+            }
+
+            var result = await this.tasks.AddNewTaskAsync(newTask);
+
+            return View(model);
+
+
+
+
+
+
+
+            //return RedirectToAction("CreateNewTask");
             //if (!ModelState.IsValid || !directorateId.HasValue || !priorityId.HasValue || !hourslimit.HasValue)
             //{
 
@@ -351,13 +418,6 @@ namespace TaskMenager.Client.Controllers
             //}
 
 
-            //newTask.Name = model.TaskName;
-            //newTask.Description = model.Description;
-            //newTask.StartDate = model.Valid_From;
-            //newTask.EndDatePrognose = model.Valid_To;
-            //newTask.OwnerId = currentUser.Id;
-            //newTask.DirectorateId = directorateId;
-            //newTask.DepartmentId = departmentId;
 
             //teacher.DateTimeInLocalTime = DateTime.Now;  
             //teacher.DateTimeInUtc = DateTime.UtcNow;  

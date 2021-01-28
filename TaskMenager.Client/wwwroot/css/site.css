@@ -75,13 +75,32 @@ body {
     background: #fff;
     width: 100%;
     margin: 10% auto 0 auto;
-    padding: 1em;
+    padding: 0 1em 1em 1em;
     padding-bottom: 1em;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
 
+#container {
+    /*width: 80%;*/
+    /*border-radius: 25px;*/
+    /*border: 2px solid Black;*/
+    /*padding: 15px 15px 15px 15px;*/
+    /*margin: 20px 20px 20px 20px;*/
+    /*background: #A4D3EE;*/
+    overflow: visible;
+    /*box-shadow: 5px 5px 2px #888888;*/
+    position: relative;
+}
+
+#x {
+    position: absolute;
+    background: #cb8181;
+    color: white;
+    top: -10px;
+    right: -10px;
+}
 
 .logo-text-wrapper {
     display: inline-block;

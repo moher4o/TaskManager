@@ -32,11 +32,15 @@ namespace TaskManager.Services.Models
 
         public int AssignerId { get; set; }
 
-        public int? StatusId { get; set; }
+        public int[] EmployeesIds { get; set; }
+
+        public int StatusId { get; set; }
 
         public int TypeId { get; set; }
 
-        public int? PriorityId { get; set; }
+        public int PriorityId { get; set; }
+
+        public int HoursLimit { get; set; } = 100;
 
         public bool isDeleted { get; set; } = false;
 

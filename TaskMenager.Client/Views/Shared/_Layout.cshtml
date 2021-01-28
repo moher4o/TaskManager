@@ -81,7 +81,7 @@
             </div>
 
             <ul class="list-unstyled components">
-                <li class="active">
+                <li>
                     <a asp-controller="Home" asp-action="Index"><i class="fas fa-home"></i>Начало</a>
                 </li>
 
@@ -151,13 +151,13 @@
         <div id="content">
             <nav class="navbar navbar-expand-sm navbar-light bg-light" style="max-height:40px !important;">
                 <div class="container-fluid">
-                    <button type="button" id="sidebarCollapse" class="btn btn-info">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info" style="background-color: #69a0f1;">
                         <i class="fas fa-align-left"></i>
                         @*<span>Toggle Sidebar</span>*@
                     </button>
-                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fas fa-align-justify"></i>
-                    </button>
+                    </button>*@
                     <div class="offset-4" id="notifications">
                         <div id="loadingBox" class="notification"><span>Loading …</span></div>
                         <div id="infoBox" class="notification"><span>Info</span></div>
@@ -166,7 +166,10 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault())</a>
+                                <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Home" asp-action="Index">
+                                    <i class="fas fa-wrench"></i>
+                                    @(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault())
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -193,8 +196,8 @@
                         }
                     </div>
                 </div>*@
-            <div class="container">
-                <div>
+            <div class="container" style="max-width:85%;">
+                
                     <main role="main" class="pb-3">
                         @RenderBody()
                         @if (TempData["Success"] != null)
@@ -206,7 +209,7 @@
                             <p class="alert alert-danger" id="errorMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
                         }
                     </main>
-                </div>
+                
             </div>
         </div>
         <footer class="border-top footer text-muted">
