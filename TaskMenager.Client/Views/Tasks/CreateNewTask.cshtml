@@ -41,7 +41,7 @@
         <div class="form-group row">
             @Html.LabelFor(model => model.Assigners, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownList(Model.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
+                @Html.DropDownListFor(m => m.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
                 @*<select name="assigners" asp-items="Model.Assigners" class="form-control" id="assigners"></select>*@
             </div>
             @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
@@ -57,20 +57,20 @@
             </div>
             @Html.LabelFor(model => model.TaskPrioritys, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
-                @Html.DropDownList(Model.TaskPriorityId, new SelectList(Model.TaskPrioritys, "Value", "Text"), new { @class = "form-control", name = "taskPriorityId", id = "taskPriorityId" })
+                @Html.DropDownListFor(m => m.TaskPriorityId, new SelectList(Model.TaskPrioritys, "Value", "Text"), new { @class = "form-control", name = "taskPriorityId", id = "taskPriorityId" })
                 @*<select name="priorityId" asp-items="Model.TaskPrioritys" class="form-control" id="priorityId"></select>*@
             </div>
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownList(Model.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directoratesId", onchange = "LoadDepartments(event)" })
+                @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directoratesId", onchange = "LoadDepartments(event)" })
 
                 @*<select name="directorateId" asp-items="Model.Directorates" class="form-control" id="directorateId"></select>*@
             </div>
             @Html.LabelFor(model => model.TaskTypes, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
-                @Html.DropDownList(Model.TaskTypesId, new SelectList(Model.TaskTypes, "Value", "Text"), new { @class = "form-control", name = "taskTypesId", id = "taskTypesId" })
+                @Html.DropDownListFor(m => m.TaskTypesId, new SelectList(Model.TaskTypes, "Value", "Text"), new { @class = "form-control", name = "taskTypesId", id = "taskTypesId" })
                 @*<select name="typeId" asp-items="Model.TaskTypes" class="form-control" id="typeId"></select>*@
             </div>
 
@@ -78,7 +78,7 @@
         <div class="form-group row">
             @Html.LabelFor(model => model.Departments, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownList(Model.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
+                @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
                 @*<select name="departments" asp-items="Model.Departments" class="form-control" id="departments"></select>*@
             </div>
             @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label" })
@@ -92,7 +92,7 @@
         <div class="form-group row">
             @Html.LabelFor(model => model.Sectors, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownList(Model.SectorsId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
+                @Html.DropDownListFor(m => m.SectorsId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
                 @*<select name="sectors" asp-items="Model.Sectors" class="form-control" id="sectors"></select>*@
             </div>
             @Html.LabelFor(model => model.Valid_To, new { @class = "col-md-2 col-form-label" })
