@@ -3,18 +3,11 @@
 @{
     ViewData["Title"] = "Създаване на задача";
 }
-
+@{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 <form method="post" asp-controller="Tasks" asp-action="CreateNewTask">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="PrimeBox2" style="margin-top:15px;">
-        @*<div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;">
-            <h5 style="color:white; margin-left:15px;">Създаване на задача</h5>
-            <button id="x">
-                X
-            </button>
-
-        </div>*@
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">Създаване на задача</h5>
             <button asp-controller="Home" asp-action="Index" id="x">
@@ -42,7 +35,6 @@
             @Html.LabelFor(model => model.Assigners, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
-                @*<select name="assigners" asp-items="Model.Assigners" class="form-control" id="assigners"></select>*@
             </div>
             @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
@@ -58,28 +50,34 @@
             @Html.LabelFor(model => model.TaskPrioritys, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
                 @Html.DropDownListFor(m => m.TaskPriorityId, new SelectList(Model.TaskPrioritys, "Value", "Text"), new { @class = "form-control", name = "taskPriorityId", id = "taskPriorityId" })
-                @*<select name="priorityId" asp-items="Model.TaskPrioritys" class="form-control" id="priorityId"></select>*@
             </div>
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directoratesId", onchange = "LoadDepartments(event)" })
+                @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"),
+                  permisionType != SuperAdmin ? new { @disabled = "disabled" } as object :
+                  new
+                       {
+                           @class = "form-control",
+                           id = "directorateId",
+                           name = "directoratesId",
+                           onchange = "LoadDepartments(event)"
 
-                @*<select name="directorateId" asp-items="Model.Directorates" class="form-control" id="directorateId"></select>*@
+                  } as object)
             </div>
             @Html.LabelFor(model => model.TaskTypes, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
                 @Html.DropDownListFor(m => m.TaskTypesId, new SelectList(Model.TaskTypes, "Value", "Text"), new { @class = "form-control", name = "taskTypesId", id = "taskTypesId" })
-                @*<select name="typeId" asp-items="Model.TaskTypes" class="form-control" id="typeId"></select>*@
             </div>
 
         </div>
         <div class="form-group row">
             @Html.LabelFor(model => model.Departments, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
-                @*<select name="departments" asp-items="Model.Departments" class="form-control" id="departments"></select>*@
+                @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"),
+               (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) ? new { @disabled = "disabled" } as object :
+               new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
             </div>
             @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
@@ -92,8 +90,9 @@
         <div class="form-group row">
             @Html.LabelFor(model => model.Sectors, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownListFor(m => m.SectorsId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
-                @*<select name="sectors" asp-items="Model.Sectors" class="form-control" id="sectors"></select>*@
+                @Html.DropDownListFor(m => m.SectorsId, new SelectList(Model.Sectors, "Value", "Text"),
+                (permisionType == SectorAdmin || permisionType == Employee) ? new { @disabled = "disabled" } as object :
+               new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
             </div>
             @Html.LabelFor(model => model.Valid_To, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
@@ -118,28 +117,61 @@
 <script type="text/javascript">
     function LoadDepartments(event) {
         $.getJSON('\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
-            if (event.target.id == 'directorateId') {
+            if ($('#departmentsId :selected').text() === 'Моля изберете...') {
                 $('#departmentsId').children('option:not(:first)').remove();
-                $.each(data, function (key, value) {
-                    $('#departmentsId')
-                        .append($("<option></option>")
-                            .attr("value", value.id)
-                            .text(value.textValue));
-                });
             }
+            else {
+                $('#departmentsId').children('option').remove();
+                $('#departmentsId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
+            $.each(data, function (key, value) {
+                $('#departmentsId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#departmentsId").attr('disabled', 'disabled');
+                $("#sectorsId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#departmentsId").removeAttr('disabled');
+                $("#sectorsId").removeAttr('disabled');
+            }
+
         });
     }
 
 
     function LoadSectors(event) {
         $.getJSON('\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
-            $('#sectorsId').children('option:not(:first)').remove();
+            if ($('#sectorsId :selected').text() === 'Моля изберете...') {
+                $('#sectorsId').children('option:not(:first)').remove();
+            }
+            else {
+                $('#sectorsId').children('option').remove();
+                $('#sectorsId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
             $.each(data, function (key, value) {
                 $('#sectorsId')
                     .append($("<option></option>")
                         .attr("value", value.id)
                         .text(value.textValue));
             });
+
+            if (data.length <= 0) {
+                $("#sectorsId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#sectorsId").removeAttr('disabled');
+            }
+
         });
     }
 </script>
