@@ -15,139 +15,105 @@ using TaskManager.Services;
 using TaskManager.Services.Models;
 using TaskMenager.Client.Infrastructure.Extensions;
 using TaskMenager.Client.Models;
-
+using TaskMenager.Client.Models.Home;
 
 namespace TaskMenager.Client.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IEmployeesService employees;
+        //private readonly ILogger<HomeController> _logger;
+        //private readonly IEmployeesService employees;
         private readonly IRolesService roles;
-        private readonly ITasksService tasks;
+        //private readonly ITasksService tasks;
 
-        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles, ITasksService tasks)
+        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, employees, tasks)
         {
-            _logger = logger;
-            this.employees = employees;
+            //_logger = logger;
+            //this.employees = employees;
             this.roles = roles;
-            this.tasks = tasks;
+            //this.tasks = tasks;
         }
+
+
 
         public async Task<IActionResult> Index()
         {
-            string result = string.Empty;
-            if (this.roles.RolesCount() != DataConstants.RolesCount)
+
+            if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
             {
-                result = await this.roles.CreateRolesAsync();
-                if (!result.Equals("success"))
-                {
-                    TempData["Error"] = "Грешка след опит за инициализиране на ролите : " + result + " ";
-                }
-                else
-                {
-                    TempData["Success"] = "Заредени ролите";
-                }
-
-
-                if (this.tasks.TasksStatusCount() != DataConstants.TasksStatusCount)
-                {
-                    result = await this.tasks.CreateTasksStatusesAsync();
-                    if (!result.Equals("success"))
-                    {
-                        TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на статусите на задачите : " + result;
-                    }
-                    else
-                    {
-                        TempData["Success"] = TempData["Success"] + "<  >" + "Заредени статусите на задачите";
-                    }
-
-                }
-                if (this.tasks.TasksPrioritysCount() != DataConstants.TasksPriorityCount)
-                {
-                    result = await this.tasks.CreateTasksPrioritiesAsync();
-                    if (!result.Equals("success"))
-                    {
-                        TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на приоритетите на задачите : " + result;
-                    }
-                    else
-                    {
-                        TempData["Success"] = TempData["Success"] + "<  >" + "Заредени приоритетите на задачите";
-                    }
-
-                }
-                if (this.tasks.TasksTypesCount() != DataConstants.TasksTypesCount)
-                {
-                    result = await this.tasks.CreateTasksTypesAsync();
-                    if (!result.Equals("success"))
-                    {
-                        TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на типовете задачи : " + result;
-                    }
-                    else
-                    {
-                        TempData["Success"] = TempData["Success"] + "<  >" + "Заредени типовете задачи";
-                    }
-
-                }
-
-                return RedirectToAction("NotAuthorized");
+                TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
+                return RedirectToAction("NotAuthorized", "Base");
             }
 
-
-
-            var logedUser = this.User.Identities.FirstOrDefault().Name.ToLower();
-            var currentEmployee = this.employees.GetUserDataForCooky(logedUser);
-            if (currentEmployee == null)
+            var currentEmployee = new UserTasksViewModel()
             {
-                TempData["Error"] = logedUser + " Няма създаден акаунт в системата";
-                return RedirectToAction("NotAuthorized");
-            }
-
-            //var clTr = new ClaimsTransformer();
-            //var br = this.User.Claims.Count();
-            //this.User.Identities.FirstOrDefault().AddClaim(new Claim("permission", "DepartmentAdmin"));
-            //br = this.User.Claims.Count();
-            //if (userForCoocy == null)
+                userId = currentUser.Id,
+                ActiveTasks = await this.employees.GetUserActiveTaskAsync(currentUser.Id),
+                AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
+            };
+            return View(currentEmployee);
+            //string result = string.Empty;
+            //if (this.roles.RolesCount() != DataConstants.RolesCount)
             //{
-            //    var claims = this.User.Claims.ToList();
-            //    //this.User.Claims.Append(new System.Security.Claims.Claim())
-            //    foreach (var cookie in Request.Cookies.Keys)
+            //    result = await this.roles.CreateRolesAsync();
+            //    if (!result.Equals("success"))
             //    {
-            //        Response.Cookies.Delete(cookie);
+            //        TempData["Error"] = "Грешка след опит за инициализиране на ролите : " + result + " ";
+            //    }
+            //    else
+            //    {
+            //        TempData["Success"] = "Заредени ролите";
             //    }
 
 
-            //    await HttpContext.AuthenticateAsync();
-            //    // await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            //    Response.Cookies.Append("EdgeAccessCookie", "", new Microsoft.AspNetCore.Http.CookieOptions()
+            //    if (this.tasks.TasksStatusCount() != DataConstants.TasksStatusCount)
             //    {
-            //        Path = "/",
-            //        HttpOnly = true,
-            //        SameSite = SameSiteMode.Lax,
-            //        Expires = DateTime.Now.AddDays(-1)
-            //    });
+            //        result = await this.tasks.CreateTasksStatusesAsync();
+            //        if (!result.Equals("success"))
+            //        {
+            //            TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на статусите на задачите : " + result;
+            //        }
+            //        else
+            //        {
+            //            TempData["Success"] = TempData["Success"] + "<  >" + "Заредени статусите на задачите";
+            //        }
 
-            //    TempData["Error"] = "Потребител: " + logedUser + " няма конфигуриран достъп!";
+            //    }
+            //    if (this.tasks.TasksPrioritysCount() != DataConstants.TasksPriorityCount)
+            //    {
+            //        result = await this.tasks.CreateTasksPrioritiesAsync();
+            //        if (!result.Equals("success"))
+            //        {
+            //            TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на приоритетите на задачите : " + result;
+            //        }
+            //        else
+            //        {
+            //            TempData["Success"] = TempData["Success"] + "<  >" + "Заредени приоритетите на задачите";
+            //        }
+
+            //    }
+            //    if (this.tasks.TasksTypesCount() != DataConstants.TasksTypesCount)
+            //    {
+            //        result = await this.tasks.CreateTasksTypesAsync();
+            //        if (!result.Equals("success"))
+            //        {
+            //            TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на типовете задачи : " + result;
+            //        }
+            //        else
+            //        {
+            //            TempData["Success"] = TempData["Success"] + "<  >" + "Заредени типовете задачи";
+            //        }
+
+            //    }
+
             //    return RedirectToAction("NotAuthorized");
             //}
 
-            //var userFromCoocy = new UserCookyServiceModel();
-            //if (this.HttpContext.Request.Cookies.ContainsKey("daeuuser"))
-            //{
-            //    try
-            //    {
-            //        this.HttpContext.Request.Cookies.TryGetValue("daeuuser", out string userSerialized);
-            //        userFromCoocy = JsonConvert.DeserializeObject<UserCookyServiceModel>(userSerialized);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        throw;
-            //    }
-            //}
 
-            //Response.Cookies.Append("user", JsonConvert.SerializeObject(model.SearchPatern))
-            return View();
+
+            //var logedUser = this.User.Identities.FirstOrDefault().Name.ToLower();
+            //var currentEmployee = this.employees.GetUserDataForCooky(logedUser);
+
         }
 
         public IActionResult Privacy()

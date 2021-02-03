@@ -1,0 +1,54 @@
+﻿@model AddWorkedHoursViewModel
+
+@{
+    ViewData["Title"] = "Отчитане";
+}
+
+<form method="post" asp-controller="Tasks" asp-action="AddWorkHours">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="PrimeBox2" style="max-width:60%;">
+        <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
+            <h5 style="color:white; margin-left:15px;">@Model.TaskName</h5>
+            <button asp-controller="Home" asp-action="Index" id="x">
+                X
+            </button>
+        </div>
+        <div class="form-group row">
+            @Html.HiddenFor(model => model.employeeId)
+            @Html.HiddenFor(model => model.taskId)
+            @Html.LabelFor(model => model.HoursSpend, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.HoursSpend, new { @class = "form-control", placeholder = "Въведете отработените часове (цяло число)", id = "hours", name = "hours" })
+                <span asp-validation-for="HoursSpend" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.WorkDate, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="WorkDate" class="form-control" id="workdate" />
+                    <span asp-validation-for="WorkDate" class="text-warning"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Text, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.Text, new { @class = "form-control", placeholder = "Въведете коментар", rows = "3" })
+                <span asp-validation-for="Text" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top:10px;">
+        <button type="button" class="button save" id="send">Запис</button>
+    </div>
+    <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
+</form>
+@section Scripts{
+    <script src="~/js/addWorkHours.js" charset="utf-8"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

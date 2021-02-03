@@ -7,7 +7,7 @@
 <form method="post" asp-controller="Tasks" asp-action="CreateNewTask">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="PrimeBox2" style="margin-top:15px;">
+    <div class="PrimeBox2" style="margin-top:20px;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">Създаване на задача</h5>
             <button asp-controller="Home" asp-action="Index" id="x">
@@ -183,5 +183,7 @@
             $('#Subjects_dropdown').multiselect();
         });
     </script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }
+
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace TaskManager.Data.Models
@@ -16,6 +17,7 @@ namespace TaskManager.Data.Models
 
         public DateTime NoteDate { get; set; }
 
+        [MaxLength(500)]
         public string Text { get; set; }
 
         public bool isDeleted { get; set; } = false;

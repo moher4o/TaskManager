@@ -1,4 +1,84 @@
-﻿@{
-    ViewData["Title"] = "Начална страница";
+﻿@model UserTasksViewModel
+@{
+    ViewData["Title"] = "Моите задачи";
 }
-
+<div style="min-height:400px; max-height:401px; overflow:auto;" @(Model.ActiveTasks.Count() > 0 ? "hiden" : "")>
+    <h4>Активни задачи</h4>
+    @foreach (var item in Model.ActiveTasks)
+    {
+        <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
+            @{var name = item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName;}
+            <div class="col-md-5">
+                <label>@name</label>
+            </div>
+            <div class="col-md-2">
+                <label style="padding-left:10px;">@item.TaskStatusName</label>
+            </div>
+            <div class="col-md-1">
+                <label style="padding-left:10px;">@item.TaskPriorityName</label>
+            </div>
+            <div class="col-md-1">
+                <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
+            </div>
+            <div class="col-md-2 offset-md-1" style="color: #5f9fec;">
+                <div class="row">
+                    <div style="padding-left:20px;">
+                        <i class="fas fa-info fa-lg"></i>
+                    </div>
+                    <div style="padding-left:20px;">
+                        <i class="fas fa-sticky-note fa-lg"></i>
+                    </div>
+                    <div style="padding-left:20px;">
+                        <a asp-controller="Tasks" asp-action="AddWorkHours"
+                           asp-route-taskName ="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
+                           asp-route-taskId="@item.Id"
+                           asp-route-employeeId="@Model.userId"><i class="fas fa-clock fa-lg"></i></a>
+                    </div>
+                    <div style="padding-left:20px;">
+                        <i class="fas fa-plus fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div @(Model.AssignerTasks.Count() > 0 ? "hiden" : "")>
+    <h4>Задачи по които потребителя е отговорник</h4>
+    @foreach (var item in Model.AssignerTasks)
+    {
+        <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
+            @{var name = item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName;}
+            <div class="col-md-5">
+                <label>@name</label>
+            </div>
+            <div class="col-md-2">
+                <label style="padding-left:10px;">@item.TaskStatusName</label>
+            </div>
+            <div class="col-md-1">
+                <label style="padding-left:10px;">@item.TaskPriorityName</label>
+            </div>
+            <div class="col-md-1">
+                <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
+            </div>
+            <div class="col-md-2 offset-md-1" style="color: #5f9fec;">
+                <div class="row">
+                    <div style="padding-left:20px;">
+                        <i class="fas fa-info fa-lg"></i>
+                    </div>
+                    <div style="padding-left:20px;">
+                        <i class="fas fa-sticky-note fa-lg"></i>
+                    </div>
+                    <div style="padding-left:20px;">
+                        <i class="fas fa-clock fa-lg"></i>
+                    </div>
+                    <div style="padding-left:20px;">
+                        <i class="fas fa-plus fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

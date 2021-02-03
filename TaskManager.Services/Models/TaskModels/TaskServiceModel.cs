@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TaskManager.Common.Mapping;
+using TaskManager.Data.Models;
 
-namespace TaskManager.Services.Models
+namespace TaskManager.Services.Models.TaskModels
 {
-    public class AddNewTaskServiceModel
+    public class TaskServiceModel : IMapFrom<TaskManager.Data.Models.Task>
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string TaskName { get; set; }
 
         public string Description { get; set; }
 
         public int? SectorId { get; set; }
 
-        public int? DepartmentId{ get; set; }
+        public int? DepartmentId { get; set; }
 
         public int? DirectorateId { get; set; }
 
@@ -43,6 +45,5 @@ namespace TaskManager.Services.Models
         public int HoursLimit { get; set; } = 100;
 
         public bool isDeleted { get; set; } = false;
-
     }
 }

@@ -10,6 +10,8 @@ using TaskManager.Data;
 using TaskManager.Data.Models;
 using TaskManager.Services.Models;
 using TaskManager.Common;
+using TaskManager.Services.Models.TaskModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace TaskManager.Services.Implementations
 {
@@ -24,6 +26,33 @@ namespace TaskManager.Services.Implementations
         }
 
         private IConfiguration Configuration { get; }
+
+        public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(int userId)
+        {
+            var tasks = await this.db.EmployeesTasks
+                    .Where(et => et.EmployeeId == userId)
+                    .Select(t => t.Task)
+                    .Distinct()
+                    .OrderBy(t => t.PriorityId)
+                    .ThenByDescending(t => t.EndDatePrognose)
+                    .ProjectTo<TaskFewInfoServiceModel>()
+                    .ToListAsync();
+
+            return tasks;
+        }
+
+        public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId)
+        {
+            var tasks = await this.db.Tasks
+                    .Where(et => et.AssignerId == userId)
+                    .OrderBy(t => t.PriorityId)
+                    .ThenByDescending(t => t.EndDatePrognose)
+                    .ProjectTo<TaskFewInfoServiceModel>()
+                    .ToListAsync();
+
+            return tasks;
+        }
+
 
 
         public async Task<string> AddEmployeesCollection(List<AddNewEmployeeServiceModel> employees)
@@ -52,7 +81,7 @@ namespace TaskManager.Services.Implementations
                         DaeuAccaunt = string.IsNullOrWhiteSpace(employees[i].DaeuAccaunt) ? throw new ArgumentNullException("Акаунта не може да е null") : employees[i].DaeuAccaunt,
                         JobTitleId = string.IsNullOrWhiteSpace(employees[i].JobTitle) ? throw new ArgumentNullException("Длъжността не може да е null") : this.db.JobTitles.Where(d => d.TitleName == employees[i].JobTitle).Select(d => d.Id).FirstOrDefault(),
                         RoleId = string.IsNullOrWhiteSpace(employees[i].Role) ? throw new ArgumentNullException("Ролята не може да е null") : this.db.Roles.Where(d => d.Name == employees[i].Role).Select(d => d.Id).FirstOrDefault(),
-                        SectorId = string.IsNullOrWhiteSpace(employees[i].Sector) ? (int?) null : this.db.Sectors.Where(d => d.SectorName == employees[i].Sector).Select(d => d.Id).FirstOrDefault(),
+                        SectorId = string.IsNullOrWhiteSpace(employees[i].Sector) ? (int?)null : this.db.Sectors.Where(d => d.SectorName == employees[i].Sector).Select(d => d.Id).FirstOrDefault(),
                         DepartmentId = string.IsNullOrWhiteSpace(employees[i].Department) ? (int?)null : this.db.Departments.Where(d => d.DepartmentName == employees[i].Department).Select(d => d.Id).FirstOrDefault(),
                         DirectorateId = string.IsNullOrWhiteSpace(employees[i].Directorate) ? (int?)null : this.db.Directorates.Where(d => d.DirectorateName == employees[i].Directorate).Select(d => d.Id).FirstOrDefault(),
                         FullName = employees[i].FullName,
@@ -153,6 +182,14 @@ namespace TaskManager.Services.Implementations
                 .FirstOrDefault();
 
             return searchedUser;
+        }
+
+        public async Task<string> GetEmployeeNameByIdAsync(int userId)
+        {
+            return await this.db.Employees
+                .Where(e => e.Id == userId)
+                .Select(e => e.FullName)
+                .FirstOrDefaultAsync();
         }
     }
 }

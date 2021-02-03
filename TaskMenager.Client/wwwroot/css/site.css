@@ -82,6 +82,21 @@ body {
     box-sizing: border-box;
 }
 
+.PrimeBox3 {
+    border: 1px solid #2a67ac;
+    border-right: 2px solid #2a67ac;
+    border-bottom: 3px solid #2a67ac;
+    background-color: rgba(42, 103, 172, 0.9);
+    box-shadow: 2px 2px 8px rgba(42, 103, 172, 0.5);
+    background: #fff;
+    width: 100%;
+    margin: 10% auto 0 auto;
+    padding: 0.4em 0.4em 0.4em 0.4em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 #container {
     /*width: 80%;*/
     /*border-radius: 25px;*/
@@ -215,7 +230,7 @@ body {
   bottom: 0;
   width: 100%;
   white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+  line-height: 25px; /* Vertically center the text there */
 }
 
 /*3D BUTTON*/

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,7 @@ using TaskManager.Common;
 using TaskManager.Data;
 using TaskManager.Data.Models;
 using TaskManager.Services.Models;
+using TaskManager.Services.Models.TaskModels;
 
 namespace TaskManager.Services.Implementations
 {
@@ -27,7 +30,7 @@ namespace TaskManager.Services.Implementations
                 List<EmployeesTasks> assignedEmployeesDB = new List<EmployeesTasks>();
                 Data.Models.Task taskDB = new Data.Models.Task()
                 {
-                    TaskName = newTask.Name,
+                    TaskName = newTask.TaskName,
                     Description = newTask.Description,
                     AssignerId = newTask.AssignerId,
                     DirectorateId = newTask.DirectorateId,

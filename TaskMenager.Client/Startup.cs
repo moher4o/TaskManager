@@ -47,7 +47,7 @@ namespace TaskMenager.Client
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(DataConstants.Employee, policy =>
-                                  policy.RequireClaim("permission", DataConstants.Employee));
+                                policy.RequireAssertion(context => context.User.HasClaim(c => c.Value == DataConstants.Employee || c.Value == "Admin")));
                 options.AddPolicy("Admin", policy =>
                                 policy.RequireClaim("permission", "Admin"));
                 options.AddPolicy(DataConstants.SuperAdmin, policy =>

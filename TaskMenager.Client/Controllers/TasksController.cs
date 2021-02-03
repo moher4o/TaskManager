@@ -9,38 +9,60 @@ using System.Threading.Tasks;
 using TaskManager.Data.Models;
 using TaskManager.Services;
 using TaskManager.Services.Models;
+using TaskManager.Services.Models.TaskModels;
 using TaskMenager.Client.Models.Tasks;
 using static TaskManager.Common.DataConstants;
 
 namespace TaskMenager.Client.Controllers
 {
     
-    public class TasksController : Controller
+    public class TasksController : BaseController
     {
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
         private readonly ITaskTypesService tasktypes;
         private readonly ITaskPrioritysService taskprioritys;
-        private readonly IEmployeesService employees;
+        //private readonly IEmployeesService employees;
         private readonly IStatusService statuses;
-        private readonly ITasksService tasks;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly UserServiceModel currentUser;
-        public TasksController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks)
+        //private readonly ITasksService tasks;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
+        //private readonly UserServiceModel currentUser;
+        public TasksController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks) : base(httpContextAccessor, employees, tasks)
         {
-            this.tasks = tasks;
+            //this.tasks = tasks;
             this.statuses = statuses;
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
             this.tasktypes = tasktypes;
             this.taskprioritys = taskprioritys;
-            this.employees = employees;
-            this._httpContextAccessor = httpContextAccessor;
-            currentUser = this.employees.GetUserDataForCooky(_httpContextAccessor?.HttpContext?.User?.Identities.FirstOrDefault().Name.ToLower());
+            //this.employees = employees;
+            //this._httpContextAccessor = httpContextAccessor;
+            //currentUser = this.employees.GetUserDataForCooky(_httpContextAccessor?.HttpContext?.User?.Identities.FirstOrDefault().Name.ToLower());
 
         }
+
+        
+        public async Task<IActionResult> AddWorkHours(string taskName, int taskId, int employeeId)
+        {
+            var newWork = new AddWorkedHoursViewModel()
+            {
+                employeeId = employeeId,
+                taskId = taskId,
+                TaskName = taskName,
+                employeeFullName = await this.employees.GetEmployeeNameByIdAsync(employeeId)
+            };
+            return View(newWork);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddWorkHours(AddWorkedHoursViewModel model)
+        {
+            
+            return View();
+        }
+
 
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateNewTask()
@@ -617,7 +639,7 @@ namespace TaskMenager.Client.Controllers
             return newTask;
         }
 
-
+        [Authorize(Policy = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateNewTask(AddNewTaskViewModel model)
         {
@@ -640,7 +662,7 @@ namespace TaskMenager.Client.Controllers
 
             AddNewTaskServiceModel newTask = new AddNewTaskServiceModel();
             
-            newTask.Name = model.TaskName;
+            newTask.TaskName = model.TaskName;
             newTask.Description = model.Description;
             newTask.StartDate = model.Valid_From;
             newTask.EndDatePrognose = model.Valid_To;

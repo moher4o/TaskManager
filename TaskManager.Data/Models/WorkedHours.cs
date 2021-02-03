@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace TaskManager.Data.Models
@@ -17,6 +18,9 @@ namespace TaskManager.Data.Models
         public DateTime WorkDate { get; set; }
 
         public int HoursSpend { get; set; }
+
+        [MaxLength(250)]
+        public string Text { get; set; }
 
         public bool isDeleted { get; set; } = false;
     }
