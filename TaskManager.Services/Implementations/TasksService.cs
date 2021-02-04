@@ -59,7 +59,7 @@ namespace TaskManager.Services.Implementations
                     taskDB.AssignedExperts = assignedEmployeesDB;
                 }
                 await this.db.Tasks.AddAsync(taskDB);
-                var result = await this.db.SaveChangesAsync();
+                await this.db.SaveChangesAsync();
                 return "success";
             }
             catch (Exception)
@@ -251,5 +251,27 @@ namespace TaskManager.Services.Implementations
             return this.db.TasksTypes.Count();
         }
 
+        public async Task<string> SetWorkedHoursAsync(TaskWorkedHoursServiceModel workedHours)
+        {
+            try
+            {
+                var workedHousDB = new WorkedHours()
+                {
+                    EmployeeId = workedHours.EmployeeId,
+                    TaskId = workedHours.TaskId,
+                    HoursSpend = workedHours.HoursSpend,
+                    Text = workedHours.Text,
+                    WorkDate = workedHours.WorkDate
+                };
+                await this.db.WorkedHours.AddAsync(workedHousDB);
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception)
+            {
+                return "Неуспешен запис. Проверете входните данни.";
+            }
+        }
     }
 }

@@ -2,12 +2,12 @@
 @{
     ViewData["Title"] = "Моите задачи";
 }
-<div style="min-height:400px; max-height:401px; overflow:auto;" @(Model.ActiveTasks.Count() > 0 ? "hiden" : "")>
+<div style="min-height:400px; max-height:401px; overflow:auto;" @(Model.ActiveTasks.Count() <= 0 ? "hidden" : "")>
     <h4>Активни задачи</h4>
     @foreach (var item in Model.ActiveTasks)
     {
-        <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
-            @{var name = item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName;}
+        <div class="row PrimeBox3" style="margin-top:5px; font-size:medium; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
+            @{var name = item.TaskName.Length > 55 ? (item.TaskName).Substring(0, 55) + "..." : item.TaskName;}
             <div class="col-md-5">
                 <label>@name</label>
             </div>
@@ -20,29 +20,37 @@
             <div class="col-md-1">
                 <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
             </div>
-            <div class="col-md-2 offset-md-1" style="color: #5f9fec;">
-                <div class="row">
+            <div class="col-md-3" style="color: #5f9fec;">
+                <div class="row"style=" margin-left: 10px;">
+                    <!--<div style="padding-left:20px;">-->
+                        @*<i class="fas fa-info fa-2x"></i>*@
+                        <!--<img class="chatnotifications" src="~/png/details.png" />
+                    </div>-->
                     <div style="padding-left:20px;">
-                        <i class="fas fa-info fa-lg"></i>
-                    </div>
-                    <div style="padding-left:20px;">
-                        <i class="fas fa-sticky-note fa-lg"></i>
+                        @*<i class="fas fa-sticky-note fa-lg"></i>*@
+                        <img class="chatnotifications" src="~/png/note.png" />
+                        <span class="notificationsCountValue">32</span>
                     </div>
                     <div style="padding-left:20px;">
                         <a asp-controller="Tasks" asp-action="AddWorkHours"
-                           asp-route-taskName ="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
+                           asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
                            asp-route-taskId="@item.Id"
-                           asp-route-employeeId="@Model.userId"><i class="fas fa-clock fa-lg"></i></a>
+                           asp-route-employeeId="@Model.userId">
+                            @*<i class="fas fa-clock fa-2x"></i>*@
+                            <img class="chatnotifications" src="~/png/3DClock.png" />
+                            <span class="notificationsCountValue">3</span>
+                        </a>
                     </div>
                     <div style="padding-left:20px;">
-                        <i class="fas fa-plus fa-lg"></i>
+                        @*<i class="fas fa-plus fa-lg"></i>*@
+                        <img class="chatnotifications" src="~/png/plus.png" />
                     </div>
                 </div>
             </div>
         </div>
     }
 </div>
-<div @(Model.AssignerTasks.Count() > 0 ? "hiden" : "")>
+<div @(Model.AssignerTasks.Count() <= 0 ? "hidden" : "")>
     <h4>Задачи по които потребителя е отговорник</h4>
     @foreach (var item in Model.AssignerTasks)
     {
@@ -80,5 +88,6 @@
     }
 </div>
 @section Scripts {
+    <script src="~/js/index.js" charset="utf-8"></script>
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

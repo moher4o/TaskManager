@@ -12,7 +12,7 @@ namespace TaskMenager.Client.Models.Tasks
 
         public int employeeId { get; set; }
 
-        [Display(Name = "Име на служителя")]
+        [Display(Name = "Служител")]
         public string employeeFullName { get; set; }
 
         [Display(Name = "Часове")]

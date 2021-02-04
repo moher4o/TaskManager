@@ -23,7 +23,6 @@ namespace TaskManager.Services
         int TasksTypesCount();
 
         int TasksPrioritysCount();
-
-
+        Task<string> SetWorkedHoursAsync(TaskWorkedHoursServiceModel workedHours);
     }
 }
