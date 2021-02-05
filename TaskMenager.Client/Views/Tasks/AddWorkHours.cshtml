@@ -6,7 +6,7 @@
 
 <form method="post" asp-controller="Tasks" asp-action="AddWorkHours">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="PrimeBox2" style="max-width:60%;">
+    <div class="PrimeBox2" style="max-width:60%; position:relative; right:80px;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">@Model.TaskName</h5>
             <button asp-controller="Home" asp-action="Index" id="x">
@@ -54,7 +54,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top:10px;">
+        margin-top:10px;
+        position:relative;
+        right:80px;">
         <button type="button" class="button save" id="send">Запис</button>
     </div>
     <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />

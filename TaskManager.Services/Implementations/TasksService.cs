@@ -255,17 +255,46 @@ namespace TaskManager.Services.Implementations
         {
             try
             {
-                var workedHousDB = new WorkedHours()
+                var currentTask = await this.db.Tasks.Where(t => t.Id == workedHours.TaskId).FirstOrDefaultAsync();
+                if (currentTask.StartDate.Date >workedHours.WorkDate.Date)
                 {
-                    EmployeeId = workedHours.EmployeeId,
-                    TaskId = workedHours.TaskId,
-                    HoursSpend = workedHours.HoursSpend,
-                    Text = workedHours.Text,
-                    WorkDate = workedHours.WorkDate
-                };
-                await this.db.WorkedHours.AddAsync(workedHousDB);
-                await this.db.SaveChangesAsync();
-                return "success";
+                    return "Началната дата на задачата е : " + currentTask.StartDate.Date.ToString("dd/MM/yyyy")+"г.";
+                }
+                var currentTaskHours = await this.db.WorkedHours
+                    .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId && d.TaskId == workedHours.TaskId)
+                    .FirstOrDefaultAsync();
+
+                var dayWorkedHurs = this.db.WorkedHours
+                    .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId)
+                    .Sum(d => d.HoursSpend);
+                    
+                var totalHoursPerDayPrognose = dayWorkedHurs + workedHours.HoursSpend;
+                if (totalHoursPerDayPrognose <= DataConstants.TotalHoursPerDay)
+                {
+                    if (currentTaskHours == null)
+                    {
+                        var workedHousDB = new WorkedHours()
+                        {
+                            EmployeeId = workedHours.EmployeeId,
+                            TaskId = workedHours.TaskId,
+                            HoursSpend = workedHours.HoursSpend,
+                            Text = workedHours.Text,
+                            WorkDate = workedHours.WorkDate
+                        };
+                        await this.db.WorkedHours.AddAsync(workedHousDB);
+                    }
+                    else
+                    {
+                        currentTaskHours.HoursSpend += workedHours.HoursSpend;
+                    }
+                    await this.db.SaveChangesAsync();
+                    return "success";
+
+                }
+                else
+                {
+                    return "Остават " + (DataConstants.TotalHoursPerDay - dayWorkedHurs).ToString() +"часа за дата "+workedHours.WorkDate.Date.ToString("dd/MM/yyyy")+"г. Записа е неуспешен";
+                }
 
             }
             catch (Exception)

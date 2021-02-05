@@ -66,7 +66,11 @@ namespace TaskMenager.Client.Controllers
                 {
                     return View(model);
                 }
-
+                if (model.HoursSpend <= 0)
+                {
+                    TempData["Error"] = ":) Часовете трябва да са положително цяло число по-голямо от 0";
+                    return View(model);
+                }
                 var workedHours = new TaskWorkedHoursServiceModel()
                 {
                     EmployeeId = model.employeeId,

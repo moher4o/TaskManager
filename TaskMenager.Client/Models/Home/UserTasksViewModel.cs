@@ -10,6 +10,8 @@ namespace TaskMenager.Client.Models.Home
     {
         public int userId { get; set; }
 
+        public int totalHoursPerDay { get; set; } = 0;
+
         public IEnumerable<TaskFewInfoServiceModel> ActiveTasks { get; set; } = new List<TaskFewInfoServiceModel>();
 
         public IEnumerable<TaskFewInfoServiceModel> AssignerTasks { get; set; } = new List<TaskFewInfoServiceModel>();

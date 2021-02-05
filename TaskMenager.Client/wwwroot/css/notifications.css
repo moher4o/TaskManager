@@ -53,14 +53,24 @@
 
 }
 
-.notificationsCountValue {
+.notificationsTodayCountValue {
     position: relative;
     background-color: #fa3e3e;
     border-radius: 2px;
     padding: 1px 3px;
     color: #fff;
     right: 14px;
-    top:-5px;
-    font-size: 11px;
+    top:-7px;
+    font-size: 10px;
+}
+.notificationsCountValue {
+    position: relative;
+    background-color: #3ba3c9;
+    border-radius: 2px;
+    padding: 1px 3px;
+    color: #fff;
+    right: 30px;
+    top: 8px;
+    font-size: 10px;
 }
 /*Facebook like notification*/

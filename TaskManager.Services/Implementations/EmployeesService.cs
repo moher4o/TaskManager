@@ -35,7 +35,7 @@ namespace TaskManager.Services.Implementations
                     .Distinct()
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
-                    .ProjectTo<TaskFewInfoServiceModel>()
+                    .ProjectTo<TaskFewInfoServiceModel>(new { currentEmployeeId = userId })
                     .ToListAsync();
 
             return tasks;

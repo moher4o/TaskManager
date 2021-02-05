@@ -6,6 +6,8 @@ namespace TaskManager.Common
     public static class DataConstants
     {
 
+        public const int TotalHoursPerDay = 8;
+
         public const string SuperAdmin = "SuperAdmin";
         public const string DirectorateAdmin = "DirectorateAdmin";
         public const string DepartmentAdmin = "DepartmentAdmin";

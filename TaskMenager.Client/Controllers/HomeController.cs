@@ -51,6 +51,8 @@ namespace TaskMenager.Client.Controllers
                 ActiveTasks = await this.employees.GetUserActiveTaskAsync(currentUser.Id),
                 AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
+
+            currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
             return View(currentEmployee);
             //string result = string.Empty;
             //if (this.roles.RolesCount() != DataConstants.RolesCount)
