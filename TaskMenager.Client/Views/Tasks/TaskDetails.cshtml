@@ -1,0 +1,73 @@
+﻿@model TaskViewModel
+
+@{
+    ViewData["Title"] = "Детайли";
+}
+
+<div class="PrimeBox2" style="margin-top:20px;">
+    <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
+        <h5 style="color:white; margin-left:15px;">Подробна информация за задача N: @Model.Id.ToString()</h5>
+        <button asp-controller="Home" asp-action="Index" id="x">
+            X
+        </button>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-10">
+            @*@Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", id = "taskName", name = "taskName"})*@
+            <label class="form-control">@Model.TaskName</label>
+        </div>
+    </div>
+    <div class="form-group row" style="margin-bottom:8px;">
+        @Html.LabelFor(model => model.Description, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Въведете описание", rows = "3", @disabled = "disabled" })
+
+        </div>
+    </div>
+    <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
+    <div class="form-group row">
+        @Html.LabelFor(model => model.AssignerName, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-5">
+            <label class="form-control">@Model.AssignerName</label>
+        </div>
+        @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-3">
+            <label class="form-control">@Model.HoursLimit</label>
+        </div>
+    </div>
+    <div class="form-group row">
+        @Html.LabelFor(model => model.Colleagues, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-5">
+            <table class="table table-fixed-small">
+                <thead>
+                    <tr>
+                        <th class="col-md-12">
+                            <a style="color:whitesmoke">Участници</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var emp in Model.Colleagues)
+                    {
+                        <tr>
+                            <td class="col-md-12">
+                            @emp.Text
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @Html.LabelFor(model => model.TaskPriorityName, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-3">
+            <label class="form-control">@Model.TaskPriorityName</label>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

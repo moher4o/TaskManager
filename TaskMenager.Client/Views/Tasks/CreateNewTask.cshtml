@@ -18,6 +18,7 @@
         <div class="form-group row">
             @*@Html.HiddenFor(model => model.Id)*@
             @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
+            <a asp-controller="Home" asp-action="Index">Izhod</a>
             <div class="col-md-10">
                 @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", placeholder = "Въведете име на задачата", id = "taskName", name = "taskName" })
                 <span asp-validation-for="TaskName" class="text-danger"></span>
@@ -141,11 +142,8 @@
                 $("#departmentsId").removeAttr('disabled');
                 $("#sectorsId").removeAttr('disabled');
             }
-
         });
     }
-
-
     function LoadSectors(event) {
         $.getJSON('\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
             if ($('#sectorsId :selected').text() === 'Моля изберете...') {
@@ -164,14 +162,12 @@
                         .attr("value", value.id)
                         .text(value.textValue));
             });
-
             if (data.length <= 0) {
                 $("#sectorsId").attr('disabled', 'disabled');
             }
             else {
                 $("#sectorsId").removeAttr('disabled');
             }
-
         });
     }
 </script>

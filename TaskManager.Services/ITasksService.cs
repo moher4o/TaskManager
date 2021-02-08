@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Services.Models;
@@ -10,6 +11,7 @@ namespace TaskManager.Services
     public interface ITasksService
     {
 
+        IQueryable<TaskInfoServiceModel> GetTaskDetailsAsync(int taskId);
         Task<string> AddNewTaskAsync(AddNewTaskServiceModel newTask);
 
         Task<string> CreateTasksStatusesAsync();

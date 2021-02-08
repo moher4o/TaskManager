@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -209,7 +210,8 @@ namespace TaskMenager.Client.Controllers
                 if (result == "success")
                 {
                     TempData["Success"] = "Задачата е създадена успешно";
-                    return View();
+                    return RedirectToAction(nameof(CreateNewTask));
+
                 }
                 else
                 {
@@ -459,9 +461,14 @@ namespace TaskMenager.Client.Controllers
         private async Task<AddNewTaskViewModel> TasksModelPrepareForViewWithOldInfo(AddNewTaskViewModel oldTask)
         {
             var newTask = new AddNewTaskViewModel();
-
             List<int> subjectsIds = new List<int>();
             newTask.EmployeesIds = oldTask.EmployeesIds != null ? oldTask.EmployeesIds : subjectsIds.ToArray();
+
+            if (currentUser.RoleName == TaskManager.Common.DataConstants.Employee)
+            {
+
+            }
+
             if (currentUser.RoleName == SectorAdmin)
             {
                 newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
@@ -778,6 +785,18 @@ namespace TaskMenager.Client.Controllers
                                .ToList();
             newTask.TaskPriorityId = oldTask.TaskPriorityId;
             return newTask;
+        }
+
+        public async Task<IActionResult> TaskDetails(int taskId)
+        {
+            var taskDetails = new TaskViewModel();
+
+            taskDetails = this.tasks.GetTaskDetailsAsync(taskId)
+                .ProjectTo<TaskViewModel>()
+                .FirstOrDefault();
+
+
+            return View(taskDetails);
         }
 
 

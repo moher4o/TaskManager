@@ -23,6 +23,18 @@ namespace TaskManager.Services.Implementations
 
         }
 
+
+        public IQueryable<TaskInfoServiceModel> GetTaskDetailsAsync(int taskId)
+        {
+            var taskData = this.db.Tasks
+                    .Where(et => et.Id == taskId)
+                    //.Include(te => te.AssignedExperts)
+                    .ProjectTo<TaskInfoServiceModel>()
+                    .AsQueryable();
+
+            return taskData;
+        }
+
         public async Task<string> AddNewTaskAsync(AddNewTaskServiceModel newTask)
         {
             try

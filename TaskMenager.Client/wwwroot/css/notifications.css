@@ -41,8 +41,8 @@
 
 
 .chatnotifications {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     /*background: url('../png/blueClock.png');*/
     /*background-image: url("https://www.facebook.com/rsrc.php/v3/yz/r/QjiHJy8j_PU.png");*/
     /*background-repeat: no-repeat;
@@ -61,7 +61,7 @@
     color: #fff;
     right: 14px;
     top:-7px;
-    font-size: 10px;
+    font-size: 9px;
 }
 .notificationsCountValue {
     position: relative;
@@ -71,6 +71,6 @@
     color: #fff;
     right: 30px;
     top: 8px;
-    font-size: 10px;
+    font-size: 9px;
 }
 /*Facebook like notification*/

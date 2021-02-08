@@ -6,49 +6,73 @@
     <label style="font-size:x-large;"><b>Активни задачи</b></label><label style="padding-left: 50px;"> --> отчетени часове за @DateTime.Now.Date.ToString("dd/MM/yyyy") : <span style="color:red;">@Model.totalHoursPerDay</span></label>
     @foreach (var item in Model.ActiveTasks)
     {
-        <div class="row PrimeBox3" style="margin-top:5px; font-size:medium; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
-            @{var name = item.TaskName.Length > 55 ? (item.TaskName).Substring(0, 55) + "..." : item.TaskName;}
-            <div class="col-md-5">
-                <label><a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id" asp-route-employeeId="@Model.userId">@name</a></label>
+<div class="row PrimeBox3" style="margin-top:5px; font-size:medium; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
+    @{var name = item.TaskName.Length > 50 ? (item.TaskName).Substring(0, 50) + "..." : item.TaskName;}
+    <div class="col-md-5">
+        <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
+    </div>
+    <div class="col-md-2">
+        <label style="padding-left:10px;">@item.TaskStatusName</label>
+    </div>
+    <div class="col-md-1">
+        <label style="padding-left:10px;">@item.TaskPriorityName</label>
+    </div>
+    <div class="col-md-1">
+        <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
+    </div>
+    <div class="col-md-1" style="color: #5f9fec;">
+        <div style="padding-left:20px; min-width:100px;">
+            <img class="chatnotifications" src="~/png/note.png" />
+            <span class="notificationsTodayCountValue">32</span>
+        </div>
+    </div>
+    <div class="col-md-1" style="color: #5f9fec;">
+        <div style="padding-left:20px; min-width:100px;">
+            <a asp-controller="Tasks" asp-action="AddWorkHours"
+               asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
+               asp-route-taskId="@item.Id"
+               asp-route-employeeId="@Model.userId">
+                <img class="chatnotifications" src="~/png/3DClock.png" />
+                <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
+                <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-1" style="color: #5f9fec;">
+        <div style="padding-left:20px;">
+            <img class="chatnotifications" src="~/png/plus.png" />
+        </div>
+    </div>
+
+    <!--<div class="col-md-3" style="color: #5f9fec;">
+        <div class="row" style=" margin-left: 10px;">-->
+    <!--<div style="padding-left:20px;">-->
+    <!--<i class="fas fa-info fa-2x"></i>-->
+    <!--<img class="chatnotifications" src="~/png/details.png" />
             </div>
-            <div class="col-md-2">
-                <label style="padding-left:10px;">@item.TaskStatusName</label>
+            <div style="padding-left:20px; min-width:110px;">
+                <i class="fas fa-sticky-note fa-lg"></i>
+                <img class="chatnotifications" src="~/png/note.png" />
+                <span class="notificationsTodayCountValue">32</span>
             </div>
-            <div class="col-md-1">
-                <label style="padding-left:10px;">@item.TaskPriorityName</label>
+            <div style="padding-left:20px; min-width:110px;">
+                <a asp-controller="Tasks" asp-action="AddWorkHours"
+                   asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
+                   asp-route-taskId="@item.Id"
+                   asp-route-employeeId="@Model.userId">
+                    <i class="fas fa-clock fa-2x"></i>
+                    <img class="chatnotifications" src="~/png/3DClock.png" />
+                    <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
+                    <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
+                </a>
             </div>
-            <div class="col-md-1">
-                <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
-            </div>
-            <div class="col-md-3" style="color: #5f9fec;">
-                <div class="row" style=" margin-left: 10px;">
-                    <!--<div style="padding-left:20px;">-->
-                    @*<i class="fas fa-info fa-2x"></i>*@
-                    <!--<img class="chatnotifications" src="~/png/details.png" />
-                    </div>-->
-                    <div style="padding-left:20px; min-width:110px;">
-                        @*<i class="fas fa-sticky-note fa-lg"></i>*@
-                        <img class="chatnotifications" src="~/png/note.png" />
-                        <span class="notificationsTodayCountValue">32</span>
-                    </div>
-                    <div style="padding-left:20px; min-width:110px;">
-                        <a asp-controller="Tasks" asp-action="AddWorkHours"
-                           asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
-                           asp-route-taskId="@item.Id"
-                           asp-route-employeeId="@Model.userId">
-                            @*<i class="fas fa-clock fa-2x"></i>*@
-                            <img class="chatnotifications" src="~/png/3DClock.png" />
-                            <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
-                            <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
-                        </a>
-                    </div>
-                    <div style="padding-left:20px;">
-                        @*<i class="fas fa-plus fa-lg"></i>*@
-                        <img class="chatnotifications" src="~/png/plus.png" />
-                    </div>
-                </div>
+            <div style="padding-left:20px;">
+                <i class="fas fa-plus fa-lg"></i>
+                <img class="chatnotifications" src="~/png/plus.png" />
             </div>
         </div>
+    </div>-->
+</div>
     }
 </div>
 <div @(Model.AssignerTasks.Count() <= 0 ? "hidden" : "")>
