@@ -16,6 +16,10 @@ namespace TaskManager.Data.Models
         [MaxLength(500)]
         public string Description { get; set; }
 
+        [MaxLength(500)]
+        public string EndNote { get; set; }
+
+
         public int? SectorId { get; set; }
 
         public Sector Sector { get; set; }

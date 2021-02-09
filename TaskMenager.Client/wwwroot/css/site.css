@@ -96,6 +96,20 @@ body {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+.PrimeBox4 {
+    border: 1px solid #2a67ac;
+    border-right: 2px solid #2a67ac;
+    border-bottom: 3px solid #2a67ac;
+    background-color: rgba(42, 103, 172, 0.9);
+    box-shadow: 2px 2px 8px rgba(42, 103, 172, 0.5);
+    background: #fff;
+    width: 100%;
+    margin: 0% auto 0 auto;
+    padding: 0em 0.4em 0em 0.4em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
 
 #container {
     /*width: 80%;*/
@@ -457,3 +471,92 @@ div.menuspace {
     line-height: 1.8;
 }
 
+/*FIXED TABLE*/
+.table-fixed tbody {
+    height: 490px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.table-fixed thead,
+.table-fixed tbody,
+.table-fixed tr,
+.table-fixed td,
+.table-fixed th {
+    display: block;
+}
+
+    .table-fixed tr:after {
+        content: "";
+        display: block;
+        visibility: hidden;
+        clear: both;
+    }
+
+    .table-fixed tbody td,
+    .table-fixed thead > tr > th {
+        float: left;
+    }
+
+/*table-fixed-small*/
+.table-fixed-small tbody {
+    height: 420px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.table-fixed-small thead,
+.table-fixed-small tbody,
+.table-fixed-small tr,
+.table-fixed-small td,
+.table-fixed-small th {
+    display: block;
+}
+
+    .table-fixed-small tr:after {
+        content: "";
+        display: block;
+        visibility: hidden;
+        clear: both;
+    }
+
+    .table-fixed-small tbody td,
+    .table-fixed-small thead > tr > th {
+        float: left;
+    }
+/*table-fixed-small*/
+
+
+.table > thead > tr > th,
+.table > thead > tr > td {
+    font-size: .8em;
+    font-weight: 400;
+    border-bottom: 0;
+    letter-spacing: 1px;
+    vertical-align: top;
+    padding: 8px;
+    /*background: #e9ecef;*/
+    background: #8bb2ed;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.table-info > tbody > tr > td,
+.table-info > tbody > tr > td > pre,
+.table-info > tbody > tr > td > input,
+.table-info > tbody > tr > td > textarea,
+.table-info > tbody > tr > td > a,
+.table-info > tbody > tr > td > p {
+    margin-left: 10px;
+    min-width: 120px !important;
+}
+
+.meaning {
+    max-width: 160px !important;
+}
+
+.meaning-version {
+    width: 25% !important;
+}
+
+/*FIXED TABLE*/

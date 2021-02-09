@@ -49,7 +49,7 @@ namespace TaskMenager.Client.Models.Tasks
         public DateTime? EndDate { get; set; }
 
         [DataType(DataType.Date)]
-        [Display(Name = "Крайна дата: ")]
+        [Display(Name = "Крайна дата(прогнозна): ")]
         public DateTime? EndDatePrognose { get; set; }
 
         public int? ParentTaskId { get; set; }
@@ -89,15 +89,16 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Основна Задача: ")]
         public string ParentTaskName { get; set; }
 
-        [Display(Name = "Дирекция")] 
+        [Display(Name = "Дирекция: ")] 
         public string DirectorateName { get; set; }
 
-        [Display(Name = "Отдел")]
+        [Display(Name = "Отдел: ")]
         public string DepartmentName { get; set; }
 
-        [Display(Name = "Сектор")]
+        [Display(Name = "Сектор: ")]
         public string SectorName { get; set; }
 
+        [Display(Name = "Участници: ")]
         public IList<SelectListItem> Colleagues { get; set; } = new List<SelectListItem>();
 
         public void ConfigureMapping(Profile profile)

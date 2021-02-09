@@ -10,15 +10,14 @@
     <div class="PrimeBox2" style="margin-top:20px;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">Създаване на задача</h5>
-            <button asp-controller="Home" asp-action="Index" id="x">
-                X
-            </button>
+                <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">
+                    X
+                </button>
         </div>
 
         <div class="form-group row">
             @*@Html.HiddenFor(model => model.Id)*@
             @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
-            <a asp-controller="Home" asp-action="Index">Izhod</a>
             <div class="col-md-10">
                 @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", placeholder = "Въведете име на задачата", id = "taskName", name = "taskName" })
                 <span asp-validation-for="TaskName" class="text-danger"></span>
