@@ -18,9 +18,16 @@
         errorBox.fadeIn();
         setTimeout(() => errorBox.fadeOut(), 3000);
     }
+    function showSuccess(message) {
+        let successBox = $('#successBox');
+        successBox.find('span').text(message);
+        successBox.fadeIn();
+        setTimeout(() => successBox.fadeOut(), 3000);
+    }
 
     return {
         showInfo,
-        showError
+        showError,
+        showSuccess
     };
 })();

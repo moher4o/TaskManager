@@ -10,7 +10,7 @@ for details on configuring this project to bundle and minify static web assets. 
 body {
     padding-top: 10px;
     padding-bottom: 10px;
-    max-width:99.1%;
+    max-width: 99.1%;
 }
 
 /* Wrapping element */
@@ -63,7 +63,7 @@ body {
     margin: 10% auto 0 auto;
     padding: 1em;
     padding-bottom: 1em;
-/*    text-align: center;*/
+    /*    text-align: center;*/
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -96,6 +96,7 @@ body {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+
 .PrimeBox4 {
     border: 1px solid #2a67ac;
     border-right: 2px solid #2a67ac;
@@ -110,6 +111,18 @@ body {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+.modal-dialog {
+    position: absolute;
+    top: 120px;
+    right: 100px;
+    bottom: 0;
+    left: 0;
+    z-index: 10040;
+    overflow: auto;
+    overflow-y: auto;
+}
+
 
 #container {
     /*width: 80%;*/
@@ -172,15 +185,15 @@ hr {
     background-color: #006cc7;
     border: 0 none;
     margin-top: 8px;
-    margin-bottom:0px;
- }
+    margin-bottom: 0px;
+}
 
 /* Копирано от Убд */
 
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
 }
 
 /* Provide sufficient contrast against white background */
@@ -190,61 +203,65 @@ a {
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
+
 @media (min-width: 768px) {
-  html {
-/*    font-size: 16px;
-*/  }
+    html {
+        /*    font-size: 16px;
+*/
+    }
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
 }
+
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
 button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+    font-size: 1rem;
+    line-height: inherit;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
 }
+
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 25px; /* Vertically center the text there */
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 25px; /* Vertically center the text there */
 }
 
 /*3D BUTTON*/
@@ -377,6 +394,37 @@ body {
             background-color: #28d92f;
         }
 
+    .button.save-small {
+        margin-right: 20px;
+        min-width: 100px;
+        padding: 5px 11px;
+        font-size: 12px;
+        color: #fff;
+        background-color: #cb8181;
+    }
+
+
+        .button.save-small:hover {
+            background-color: #ae5d5d;
+        }
+
+
+    .button.save {
+        margin-right: 20px;
+        min-width: 150px;
+        padding: 5px 15px;
+        font-size: 14px;
+        color: #fff;
+        background-color: #cb8181;
+    }
+
+
+        .button.save:hover {
+            background-color: #ae5d5d;
+        }
+
+
+
     .button.search {
         margin-right: 20px;
         min-width: 50px;
@@ -419,52 +467,38 @@ body {
             background-color: #a2c0f5;
         }
 
-    .button.save {
+    .button.choice {
         margin-right: 20px;
-        min-width: 150px;
-        padding: 5px 15px;
+        min-width: 50px;
+        padding: 5px 10px;
         font-size: 14px;
         color: #fff;
-        background-color: #cb8181;
+        /*background-color: #afce47*/
+        background-color: #49744a;
     }
 
-l
-.button.save:hover {
-    background-color: #ae5d5d;
-}
+        .button.choice:hover {
+            background-color: #478249;
+        }
 
-.button.choice {
-    margin-right: 20px;
-    min-width: 50px;
-    padding: 5px 10px;
-    font-size: 14px;
-    color: #fff;
-    /*background-color: #afce47*/
-    background-color: #49744a;
-}
 
-    .button.choice:hover {
-        background-color: #478249;
+    .button.notselected {
+        color: #000;
+        background-color: #9fa1a5;
     }
 
+        .button.notselected:hover {
+            background-color: #7f8aa1;
+        }
 
-.button.notselected {
-    color: #000;
-    background-color: #9fa1a5;
-}
-
-    .button.notselected:hover {
-        background-color: #7f8aa1;
+    .button.btnnotactive {
+        color: #fff;
+        background-color: #ae5d5d;
     }
 
-.button.btnnotactive {
-    color: #fff;
-    background-color: #ae5d5d;
-}
-
-    .button.btnnotactive:hover {
-        background-color: #9c3a3a;
-    }
+        .button.btnnotactive:hover {
+            background-color: #9c3a3a;
+        }
 /*3D BUTTON*/
 
 div.menuspace {

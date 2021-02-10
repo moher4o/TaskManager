@@ -123,10 +123,10 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
-        public IActionResult NotAuthorized()
-        {
-            return View();
-        }
+        //public IActionResult NotAuthorized()
+        //{
+        //    return View();
+        //}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -134,7 +134,35 @@ namespace TaskMenager.Client.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        public IActionResult CloseTask(int taskId, string taskName)
+        {
+            var model = new CloseTaskViewModel();
 
+            model.TaskId = taskId;
+            model.TaskName = taskName;
+
+            return PartialView("_CloseTaskModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CloseTask(CloseTaskViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                bool result = await this.tasks.CloseTaskAsync(model.TaskId, model.EndNote, currentUser.Id);
+                if (result)
+                {
+                    TempData["Success"] = "Задачата е приключена успешно!";
+                }
+                else
+                {
+                    TempData["Error"] = "Сървиз грешка! Уведомете администратора.";
+                }
+                
+            }
+            return PartialView("_CloseTaskModalPartial", model);
+        }
 
     }
 }

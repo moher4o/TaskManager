@@ -50,6 +50,10 @@ namespace TaskManager.Data.Models
         public int AssignerId { get; set; }
         public Employee Assigner { get; set; }
 
+        public int? CloseUserId { get; set; }
+        public Employee CloseUser { get; set; }
+
+
         public int StatusId { get; set; }
         public TasksStatus TaskStatus { get; set; }
 

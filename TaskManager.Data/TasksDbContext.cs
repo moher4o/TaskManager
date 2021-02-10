@@ -139,6 +139,13 @@ namespace TaskManager.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Employee>()
+                .HasMany(tt => tt.TasksCloser)
+                .WithOne(t => t.CloseUser)
+                .HasForeignKey(t => t.CloseUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+            builder.Entity<Employee>()
                 .HasMany(tt => tt.TasksAssigner)
                 .WithOne(t => t.Assigner)
                 .HasForeignKey(t => t.AssignerId)

@@ -25,6 +25,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @*<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>*@
     <script src="~/js/notify.js"></script>
+    
 </head>
 <body>
     <header>
@@ -160,11 +161,12 @@
                     @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <i class="fas fa-align-justify"></i>
                         </button>*@
-                    <div class="offset-4" id="notifications">
-                        <div id="loadingBox" class="notification"><span>Loading …</span></div>
-                        <div id="infoBox" class="notification"><span>Info</span></div>
-                        <div id="errorBox" class="notification"><span>Error</span></div>
-                    </div>
+                <div class="offset-4" id="notifications">
+                    <div id="loadingBox" class="notification"><span>Loading …</span></div>
+                    <div id="infoBox" class="notification"><span>Info</span></div>
+                    <div id="errorBox" class="notification"><span>Error</span></div>
+                    <div id="successBox" class="notification"><span>Success</span></div>
+                </div>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
@@ -204,11 +206,24 @@
                     @RenderBody()
                     @if (TempData["Success"] != null)
                     {
-                        <p class="alert alert-success" id="successMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                var data = $('#successMessage').text();
+                                notify.showSuccess(data);
+                            });
+                        </script>
+                        <p class="alert alert-success" id="successMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
                     }
                     @if (TempData["Error"] != null)
                     {
-                        <p class="alert alert-danger" id="errorMessage" style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                var data = $('#errorMessage').text();
+                                notify.showError(data);
+                            });
+                        </script>
+
+                        <p class="alert alert-danger" id="errorMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
                     }
                 </main>
 

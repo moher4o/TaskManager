@@ -314,5 +314,42 @@ namespace TaskManager.Services.Implementations
                 return "Неуспешен запис. Проверете входните данни.";
             }
         }
+
+        public async Task<bool> CloseTaskAsync(int taskId, string endNote, int closerid)
+        {
+            var currentTask = await this.db.Tasks
+                       .Where(t => t.Id == taskId)
+                       .FirstOrDefaultAsync();
+            if (currentTask == null)
+            {
+                return false;
+            }
+
+            currentTask.EndNote = endNote;
+            currentTask.CloseUserId = closerid;
+            currentTask.EndDate = DateTime.UtcNow;
+            currentTask.TaskStatus = await this.db.TasksStatuses
+                                                    .Where(t => t.StatusName == DataConstants.TaskStatusClosed)
+                                                    .FirstOrDefaultAsync();
+            await this.db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ReopenTaskAsync(int taskId)
+        {
+            var currentTask = await this.db.Tasks
+                       .Where(t => t.Id == taskId)
+                       .FirstOrDefaultAsync();
+            if (currentTask == null)
+            {
+                return false;
+            }
+            currentTask.EndDate = null;
+            currentTask.TaskStatus = await this.db.TasksStatuses
+                                                    .Where(t => t.StatusName == DataConstants.TaskStatusInProgres)
+                                                    .FirstOrDefaultAsync();
+            await this.db.SaveChangesAsync();
+            return true;
+        }
     }
 }

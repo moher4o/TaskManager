@@ -246,6 +246,9 @@ namespace TaskManager.Data.Migrations
                     b.Property<int>("AssignerId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CloseUserId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
@@ -304,6 +307,8 @@ namespace TaskManager.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignerId");
+
+                    b.HasIndex("CloseUserId");
 
                     b.HasIndex("DepartmentId");
 
@@ -490,6 +495,11 @@ namespace TaskManager.Data.Migrations
                         .HasForeignKey("AssignerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("TaskManager.Data.Models.Employee", "CloseUser")
+                        .WithMany("TasksCloser")
+                        .HasForeignKey("CloseUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("TaskManager.Data.Models.Department", "Department")
                         .WithMany("Tasks")

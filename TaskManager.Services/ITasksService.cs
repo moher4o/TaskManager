@@ -26,5 +26,6 @@ namespace TaskManager.Services
 
         int TasksPrioritysCount();
         Task<string> SetWorkedHoursAsync(TaskWorkedHoursServiceModel workedHours);
+        Task<bool> CloseTaskAsync(int taskId, string endNote, int closerid);
     }
 }

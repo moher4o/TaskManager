@@ -12,12 +12,12 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Номер на задачата")]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Полето е задължително")]
         [MaxLength(250)]
         [Display(Name = "Име *")]
         public string TaskName { get; set; }
 
-        [Required]
+        
         [MaxLength(500)]
         [Display(Name = "Описание")]
         public string Description { get; set; }
@@ -41,7 +41,7 @@ namespace TaskMenager.Client.Models.Tasks
 
         public string SectorsId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Полето е задължително")]
         [DataType(DataType.Date)]
         [Display(Name = "Начална дата *")]
         public DateTime Valid_From { get; set; } = DateTime.UtcNow.Date;
