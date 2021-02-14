@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace TaskManager.Services.Implementations
         }
 
 
-        public IQueryable<TaskInfoServiceModel> GetTaskDetailsAsync(int taskId)
+        public IQueryable<TaskInfoServiceModel> GetTaskDetails(int taskId)
         {
             var taskData = this.db.Tasks
                     .Where(et => et.Id == taskId)
@@ -320,14 +321,14 @@ namespace TaskManager.Services.Implementations
             var currentTask = await this.db.Tasks
                        .Where(t => t.Id == taskId)
                        .FirstOrDefaultAsync();
-            if (currentTask == null)
+            if (currentTask == null || endNote.Length > 500)
             {
                 return false;
             }
 
             currentTask.EndNote = endNote;
             currentTask.CloseUserId = closerid;
-            currentTask.EndDate = DateTime.UtcNow;
+            currentTask.EndDate = DateTime.Now;
             currentTask.TaskStatus = await this.db.TasksStatuses
                                                     .Where(t => t.StatusName == DataConstants.TaskStatusClosed)
                                                     .FirstOrDefaultAsync();
@@ -344,7 +345,9 @@ namespace TaskManager.Services.Implementations
             {
                 return false;
             }
+            CultureInfo.CurrentCulture.ClearCachedData();
             currentTask.EndDate = null;
+            currentTask.EndNote = "Задачата е отново отворена на дата " + DateTime.Now.ToString("dd/MM/yyyy") + "г. " + "--> " + (currentTask.EndNote.Length > 430 ? currentTask.EndNote.Substring(0, 430) + "..." : currentTask.EndNote);
             currentTask.TaskStatus = await this.db.TasksStatuses
                                                     .Where(t => t.StatusName == DataConstants.TaskStatusInProgres)
                                                     .FirstOrDefaultAsync();

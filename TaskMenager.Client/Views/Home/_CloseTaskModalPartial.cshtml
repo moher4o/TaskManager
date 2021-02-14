@@ -1,0 +1,32 @@
+﻿@model CloseTaskViewModel
+<!-- Modal -->
+<div class="modal fade" id="add-contact" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div style="background-color:whitesmoke;"  class="modal-header">
+                <label style="font-size:medium;" class="modal-title" id="addContactLabel"><strong>Приключване на задача: </strong></label>
+                <p><span style="font-weight:700">@Model.TaskName</span></p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="CloseTask">
+                    <input asp-for="TaskId" hidden />
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <div class="form-group">
+                        <label asp-for="EndNote">Коментар до 500 символа</label>
+                        @Html.TextAreaFor(model => model.EndNote, new { @class = "form-control", placeholder = "Въведете подробна информация", rows = "5" })
+                        <span asp-validation-for="EndNote" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                @*<button type="button" class="btn btn-secondary" data-dismiss="modal">Отказ</button>*@
+                @*<button type="button" class="btn btn-primary" data-save="modal">Приключи</button>*@
+                <button type="button" class="button back-small" data-dismiss="modal">Отказ</button>
+                <button type="button" class="button save-small" data-save="modal">Приключи</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -45,6 +45,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                 var roleName = await this.roles.UserRoleNameByRoleIdAsync(currentEmployee.RoleId);
 
                 ci.AddClaim(new Claim("fullName", currentEmployee.FullName));
+                ci.AddClaim(new Claim("userId", currentEmployee.Id.ToString()));
 
                 if (roleName != DataConstants.Employee)
                 {

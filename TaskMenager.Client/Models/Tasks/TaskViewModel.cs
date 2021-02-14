@@ -27,6 +27,9 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Описание: ")]
         public string Description { get; set; }
 
+        [Display(Name = "Финален коментар: ")]
+        public string EndNote { get; set; }
+
         public int? SectorId { get; set; }
 
         public int? DepartmentId { get; set; }

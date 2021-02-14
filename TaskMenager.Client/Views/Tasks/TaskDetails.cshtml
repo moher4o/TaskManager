@@ -3,7 +3,8 @@
 @{
     ViewData["Title"] = "Детайли";
 }
-
+@{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
+@{var isClosed = Model.TaskStatusName == DataConstants.TaskStatusClosed;}
 <div class="PrimeBox2" style="margin-top:20px;">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
         <h5 style="color:white; margin-left:15px;">Подробна информация за задача N: @Model.Id.ToString()</h5>
@@ -13,36 +14,36 @@
     </div>
 
     <div class="form-group row">
-        @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
+        @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label strong" })
         <div class="col-md-10">
             @*@Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", id = "taskName", name = "taskName"})*@
-            <label class="form-control">@Model.TaskName</label>
+            <label class="form-control" style="border:none;">@Model.TaskName</label>
         </div>
     </div>
     <div class="form-group row" style="margin-bottom:8px;">
-        @Html.LabelFor(model => model.Description, new { @class = "col-md-2 col-form-label" })
+        @Html.LabelFor(model => model.Description, new { @class = "col-md-2 col-form-label strong" })
         <div class="col-md-10">
-            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Въведете описание", rows = "3", @readonly = "readonly"})
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "3", @readonly = "readonly" })
         </div>
     </div>
     <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
     <div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.AssignerName, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.AssignerName, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
-                <label class="form-control">@Model.AssignerName</label>
+                <label class="form-control" style="border:none;">@Model.AssignerName</label>
             </div>
             <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
-                @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-5 col-form-label" })
+                @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-5 col-form-label strong" })
                 <div class="col-md-5">
-                    <label class="form-control">@Model.HoursLimit</label>
+                    <label class="form-control" style="border:none;">@Model.HoursLimit</label>
                 </div>
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.Colleagues, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Colleagues, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
-                <table class="table table-fixed-small table-bordered">
+                <table class="table table-fixed-small table-responsive-sm">
                     @*<thead>
                             <tr>
                                 <th class="col-md-12">
@@ -64,76 +65,115 @@
             </div>
             <div class="container form-group row col-md-5" style="padding-left:31px;">
                 <div class="form-group row" style="margin-bottom: 0rem; width:100%;">
-                    @Html.LabelFor(model => model.TaskPriorityName, new { @class = "col-md-5 col-form-label" })
+                    @Html.LabelFor(model => model.TaskPriorityName, new { @class = "col-md-5 col-form-label strong" })
                     <div class="col-md-5" style="padding-left:17px;">
-                        <label class="form-control" style=" background-color:@(Model.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">@Model.TaskPriorityName</label>
+                        <label class="form-control" style="border:none; background-color:@(Model.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">@Model.TaskPriorityName</label>
                     </div>
                 </div>
                 <div class="form-group row" style="margin-bottom: 0rem; width:100%;">
-                    @Html.LabelFor(model => model.TaskStatusName, new { @class = "col-md-5 col-form-label" })
+                    @Html.LabelFor(model => model.TaskStatusName, new { @class = "col-md-5 col-form-label strong" })
                     <div class="col-md-5" style="padding-left:17px;">
-                        <label class="form-control">@Model.TaskStatusName</label>
+                        <label class="form-control" style="border:none;">@Model.TaskStatusName</label>
                     </div>
                 </div>
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.DirectorateName, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.DirectorateName, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
-                <label class="form-control">@Model.DirectorateName</label>
+                <label class="form-control" style="border:none;">@Model.DirectorateName</label>
             </div>
             <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
-                @Html.LabelFor(model => model.TaskTypeName, new { @class = "col-md-5 col-form-label" })
+                @Html.LabelFor(model => model.TaskTypeName, new { @class = "col-md-5 col-form-label strong" })
                 <div class="col-md-5">
-                    <label class="form-control">@Model.TaskTypeName</label>
+                    <label class="form-control" style="border:none;">@Model.TaskTypeName</label>
                 </div>
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.DepartmentName, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.DepartmentName, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
-                <label class="form-control">@Model.DepartmentName</label>
+                <label class="form-control" style="border:none;">@Model.DepartmentName</label>
             </div>
             <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
-                @Html.LabelFor(model => model.SectorName, new { @class = "col-md-5 col-form-label" })
+                @Html.LabelFor(model => model.SectorName, new { @class = "col-md-5 col-form-label strong" })
                 <div class="col-md-5">
-                    <label class="form-control">@Model.SectorName</label>
+                    <label class="form-control" style="border:none;">@Model.SectorName</label>
                 </div>
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.StartDate, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.StartDate, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
-                <label class="form-control">@Model.StartDate.Date.ToString("dd/MM/yyyy")г.</label>
+                <label class="form-control" style="border:none;">@Model.StartDate.Date.ToString("dd/MM/yyyy")г.</label>
             </div>
             <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
-                @Html.LabelFor(model => model.EndDatePrognose, new { @class = "col-md-5 col-form-label" })
+                @Html.LabelFor(model => model.EndDatePrognose, new { @class = "col-md-5 col-form-label strong" })
                 <div class="col-md-5">
-                    <label class="form-control">@Model.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy")г.</label>
+                    <label class="form-control" style="border:none;">@Model.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy")г.</label>
                 </div>
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.RegCreated, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.RegCreated, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
-                <label class="form-control">@Model.RegCreated.Date.ToString("dd/MM/yyyy")г.</label>
+                <label class="form-control" style="border:none;">@Model.RegCreated.Date.ToString("dd/MM/yyyy")г.</label>
             </div>
-            <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
-                @Html.LabelFor(model => model.EndDate, new { @class = "col-md-5 col-form-label" })
-                <div class="col-md-5">
-                    <label class="form-control">
-                        @(Model.EndDate.HasValue ?
+            @if (isClosed)
+            {
+                <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
+                    @Html.LabelFor(model => model.EndDate, new { @class = "col-md-5 col-form-label strong" })
+                    <div class="col-md-5">
+                        <label class="form-control" style="border:none;">
+                            @(Model.EndDate.HasValue ?
                     @Model.EndDate.Value.Date.ToString("dd/MM/yyyy") : "")
-                    </label>
+                        </label>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.OwnerName, new { @class = "col-md-2 col-form-label strong" })
+            <div class="col-md-5">
+                <label class="form-control" style="border:none;">@Model.OwnerName</label>
+            </div>
+            <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
+                <div class="col-md-5"></div>
+                <div class="col-md-5">
+                    @if (isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                    {
+                        var modalId = "modal" + Model.Id.ToString();
+                        <form method="post" asp-controller="Tasks" asp-action="ReopenTask" asp-route-taskId="@Model.Id">
+                            <a title="Ново отваряне на задачата" style="background-color: #b2d6f8;" class="btn btn-secondary" data-toggle="modal" data-target="#@modalId">
+                                Възстановяване
+                            </a>
+                            <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div style="background-color:white;" class="modal-content">
+                                        <div class="modal-body">
+                                            <h5>Сигурни ли сте, че искате да отворите отново задача: </h5> <h5><span style="font-weight:700">@Model.TaskName</span></h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отказ</button>
+                                            <button type="submit" class="btn btn-danger">Потвърди</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    }
                 </div>
             </div>
         </div>
-        <div class="form-group row">
-            @Html.LabelFor(model => model.OwnerName, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-5">
-                <label class="form-control">@Model.OwnerName</label>
+        @if (!string.IsNullOrWhiteSpace(Model.EndNote))
+        {
+            <div class="form-group row" style="margin-bottom:8px;">
+                @Html.LabelFor(model => model.EndNote, new { @class = "col-md-2 col-form-label strong" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.EndNote, new { @class = "form-control", rows = "3", @readonly = "readonly" })
+                </div>
             </div>
-        </div>
+        }
     </div>
 </div>
 

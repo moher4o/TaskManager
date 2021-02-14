@@ -787,17 +787,25 @@ namespace TaskMenager.Client.Controllers
             return newTask;
         }
 
-        public async Task<IActionResult> TaskDetails(int taskId)
+        public IActionResult TaskDetails(int taskId)
         {
             var taskDetails = new TaskViewModel();
 
-            taskDetails = this.tasks.GetTaskDetailsAsync(taskId)
+            taskDetails = this.tasks.GetTaskDetails(taskId)
                 .ProjectTo<TaskViewModel>()
                 .FirstOrDefault();
 
 
             return View(taskDetails);
         }
+
+        public async Task<IActionResult> ReopenTask(int taskId)
+        {
+            var result = await this.tasks.ReopenTaskAsync(taskId);
+
+            return RedirectToAction(nameof(TaskDetails), new { taskId });
+        }
+
 
 
         public async Task<IActionResult> GetDepartments(string direktorateId)

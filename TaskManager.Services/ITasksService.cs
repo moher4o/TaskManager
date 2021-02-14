@@ -11,7 +11,7 @@ namespace TaskManager.Services
     public interface ITasksService
     {
 
-        IQueryable<TaskInfoServiceModel> GetTaskDetailsAsync(int taskId);
+        IQueryable<TaskInfoServiceModel> GetTaskDetails(int taskId);
         Task<string> AddNewTaskAsync(AddNewTaskServiceModel newTask);
 
         Task<string> CreateTasksStatusesAsync();
@@ -27,5 +27,7 @@ namespace TaskManager.Services
         int TasksPrioritysCount();
         Task<string> SetWorkedHoursAsync(TaskWorkedHoursServiceModel workedHours);
         Task<bool> CloseTaskAsync(int taskId, string endNote, int closerid);
+
+        Task<bool> ReopenTaskAsync(int taskId);
     }
 }

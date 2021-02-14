@@ -14,6 +14,8 @@ namespace TaskManager.Services.Models.TaskModels
 
         public string Description { get; set; }
 
+        public string EndNote { get; set; }
+
         public int? SectorId { get; set; }
 
         public int? DepartmentId { get; set; }
