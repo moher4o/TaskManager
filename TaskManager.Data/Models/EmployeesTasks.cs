@@ -13,5 +13,7 @@ namespace TaskManager.Data.Models
         public int TaskId { get; set; }
 
         public Task Task { get; set; }
+
+        public bool isDeleted { get; set; } = false;
     }
 }

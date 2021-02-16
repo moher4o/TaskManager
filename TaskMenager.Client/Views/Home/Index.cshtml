@@ -68,7 +68,11 @@
             </div>
             <div class="col-md-1" style="color: #5f9fec;">
                 <div style="padding-left:20px; min-width:100px;">
-                    <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+                    <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
+                        <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+                    </a>
+
+                    
                 </div>
             </div>
 

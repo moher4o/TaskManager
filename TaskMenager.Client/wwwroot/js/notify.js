@@ -16,13 +16,13 @@
         let errorBox = $('#errorBox');
         errorBox.find('span').text(message);
         errorBox.fadeIn();
-        setTimeout(() => errorBox.fadeOut(), 3000);
+        setTimeout(() => errorBox.fadeOut(), 8000);
     }
     function showSuccess(message) {
         let successBox = $('#successBox');
         successBox.find('span').text(message);
         successBox.fadeIn();
-        setTimeout(() => successBox.fadeOut(), 3000);
+        setTimeout(() => successBox.fadeOut(), 8000);
     }
 
     return {

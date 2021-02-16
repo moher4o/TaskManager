@@ -29,5 +29,6 @@ namespace TaskManager.Services
         Task<bool> CloseTaskAsync(int taskId, string endNote, int closerid);
 
         Task<bool> ReopenTaskAsync(int taskId);
+        Task<string> EditTaskAsync(AddNewTaskServiceModel taskToEdit);
     }
 }

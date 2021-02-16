@@ -140,7 +140,8 @@
             <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
                 <div class="col-md-5"></div>
                 <div class="col-md-5">
-                    @if (isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                    @if (isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
+                       || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         var modalId = "modal" + Model.Id.ToString();
                         <form method="post" asp-controller="Tasks" asp-action="ReopenTask" asp-route-taskId="@Model.Id">
@@ -161,6 +162,13 @@
                                 </div>
                             </div>
                         </form>
+                    }
+                    @if (!isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
+                       || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                    {
+                        <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@Model.Id">
+                            Редактиране
+                        </a>
                     }
                 </div>
             </div>

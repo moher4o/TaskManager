@@ -51,7 +51,7 @@ namespace TaskManager.Services.Implementations
                     SectorId = newTask.SectorId,
                     OwnerId = newTask.OwnerId,
                     HoursLimit = newTask.HoursLimit,
-                    RegCreated = DateTime.UtcNow.Date,
+                    RegCreated = DateTime.Now.Date,
                     StartDate = newTask.StartDate,
                     EndDatePrognose = newTask.EndDatePrognose,
                     PriorityId = newTask.PriorityId,
@@ -268,10 +268,19 @@ namespace TaskManager.Services.Implementations
         {
             try
             {
-                var currentTask = await this.db.Tasks.Where(t => t.Id == workedHours.TaskId).FirstOrDefaultAsync();
-                if (currentTask.StartDate.Date >workedHours.WorkDate.Date)
+                var isActiveEmployee = await this.db.EmployeesTasks
+                    .Where(e => e.EmployeeId == workedHours.EmployeeId && e.TaskId == workedHours.TaskId)
+                    .Select(t => t.isDeleted).FirstOrDefaultAsync();
+
+                if (!isActiveEmployee)
                 {
-                    return "Началната дата на задачата е : " + currentTask.StartDate.Date.ToString("dd/MM/yyyy")+"г.";
+                    return workedHours.EmployeeName + " не е активен участник по задача: " + workedHours.TaskName;
+                }
+
+                var currentTask = await this.db.Tasks.Where(t => t.Id == workedHours.TaskId && t.isDeleted == false).FirstOrDefaultAsync();
+                if (currentTask.StartDate.Date > workedHours.WorkDate.Date)
+                {
+                    return "Началната дата на задачата е : " + currentTask.StartDate.Date.ToString("dd/MM/yyyy") + "г.";
                 }
                 var currentTaskHours = await this.db.WorkedHours
                     .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId && d.TaskId == workedHours.TaskId)
@@ -280,7 +289,7 @@ namespace TaskManager.Services.Implementations
                 var dayWorkedHurs = this.db.WorkedHours
                     .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId)
                     .Sum(d => d.HoursSpend);
-                    
+
                 var totalHoursPerDayPrognose = dayWorkedHurs + workedHours.HoursSpend;
                 if (totalHoursPerDayPrognose <= DataConstants.TotalHoursPerDay)
                 {
@@ -306,7 +315,7 @@ namespace TaskManager.Services.Implementations
                 }
                 else
                 {
-                    return "Остават " + (DataConstants.TotalHoursPerDay - dayWorkedHurs).ToString() +"часа за дата "+workedHours.WorkDate.Date.ToString("dd/MM/yyyy")+"г. Записа е неуспешен";
+                    return "Остават " + (DataConstants.TotalHoursPerDay - dayWorkedHurs).ToString() + "часа за дата " + workedHours.WorkDate.Date.ToString("dd/MM/yyyy") + "г. Записа е неуспешен";
                 }
 
             }
@@ -353,6 +362,102 @@ namespace TaskManager.Services.Implementations
                                                     .FirstOrDefaultAsync();
             await this.db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<string> EditTaskAsync(AddNewTaskServiceModel taskToEdit)
+        {
+            try
+            {
+                var result = "success";
+                if (taskToEdit == null)
+                {
+                    return "Service error! EditTaskAsync --> taskToEdit is null. Send result to admin";
+                }
+                var currentTask = await this.db.Tasks
+               .Where(t => t.Id == taskToEdit.Id)
+               .FirstOrDefaultAsync();
+                if (currentTask == null)
+                {
+                    return "Не съществува задача с N: " + taskToEdit.Id.ToString();
+                }
+
+                currentTask.TaskName = taskToEdit.TaskName;
+                currentTask.Description = taskToEdit.Description;
+                currentTask.AssignerId = taskToEdit.AssignerId;
+                currentTask.DirectorateId = taskToEdit.DirectorateId;
+                currentTask.DepartmentId = taskToEdit.DepartmentId;
+                currentTask.SectorId = taskToEdit.SectorId;
+                currentTask.HoursLimit = taskToEdit.HoursLimit;
+                currentTask.EndDatePrognose = taskToEdit.EndDatePrognose.Value.Date;
+                currentTask.PriorityId = taskToEdit.PriorityId;
+                currentTask.TypeId = taskToEdit.TypeId;
+                currentTask.StatusId = taskToEdit.StatusId;
+                //OwnerId = newTask.OwnerId,
+                //RegCreated = DateTime.UtcNow.Date,
+                var firstDateWorkedHours = await this.db.WorkedHours
+                    .Where(d => d.TaskId == currentTask.Id)
+                    .OrderBy(d => d.WorkDate.Date)
+                    //.Select(d => d.WorkDate.Date)
+                    .FirstOrDefaultAsync();
+                if (firstDateWorkedHours != null)
+                {
+                    //currentTask.StartDate = taskToEdit.StartDate.Date < firstDateWorkedHours.Value.Date ? taskToEdit.StartDate.Date : firstDateWorkedHours.Value.Date;
+                    if (taskToEdit.StartDate.Date > firstDateWorkedHours.WorkDate.Date)
+                    {
+                        result = "halfsuccess";
+                        currentTask.StartDate = firstDateWorkedHours.WorkDate.Date;
+                    }
+                    else
+                    {
+                        currentTask.StartDate = taskToEdit.StartDate.Date;
+                    }
+                }
+                else
+                {
+                    currentTask.StartDate = taskToEdit.StartDate.Date;
+                    
+                }
+
+                this.db.EmployeesTasks.Where(et => et.TaskId == currentTask.Id)
+                                      .ToList()
+                                      .ForEach(e => e.isDeleted = true);   //премахвам всички експерти
+                await this.db.SaveChangesAsync();
+
+                if (taskToEdit.EmployeesIds != null && taskToEdit.EmployeesIds.Length > 0)    //добавям експерти
+                {
+                    
+                    foreach (var employee in taskToEdit.EmployeesIds)
+                    {
+                        var expert = await this.db.EmployeesTasks.Where(e => e.EmployeeId == employee && e.TaskId == currentTask.Id).FirstOrDefaultAsync();
+                        if (expert != null)
+                        {
+                            expert.isDeleted = false;
+                            await this.db.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            var newExpert = new EmployeesTasks()
+                            {
+                                EmployeeId = employee,
+                                TaskId = currentTask.Id
+                            };
+                            await this.db.EmployeesTasks.AddAsync(newExpert);
+                            await this.db.SaveChangesAsync();
+                        }
+
+                    }
+                }
+                
+                await this.db.SaveChangesAsync();
+
+                return result;
+               
+            }
+            catch (Exception)
+            {
+                return "Неуспешено редактиране. Проверете входните данни.";
+            }
+
         }
     }
 }

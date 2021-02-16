@@ -75,6 +75,8 @@ namespace TaskMenager.Client.Controllers
                 var workedHours = new TaskWorkedHoursServiceModel()
                 {
                     EmployeeId = model.employeeId,
+                    EmployeeName = model.employeeFullName,
+                    TaskName = model.TaskName,
                     TaskId = model.taskId,
                     HoursSpend = model.HoursSpend,
                     Text = model.Text,
@@ -102,6 +104,168 @@ namespace TaskMenager.Client.Controllers
 
         }
 
+        public async Task<IActionResult> EditTask(int taskId)
+        {
+            try
+            {
+               var taskDetails = this.tasks.GetTaskDetails(taskId)
+                        .ProjectTo<TaskViewModel>()
+                        .FirstOrDefault();
+                if (currentUser.RoleName != SuperAdmin && currentUser.Id != taskDetails.OwnerId && currentUser.Id != taskDetails.AssignerId)
+                {
+                    TempData["Error"] = "Суперадмин, създател и отговорник имат право да променят задача!";
+                    return RedirectToAction(nameof(TaskDetails), new { taskId });
+                }
+
+                if (taskDetails.TaskStatusName == TaskStatusClosed)
+                {
+                    TempData["Error"] = "Не се променя приключена задача!";
+                    return RedirectToAction(nameof(TaskDetails), new { taskId });
+                }
+
+                var taskToEdit = new AddNewTaskViewModel()
+                {
+                     DirectoratesId = taskDetails.DirectorateId.ToString(),
+                     DepartmentsId = taskDetails.DepartmentId.ToString(),
+                     SectorsId = taskDetails.SectorId.ToString(),
+                     AssignerId = taskDetails.AssignerId.ToString(),
+                     TaskPriorityId = taskDetails.PriorityId.ToString(),
+                     TaskTypesId = taskDetails.TypeId.ToString(),
+                     Valid_From = taskDetails.StartDate.Date,
+                     Valid_To = taskDetails.EndDatePrognose.Value.Date
+                };
+
+                 var assignedEmployees = new List<int>();
+                 assignedEmployees.AddRange(taskDetails.Colleagues.Select(c => int.Parse(c.Value)).ToList());
+
+                taskToEdit.EmployeesIds = assignedEmployees.ToArray();
+
+                taskToEdit = await TasksModelPrepareForViewWithOldInfo(taskToEdit);
+
+                taskToEdit.Id = taskDetails.Id;
+                taskToEdit.OwnerId = taskDetails.OwnerId;
+                taskToEdit.TaskName = taskDetails.TaskName;
+                taskToEdit.Description = taskDetails.Description;
+                taskToEdit.HoursLimit = taskDetails.HoursLimit;
+                taskToEdit.ParentTaskId = taskDetails.ParentTaskId;
+
+                return View(taskToEdit);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Грешка при създаване на модела за промяна на задачата.";
+                return RedirectToAction("Index", "Home");
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditTask(AddNewTaskViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+
+                    model = await TasksModelPrepareForViewWithOldInfo(model);
+
+                    TempData["Error"] = "Невалидни данни. Моля прегледайте въведената информация за новата задача.";
+
+                    return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                }
+
+                if (model.Valid_From > model.Valid_To)
+                {
+                    TempData["Error"] = "Невалидни дати";
+                    return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                }
+
+                AddNewTaskServiceModel taskToEdit = new AddNewTaskServiceModel();
+
+                taskToEdit.Id = model.Id;
+                taskToEdit.TaskName = model.TaskName;
+                taskToEdit.Description = model.Description;
+                taskToEdit.StartDate = model.Valid_From;
+                taskToEdit.EndDatePrognose = model.Valid_To;
+                taskToEdit.OwnerId = model.OwnerId;
+                taskToEdit.TypeId = int.Parse(model.TaskTypesId);
+                taskToEdit.HoursLimit = model.HoursLimit;
+                if (model.EmployeesIds != null && model.EmployeesIds.Length > 0)
+                {
+                    taskToEdit.EmployeesIds = model.EmployeesIds;
+                    taskToEdit.StatusId = await this.statuses.GetStatusIdByNameAsync(TaskStatusInProgres);
+                }
+                else
+                {
+                    taskToEdit.StatusId = await this.statuses.GetStatusIdByNameAsync(TaskStatusNew);
+                }
+
+                if (int.TryParse(model.DirectoratesId, out int directorateId))
+                {
+                    taskToEdit.DirectorateId = (directorateId != 0) ? directorateId : (int?)null;
+                }
+                if (int.TryParse(model.DepartmentsId, out int departmentId))
+                {
+                    taskToEdit.DepartmentId = (departmentId != 0) ? departmentId : (int?)null;
+                }
+                if (int.TryParse(model.SectorsId, out int sectorId))
+                {
+                    taskToEdit.SectorId = (sectorId != 0) ? sectorId : (int?)null;
+                }
+                if (int.TryParse(model.AssignerId, out int assignerId))
+                {
+                    if (assignerId == 0)
+                    {
+                        TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                        return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                    }
+                    taskToEdit.AssignerId = assignerId;
+                }
+                else
+                {
+                    TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                    return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                }
+                if (int.TryParse(model.TaskPriorityId, out int priorityId))
+                {
+                    if (priorityId == 0)
+                    {
+                        TempData["Error"] = "Задачата трябва да има определен приоритет";
+                        return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                    }
+                    taskToEdit.PriorityId = priorityId;
+                }
+                else
+                {
+                    TempData["Error"] = "Задачата трябва да има определен приоритет";
+                    return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                }
+
+                string result = await this.tasks.EditTaskAsync(taskToEdit);
+
+                if (result == "success")
+                {
+                    TempData["Success"] = "Промените са записани успешно";
+                    return RedirectToAction(nameof(TaskDetails), new { taskId = model.Id });
+                }
+                else if(result == "halfsuccess")
+                {
+                    TempData["Success"] = "Промените са записани успешно, но началната дата е съобразена с първите отчетени часове!";
+                    return RedirectToAction(nameof(TaskDetails), new { taskId = model.Id });
+                }
+                else
+                {
+                    TempData["Error"] = result;
+                    return RedirectToAction(nameof(TaskDetails), new { taskId = model.Id });
+                }
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Основна грешка. Неуспешен запис на промените.";
+                return RedirectToAction("Index", "Home");
+            }
+
+        }
 
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateNewTask()
@@ -784,6 +948,9 @@ namespace TaskMenager.Client.Controllers
                                })
                                .ToList();
             newTask.TaskPriorityId = oldTask.TaskPriorityId;
+            newTask.HoursLimit = oldTask.HoursLimit;
+            newTask.Valid_From = oldTask.Valid_From;
+            newTask.Valid_To = oldTask.Valid_To;
             return newTask;
         }
 
@@ -805,8 +972,6 @@ namespace TaskMenager.Client.Controllers
 
             return RedirectToAction(nameof(TaskDetails), new { taskId });
         }
-
-
 
         public async Task<IActionResult> GetDepartments(string direktorateId)
         {

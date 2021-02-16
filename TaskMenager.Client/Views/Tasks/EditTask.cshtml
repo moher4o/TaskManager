@@ -1,0 +1,185 @@
+﻿@model AddNewTaskViewModel
+
+@{
+    ViewData["Title"] = "Редактиране на задача";
+}
+@{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
+<form method="post" asp-controller="Tasks" asp-action="EditTask">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="PrimeBox2" style="margin-top:20px;">
+        <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
+            <h5 style="color:white; margin-left:15px;">Редактиране на задача</h5>
+            <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">
+                X
+            </button>
+        </div>
+
+        <div class="form-group row">
+            @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.OwnerId)
+            @Html.HiddenFor(model => model.ParentTaskId)
+            @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", placeholder = "Въведете име на задачата", id = "taskName", name = "taskName" })
+                <span asp-validation-for="TaskName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row" style="margin-bottom:8px;">
+            @Html.LabelFor(model => model.Description, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Въведете описание", rows = "3" })
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+        <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Assigners, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(m => m.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
+            </div>
+            @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.HoursLimit, new { @class = "form-control", id = "hourslimit", name = "hourslimit" })
+                <span asp-validation-for="HoursLimit" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Employees, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-5">
+                @Html.ListBoxFor(model => model.EmployeesIds, new MultiSelectList(Model.Employees, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown" })
+            </div>
+            @Html.LabelFor(model => model.TaskPrioritys, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                @Html.DropDownListFor(m => m.TaskPriorityId, new SelectList(Model.TaskPrioritys, "Value", "Text"), new { @class = "form-control", name = "taskPriorityId", id = "taskPriorityId" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"),
+                  permisionType != SuperAdmin ? new { @disabled = "disabled" } as object :
+                  new
+                       {
+                           @class = "form-control",
+                           id = "directorateId",
+                           name = "directoratesId",
+                           onchange = "LoadDepartments(event)"
+
+                  } as object)
+            </div>
+            @Html.LabelFor(model => model.TaskTypes, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                @Html.DropDownListFor(m => m.TaskTypesId, new SelectList(Model.TaskTypes, "Value", "Text"), new { @class = "form-control", name = "taskTypesId", id = "taskTypesId" })
+            </div>
+
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Departments, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"),
+               (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) ? new { @disabled = "disabled" } as object :
+               new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
+            </div>
+            @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input asp-for="Valid_From" class="form-control" id="validFrom" />
+                    <span asp-validation-for="Valid_From" class="text-warning"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.Sectors, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(m => m.SectorsId, new SelectList(Model.Sectors, "Value", "Text"),
+                (permisionType == SectorAdmin || permisionType == Employee) ? new { @disabled = "disabled" } as object :
+               new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
+            </div>
+            @Html.LabelFor(model => model.Valid_To, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input asp-for="Valid_To" class="form-control" id="validTo" />
+                    <span asp-validation-for="Valid_To" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top:10px;">
+        <button type="button" class="button save" id="send">Запис</button>
+    </div>
+    <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
+
+</form>
+
+<script type="text/javascript">
+    function LoadDepartments(event) {
+        $.getJSON('\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
+            if ($('#departmentsId :selected').text() === 'Моля изберете...') {
+                $('#departmentsId').children('option:not(:first)').remove();
+            }
+            else {
+                $('#departmentsId').children('option').remove();
+                $('#departmentsId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
+            $.each(data, function (key, value) {
+                $('#departmentsId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#departmentsId").attr('disabled', 'disabled');
+                $("#sectorsId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#departmentsId").removeAttr('disabled');
+                $("#sectorsId").removeAttr('disabled');
+            }
+        });
+    }
+    function LoadSectors(event) {
+        $.getJSON('\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
+            if ($('#sectorsId :selected').text() === 'Моля изберете...') {
+                $('#sectorsId').children('option:not(:first)').remove();
+            }
+            else {
+                $('#sectorsId').children('option').remove();
+                $('#sectorsId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
+            $.each(data, function (key, value) {
+                $('#sectorsId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#sectorsId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#sectorsId").removeAttr('disabled');
+            }
+        });
+    }
+</script>
+@section Scripts{
+    <script src="~/js/createNewTask.js" charset="utf-8"></script>
+    <script src="~/js/bootstrap-multiselect.js" charset="utf-8"></script>
+    <script>
+        $(document).ready(function () {
+            $('#Subjects_dropdown').multiselect();
+        });
+    </script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+
