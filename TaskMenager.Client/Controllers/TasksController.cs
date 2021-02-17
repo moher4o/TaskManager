@@ -11,6 +11,7 @@ using TaskManager.Data.Models;
 using TaskManager.Services;
 using TaskManager.Services.Models;
 using TaskManager.Services.Models.TaskModels;
+using TaskMenager.Client.Models.Home;
 using TaskMenager.Client.Models.Tasks;
 using static TaskManager.Common.DataConstants;
 
@@ -36,6 +37,15 @@ namespace TaskMenager.Client.Controllers
 
         }
 
+        public async Task<IActionResult> AssignerTasks()
+        {
+            var currentEmployee = new UserTasksViewModel()
+            {
+                userId = currentUser.Id,
+                AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
+            };
+            return View(currentEmployee);
+        }
 
         public async Task<IActionResult> AddWorkHours(string taskName, int taskId, int employeeId)
         {
@@ -136,7 +146,7 @@ namespace TaskMenager.Client.Controllers
                 };
 
                  var assignedEmployees = new List<int>();
-                 assignedEmployees.AddRange(taskDetails.Colleagues.Select(c => int.Parse(c.Value)).ToList());
+                 assignedEmployees.AddRange(taskDetails.Colleagues.Select(c => c.Id).ToList());
 
                 taskToEdit.EmployeesIds = assignedEmployees.ToArray();
 
@@ -961,7 +971,6 @@ namespace TaskMenager.Client.Controllers
             taskDetails = this.tasks.GetTaskDetails(taskId)
                 .ProjectTo<TaskViewModel>()
                 .FirstOrDefault();
-
 
             return View(taskDetails);
         }

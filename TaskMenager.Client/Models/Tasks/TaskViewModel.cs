@@ -102,17 +102,18 @@ namespace TaskMenager.Client.Models.Tasks
         public string SectorName { get; set; }
 
         [Display(Name = "Участници: ")]
-        public IList<SelectListItem> Colleagues { get; set; } = new List<SelectListItem>();
+        public IList<SelectServiceModel> Colleagues { get; set; } = new List<SelectServiceModel>();
 
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<TaskInfoServiceModel, TaskViewModel>()
                    .ForMember(u => u.Colleagues, cfg => cfg.MapFrom(s => s.AssignedExperts
                                                            .OrderBy(e => e.Employee.FullName)
-                                                           .Select(e => new SelectListItem
+                                                           .Select(e => new SelectServiceModel
                                                            {
-                                                               Text = string.Concat(e.Employee.JobTitle.TitleName, " ", e.Employee.FullName),
-                                                               Value = e.Employee.Id.ToString()
+                                                               TextValue = string.Concat(e.Employee.JobTitle.TitleName, " ", e.Employee.FullName),
+                                                               Id = e.Employee.Id,
+                                                               isDeleted = e.isDeleted
                                                            })
                                                            .ToList()));
         }

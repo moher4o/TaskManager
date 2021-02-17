@@ -43,7 +43,8 @@
         <div class="form-group row">
             @Html.LabelFor(model => model.Colleagues, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
-                <table class="table table-fixed-small table-responsive-sm">
+                @*<table class="table table-fixed-small table-responsive-sm">*@
+                <table class="table table-hover table-borderless table-fixed-small table-responsive-sm">
                     @*<thead>
                             <tr>
                                 <th class="col-md-12">
@@ -51,12 +52,22 @@
                                 </th>
                             </tr>
                         </thead>*@
-                    <tbody style="max-height:130px !important;">
+                    <tbody style="max-height:168px !important; overflow:auto; background-color: #f8f9fa;">
                         @foreach (var emp in Model.Colleagues)
                         {
                             <tr>
-                                <td class="col-md-12">
-                                    @emp.Text
+                                <td class="col-md-12" style="color: @(emp.isDeleted ? "#82b9f6" : "#0366d6")">
+                                    @if (emp.isDeleted)
+                                    {
+                                        <i class="fas fa-user-slash"> </i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-user"> </i>
+                                    }
+                                    
+                                        @emp.TextValue
+                                    
                                 </td>
                             </tr>
                         }
@@ -141,7 +152,7 @@
                 <div class="col-md-5"></div>
                 <div class="col-md-5">
                     @if (isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-                       || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                      || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         var modalId = "modal" + Model.Id.ToString();
                         <form method="post" asp-controller="Tasks" asp-action="ReopenTask" asp-route-taskId="@Model.Id">
@@ -164,7 +175,7 @@
                         </form>
                     }
                     @if (!isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-                       || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                      || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@Model.Id">
                             Редактиране

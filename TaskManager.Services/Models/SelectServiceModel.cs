@@ -9,5 +9,7 @@ namespace TaskManager.Services.Models
         public string TextValue { get; set; }
 
         public int Id { get; set; }
+
+        public bool isDeleted { get; set; } = false;
     }
 }

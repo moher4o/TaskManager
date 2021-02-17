@@ -27,7 +27,6 @@ namespace TaskManager.Services.Models.TaskModels
         public string AssignerName { get; set; }
 
         public ICollection<EmployeesTasks> AssignedExperts { get; set; } = new List<EmployeesTasks>();
-        //IEnumerable<SelectServiceModel> Colleagues { get; set; } = new List<SelectServiceModel>();
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Task, TaskInfoServiceModel>()
@@ -40,14 +39,6 @@ namespace TaskManager.Services.Models.TaskModels
                    .ForMember(u => u.TaskStatusName, cfg => cfg.MapFrom(s => s.TaskStatus.StatusName))
                    .ForMember(u => u.TaskTypeName, cfg => cfg.MapFrom(s => s.TaskType.TypeName))
                    .ForMember(u => u.TaskPriorityName, cfg => cfg.MapFrom(s => s.TaskPriority.PriorityName));
-                   //.ForMember(u => u.Colleagues, cfg => cfg.MapFrom(s => s.AssignedExperts
-                   //                                        .OrderBy(e => e.Employee.FullName)
-                   //                                        .Select(e => new SelectServiceModel
-                   //                                        {
-                   //                                            TextValue = string.Concat(e.Employee.JobTitle.TitleName," ",e.Employee.FullName),
-                   //                                            Id = e.Employee.Id
-                   //                                        })
-                   //                                        .ToList()));
 
         }
     }
