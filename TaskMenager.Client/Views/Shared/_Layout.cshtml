@@ -94,17 +94,17 @@
                         Задачи
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
-                        @if (User.Claims.Any(u => u.Value == "Admin"))
-                        {
-                            <li>
-                                <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
+                        @*@if (User.Claims.Any(u => u.Value == "Admin"))
+                        {*@
+                            <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
+                                <a asp-controller="Tasks" asp-action="CreateNewTask" >Създаване на задача</a>
                             </li>
-                        }
+                        @*}*@
                         <li>
-                            <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
+                            <a asp-controller="Tasks" asp-action="AssignerTasks" >Наблюдавани задачи</a>
                         </li>
                         <li>
-                            <a href="#">Собствени задачи</a>
+                            <a asp-controller="Tasks" asp-action="CreatedTasks" >Създадени задачи</a>
                         </li>
                     </ul>
                 </li>
@@ -152,8 +152,8 @@
 
         <!-- Page Content  -->
         <div id="content">
-            <nav class="navbar navbar-expand-sm navbar-light bg-light" style="max-height:40px !important;">
-                <div class="container-fluid">
+            <nav class="navbar navbar-expand-sm navbar-light bg-light marginbmobile" style="max-height:40px !important;">
+                <div class="container-fluid" >
                     <button type="button" id="sidebarCollapse" class="btn btn-info" style="background-color: #69a0f1;">
                         <i class="fas fa-align-left"></i>
                         @*<span>Toggle Sidebar</span>*@
@@ -161,12 +161,12 @@
                     @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <i class="fas fa-align-justify"></i>
                         </button>*@
-                <div style="display: flex; justify-content: center; align-items: center; text-align: center;" id="notifications">
-                    <div id="loadingBox" class="notification" ><span>Зареждане …</span></div>
-                    <div id="infoBox" class="notification" ><span>Информация</span></div>
-                    <div id="errorBox" class="notification" ><span>Грешка</span></div>
-                    <div id="successBox" class="notification" ><span>Успех</span></div>
-                </div>
+                    <div id="notifications" style="position: relative; left: 20%;">
+                        <div id="loadingBox" class="notification" ><span>Зареждане …</span></div>
+                        <div id="infoBox" class="notification" ><span>Информация</span></div>
+                        <div id="errorBox" class="notification" ><span>Грешка</span></div>
+                        <div id="successBox" class="notification" ><span>Успех</span></div>
+                    </div>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
@@ -200,7 +200,7 @@
                         }
                     </div>
                 </div>*@
-            <div class="container" style="max-width:85%;">
+            <div class="container widthmobile" style="max-width:85%;">
 
                 <main role="main" class="pb-3">
                     @RenderBody()
@@ -229,7 +229,7 @@
 
             </div>
         </div>
-        <footer class="border-top footer text-muted">
+        <footer class="border-top footer text-muted hideonmobile">
             <div class="container">
                 &copy; 2021 - Приложение за планиране и отчитане на задачи
             </div>

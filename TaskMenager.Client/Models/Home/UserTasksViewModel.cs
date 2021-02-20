@@ -15,5 +15,8 @@ namespace TaskMenager.Client.Models.Home
         public IEnumerable<TaskFewInfoServiceModel> ActiveTasks { get; set; } = new List<TaskFewInfoServiceModel>();
 
         public IEnumerable<TaskFewInfoServiceModel> AssignerTasks { get; set; } = new List<TaskFewInfoServiceModel>();
+
+        public IEnumerable<TaskFewInfoServiceModel> CreatedTasks { get; set; } = new List<TaskFewInfoServiceModel>();
+
     }
 }

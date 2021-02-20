@@ -1,0 +1,89 @@
+﻿@model UserTasksViewModel
+@{
+    ViewData["Title"] = "Наблюдавани задачи";
+}
+<div style="min-height:650px; max-height:651px;">
+    <div class="row" style="position: relative;">
+        <div class="col-md-8">
+            <label style="font-size:large;"><b>Създадени задачи</b></label>
+        </div>
+        <div class="col-md-4" style="padding-top:6px;">
+            <input style="margin-left:15px;" type="checkbox" name="showInactive" id="showInactive">
+            <label for="showInactive"> Показване на приключените задачи</label>
+        </div>
+    </div>
+    <partial name="../Home/_IndexHead" />
+    <div style="min-height:600px; max-height:601px !important; overflow:auto;">
+        @foreach (var item in Model.CreatedTasks.Where(t => t.TaskStatusName != TaskStatusClosed))
+        {
+        <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
+            @{var name = item.TaskName.Length > 50 ? (item.TaskName).Substring(0, 50) + "..." : item.TaskName; var modalId = "modal" + item.Id;}
+            <div class="col-md-5">
+                <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
+            </div>
+            <div class="col-md-2">
+                <label style="padding-left:10px;">@item.TaskStatusName</label>
+            </div>
+            <div class="col-md-1">
+                <label style="padding-left:10px;">@item.TaskPriorityName</label>
+            </div>
+            <div class="col-md-1">
+                <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
+            </div>
+            <div class="col-md-3" style="color: #5f9fec;">
+                <div class="row">
+                    <div style="padding-left:20px; min-width:100px;">
+                        <img class="chatnotifications" src="~/png/note.png" />
+                        <span class="notificationsTodayCountValue">0</span>
+                    </div>
+                    <div style="padding-left:20px; min-width:100px;">
+                        <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
+                            <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+                        </a>
+                    </div>
+                    <!-- Modal placeholder -->
+                    <div id="modal-placeholder"></div>
+                    <!-- Button trigger modal -->
+                    <a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer;"
+                       data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("CloseTask")" data-taskid="@item.Id" data-taskname="@item.TaskName">
+                        <img class="chatnotifications2" src="~/png/Cansel2.png" />
+                    </a>
+                </div>
+            </div>
+
+            <!--<div class="col-md-1" style="color: #5f9fec;">
+        <div style="padding-left:20px; min-width:100px;">
+            <img class="chatnotifications" src="~/png/note.png" />
+            <span class="notificationsTodayCountValue">0</span>
+        </div>
+    </div>
+    <div class="col-md-1" style="color: #5f9fec;">
+        <div style="padding-left:20px; min-width:100px;">
+            <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
+                <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-1" style="padding-left:30px;">-->
+            <!-- Modal placeholder -->
+            <!--<div id="modal-placeholder"></div>-->
+            <!-- Button trigger modal -->
+            <!--<a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer;"
+           data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("CloseTask")" data-taskid="@item.Id" data-taskname="@item.TaskName">
+            <img class="chatnotifications2" src="~/png/Cansel2.png" />
+        </a>
+    </div>-->
+
+        </div>
+        }
+        <div class="displayno">
+            <partial name="../Home/_ShowClosedTasksPartial" model="@Model.CreatedTasks.Where(t => t.TaskStatusName == TaskStatusClosed)" />
+        </div>
+
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/AssignersTasks.js" charset="utf-8"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

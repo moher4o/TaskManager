@@ -16,6 +16,8 @@ namespace TaskManager.Services.Models.TaskModels
 
         public DateTime? EndDatePrognose { get; set; }
 
+        public DateTime? EndDate { get; set; }
+
         public int? ParentTaskId { get; set; }
 
         public string TaskStatusName { get; set; }

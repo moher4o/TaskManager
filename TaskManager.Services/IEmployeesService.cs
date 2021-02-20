@@ -15,6 +15,8 @@ namespace TaskManager.Services
 
         Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId);
 
+        Task<IEnumerable<TaskFewInfoServiceModel>> GetUserCreatedTaskAsync(int userId);
+
         Task<string> AddEmployeesCollection(List<AddNewEmployeeServiceModel> employees);
 
         UserServiceModel GetUserDataForCooky(string daeuAccaunt);
@@ -28,6 +30,6 @@ namespace TaskManager.Services
         IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId);
 
         IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId);
-
+        
     }
 }

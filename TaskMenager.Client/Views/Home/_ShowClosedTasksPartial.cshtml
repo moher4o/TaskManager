@@ -1,0 +1,28 @@
+﻿@model IEnumerable<TaskFewInfoServiceModel>
+
+
+@foreach (var item in Model)
+{
+    <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:#e4e4e4;">
+        @{var name = item.TaskName.Length > 50 ? (item.TaskName).Substring(0, 50) + "..." : item.TaskName;}
+        <div class="col-md-5">
+            <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
+        </div>
+        <div class="col-md-2">
+            <label style="padding-left:10px;">@item.TaskStatusName</label>
+        </div>
+        <div class="col-md-1">
+            <label style="padding-left:10px;">@item.TaskPriorityName</label>
+        </div>
+        <div class="col-md-1">
+            <label style="padding-left:10px;">@(item.EndDate.HasValue ? item.EndDate.Value.Date.ToString("dd/MM/yyyy") : "")</label>
+        </div>
+        <div class="col-md-1" style="color: #5f9fec;">
+            <div style="padding-left:20px; min-width:100px;">
+                <img class="chatnotifications" src="~/png/note.png" />
+                <span class="notificationsTodayCountValue">0</span>
+            </div>
+        </div>
+     </div>
+
+}

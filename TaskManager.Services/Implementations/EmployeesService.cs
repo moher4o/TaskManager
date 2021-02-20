@@ -12,6 +12,7 @@ using TaskManager.Services.Models;
 using TaskManager.Common;
 using TaskManager.Services.Models.TaskModels;
 using Microsoft.EntityFrameworkCore;
+using static TaskManager.Common.DataConstants;
 
 namespace TaskManager.Services.Implementations
 {
@@ -30,8 +31,9 @@ namespace TaskManager.Services.Implementations
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(int userId)
         {
             var tasks = await this.db.EmployeesTasks
-                    .Where(et => et.EmployeeId == userId)
+                    .Where(et => et.EmployeeId == userId && et.isDeleted == false)
                     .Select(t => t.Task)
+                    .Where(t => t.isDeleted == false)
                     .Distinct()
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
@@ -53,6 +55,17 @@ namespace TaskManager.Services.Implementations
             return tasks;
         }
 
+        public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserCreatedTaskAsync(int userId)
+        {
+            var tasks = await this.db.Tasks
+                    .Where(et => et.OwnerId == userId)
+                    .OrderBy(t => t.PriorityId)
+                    .ThenByDescending(t => t.EndDatePrognose)
+                    .ProjectTo<TaskFewInfoServiceModel>()
+                    .ToListAsync();
+
+            return tasks;
+        }
 
 
         public async Task<string> AddEmployeesCollection(List<AddNewEmployeeServiceModel> employees)
@@ -191,5 +204,6 @@ namespace TaskManager.Services.Implementations
                 .Select(e => e.FullName)
                 .FirstOrDefaultAsync();
         }
+
     }
 }

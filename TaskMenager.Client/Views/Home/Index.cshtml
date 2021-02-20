@@ -2,13 +2,24 @@
 @{
     ViewData["Title"] = "Моите задачи";
 }
-<div style="min-height:640px; max-height:641px;" @*@(Model.ActiveTasks.Count() <= 0 ? "hidden" : "")*@>
-    <label style="font-size:x-large;"><b>Активни задачи</b></label><label style="padding-left: 50px;"> --> отчетени часове за @DateTime.Now.Date.ToString("dd/MM/yyyy") : <span style="color:red;">@Model.totalHoursPerDay</span></label>
+<div style="min-height:640px; max-height:641px;">
+    <div class="row" style="position: relative;">
+        <div class="col-md-4">
+            <label style="font-size:large;"><b>Активни задачи</b></label>
+        </div>
+        <div class="col-md-4" style="padding-top:6px;">
+            <label> Отчетени часове за @DateTime.Now.Date.ToString("dd/MM/yyyy") : <span style="color:red;">@Model.totalHoursPerDay</span></label>
+        </div>
+        <div class="col-md-4" style="padding-top:6px;">
+            <input style="margin-left:15px;" type="checkbox" name="showInactive" id="showInactive">
+            <label for="showInactive"> Показване на приключените задачи</label>
+        </div>
+    </div>
     <partial name="_IndexHead" />
     <div style="min-height:600px; max-height:601px !important; overflow:auto;">
-        @foreach (var item in Model.ActiveTasks)
+        @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed))
         {
-            <div class="row PrimeBox3" style="margin-top:5px; font-size:medium; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
+            <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
                 @{var name = item.TaskName.Length > 50 ? (item.TaskName).Substring(0, 50) + "..." : item.TaskName;}
                 <div class="col-md-5">
                     <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
@@ -22,30 +33,52 @@
                 <div class="col-md-1">
                     <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
                 </div>
-                <div class="col-md-1" style="color: #5f9fec;">
-                    <div style="padding-left:20px; min-width:100px;">
-                        <img class="chatnotifications" src="~/png/note.png" />
-                        <span class="notificationsTodayCountValue">0</span>
+                @*<div class="col-md-1" style="color: #5f9fec;">
+                        <div style="padding-left:20px; min-width:100px;">
+                            <img class="chatnotifications" src="~/png/note.png" />
+                            <span class="notificationsTodayCountValue">0</span>
+                        </div>
+                    </div>
+                    <div class="col-md-1" style="color: #5f9fec;">
+                        <div style="padding-left:20px; min-width:100px;">
+                            <a asp-controller="Tasks" asp-action="AddWorkHours"
+                               asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
+                               asp-route-taskId="@item.Id"
+                               asp-route-employeeId="@Model.userId">
+                                <img class="chatnotifications" src="~/png/3DClock.png" />
+                                <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
+                                <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
+                            </a>
+                        </div>
+                    </div>*@
+                <div class="col-md-3" style="color: #5f9fec;">
+                    <div class="row">
+                        <div style="padding-left:20px; min-width:100px;">
+                            <img class="chatnotifications" src="~/png/note.png" />
+                            <span class="notificationsTodayCountValue">0</span>
+                        </div>
+                        <div style="padding-left:20px; min-width:100px;">
+                            <a asp-controller="Tasks" asp-action="AddWorkHours"
+                               asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
+                               asp-route-taskId="@item.Id"
+                               asp-route-employeeId="@Model.userId">
+                                <img class="chatnotifications" src="~/png/3DClock.png" />
+                                <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
+                                <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-1" style="color: #5f9fec;">
-                    <div style="padding-left:20px; min-width:100px;">
-                        <a asp-controller="Tasks" asp-action="AddWorkHours"
-                           asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
-                           asp-route-taskId="@item.Id"
-                           asp-route-employeeId="@Model.userId">
-                            <img class="chatnotifications" src="~/png/3DClock.png" />
-                            <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
-                            <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
-                        </a>
-                    </div>
-                </div>
+
             </div>
         }
+        <div class="displayno">
+            <partial name="_ShowClosedTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName == TaskStatusClosed)" />
+        </div>
     </div>
 </div>
-
+<script type="text/javascript">
+</script>
 @section Scripts {
-    @*<script src="~/js/index.js" charset="utf-8"></script>*@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

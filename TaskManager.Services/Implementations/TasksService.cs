@@ -12,6 +12,7 @@ using TaskManager.Data;
 using TaskManager.Data.Models;
 using TaskManager.Services.Models;
 using TaskManager.Services.Models.TaskModels;
+using static TaskManager.Common.DataConstants;
 
 namespace TaskManager.Services.Implementations
 {
@@ -268,32 +269,40 @@ namespace TaskManager.Services.Implementations
         {
             try
             {
-                var isActiveEmployee = await this.db.EmployeesTasks
+                var isDeletedEmployee = await this.db.EmployeesTasks
                     .Where(e => e.EmployeeId == workedHours.EmployeeId && e.TaskId == workedHours.TaskId)
                     .Select(t => t.isDeleted).FirstOrDefaultAsync();
 
-                if (!isActiveEmployee)
+                if (isDeletedEmployee)
                 {
                     return workedHours.EmployeeName + " не е активен участник по задача: " + workedHours.TaskName;
                 }
 
-                var currentTask = await this.db.Tasks.Where(t => t.Id == workedHours.TaskId && t.isDeleted == false).FirstOrDefaultAsync();
+                var currentTask = await this.db.Tasks.Where(t => t.Id == workedHours.TaskId && t.isDeleted == false).Include(t => t.TaskStatus).FirstOrDefaultAsync();
                 if (currentTask.StartDate.Date > workedHours.WorkDate.Date)
                 {
                     return "Началната дата на задачата е : " + currentTask.StartDate.Date.ToString("dd/MM/yyyy") + "г.";
+                }
+                if (currentTask.TaskStatus.StatusName == TaskStatusClosed)
+                {
+                    return "Задачата е приключена!";
+                    //if (currentTask.EndDate.Value.Date < workedHours.WorkDate.Date)
+                    //{
+                    //    return "Задачата е приключена на : " + currentTask.EndDate.Value.Date.ToString("dd/MM/yyyy") + "г.";
+                    //}
                 }
                 var currentTaskHours = await this.db.WorkedHours
                     .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId && d.TaskId == workedHours.TaskId)
                     .FirstOrDefaultAsync();
 
-                var dayWorkedHurs = this.db.WorkedHours
+                var dayWorkedHurs = this.db.WorkedHours        //отработени часове за датата по всички задачи
                     .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId)
                     .Sum(d => d.HoursSpend);
 
                 var totalHoursPerDayPrognose = dayWorkedHurs + workedHours.HoursSpend;
-                if (totalHoursPerDayPrognose <= DataConstants.TotalHoursPerDay)
+                if (totalHoursPerDayPrognose <= DataConstants.TotalHoursPerDay)     //ако не се надвишава лимита часове
                 {
-                    if (currentTaskHours == null)
+                    if (currentTaskHours == null)   // ако по конкретната задача не е работено за тази дата
                     {
                         var workedHousDB = new WorkedHours()
                         {

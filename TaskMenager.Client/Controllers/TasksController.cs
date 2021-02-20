@@ -37,6 +37,16 @@ namespace TaskMenager.Client.Controllers
 
         }
 
+        public async Task<IActionResult> CreatedTasks()
+        {
+            var currentEmployee = new UserTasksViewModel()
+            {
+                userId = currentUser.Id,
+                CreatedTasks = await this.employees.GetUserCreatedTaskAsync(currentUser.Id)
+            };
+            return View(currentEmployee);
+        }
+
         public async Task<IActionResult> AssignerTasks()
         {
             var currentEmployee = new UserTasksViewModel()
@@ -69,6 +79,7 @@ namespace TaskMenager.Client.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddWorkHours(AddWorkedHoursViewModel model)
         {
             try
@@ -96,7 +107,7 @@ namespace TaskMenager.Client.Controllers
                 string result = await this.tasks.SetWorkedHoursAsync(workedHours);
                 if (result == "success")
                 {
-                    TempData["Success"] = "Часовете са успешно добавени.";
+                    TempData["Success"] = "Часовете са добавени успешно.";
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -145,12 +156,39 @@ namespace TaskMenager.Client.Controllers
                      Valid_To = taskDetails.EndDatePrognose.Value.Date
                 };
 
-                 var assignedEmployees = new List<int>();
-                 assignedEmployees.AddRange(taskDetails.Colleagues.Select(c => c.Id).ToList());
+                 //var assignedEmployees = new List<int>();
+                var assignedEmployees = new List<SelectServiceModel>();
+                assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
 
-                taskToEdit.EmployeesIds = assignedEmployees.ToArray();
+                taskToEdit.EmployeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToArray(); //за да изключи премахнатите експерти
 
                 taskToEdit = await TasksModelPrepareForViewWithOldInfo(taskToEdit);
+
+                taskToEdit.EmployeesIds = assignedEmployees.Select(a => a.Id).ToArray();   //за да включи всички работили по задачата в списъка(може и да не са активни, но трябва да са в списъка)
+
+                if (taskToEdit.Employees.Count < taskToEdit.EmployeesIds.Length)    //добавям членовете на задачата, които не са в йерархиата на отговорника
+                {
+                    foreach (var empId in taskToEdit.EmployeesIds)
+                    {
+                        if (taskToEdit.Employees.FirstOrDefault(e => e.Value == empId.ToString()) == null)
+                        {
+                            var curentEmployee = assignedEmployees.Where(e => e.Id == empId).FirstOrDefault();
+                            taskToEdit.Employees.Add(new SelectListItem
+                            {
+                                Text = curentEmployee.TextValue,
+                                Value = empId.ToString(),
+                                Selected = curentEmployee.isDeleted ? false : true
+                            });
+                            taskToEdit.Assigners.Add(new SelectListItem
+                            {
+                                Text = curentEmployee.TextValue,
+                                Value = empId.ToString()
+                            });
+
+                        }
+                    }
+                }
+                taskToEdit.EmployeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToArray();  //за да изключи премахнатите експерти
 
                 taskToEdit.Id = taskDetails.Id;
                 taskToEdit.OwnerId = taskDetails.OwnerId;
@@ -170,6 +208,7 @@ namespace TaskMenager.Client.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditTask(AddNewTaskViewModel model)
         {
             try
@@ -298,6 +337,7 @@ namespace TaskMenager.Client.Controllers
 
         [Authorize(Policy = "Admin")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateNewTask(AddNewTaskViewModel model)
         {
             try
@@ -398,6 +438,36 @@ namespace TaskMenager.Client.Controllers
                 TempData["Error"] = "Основна грешка. Моля проверете входните данни.";
                 return View(model);
             }
+        }
+
+        public IActionResult CloseTask(int taskId, string taskName)
+        {
+            var model = new CloseTaskViewModel();
+
+            model.TaskId = taskId;
+            model.TaskName = taskName;
+
+            return PartialView("_CloseTaskModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CloseTask(CloseTaskViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                bool result = await this.tasks.CloseTaskAsync(model.TaskId, model.EndNote, currentUser.Id);
+                if (result)
+                {
+                    TempData["Success"] = "Задачата е приключена успешно!";
+                }
+                else
+                {
+                    TempData["Error"] = "Сървиз грешка! Уведомете администратора.";
+                }
+
+            }
+            return PartialView("_CloseTaskModalPartial", model);
         }
 
         private async Task<AddNewTaskViewModel> TasksModelPrepareForView(AddNewTaskViewModel newTask)
@@ -640,7 +710,73 @@ namespace TaskMenager.Client.Controllers
 
             if (currentUser.RoleName == TaskManager.Common.DataConstants.Employee)
             {
+                newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
+                                                       Selected = true
+                                                   })
+                                                   .ToList();
+                newTask.DirectoratesId = newTask.Directorates.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
+                newTask.Departments = this.departments.GetDepartmentsNames(currentUser.DepartmentId)
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
+                                                       Selected = true
+                                                   })
+                                                   .ToList();
+                newTask.DepartmentsId = newTask.Departments.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
+                if (currentUser.SectorId != null)
+                {
+                    newTask.Sectors = this.sectors.GetSectorsNames(currentUser.SectorId)
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a.TextValue,
+                                                       Value = a.Id.ToString(),
+                                                       Selected = true
+                                                   })
+                                                   .ToList();
+                    newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
+                    newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                                                       .Select(a => new SelectListItem
+                                                       {
+                                                           Text = a.TextValue,
+                                                           Value = a.Id.ToString(),
+                                                           Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                                                       })
+                                                       .ToList();
 
+                    newTask.Employees = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                                                       .Select(a => new SelectListItem
+                                                       {
+                                                           Text = a.TextValue,
+                                                           Value = a.Id.ToString(),
+                                                           Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                                                       })
+                                                       .ToList();
+                }
+                else
+                {
+                    newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                                                       .Select(a => new SelectListItem
+                                                       {
+                                                           Text = a.TextValue,
+                                                           Value = a.Id.ToString(),
+                                                           Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                                                       })
+                                                       .ToList();
+
+                    newTask.Employees = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                                                       .Select(a => new SelectListItem
+                                                       {
+                                                           Text = a.TextValue,
+                                                           Value = a.Id.ToString(),
+                                                           Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                                                       })
+                                                       .ToList();
+                }
             }
 
             if (currentUser.RoleName == SectorAdmin)
