@@ -12,6 +12,7 @@
     @*<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">*@
     <!-- Our Custom CSS -->
     <link rel="stylesheet" href="~/css/style4.css">
+    <link rel="stylesheet" href="~/css/notfound.css">
 
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
@@ -25,7 +26,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @*<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>*@
     <script src="~/js/notify.js"></script>
-    
+
 </head>
 <body>
     <header>
@@ -95,56 +96,61 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                        {*@
-                            <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
-                                <a asp-controller="Tasks" asp-action="CreateNewTask" >Създаване на задача</a>
-                            </li>
+                {*@
+                        <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
+                            <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
+                        </li>
                         @*}*@
                         <li>
-                            <a asp-controller="Tasks" asp-action="AssignerTasks" >Наблюдавани задачи</a>
+                            <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         <li>
-                            <a asp-controller="Tasks" asp-action="CreatedTasks" >Създадени задачи</a>
+                            <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#">
-                        <i class="fas fa-briefcase"></i>
-                        About
-                    </a>
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-copy"></i>
-                        Pages
+                        <i class="fas fa-file-excel"></i>
+                        Отчети
                     </a>
                     <ul class="collapse list-unstyled" id="pageSubmenu">
                         <li>
-                            <a href="#">Page 1</a>
+                            <a asp-controller="Report" asp-action="PeriodReport">Организационен</a>
                         </li>
                         <li>
-                            <a href="#">Page 2</a>
+                            <a href="/Home/NotImplemented">Експертен</a>
                         </li>
                         <li>
-                            <a href="#">Page 3</a>
+                            <a href="/Home/NotImplemented">Лична справка</a>
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#">
-                        <i class="fas fa-image"></i>
-                        Portfolio
+                    <a href="#expertsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-user"></i>
+                        Експерти
                     </a>
+                    <ul class="collapse list-unstyled" id="expertsSubmenu">
+                        <li>
+                            <a href="/Home/NotImplemented">Списък</a>
+                        </li>
+                        <li>
+                            <a href="/Home/NotImplemented">Телефонен указател</a>
+                        </li>
+                    </ul>
                 </li>
+
                 <li>
-                    <a href="#">
+                    <a href="/Home/NotImplemented">
                         <i class="fas fa-question"></i>
-                        FAQ
+                        За приложението
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="/Home/NotImplemented">
                         <i class="fas fa-paper-plane"></i>
-                        Contact
+                        Контакти
                     </a>
                 </li>
             </ul>

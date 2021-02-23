@@ -23,7 +23,7 @@ namespace TaskManager.Services
 
         Task<string> GetEmployeeNameByIdAsync(int userId);
 
-        IEnumerable<SelectServiceModel> GetEmployeesNames();
+        IEnumerable<SelectServiceModel> GetActiveEmployeesNames();
 
         IEnumerable<SelectServiceModel> GetEmployeesNamesBySector(int? sectorId);
 

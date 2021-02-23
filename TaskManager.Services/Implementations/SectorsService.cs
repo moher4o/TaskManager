@@ -115,20 +115,20 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
-        public IEnumerable<SelectServiceModel> GetSectorsNamesByDirectorate(int? directorateId)
+        public async Task<IEnumerable<SelectServiceModel>> GetSectorsNamesByDirectorate(int? directorateId)
         {
             if (directorateId == null)
             {
                 return null;
             }
-            var names = this.db.Sectors
+            var names = await this.db.Sectors
                 .Where(c => c.isDeleted == false && c.DirectorateId == directorateId)
                 .Select(d => new SelectServiceModel
                 {
                     TextValue = d.SectorName,
                     Id = d.Id
                 })
-                .ToList();
+                .ToListAsync();
             return names;
         }
 

@@ -16,7 +16,7 @@ namespace TaskManager.Services
 
         Task<IEnumerable<SelectServiceModel>> GetSectorsNamesByDepartment(int? departmentId);
 
-        IEnumerable<SelectServiceModel> GetSectorsNamesByDirectorate(int? directorateId);
+        Task<IEnumerable<SelectServiceModel>> GetSectorsNamesByDirectorate(int? directorateId);
 
     }
 }

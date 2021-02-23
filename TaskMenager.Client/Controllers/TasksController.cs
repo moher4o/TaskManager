@@ -591,7 +591,6 @@ namespace TaskMenager.Client.Controllers
                                                    .ToList();
                 newTask.DirectoratesId = newTask.Directorates.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
                 newTask.Departments = this.departments.GetDepartmentsNamesByDirectorate(currentUser.DirectorateId)
-                                                   .Result
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -633,7 +632,7 @@ namespace TaskMenager.Client.Controllers
             }
             else if (currentUser.RoleName == SuperAdmin)
             {
-                newTask.Directorates = this.directorates.GetDirectoratesNames()
+                newTask.Directorates = this.directorates.GetDirectoratesNames(null)
                                                .Select(a => new SelectListItem
                                                {
                                                    Text = a.TextValue,
@@ -658,7 +657,7 @@ namespace TaskMenager.Client.Controllers
                     Value = "0",
                     Selected = true
                 });
-                newTask.Assigners = this.employees.GetEmployeesNames()
+                newTask.Assigners = this.employees.GetActiveEmployeesNames()
                                    .Select(a => new SelectListItem
                                    {
                                        Text = a.TextValue,
@@ -671,7 +670,7 @@ namespace TaskMenager.Client.Controllers
                     Value = "0",
                     Selected = true
                 });
-                newTask.Employees = this.employees.GetEmployeesNames()
+                newTask.Employees = this.employees.GetActiveEmployeesNames()
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -899,7 +898,6 @@ namespace TaskMenager.Client.Controllers
                                                    .ToList();
                 newTask.DirectoratesId = newTask.Directorates.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
                 newTask.Departments = this.departments.GetDepartmentsNamesByDirectorate(currentUser.DirectorateId)
-                                                   .Result
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -972,7 +970,7 @@ namespace TaskMenager.Client.Controllers
             }
             else if (currentUser.RoleName == SuperAdmin)
             {
-                newTask.Directorates = this.directorates.GetDirectoratesNames()
+                newTask.Directorates = this.directorates.GetDirectoratesNames(null)
                                                .Select(a => new SelectListItem
                                                {
                                                    Text = a.TextValue,
@@ -1006,7 +1004,6 @@ namespace TaskMenager.Client.Controllers
                 {
                     newTask.DirectoratesId = oldTask.DirectoratesId;
                     newTask.Departments = this.departments.GetDepartmentsNamesByDirectorate(int.Parse(newTask.DirectoratesId))
-                                                       .Result
                                                        .Select(a => new SelectListItem
                                                        {
                                                            Text = a.TextValue,
@@ -1057,7 +1054,7 @@ namespace TaskMenager.Client.Controllers
                     }
 
                 }
-                newTask.Assigners = this.employees.GetEmployeesNames()
+                newTask.Assigners = this.employees.GetActiveEmployeesNames()
                                    .Select(a => new SelectListItem
                                    {
                                        Text = a.TextValue,
@@ -1066,7 +1063,7 @@ namespace TaskMenager.Client.Controllers
                                    })
                                    .ToList();
 
-                newTask.Employees = this.employees.GetEmployeesNames()
+                newTask.Employees = this.employees.GetActiveEmployeesNames()
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -1118,12 +1115,12 @@ namespace TaskMenager.Client.Controllers
             return RedirectToAction(nameof(TaskDetails), new { taskId });
         }
 
-        public async Task<IActionResult> GetDepartments(string direktorateId)
+        public IActionResult GetDepartments(string direktorateId)
         {
             var idparseResult = int.TryParse(direktorateId, out int id);
             if (idparseResult)
             {
-                var result = await this.departments.GetDepartmentsNamesByDirectorate(id);
+                var result = this.departments.GetDepartmentsNamesByDirectorate(id);
                 return Json(result);
             }
 

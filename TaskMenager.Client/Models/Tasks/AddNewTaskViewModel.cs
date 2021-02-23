@@ -44,12 +44,12 @@ namespace TaskMenager.Client.Models.Tasks
         [Required(ErrorMessage = "Полето е задължително")]
         [DataType(DataType.Date)]
         [Display(Name = "Начална дата *")]
-        public DateTime Valid_From { get; set; } = DateTime.UtcNow.Date;
+        public DateTime Valid_From { get; set; } = DateTime.Now.Date;
 
         
         [DataType(DataType.Date)]
         [Display(Name = "Крайна дата")]
-        public DateTime? Valid_To { get; set; } = DateTime.UtcNow.Date.AddDays(1);
+        public DateTime? Valid_To { get; set; } = DateTime.Now.Date.AddDays(1);
 
         [Display(Name = "Обхват")]
         public IList<SelectListItem> TaskTypes { get; set; } = new List<SelectListItem>();

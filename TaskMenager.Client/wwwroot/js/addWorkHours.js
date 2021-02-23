@@ -12,9 +12,7 @@
 
     function checkDate() {
         var selectedText = document.getElementById("workdate").value;
-        console.log(selectedText);
         var selectedDate = new Date(selectedText);
-        console.log(selectedDate);
         var now = new Date();
         if (selectedDate > now) {
             notify.showError('Въведете днешна или минала дата');

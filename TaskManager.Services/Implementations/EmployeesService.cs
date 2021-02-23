@@ -119,7 +119,7 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
-        public IEnumerable<SelectServiceModel> GetEmployeesNames()
+        public IEnumerable<SelectServiceModel> GetActiveEmployeesNames()
         {
             var names = this.db.Employees
                 .Where(c => c.isDeleted == false)

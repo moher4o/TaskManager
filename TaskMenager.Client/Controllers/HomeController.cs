@@ -49,7 +49,7 @@ namespace TaskMenager.Client.Controllers
             {
                 userId = currentUser.Id,
                 ActiveTasks = await this.employees.GetUserActiveTaskAsync(currentUser.Id),
-                AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
+                //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
 
             currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
@@ -123,17 +123,16 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
-        //public IActionResult NotAuthorized()
-        //{
-        //    return View();
-        //}
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        public IActionResult NotImplemented()
+        {
+            return View();
+        }
 
 
     }

@@ -11,6 +11,7 @@ using TaskManager.Common;
 using TaskManager.Data;
 using TaskManager.Data.Models;
 using TaskManager.Services.Models;
+using TaskManager.Services.Models.ReportModels;
 using TaskManager.Services.Models.TaskModels;
 using static TaskManager.Common.DataConstants;
 
@@ -467,6 +468,31 @@ namespace TaskManager.Services.Implementations
                 return "Неуспешено редактиране. Проверете входните данни.";
             }
 
+        }
+
+        public async Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate)
+        {
+            var report = new ReportServiceModel();
+            var tasksIdList = new List<int>();
+            foreach (var employeeId in employeesIds)
+            {
+                var empTaskIds = await this.db.WorkedHours
+                    .Where(wh => wh.EmployeeId == employeeId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate <= endDate.Date && !wh.isDeleted)
+                    .OrderBy(wh => wh.TaskId)
+                    .Select(wh => wh.TaskId)
+                    .Distinct()
+                    .ToListAsync();
+
+                tasksIdList = tasksIdList.Union(empTaskIds).ToList();
+            }
+
+            var searchedTasks = await this.db.Tasks
+                .Where(t => tasksIdList.Contains(t.Id))
+                .OrderBy(t => t.Id)
+                .ProjectTo<ReportServiceModel>(new {employeesIds = employeesIds.ToArray(), startDate, endDate})
+                .ToListAsync();
+
+            return searchedTasks;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -65,25 +66,34 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
-        public IEnumerable<SelectServiceModel> GetDirectoratesNames()
-        {
-            var names = this.db.Directorates
-                .Where(c => c.isDeleted == false)
-                .Select(d => new SelectServiceModel {
-                TextValue = d.DirectorateName,
-                Id = d.Id
-                })
-                .ToList();
-            return names;
-        }
+        //public IEnumerable<SelectServiceModel> GetDirectoratesNames()
+        //{
+        //    var names = this.db.Directorates
+        //        .Where(c => c.isDeleted == false)
+        //        .Select(d => new SelectServiceModel {
+        //        TextValue = d.DirectorateName,
+        //        Id = d.Id
+        //        })
+        //        .ToList();
+        //    return names;
+        //}
 
         public IEnumerable<SelectServiceModel> GetDirectoratesNames(int? directorateId)
         {
+            var names = new List<SelectServiceModel>();
             if (directorateId == null)
             {
-                return null;
+                names = this.db.Directorates
+                    .Where(c => c.isDeleted == false)
+                    .Select(d => new SelectServiceModel
+                    {
+                        TextValue = d.DirectorateName,
+                        Id = d.Id
+                    })
+                    .ToList();
+                return names;
             }
-            var names = this.db.Directorates
+            names = this.db.Directorates
                 .Where(c => c.isDeleted == false && c.Id == directorateId)
                 .Select(d => new SelectServiceModel
                 {
