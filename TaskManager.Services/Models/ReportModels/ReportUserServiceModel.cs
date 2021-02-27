@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TaskManager.Common.Mapping;
+using TaskManager.Data.Models;
 
 namespace TaskManager.Services.Models.ReportModels
 {
-    public class ReportUserServiceModel
+    public class ReportUserServiceModel : IMapFrom<Employee>
     {
         public int Id { get; set; }
 

@@ -207,32 +207,32 @@ namespace TaskManager.Services.Implementations
 
                 var newTypeDb = new TasksType()
                 {
-                    TypeName = DataConstants.TaskTypeProject
+                    TypeName = DataConstants.TaskTypeSpecificWork
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
 
                 newTypeDb = new TasksType()
                 {
 
-                    TypeName = DataConstants.TaskTypeDirectorate
+                    TypeName = DataConstants.TaskTypeProcurement
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
                 {
 
-                    TypeName = DataConstants.TaskTypeDepartment
+                    TypeName = DataConstants.TaskTypeLearning
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
                 {
 
-                    TypeName = DataConstants.TaskTypeSector
+                    TypeName = DataConstants.TaskTypeAdminActivity
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
                 {
 
-                    TypeName = DataConstants.TaskTypeEmployee
+                    TypeName = DataConstants.TaskTypeMeetings
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
@@ -493,6 +493,17 @@ namespace TaskManager.Services.Implementations
                 .ToListAsync();
 
             return searchedTasks;
+        }
+
+        public async Task<TaskServiceModel> GetTaskAsync(int parentTaskId = 0)
+        {
+            var searchedTask = await this.db.Tasks
+                .Where(t => t.Id == parentTaskId)
+                .OrderBy(t => t.Id)
+                .ProjectTo<TaskServiceModel>()
+                .FirstOrDefaultAsync();
+
+            return searchedTask;
         }
     }
 }

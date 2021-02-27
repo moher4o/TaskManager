@@ -13,6 +13,7 @@ using TaskManager.Common;
 using TaskManager.Services.Models.TaskModels;
 using Microsoft.EntityFrameworkCore;
 using static TaskManager.Common.DataConstants;
+using TaskManager.Services.Models.ReportModels;
 
 namespace TaskManager.Services.Implementations
 {
@@ -132,6 +133,18 @@ namespace TaskManager.Services.Implementations
                 .ToList();
             return names;
         }
+
+        public IEnumerable<ReportUserServiceModel> GetEmployeesByList(IEnumerable<int> employeesList)
+        {
+            var employees = this.db.Employees
+                .Where(e => employeesList.Contains(e.Id))
+                .OrderBy(e => e.DepartmentId)
+                .ThenBy(e => e.SectorId)
+                .ProjectTo<ReportUserServiceModel>()
+                .ToList();
+            return employees;
+        }
+
 
         public IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId)
         {

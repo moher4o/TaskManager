@@ -15,6 +15,10 @@ namespace TaskManager.Services.Models.ReportModels
 
         public string TaskName { get; set; }
 
+        public string Description { get; set; }
+
+        public string EndNote { get; set; }
+
         public DateTime StartDate { get; set; }
 
         public DateTime? EndDatePrognose { get; set; }
@@ -25,9 +29,11 @@ namespace TaskManager.Services.Models.ReportModels
 
         public string TaskStatusName { get; set; }
 
+        public string TaskTypeName { get; set; }
+
         public int HoursLimit { get; set; }
 
-        public IEnumerable<ReportUserServiceModel> Colleagues { get; set; } = new List<ReportUserServiceModel>();
+        public List<ReportUserServiceModel> Colleagues { get; set; } = new List<ReportUserServiceModel>();
 
         public void ConfigureMapping(Profile profile)
         {
@@ -36,6 +42,7 @@ namespace TaskManager.Services.Models.ReportModels
             DateTime endDate = DateTime.Now.Date;
             profile.CreateMap<Task, ReportServiceModel>()
                    .ForMember(u => u.TaskStatusName, cfg => cfg.MapFrom(s => s.TaskStatus.StatusName))
+                   .ForMember(u => u.TaskTypeName, cfg => cfg.MapFrom(s => s.TaskType.TypeName))
                    .ForMember(u => u.Colleagues, cfg => cfg.MapFrom(s => s.AssignedExperts
                                                            .Where(ex => employeesIds.Contains(ex.EmployeeId))
                                                            .OrderBy(e => e.Employee.FullName)

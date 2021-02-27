@@ -20,12 +20,12 @@ namespace TaskManager.Common
         public const string TaskStatusClosed = "Приключена";
         public const int TasksStatusCount = 3; // броя на статусите по-горе  !!!
 
-        public const string TaskTypeProject = "Проект";
-        public const string TaskTypeDirectorate = "Дирекция";
-        public const string TaskTypeDepartment = "Отдел";
-        public const string TaskTypeSector = "Сектор";
-        public const string TaskTypeEmployee = "Служител";
-        public const string TaskTypeOther = "Друго";
+        public const string TaskTypeSpecificWork = "Специфична дейност";
+        public const string TaskTypeProcurement = "Обществени поръчки";
+        public const string TaskTypeLearning = "Обучения, Презентации";
+        public const string TaskTypeAdminActivity = "Административна дейност";
+        public const string TaskTypeMeetings = "Работни групи, Комисии, Работни срещи";
+        public const string TaskTypeOther = "Други дейности";
         public const int TasksTypesCount = 6; // броя на типовете по-горе  !!!
 
         public const string TaskPriorityLow = "Нисък";

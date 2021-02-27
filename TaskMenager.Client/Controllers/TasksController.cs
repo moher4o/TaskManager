@@ -684,7 +684,7 @@ namespace TaskMenager.Client.Controllers
                    {
                        Text = a.TextValue,
                        Value = a.Id.ToString(),
-                       Selected = a.TextValue == TaskTypeEmployee ? true : false
+                       Selected = a.TextValue == TaskTypeSpecificWork ? true : false
                    })
                    .ToList();
             newTask.TaskTypesId = newTask.TaskTypes.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();

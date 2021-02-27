@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Services.Models;
+using TaskManager.Services.Models.ReportModels;
 using TaskManager.Services.Models.TaskModels;
 
 namespace TaskManager.Services
@@ -30,6 +31,9 @@ namespace TaskManager.Services
         IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId);
 
         IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId);
-        
+
+        IEnumerable<ReportUserServiceModel> GetEmployeesByList(IEnumerable<int> employeesList);
+
+
     }
 }
