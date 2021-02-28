@@ -19,6 +19,18 @@
             @Html.HiddenFor(model => model.Id)
             @Html.HiddenFor(model => model.OwnerId)
             @Html.HiddenFor(model => model.ParentTaskId)
+            @if (permisionType != SuperAdmin)
+            {
+                @Html.HiddenFor(model => model.DirectoratesId);
+            }
+            @if (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin)
+            {
+                @Html.HiddenFor(model => model.DepartmentsId)
+            }
+            @if (permisionType == SectorAdmin || permisionType == Employee)
+            {
+                @Html.HiddenFor(model => model.SectorsId)
+            }
             @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-10">
                 @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", placeholder = "Въведете име на задачата", id = "taskName", name = "taskName" })

@@ -979,7 +979,7 @@ namespace TaskMenager.Client.Controllers
                                                })
                                                .ToList();
 
-                if (oldTask.DirectoratesId == "0") //ако не е избрана дирекция
+                if (oldTask.DirectoratesId == "0" || string.IsNullOrWhiteSpace(oldTask.DirectoratesId)) //ако не е избрана дирекция
                 {
                     newTask.Directorates.Insert(0, new SelectListItem
                     {

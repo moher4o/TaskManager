@@ -8,6 +8,9 @@
 
     <title>@ViewData["Title"] - TaskMenager</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="~/css/toastr.min.css" />
+    <link rel="stylesheet" href="~/css/sweetalert.min.css" />
     <!-- Bootstrap CSS CDN -->
     @*<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">*@
     <!-- Our Custom CSS -->
@@ -96,7 +99,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                {*@
+                            {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -119,10 +122,12 @@
                             <a asp-controller="Report" asp-action="PeriodReport">Организационен</a>
                         </li>
                         <li>
-                            <a href="/Home/NotImplemented">Експертен</a>
+                            <a asp-controller="Home" asp-action="NotImplemented">Експертен</a>
+                            @*<a href="/Home/NotImplemented">Експертен</a>*@
                         </li>
                         <li>
-                            <a href="/Home/NotImplemented">Лична справка</a>
+                            <a asp-controller="Home" asp-action="NotImplemented">Лична справка</a>
+                            @*<a href="/Home/NotImplemented">Лична справка</a>*@
                         </li>
                     </ul>
                 </li>
@@ -133,25 +138,35 @@
                     </a>
                     <ul class="collapse list-unstyled" id="expertsSubmenu">
                         <li>
-                            <a href="/Home/NotImplemented">Списък</a>
+                            <a asp-controller="Home" asp-action="NotImplemented">Списък</a>
+                            @*<a href="/Home/NotImplemented">Списък</a>*@
                         </li>
                         <li>
-                            <a href="/Home/NotImplemented">Телефонен указател</a>
+                            <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
+                            @*<a href="/Home/NotImplemented">Телефонен указател</a>*@
                         </li>
                     </ul>
                 </li>
 
                 <li>
-                    <a href="/Home/NotImplemented">
+                    <a asp-controller="Home" asp-action="NotImplemented">
                         <i class="fas fa-question"></i>
                         За приложението
                     </a>
+                    @*<a href="/Home/NotImplemented">
+                        <i class="fas fa-question"></i>
+                        За приложението
+                    </a>*@
                 </li>
                 <li>
-                    <a href="/Home/NotImplemented">
+                    <a asp-controller="Home" asp-action="NotImplemented">
                         <i class="fas fa-paper-plane"></i>
                         Контакти
                     </a>
+                    @*<a href="/Home/NotImplemented">
+                        <i class="fas fa-paper-plane"></i>
+                        Контакти
+                    </a>*@
                 </li>
             </ul>
         </nav>
@@ -159,7 +174,7 @@
         <!-- Page Content  -->
         <div id="content">
             <nav class="navbar navbar-expand-sm navbar-light bg-light marginbmobile" style="max-height:40px !important;">
-                <div class="container-fluid" >
+                <div class="container-fluid">
                     <button type="button" id="sidebarCollapse" class="btn btn-info" style="background-color: #69a0f1;">
                         <i class="fas fa-align-left"></i>
                         @*<span>Toggle Sidebar</span>*@
@@ -168,10 +183,10 @@
                             <i class="fas fa-align-justify"></i>
                         </button>*@
                     <div id="notifications" style="position: relative; left: 20%;">
-                        <div id="loadingBox" class="notification" ><span>Зареждане …</span></div>
-                        <div id="infoBox" class="notification" ><span>Информация</span></div>
-                        <div id="errorBox" class="notification" ><span>Грешка</span></div>
-                        <div id="successBox" class="notification" ><span>Успех</span></div>
+                        <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
+                        <div id="infoBox" class="notification"><span>Информация</span></div>
+                        <div id="errorBox" class="notification"><span>Грешка</span></div>
+                        <div id="successBox" class="notification"><span>Успех</span></div>
                     </div>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
@@ -242,11 +257,15 @@
         </footer>
 
     </div>
-        @*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
+    @*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
     <!-- Popper.JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <script src="~/js/sweetalert.min.js"></script>
+
     @RenderSection("Scripts", required: false)
     <script type="text/javascript">
         $(document).ready(function () {
