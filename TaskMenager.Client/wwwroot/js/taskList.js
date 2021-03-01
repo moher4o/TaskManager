@@ -19,7 +19,6 @@ function DeletedTasksShowOrHide() {
         $(".displayno").hide();
     }
 }
-
 function loadDataTable() {
     dataTable = $('#DT_load').DataTable({
         "ajax": {
@@ -29,20 +28,21 @@ function loadDataTable() {
         },
         "columns": [
             { "data": "id", "width": "6%" },
-            { "data": "taskName", "width": "50%" },
+            { "data": "taskName", "width": "60%" },
             { "data": "assignedExpertsCount", "width": "5%" },
             { "data": "status", "width": "12%" },
             {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                        <a href="/Tasks/TaskDetails?taskId=${data}" class='btn btn-success text-white' style='cursor:pointer; width:90px;'>
-                            Детайли
+                        
+                        <a href="/Tasks/TaskDetails?taskId=${data}" style='cursor:pointer;'>
+                            <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                         &nbsp;
-                        <a class='btn btn-danger text-white' style='cursor:pointer; width:90px;'
+                        <a style='cursor:pointer;'
                             onclick=Delete('/Tasks/Delete?id='+${data})>
-                            Изтриване
+                            <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
                         </div>`;
                 }, "width": "27%"
@@ -60,10 +60,11 @@ function Delete(url) {
         title: "Потвърждение",
         text: "Сигурни ли сте, че искате да изтриете задачата?",
         icon: "warning",
+        closeOnEsc: false,
         //showCancelButton: true,
         //buttons: true,
         //cancelButtonText: "Отказ",
-        confirmButtonColor: "#DD6B55",
+        //confirmButtonColor: "#DD6B55",
         //confirmButtonText: "Изтриване",
         buttons: ["Отказ", "Изтриване!"],
         dangerMode: true
@@ -85,3 +86,8 @@ function Delete(url) {
         }
     });
 }
+
+//function TaskInfo(url) {
+//    var swal_html = '<div class="panel" style="background:aliceblue;font-weight:bold"><div class="panel-heading panel-info text-center btn-info"> <b>Import Status</b> </div> <div class="panel-body"><div class="text-center"><b><p style="font-weight:bold">Total number of not inserted  rows : add data</p><p style="font-weight:bold">Row numbers:Add data</p></b></div></div></div>';
+//    swal({ title: "Good Job!", content: (swal_html) });
+//}
