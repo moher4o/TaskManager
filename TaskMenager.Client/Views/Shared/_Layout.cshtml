@@ -99,7 +99,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                            {*@
+        {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -110,6 +110,10 @@
                         <li>
                             <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
                         </li>
+                        <li>
+                            <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
+                        </li>
+
                     </ul>
                 </li>
                 <li>

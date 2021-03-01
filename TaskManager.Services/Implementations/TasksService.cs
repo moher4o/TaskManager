@@ -26,6 +26,25 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withDeleted = false)
+        {
+
+            if (withDeleted)
+            {
+               return this.db.Tasks
+                        .Include(te => te.AssignedExperts)
+                        .AsQueryable();
+            }
+            else
+            {
+                return this.db.Tasks
+                        .Where(t => t.isDeleted == false)
+                        .Include(te => te.AssignedExperts)
+                        .AsQueryable();
+            }
+        }
+
+
 
         public IQueryable<TaskInfoServiceModel> GetTaskDetails(int taskId)
         {
@@ -495,7 +514,7 @@ namespace TaskManager.Services.Implementations
             return searchedTasks;
         }
 
-        public async Task<TaskServiceModel> GetTaskAsync(int parentTaskId = 0)
+        public async Task<TaskServiceModel> GetParentTaskAsync(int parentTaskId = 0)
         {
             var searchedTask = await this.db.Tasks
                 .Where(t => t.Id == parentTaskId)

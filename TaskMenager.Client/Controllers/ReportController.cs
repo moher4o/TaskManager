@@ -264,7 +264,7 @@ namespace TaskMenager.Client.Controllers
                             {
                                 if (task.ParentTaskId != null && task.ParentTaskId != parentTaskId)
                                 {
-                                    TaskServiceModel parentTask = await this.tasks.GetTaskAsync(task.ParentTaskId.Value);
+                                    TaskServiceModel parentTask = await this.tasks.GetParentTaskAsync(task.ParentTaskId.Value);
                                     if (parentTask != null)
                                     {
                                         worksheet.Row(row).Style.Font.Size = 12;
@@ -586,7 +586,7 @@ namespace TaskMenager.Client.Controllers
                             {
                                 if (task.ParentTaskId != null && task.ParentTaskId != parentTaskId)
                                 {
-                                    TaskServiceModel parentTask = await this.tasks.GetTaskAsync(task.ParentTaskId.Value);
+                                    TaskServiceModel parentTask = await this.tasks.GetParentTaskAsync(task.ParentTaskId.Value);
                                     if (parentTask != null)
                                     {
                                         worksheet.Row(row).Style.Font.Size = 12;

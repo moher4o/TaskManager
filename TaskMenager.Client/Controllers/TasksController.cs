@@ -37,6 +37,12 @@ namespace TaskMenager.Client.Controllers
 
         }
 
+        public IActionResult TasksList()
+        {
+            return View();
+        }
+
+
         public async Task<IActionResult> CreatedTasks()
         {
             var currentEmployee = new UserTasksViewModel()
@@ -1115,6 +1121,40 @@ namespace TaskMenager.Client.Controllers
             return RedirectToAction(nameof(TaskDetails), new { taskId });
         }
 
+        #region API Calls
+        [HttpGet]
+        public async Task<IActionResult> GetAll(bool withDeleted = false)
+        {
+            //var taskList = new List<TaskManager.Data.Models.Task>();
+            //System.Threading.Tasks.Task
+            //   .Run(async () =>
+            //        {
+            //            taskList = await this.tasks.GetAllTasksAsync();
+            //        }
+            //        ).Wait();
+            //var data = new List<TasksListViewModel>();
+
+            var data = this.tasks.GetAllTasks(withDeleted)
+                .ProjectTo<TasksListViewModel>()
+                .ToList();
+
+            return Json(new { data });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            //var bookFromDb = await _db.Books.FirstOrDefaultAsync(u => u.Id == id);
+            //if (bookFromDb == null)
+            //{
+            //    return Json(new { success = false, message = "Error while Deleting" });
+            //}
+            //_db.Books.Remove(bookFromDb);
+            //await _db.SaveChangesAsync();
+            return Json(new { success = true, message = "Задачата е изтрита" });
+        }
+
+        [HttpGet]
         public IActionResult GetDepartments(string direktorateId)
         {
             var idparseResult = int.TryParse(direktorateId, out int id);
@@ -1127,6 +1167,7 @@ namespace TaskMenager.Client.Controllers
             return Json(null);
         }
 
+        [HttpGet]
         public async Task<IActionResult> GetSectors(string departmentId)
         {
             var idparseResult = int.TryParse(departmentId, out int id);
@@ -1138,6 +1179,6 @@ namespace TaskMenager.Client.Controllers
 
             return Json(null);
         }
-
+        #endregion
     }
 }
