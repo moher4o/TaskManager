@@ -5,10 +5,20 @@
 }
 <br />
 <div class="container row p-0 m-0">
-    <div class="col-6">
+    <div class="col-md-3">
         <h2 class="text-info">Списък задачи</h2>
     </div>
-    <div class="col-3 offset-3">
+    <div class="col-md-3" style="padding-top:6px;">
+        <input style="margin-left:15px;" type="checkbox" name="showDeleted" id="showDeleted">
+        <label for="showDeleted"> Изтрити задачи</label>
+    </div>
+
+    <div class="col-md-3" style="padding-top:6px;">
+        <input style="margin-left:15px;" type="checkbox" name="showClosed" id="showClosed">
+        <label for="showClosed"> Приключени задачи</label>
+    </div>
+
+    <div class="col-md-2 offset-md-1">
         <a asp-action="CreateNewTask" asp-controller="Tasks" class="btn btn-info form-control text-white">
             Създай задача
         </a>

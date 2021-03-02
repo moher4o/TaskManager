@@ -5,6 +5,7 @@
 }
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 @{var isClosed = Model.TaskStatusName == DataConstants.TaskStatusClosed;}
+@{var isDeleted = Model.isDeleted;}
 <div class="PrimeBox2" style="margin-top:20px;">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
         <h5 style="color:white; margin-left:15px;">Подробна информация за задача N: @Model.Id.ToString()</h5>
@@ -65,9 +66,9 @@
                                     {
                                         <i class="fas fa-user"> </i>
                                     }
-                                    
-                                        @emp.TextValue
-                                    
+
+                                    @emp.TextValue
+
                                 </td>
                             </tr>
                         }
@@ -151,13 +152,13 @@
             <div class="form-group row col-md-5" style="margin-bottom: 0rem;">
                 <div class="col-md-5"></div>
                 <div class="col-md-5">
-                    @if (isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-                      || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                    @if (isClosed && !isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
+                  || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         var modalId = "modal" + Model.Id.ToString();
                         <form method="post" asp-controller="Tasks" asp-action="ReopenTask" asp-route-taskId="@Model.Id">
                             <a title="Ново отваряне на задачата" style="background-color: #b2d6f8;" class="btn btn-secondary" data-toggle="modal" data-target="#@modalId">
-                                Възстановяване
+                                Ново отваряне
                             </a>
                             <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
@@ -174,13 +175,24 @@
                             </div>
                         </form>
                     }
-                    @if (!isClosed && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-                      || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                    @if (!isClosed && !isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
+                  || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@Model.Id">
                             Редактиране
                         </a>
                     }
+                    @if (isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
+                  || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+                    {
+                        <div class="row">
+                            <label style="color:red;">Изтрита задача</label>
+                            <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@Model.Id">
+                                Въз
+                            </a>
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>

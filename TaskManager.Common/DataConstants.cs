@@ -18,7 +18,8 @@ namespace TaskManager.Common
         public const string TaskStatusNew = "Нова";
         public const string TaskStatusInProgres = "В изпълнение";
         public const string TaskStatusClosed = "Приключена";
-        public const int TasksStatusCount = 3; // броя на статусите по-горе  !!!
+        public const string TaskStatusDeleted = "Изтрита";
+        public const int TasksStatusCount = 4; // броя на статусите по-горе  !!!
 
         public const string TaskTypeSpecificWork = "Специфична дейност";
         public const string TaskTypeProcurement = "Обществени поръчки";

@@ -1123,7 +1123,7 @@ namespace TaskMenager.Client.Controllers
 
         #region API Calls
         [HttpGet]
-        public async Task<IActionResult> GetAll(bool withDeleted = false)
+        public async Task<IActionResult> GetAll(bool withClosed = false, bool withDeleted = false)
         {
             //var taskList = new List<TaskManager.Data.Models.Task>();
             //System.Threading.Tasks.Task
@@ -1134,7 +1134,7 @@ namespace TaskMenager.Client.Controllers
             //        ).Wait();
             //var data = new List<TasksListViewModel>();
 
-            var data = this.tasks.GetAllTasks(withDeleted)
+            var data = this.tasks.GetAllTasks(withClosed, withDeleted)
                 .ProjectTo<TasksListViewModel>()
                 .ToList();
 

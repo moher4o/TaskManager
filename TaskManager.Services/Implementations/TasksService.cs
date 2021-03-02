@@ -26,20 +26,25 @@ namespace TaskManager.Services.Implementations
 
         }
 
-        public IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withDeleted = false)
+        public IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withClosed = false, bool withDeleted = false)
         {
 
-            if (withDeleted)
+            if (withClosed)
             {
                return this.db.Tasks
+                        .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == withDeleted)
                         .Include(te => te.AssignedExperts)
+                        .OrderBy(t => t.StatusId)
+                        .ThenBy(t => t.isDeleted)
                         .AsQueryable();
             }
             else
             {
                 return this.db.Tasks
-                        .Where(t => t.isDeleted == false)
+                        .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == withDeleted)
                         .Include(te => te.AssignedExperts)
+                        .OrderBy(t => t.StatusId)
+                        .ThenBy(t => t.isDeleted)
                         .AsQueryable();
             }
         }
