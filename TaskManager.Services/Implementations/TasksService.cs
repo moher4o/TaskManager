@@ -49,7 +49,41 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-
+        public async Task<bool> MarkTaskDeletedAsync(int taskId, int userId)
+        {
+            try
+            {
+                var taskToDelete = await this.db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
+                var expert = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
+                if (expert == null || taskToDelete == null)
+                {
+                    return false;
+                }
+                taskToDelete.isDeleted = true;
+                taskToDelete.DeletedByUserId = expert.Id;
+                if (!taskToDelete.EndDate.HasValue)
+                {
+                    taskToDelete.EndDate = DateTime.Now;
+                }
+                await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
+            
+        }
+        public async Task<bool> CheckTaskByIdAsync(int taskId)
+        {
+            var taskFromDb = await this.db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
+            if (taskFromDb == null)
+            {
+                return false;
+            }
+            return true;
+        }
 
         public IQueryable<TaskInfoServiceModel> GetTaskDetails(int taskId)
         {

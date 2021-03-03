@@ -1125,15 +1125,6 @@ namespace TaskMenager.Client.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(bool withClosed = false, bool withDeleted = false)
         {
-            //var taskList = new List<TaskManager.Data.Models.Task>();
-            //System.Threading.Tasks.Task
-            //   .Run(async () =>
-            //        {
-            //            taskList = await this.tasks.GetAllTasksAsync();
-            //        }
-            //        ).Wait();
-            //var data = new List<TasksListViewModel>();
-
             var data = this.tasks.GetAllTasks(withClosed, withDeleted)
                 .ProjectTo<TasksListViewModel>()
                 .ToList();
@@ -1141,17 +1132,17 @@ namespace TaskMenager.Client.Controllers
             return Json(new { data });
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        [Authorize(Policy = SuperAdmin)]
+        [HttpGet]
+        public async Task<IActionResult> Delete(int taskId)
         {
-            //var bookFromDb = await _db.Books.FirstOrDefaultAsync(u => u.Id == id);
-            //if (bookFromDb == null)
-            //{
-            //    return Json(new { success = false, message = "Error while Deleting" });
-            //}
-            //_db.Books.Remove(bookFromDb);
-            //await _db.SaveChangesAsync();
-            return Json(new { success = true, message = "Задачата е изтрита" });
+            var taskFromDb = await this.tasks.CheckTaskByIdAsync(taskId);
+            if (!taskFromDb)
+            {
+                return Json(new { success = false, message = "Грешка при изтриване" });
+            }
+            bool result = await this.tasks.MarkTaskDeletedAsync(taskId, currentUser.Id);
+            return Json(new { success = result, message = "Задачата е изтрита" });
         }
 
         [HttpGet]

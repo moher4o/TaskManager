@@ -36,5 +36,8 @@ namespace TaskManager.Services
         Task<TaskServiceModel> GetParentTaskAsync(int parentTaskId);
 
         IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withClosed = false, bool withDeleted = false);
+
+        Task<bool> CheckTaskByIdAsync(int taskId);
+        Task<bool> MarkTaskDeletedAsync(int taskId, int userId);
     }
 }

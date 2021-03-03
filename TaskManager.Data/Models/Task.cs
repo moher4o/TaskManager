@@ -53,6 +53,8 @@ namespace TaskManager.Data.Models
         public int? CloseUserId { get; set; }
         public Employee CloseUser { get; set; }
 
+        public int? DeletedByUserId { get; set; }
+        public Employee DeletedByUser { get; set; }
 
         public int StatusId { get; set; }
         public TasksStatus TaskStatus { get; set; }

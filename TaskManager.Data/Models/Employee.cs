@@ -58,6 +58,8 @@ namespace TaskManager.Data.Models
 
         public virtual ICollection<Task> TasksCloser { get; set; } = new List<Task>();
 
+        public virtual ICollection<Task> TasksDeleted { get; set; } = new List<Task>();
+
         public virtual ICollection<EmployeesTasks> Tasks { get; set; } = new List<EmployeesTasks>();
 
         public virtual ICollection<WorkedHours> WorkedHoursByTask { get; set; } = new List<WorkedHours>();

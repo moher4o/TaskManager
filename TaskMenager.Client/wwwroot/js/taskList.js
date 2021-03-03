@@ -1,9 +1,12 @@
 ﻿var dataTable;
+var permisionType;
 
 $(document).ready(function () {
     $('#showClosed').on('change', DeletedTasksShowOrHide);
     $('#showDeleted').on('change', DeletedTasksShowOrHide);
-    loadDataTable(false);
+    loadDataTable(false, false);
+    permisionType = $('#uid').val();
+ 
 });
 
 function LoadTasksTest() {
@@ -48,7 +51,7 @@ function loadDataTable(getClosed,withDeleted) {
             {
                 "data": "id",
                 "render": function (data) {
-                    if (withDeleted) {
+                    if (withDeleted || permisionType != 'SuperAdmin') {
                         return `<div class="text-center">
                         
                         <a href="/Tasks/TaskDetails?taskId=${data}" style='cursor:pointer;'>
@@ -64,13 +67,13 @@ function loadDataTable(getClosed,withDeleted) {
                         </a>
                         &nbsp;
                         <a style='cursor:pointer;'
-                            onclick=Delete('/Tasks/Delete?id='+${data})>
+                            onclick=Delete('/Tasks/Delete?taskId=${data}')>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
                         </div>`;
                     }
 
-                }, "width": "27%"
+                }, "width": "17%"
             }
         ],
         "language": {
@@ -96,7 +99,7 @@ function Delete(url) {
     }).then((willDelete) => {
         if (willDelete) {
             $.ajax({
-                type: "DELETE",
+                type: "Get",
                 url: url,
                 success: function (data) {
                     if (data.success) {
