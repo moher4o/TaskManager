@@ -1,5 +1,8 @@
 ﻿var dataTable;
 var permisionType;
+const loc = window.location.href;
+const path = loc.substr(0, loc.lastIndexOf('/') + 1); 
+
 
 $(document).ready(function () {
     $('#showClosed').on('change', DeletedTasksShowOrHide);
@@ -35,8 +38,8 @@ function DeletedTasksShowOrHide() {
 
 
 }
-function loadDataTable(getClosed,withDeleted) {
-    var url = "/Tasks/getall?withClosed=" + getClosed +"&withDeleted="+withDeleted;
+function loadDataTable(getClosed, withDeleted) {
+    var url = path + "getall?withClosed=" + getClosed + "&withDeleted=" + withDeleted;
     dataTable = $('#DT_load').DataTable({
         "ajax": {
             "url": url,
@@ -54,7 +57,7 @@ function loadDataTable(getClosed,withDeleted) {
                     if (withDeleted || permisionType != 'SuperAdmin') {
                         return `<div class="text-center">
                         
-                        <a href="/Tasks/TaskDetails?taskId=${data}" style='cursor:pointer;'>
+                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                         </div>`;
@@ -62,12 +65,12 @@ function loadDataTable(getClosed,withDeleted) {
                     else {
                         return `<div class="text-center">
                         
-                        <a href="/Tasks/TaskDetails?taskId=${data}" style='cursor:pointer;'>
+                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                         &nbsp;
                         <a style='cursor:pointer;'
-                            onclick=Delete('/Tasks/Delete?taskId=${data}')>
+                            onclick=Delete('${path}Delete?taskId=${data}')>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
                         </div>`;
@@ -155,3 +158,4 @@ function Delete(url) {
 //        "width": "100%"
 //    });
 //}
+//onclick=Delete('/Tasks/Delete?taskId=${data}')>

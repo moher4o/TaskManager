@@ -152,6 +152,7 @@ namespace TaskMenager.Client.Controllers
 
                 var taskToEdit = new AddNewTaskViewModel()
                 {
+                     ParentTaskId = taskDetails.ParentTaskId,
                      DirectoratesId = taskDetails.DirectorateId.ToString(),
                      DepartmentsId = taskDetails.DepartmentId.ToString(),
                      SectorsId = taskDetails.SectorId.ToString(),
@@ -243,6 +244,7 @@ namespace TaskMenager.Client.Controllers
                 taskToEdit.StartDate = model.Valid_From;
                 taskToEdit.EndDatePrognose = model.Valid_To;
                 taskToEdit.OwnerId = model.OwnerId;
+                taskToEdit.ParentTaskId = model.ParentTaskId;
                 taskToEdit.TypeId = int.Parse(model.TaskTypesId);
                 taskToEdit.HoursLimit = model.HoursLimit;
                 if (model.EmployeesIds != null && model.EmployeesIds.Length > 0)
@@ -372,6 +374,7 @@ namespace TaskMenager.Client.Controllers
                 newTask.StartDate = model.Valid_From;
                 newTask.EndDatePrognose = model.Valid_To;
                 newTask.OwnerId = currentUser.Id;
+                newTask.ParentTaskId = model.ParentTaskId;
                 newTask.TypeId = int.Parse(model.TaskTypesId);
                 newTask.HoursLimit = model.HoursLimit;
                 if (model.EmployeesIds != null && model.EmployeesIds.Length > 0)
@@ -684,13 +687,27 @@ namespace TaskMenager.Client.Controllers
                                                    })
                                                    .ToList();
             }
+            
+            newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId)
+                   .Select(a => new SelectListItem
+                   {
+                       Text = a.TextValue,
+                       Value = a.Id.ToString()
+                   })
+                   .ToList();
+            newTask.TaskParetns.Insert(0, new SelectListItem
+            {
+                Text = ChooseValue,
+                Value = "0",
+                Selected = true
+            });
 
             newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
                    .Select(a => new SelectListItem
                    {
                        Text = a.TextValue,
                        Value = a.Id.ToString(),
-                       Selected = a.TextValue == TaskTypeSpecificWork ? true : false
+                       Selected = a.TextValue == TaskTypeGlobal ? true : false
                    })
                    .ToList();
             newTask.TaskTypesId = newTask.TaskTypes.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
@@ -1079,6 +1096,30 @@ namespace TaskMenager.Client.Controllers
                                                    .ToList();
             }
             newTask.AssignerId = oldTask.AssignerId;
+            newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId)
+                   .Select(a => new SelectListItem
+                   {
+                       Text = a.TextValue,
+                       Value = a.Id.ToString(),
+                       Selected = a.Id == oldTask.ParentTaskId ? true : false
+                   })
+                   .ToList();
+            newTask.TaskParetns.Insert(0, new SelectListItem
+            {
+                Text = ChooseValue,
+                Value = "0",
+                Selected = oldTask.ParentTaskId > 0 ? false : true
+            });
+            newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
+                   .Select(a => new SelectListItem
+                   {
+                       Text = a.TextValue,
+                       Value = a.Id.ToString(),
+                       Selected = a.Id.ToString() == oldTask.TaskTypesId ? true : false
+                   })
+                   .ToList();
+            newTask.TaskTypesId = oldTask.TaskTypesId;
+
             newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
                    .Select(a => new SelectListItem
                    {

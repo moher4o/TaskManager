@@ -57,6 +57,9 @@ namespace TaskMenager.Client.Models.Tasks
 
         public int? ParentTaskId { get; set; }
 
+        [Display(Name = "Задача родител: ")]
+        public string ParentTaskName { get; set; }
+
         public int OwnerId { get; set; }
 
         [Display(Name = "Създадена от: ")]
@@ -88,9 +91,6 @@ namespace TaskMenager.Client.Models.Tasks
 
         [Display(Name = "Приоритет: ")]
         public string TaskPriorityName { get; set; }
-
-        [Display(Name = "Основна Задача: ")]
-        public string ParentTaskName { get; set; }
 
         [Display(Name = "Дирекция: ")] 
         public string DirectorateName { get; set; }

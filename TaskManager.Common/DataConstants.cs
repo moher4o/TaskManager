@@ -26,7 +26,8 @@ namespace TaskManager.Common
         public const string TaskTypeAdminActivity = "Административна дейност";
         public const string TaskTypeMeetings = "Работни групи, Комисии, Работни срещи";
         public const string TaskTypeOther = "Други дейности";
-        public const int TasksTypesCount = 6; // броя на типовете по-горе  !!!
+        public const string TaskTypeGlobal = "Глобална";
+        public const int TasksTypesCount = 7; // броя на типовете по-горе  !!!
 
         public const string TaskPriorityLow = "Нисък";
         public const string TaskPriorityNormal = "Нормален";

@@ -39,5 +39,6 @@ namespace TaskManager.Services
 
         Task<bool> CheckTaskByIdAsync(int taskId);
         Task<bool> MarkTaskDeletedAsync(int taskId, int userId);
+        IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId);
     }
 }

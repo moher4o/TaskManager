@@ -131,6 +131,15 @@ namespace TaskManager.Services.Implementations
                     }
                     taskDB.AssignedExperts = assignedEmployeesDB;
                 }
+                if (newTask.ParentTaskId.Value == 0 || newTask.ParentTaskId == null)
+                {
+                    taskDB.TypeId = await this.db.TasksTypes.Where(tt => tt.TypeName == TaskTypeGlobal).Select(tt => tt.Id).FirstOrDefaultAsync();
+                }
+                else
+                {
+                    taskDB.ParentTaskId = newTask.ParentTaskId;
+                }
+
                 await this.db.Tasks.AddAsync(taskDB);
                 await this.db.SaveChangesAsync();
                 return "success";
@@ -450,6 +459,7 @@ namespace TaskManager.Services.Implementations
                 }
 
                 currentTask.TaskName = taskToEdit.TaskName;
+                currentTask.ParentTaskId = taskToEdit.ParentTaskId;
                 currentTask.Description = taskToEdit.Description;
                 currentTask.AssignerId = taskToEdit.AssignerId;
                 currentTask.DirectorateId = taskToEdit.DirectorateId;
@@ -485,6 +495,13 @@ namespace TaskManager.Services.Implementations
                     currentTask.StartDate = taskToEdit.StartDate.Date;
                     
                 }
+
+                if (taskToEdit.ParentTaskId.Value == 0 || taskToEdit.ParentTaskId == null)
+                {
+                    currentTask.TypeId = await this.db.TasksTypes.Where(tt => tt.TypeName == TaskTypeGlobal).Select(tt => tt.Id).FirstOrDefaultAsync();
+                    currentTask.ParentTaskId = null;
+                }
+ 
 
                 this.db.EmployeesTasks.Where(et => et.TaskId == currentTask.Id)
                                       .ToList()
@@ -562,6 +579,18 @@ namespace TaskManager.Services.Implementations
                 .FirstOrDefaultAsync();
 
             return searchedTask;
+        }
+
+        public IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId)
+        {
+            return this.db.Tasks.Where(t => t.ParentTaskId == null && (t.DirectorateId == directorateId || t.DirectorateId == null) && t.isDeleted == false)
+                .Select(t => new SelectServiceModel
+                {
+                    Id = t.Id,
+                    TextValue = t.TaskName,
+                    isDeleted = t.isDeleted
+                })
+                .ToList();
         }
     }
 }

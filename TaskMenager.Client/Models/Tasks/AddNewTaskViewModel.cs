@@ -22,6 +22,9 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Описание")]
         public string Description { get; set; }
 
+        [Display(Name = "Глобална задача(родител)")]
+        public IList<SelectListItem> TaskParetns { get; set; } = new List<SelectListItem>();
+
         public int? ParentTaskId { get; set; }
 
         public int OwnerId { get; set; }
