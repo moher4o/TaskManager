@@ -1,0 +1,56 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Добре дошли";
+}
+
+<div id="accaunt" hidden>@TempData["account"]</div>
+
+
+<script type="text/javascript">
+    function showSweet(event) {
+        var name = $('#accaunt').text();
+        const loc = window.location.href;
+        var content = document.createElement('div');
+        content.innerHTML = 'Здравейте, <strong>' + name + '</strong></br>Нямате създаден акаунт за оторизация в <strong>\"Мениджър задачи\"</strong>. Желаете ли да го създадете сега?';
+        const path = loc.substr(0, loc.lastIndexOf('/') + 1); 
+        swal({
+            title: "Информация",
+            content: content,
+            //text: "Здравейте, " + name + "\n" + "Нямате създаден акаунт за оторизация в \"Мениджър задачи\". Желаете ли да го създадете сега?",
+            icon: "info",
+            closeOnClickOutside: false,
+            //closeOnEsc: false,
+            //showCancelButton: true,
+            //buttons: true,
+            //cancelButtonText: "Отказ",
+            //confirmButtonColor: "#DD6B55",
+            //confirmButtonText: "Изтриване",
+            buttons: ["Отказ", "Да"],
+            //dangerMode: true
+        }).then((willDelete) => {
+            if (willDelete) {
+                window.location.href = `${path}Register`;
+            }
+            else {
+                window.location.href = `https://staging.egov.bg/wps/portal/egov/home`;
+            }
+        });
+        
+
+        //swal({
+        //    title: 'Hello',
+        //    content: content,
+        //    icon: "success",
+        //})
+        //swal("Информация", `Здравейте, ${name}.`+"LF"+` Нямате създаден акаунт за оторизация в TaskManager.`+"LF"+` Желаете ли да го създадете сега?`, "info");
+    }
+
+</script>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            showSweet();
+        });
+    </script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

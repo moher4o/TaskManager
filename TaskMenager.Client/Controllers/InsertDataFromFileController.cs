@@ -17,25 +17,23 @@ using TaskManager.Common;
 
 namespace TaskMenager.Client.Controllers
 {
-    [Authorize(Policy = DataConstants.SuperAdmin)]
-    public class InsertDataFromFileController : Controller
+    [Authorize(Policy = "Developer")]
+    public class InsertDataFromFileController : BaseController
     {
 
         private readonly ITitleService titles;
-        private readonly IRolesService roles;
+        //private readonly IRolesService roles;
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
-        private readonly IEmployeesService employees;
-        public InsertDataFromFileController(IRolesService roles, ITitleService titles, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, IDirectorateService directorates)
+        
+        public InsertDataFromFileController(IRolesService roles, ITitleService titles, IEmployeesService employees, ITasksService tasks, IDepartmentsService departments, ISectorsService sectors, IDirectorateService directorates, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, employees, tasks)
         {
-            this.roles = roles;
+            //this.roles = roles;
             this.titles = titles;
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
-            this.employees = employees;
-            
         }
 
         //private IConfiguration Configuration { get; }

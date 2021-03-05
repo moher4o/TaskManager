@@ -46,12 +46,17 @@ namespace TaskMenager.Client
 
             services.AddAuthorization(options =>
             {
+                //options.AddPolicy(DataConstants.Employee, policy =>
+                //                policy.RequireAssertion(context => context.User.HasClaim(c => c.Value == DataConstants.Employee || c.Value == "Admin")));
                 options.AddPolicy(DataConstants.Employee, policy =>
-                                policy.RequireAssertion(context => context.User.HasClaim(c => c.Value == DataConstants.Employee || c.Value == "Admin")));
+                                policy.RequireClaim("permission", new string[] { "Admin", "Employee" }));
                 options.AddPolicy("Admin", policy =>
                                 policy.RequireClaim("permission", "Admin"));
                 options.AddPolicy(DataConstants.SuperAdmin, policy =>
                                 policy.RequireClaim("permissionType", DataConstants.SuperAdmin));
+                //options.AddPolicy("Guest", policy =>
+                //                policy.RequireClaim("permissionType", "Guest"));
+
             });
 
             

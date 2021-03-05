@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -35,9 +36,14 @@ namespace TaskMenager.Client.Controllers
         }
 
 
-
+        
         public async Task<IActionResult> Index()
         {
+            if (this.User.Claims.Any(cl => cl.Value == "Guest"))
+            {
+               return RedirectToAction("WellCome", "Users");
+            }
+
 
             if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
             {

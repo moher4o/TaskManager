@@ -74,6 +74,10 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     ci.AddClaim(new Claim("permissionType", DataConstants.Employee));
                 }
             }
+            else
+            {
+                ci.AddClaim(new Claim("permissionType", "Guest"));
+            }
             var cp = new ClaimsPrincipal(ci);
 
             //return Task.FromResult(cp);

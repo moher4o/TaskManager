@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManager.Common;
 using TaskManager.Data.Models;
 using TaskManager.Services;
 using TaskManager.Services.Models;
@@ -17,7 +18,7 @@ using static TaskManager.Common.DataConstants;
 
 namespace TaskMenager.Client.Controllers
 {
-
+    [Authorize(Policy = DataConstants.Employee)]
     public class TasksController : BaseController
     {
         private readonly IDirectorateService directorates;

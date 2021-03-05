@@ -16,9 +16,12 @@ using OfficeOpenXml.Style;
 using TaskManager.Services.Models.TaskModels;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Drawing.Chart.Style;
+using Microsoft.AspNetCore.Authorization;
+using TaskManager.Common;
 
 namespace TaskMenager.Client.Controllers
 {
+    [Authorize(Policy = DataConstants.Employee)]
     public class ReportController : BaseController
     {
         private readonly IDirectorateService directorates;

@@ -11,7 +11,7 @@ using TaskManager.Services.Models;
 
 namespace TaskMenager.Client.Controllers
 {
-    [Authorize(Policy = DataConstants.Employee)]
+    
     public class BaseController : Controller
     {
         protected readonly IEmployeesService employees;
