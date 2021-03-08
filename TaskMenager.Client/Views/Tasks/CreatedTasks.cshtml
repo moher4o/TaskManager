@@ -33,8 +33,10 @@
             <div class="col-md-3" style="color: #5f9fec;">
                 <div class="row">
                     <div style="padding-left:20px; min-width:100px;">
-                        <img class="chatnotifications" src="~/png/note.png" />
-                        <span class="notificationsTodayCountValue">0</span>
+                        <a asp-controller="Home" asp-action="NotImplemented">
+                            <img class="chatnotifications" src="~/png/note.png" />
+                            <span class="notificationsTodayCountValue">0</span>
+                        </a>
                     </div>
                     <div style="padding-left:20px; min-width:100px;">
                         <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">

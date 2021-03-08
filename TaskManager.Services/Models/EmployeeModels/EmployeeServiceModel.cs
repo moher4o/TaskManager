@@ -12,9 +12,13 @@ namespace TaskManager.Services.Models.EmployeeModels
     {
         public int Id { get; set; }
 
+        [Display(Name = "Име:")]
+        [Required]
         [MaxLength(150)]
         public string FullName { get; set; }
 
+        [Display(Name = "Служебна поща:")]
+        [Required]
         [EmailAddress]
         [MaxLength(200)]
         public string Email { get; set; }
@@ -47,11 +51,14 @@ namespace TaskManager.Services.Models.EmployeeModels
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Entered phone format is not valid.")]
         public string MobileNumber { get; set; }
 
+        [Display(Name = "Логин акаунт:")]
         [Required]
         [StringLength(50)]
         public string DaeuAccaunt { get; set; }
 
-        public bool isDeleted { get; set; } = false;
+        public bool isActive { get; set; }
+
+        public bool isDeleted { get; set; }
 
         public virtual ICollection<Task> TasksCreator { get; set; } = new List<Task>();
 

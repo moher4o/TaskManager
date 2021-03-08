@@ -65,5 +65,19 @@ namespace TaskManager.Services.Implementations
             con.Close();
             return "success";
         }
+
+        public IEnumerable<SelectServiceModel> GetJobTitlesNames()
+        {
+            var names = this.db.JobTitles
+                .Where(c => c.isDeleted == false)
+                .OrderBy(j => j.TitleName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.TitleName,
+                    Id = d.Id
+                })
+                .ToList();
+            return names;
+        }
     }
 }

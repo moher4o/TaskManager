@@ -52,7 +52,7 @@ namespace TaskMenager.Client.Models.Tasks
         public DateTime? EndDate { get; set; }
 
         [DataType(DataType.Date)]
-        [Display(Name = "Крайна дата(прогнозна): ")]
+        [Display(Name = "Крайна дата: ")]
         public DateTime? EndDatePrognose { get; set; }
 
         public int? ParentTaskId { get; set; }
@@ -69,6 +69,13 @@ namespace TaskMenager.Client.Models.Tasks
 
         [Display(Name = "Отговорник: ")]
         public string AssignerName { get; set; }
+
+        [Display(Name = "Затворена от: ")]
+        public string CloserName { get; set; }
+
+        [Display(Name = "Изтрита от: ")]
+        public string DeleterName { get; set; }
+
 
         public int[] EmployeesIds { get; set; }
 

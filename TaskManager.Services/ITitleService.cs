@@ -9,5 +9,7 @@ namespace TaskManager.Services
     public interface ITitleService
     {
         Task<string> AddTitlesCollection(List<AddNewJobTitlesServiceModel> jobTypes);
+
+        IEnumerable<SelectServiceModel> GetJobTitlesNames();
     }
 }

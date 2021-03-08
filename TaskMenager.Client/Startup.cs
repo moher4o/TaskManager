@@ -54,8 +54,8 @@ namespace TaskMenager.Client
                                 policy.RequireClaim("permission", "Admin"));
                 options.AddPolicy(DataConstants.SuperAdmin, policy =>
                                 policy.RequireClaim("permissionType", DataConstants.SuperAdmin));
-                //options.AddPolicy("Guest", policy =>
-                //                policy.RequireClaim("permissionType", "Guest"));
+                options.AddPolicy("Guest", policy =>
+                                policy.RequireClaim("permissionType", "Guest"));
 
             });
 

@@ -18,11 +18,15 @@
             <label style="padding-left:10px;">@(item.EndDate.HasValue ? item.EndDate.Value.Date.ToString("dd/MM/yyyy") : "")</label>
         </div>
         <div class="col-md-1" style="color: #5f9fec;">
-            <div style="padding-left:20px; min-width:100px;">
-                <img class="chatnotifications" src="~/png/note.png" />
-                <span class="notificationsTodayCountValue">0</span>
+            <div class="row">
+                <div style="padding-left:20px; min-width:100px;">
+                    <a asp-controller="Home" asp-action="NotImplemented">
+                        <img class="chatnotifications" src="~/png/note.png" />
+                        <span class="notificationsTodayCountValue">0</span>
+                    </a>
+                </div>
             </div>
         </div>
-     </div>
+    </div>
 
 }

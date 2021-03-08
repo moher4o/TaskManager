@@ -27,6 +27,10 @@ namespace TaskManager.Services.Models
 
         public string DaeuAccaunt { get; set; }
 
+        public bool isDeleted { get; set; }
+
+        public bool isActive { get; set; }
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Employee, UserServiceModel>()

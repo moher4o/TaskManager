@@ -171,7 +171,7 @@ namespace TaskMenager.Client.Controllers
                         if (allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() > 0)   //ако има експерти в отдела
                         {
                             ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
-                            worksheet.View.ZoomScale = 80;
+                            worksheet.View.ZoomScale = 70;
                             try
                             {
                                 // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
@@ -273,8 +273,9 @@ namespace TaskMenager.Client.Controllers
                                         worksheet.Row(row).Style.Font.Size = 12;
                                         worksheet.Row(row).Style.Font.Bold = true;
                                         worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                        worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
                                         worksheet.Cells[row, 1].Value = parentTask.Id;
-                                        worksheet.Cells[row, 2].Value = parentTask.TaskName;
+                                        worksheet.Cells[row, 2].Value = parentTask.TaskName.Length > 100 ? parentTask.TaskName.Substring(0,100) + "..." : parentTask.TaskName;
                                         row += 1;
                                         parentTaskId = parentTask.Id;
 
@@ -457,12 +458,14 @@ namespace TaskMenager.Client.Controllers
 
                                 //Графики начало
                                 ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
+                                
                                 pieChart.Title.Text = "N: Задача / Часове";
                                 //select the ranges for the pie. First the values, then the header range
                                 pieChart.Legend.Position = eLegendPosition.Bottom;
                                 pieChart.DataLabel.ShowPercent = true;
                                 pieChart.DataLabel.ShowLeaderLines = true;
                                 pieChart.DataLabel.ShowCategory = true;
+                                //pieChart.ShowDataLabelsOverMaximum = true;
                                 pieChart.Legend.Remove();
                                 var rangeTitles = ExcelRange.GetAddress(3, 1, row - 11, 1);
                                 if ((row - 13) < 14)  // броя задачи променя дали имената на задачите се вземат или номерата им
@@ -472,9 +475,10 @@ namespace TaskMenager.Client.Controllers
                                 pieChart.Series.Add(ExcelRange.GetAddress(3, taskExpertsColumn, row - 11, taskExpertsColumn), rangeTitles);
                                 pieChart.SetSize(600, 500);
                                 pieChart.SetPosition(row - 7, 0, 6, 0);
-                                pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette1);
-                                //pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle7);
-
+                                pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette3);
+                                pieChart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
+                                pieChart.DataLabel.Font.Fill.Color = Color.Black;
+                                pieChart.DataLabel.Font.Size = 12;
                                 //create a new piechart of type Doughnut
                                 var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
                                 //Set position to row 1 column 7 and 16 pixels offset
@@ -493,7 +497,7 @@ namespace TaskMenager.Client.Controllers
                         if (allExperts.Where(s => s.SectorId == sector.Id).ToList().Count() > 0)   //ако има експерти в sectora
                         {
                             ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
-                            worksheet.View.ZoomScale = 80;
+                            worksheet.View.ZoomScale = 70;
                             try
                             {
                                 // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
@@ -595,6 +599,7 @@ namespace TaskMenager.Client.Controllers
                                         worksheet.Row(row).Style.Font.Size = 12;
                                         worksheet.Row(row).Style.Font.Bold = true;
                                         worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                        worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
                                         worksheet.Cells[row, 1].Value = parentTask.Id;
                                         worksheet.Cells[row, 2].Value = parentTask.TaskName;
                                         row += 1;
@@ -794,7 +799,10 @@ namespace TaskMenager.Client.Controllers
                                 pieChart.Series.Add(ExcelRange.GetAddress(3, taskExpertsColumn, row - 11, taskExpertsColumn), rangeTitles);
                                 pieChart.SetSize(600, 500);
                                 pieChart.SetPosition(row - 7, 0, 6, 0);
-                                pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette1);
+                                pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette3);
+                                pieChart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
+                                pieChart.DataLabel.Font.Fill.Color = Color.Black;
+                                pieChart.DataLabel.Font.Size = 12;
                                 //pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle7);
 
                                 //create a new piechart of type Doughnut

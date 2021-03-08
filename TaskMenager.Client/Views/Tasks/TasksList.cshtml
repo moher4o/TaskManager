@@ -2,7 +2,7 @@
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 <input type='hidden' id='uid' value=@permisionType>
 <br />
-<div class="container row p-0 m-0">
+<div class="row p-0 m-0">
     <div class="col-md-3">
         <h2 class="text-info">Списък задачи</h2>
     </div>
@@ -27,8 +27,9 @@
                 <tr>
                     <th>N:</th>
                     <th>Име на задача</th>
-                    <th>Брой експерти</th>
+                    <th><i class="fas fa-users"></i></th>
                     <th>Статус</th>
+                    <th>Тип задача</th>
                     <th>Действия</th>
                 </tr>
             </thead>

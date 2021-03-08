@@ -19,12 +19,19 @@ namespace TaskManager.Services.Models.TaskModels
         public string ParentTaskName { get; set; }
 
         public string DirectorateName { get; set; }
+
         public string DepartmentName { get; set; }
+
         public string SectorName { get; set; }
 
         public string OwnerName { get; set; }
 
         public string AssignerName { get; set; }
+
+        public string CloserName { get; set; }
+
+        public string DeleterName { get; set; }
+
 
         public ICollection<EmployeesTasks> AssignedExperts { get; set; } = new List<EmployeesTasks>();
         public void ConfigureMapping(Profile profile)
@@ -32,7 +39,8 @@ namespace TaskManager.Services.Models.TaskModels
             profile.CreateMap<Task, TaskInfoServiceModel>()
                    .ForMember(u => u.AssignerName, cfg => cfg.MapFrom(s => string.Concat(s.Assigner.JobTitle.TitleName, " ", s.Assigner.FullName)))
                    .ForMember(u => u.OwnerName, cfg => cfg.MapFrom(s => string.Concat(s.Owner.JobTitle.TitleName, " ", s.Owner.FullName)))
-                   //.ForMember(u => u.AssignedExpertsCount, cfg => cfg.MapFrom(s => s.AssignedExperts.Count()))
+                   .ForMember(u => u.CloserName, cfg => cfg.MapFrom(s => string.Concat(s.CloseUser.JobTitle.TitleName, " ", s.CloseUser.FullName)))
+                   .ForMember(u => u.DeleterName, cfg => cfg.MapFrom(s => string.Concat(s.DeletedByUser.JobTitle.TitleName, " ", s.DeletedByUser.FullName)))
                    .ForMember(u => u.DirectorateName, cfg => cfg.MapFrom(s => s.Directorate.DirectorateName))
                    .ForMember(u => u.DepartmentName, cfg => cfg.MapFrom(s => s.Department.DepartmentName))
                    .ForMember(u => u.SectorName, cfg => cfg.MapFrom(s => s.Sector.SectorName))

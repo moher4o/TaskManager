@@ -36,6 +36,10 @@ namespace TaskManager.Services.Models.TaskModels
 
         public int AssignerId { get; set; }
 
+        public int? CloseUserId { get; set; }
+
+        public int? DeletedByUserId { get; set; }
+
         public int[] EmployeesIds { get; set; }
 
         public int StatusId { get; set; }

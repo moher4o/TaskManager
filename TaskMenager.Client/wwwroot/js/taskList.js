@@ -47,10 +47,11 @@ function loadDataTable(getClosed, withDeleted) {
             "datatype": "json"
         },
         "columns": [
-            { "data": "id", "width": "6%" },
-            { "data": "taskName", "width": "60%" },
-            { "data": "assignedExpertsCount", "width": "5%" },
+            { "data": "id", "width": "5%" },
+            { "data": "taskName", "width": "55%" },
+            { "data": "assignedExpertsCount", "width": "4%" },
             { "data": "status", "width": "12%" },
+            { "data": "typeName", "width": "12%" },
             {
                 "data": "id",
                 "render": function (data) {
@@ -76,7 +77,7 @@ function loadDataTable(getClosed, withDeleted) {
                         </div>`;
                     }
 
-                }, "width": "17%"
+                }, "width": "12%"
             }
         ],
         "language": {
