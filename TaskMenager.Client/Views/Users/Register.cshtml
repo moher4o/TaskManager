@@ -54,15 +54,15 @@
                     </div>
                     @Html.LabelFor(model => model.Directorates, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
-                        @Html.DropDownListFor(m => m.DirectorateId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directoratesId", name = "directorates" })
+                        @Html.DropDownListFor(m => m.DirectorateId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directorates", onchange = "LoadDepartments(event)"})
                     </div>
                     @Html.LabelFor(model => model.Departments, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
-                        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", id = "departmentId", name = "departments" })
+                        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", id = "departmentId", name = "departments", @disabled = "disabled", onchange = "LoadSectors(event)" })
                     </div>
                     @Html.LabelFor(model => model.Sectors, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
-                        @Html.DropDownListFor(m => m.SectorId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", id = "sectorId", name = "sectors" })
+                        @Html.DropDownListFor(m => m.SectorId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", id = "sectorId", name = "sectors", @disabled = "disabled" })
                     </div>
                     @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-form-label strong" })
                     <div class="col-md-3">
@@ -81,6 +81,62 @@
         </div>
         <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
 </form>
+<script type="text/javascript">
+    function LoadDepartments(event) {
+        $.getJSON('\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
+            if ($('#departmentId :selected').text() === 'Моля изберете...') {
+                $('#departmentId').children('option:not(:first)').remove();
+            }
+            else {
+                $('#departmentId').children('option').remove();
+                $('#departmentId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
+            $.each(data, function (key, value) {
+                $('#departmentId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#departmentId").attr('disabled', 'disabled');
+                $("#sectorsId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#departmentId").removeAttr('disabled');
+                $("#sectorsId").removeAttr('disabled');
+            }
+        });
+    }
+    function LoadSectors(event) {
+        $.getJSON('\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
+            if ($('#sectorId :selected').text() === 'Моля изберете...') {
+                $('#sectorId').children('option:not(:first)').remove();
+            }
+            else {
+                $('#sectorId').children('option').remove();
+                $('#sectorId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
+            $.each(data, function (key, value) {
+                $('#sectorId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#sectorId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#sectorId").removeAttr('disabled');
+            }
+        });
+    }
+</script>
 @section Scripts{
     <script src="~/js/createNewUser.js" charset="utf-8"></script>
     @await Html.PartialAsync("_ValidationScriptsPartial")

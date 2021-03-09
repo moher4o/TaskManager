@@ -48,7 +48,7 @@
         }
 
         if (result) {
-            if ($('#directoratesId :selected').text() === 'Моля изберете...') {
+            if ($('#directorateId :selected').text() === 'Моля изберете...') {
                 ParentCheck();
                 $(':focus').blur();
             }
