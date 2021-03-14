@@ -1,4 +1,7 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Задачи";
+}
+
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 <input type='hidden' id='uid' value=@permisionType>
 <br />

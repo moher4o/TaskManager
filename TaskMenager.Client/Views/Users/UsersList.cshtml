@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Потребители";
+}
+@{var permision = User.Claims.Where(u => u.Type == "permission").Select(u => u.Value).FirstOrDefault();}
+<input type='hidden' id='uid' value=@permision>
+<br />
+<div class="row p-0 m-0">
+    <div class="col-md-4">
+        <h2 class="text-info">Списък потребители</h2>
+    </div>
+    @if (permision == "Admin")
+    {
+        <div class="col-md-3 offset-md-3" style="padding-top:6px;">
+            <input style="margin-left:15px;" type="checkbox" name="showDeleted" id="showDeleted">
+            <label for="showDeleted"> Неактивни потребители</label>
+        </div>
+
+        <div class="col-md-2">
+            <a asp-action="CreateNewTask" asp-controller="Tasks" class="btn btn-info form-control text-white">
+                Създай потрбител
+            </a>
+        </div>
+    }
+    <div class="col-12 border p-3">
+        <table id="DT_load" class="table table-striped table-bordered compact" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Дирекция</th>
+                    <th>Отдел</th>
+                    <th>Сектор</th>
+                    <th>Име на потребител</th>
+                    <th><i class="fas fa-phone"></i></th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/usersList.js"></script>
+}

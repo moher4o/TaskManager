@@ -1,21 +1,21 @@
 ﻿@model UserRegisterViewModel
 
 @{
-    ViewData["Title"] = "Създаване на задача";
+    ViewData["Title"] = "Създаване на потребител";
 }
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <div class="PrimeBox2" style="margin-top:20px; max-width:80%;">
+     @Html.HiddenFor(model => model.Id)
+     <div class="PrimeBox2" style="margin-top:20px; max-width:80%;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
-            <h5 style="color:white; margin-left:15px;">Създаване на потребител</h5>
+            <h5 style="color:white; margin-left:15px;">Създаване на потребител:  @this.User.Identities.FirstOrDefault().Name.ToLower()</h5>
             <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">
                 X
             </button>
         </div>
         <div class="row" style="display: flex; justify-content: center;  align-items: center;">
             @*<label class="form-control" style="border:none; margin-bottom:5px !important;">@(!Model.isActive ? "Акаунта не е активиран от администратор" : "")</label>*@
-            @if (!Model.isActive)
+            @if(!Model.isActive)
             {
                 <label style="border:none; margin-bottom:5px !important; color:red;">Акаунта не е активиран от администратор</label>
             }
@@ -34,12 +34,12 @@
                     </div>
                     @Html.LabelFor(model => model.TelephoneNumber, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.TelephoneNumber, new { @class = "form-control", id = "telNumberId", name = "telNumber" })
+                        @Html.TextBoxFor(model => model.TelephoneNumber, new { @class = "form-control", placeholder = "xxxx", id = "telNumberId", name = "telNumber" })
                         <span asp-validation-for="TelephoneNumber" class="text-danger"></span>
                     </div>
                     @Html.LabelFor(model => model.MobileNumber, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control", id = "mobNumberId", name = "mobNumber" })
+                        @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control", placeholder = "0xxx xxxxxx", id = "mobNumberId", name = "mobNumber" })
                         <span asp-validation-for="MobileNumber" class="text-danger"></span>
                     </div>
 
@@ -54,7 +54,7 @@
                     </div>
                     @Html.LabelFor(model => model.Directorates, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
-                        @Html.DropDownListFor(m => m.DirectorateId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directorates", onchange = "LoadDepartments(event)"})
+                        @Html.DropDownListFor(m => m.DirectorateId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", id = "directorateId", name = "directorates", onchange = "LoadDepartments(event)" })
                     </div>
                     @Html.LabelFor(model => model.Departments, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
@@ -64,22 +64,22 @@
                     <div class="col-md-10">
                         @Html.DropDownListFor(m => m.SectorId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", id = "sectorId", name = "sectors", @disabled = "disabled" })
                     </div>
-                    @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-form-label strong" })
-                    <div class="col-md-3">
-                        <label class="form-control" style="border:none; margin-bottom:0px !important;">@Model.DaeuAccaunt</label>
-                    </div>
+                    @*@Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-form-label strong" })
+                        <div class="col-md-3">
+                            <label class="form-control" style="border:none; margin-bottom:0px !important;">@Model.DaeuAccaunt</label>
+                        </div>*@
                 </div>
             </div>
         </div>
     </div>
-        <div class="row" style="
+    <div class="row" style="
         display: flex;
         justify-content: center;
         align-items: center;
         margin-top:10px;">
-            <button type="button" class="button save" id="send">Запис</button>
-        </div>
-        <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
+        <button type="button" class="button save" id="send">Запис</button>
+    </div>
+    <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
 </form>
 <script type="text/javascript">
     function LoadDepartments(event) {
@@ -102,12 +102,19 @@
             });
             if (data.length <= 0) {
                 $("#departmentId").attr('disabled', 'disabled');
-                $("#sectorsId").attr('disabled', 'disabled');
+                //$("#sectorId").attr('disabled', 'disabled');
             }
             else {
                 $("#departmentId").removeAttr('disabled');
-                $("#sectorsId").removeAttr('disabled');
+                //$("#sectorId").removeAttr('disabled');
             }
+
+            $('#sectorId').children('option').remove();
+            $('#sectorId')
+                .append($("<option></option>")
+                    .attr("value", "0")
+                    .text('Моля изберете...'));
+            $("#sectorId").attr('disabled', 'disabled');
         });
     }
     function LoadSectors(event) {
@@ -139,5 +146,17 @@
 </script>
 @section Scripts{
     <script src="~/js/createNewUser.js" charset="utf-8"></script>
+    <script>
+        $(document).ready(function () {
+            if ($('#directorateId :selected').text() != 'Моля изберете...') {
+                $("#departmentId").removeAttr('disabled');
+            }
+            if ($('#departmentId :selected').text() != 'Моля изберете...') {
+                $("#sectorId").removeAttr('disabled');
+            }
+
+        });
+    </script>
+
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

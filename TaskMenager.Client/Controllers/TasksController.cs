@@ -1187,31 +1187,6 @@ namespace TaskMenager.Client.Controllers
             return Json(new { success = result, message = "Задачата е изтрита" });
         }
 
-        [HttpGet]
-        public IActionResult GetDepartments(string direktorateId)
-        {
-            var idparseResult = int.TryParse(direktorateId, out int id);
-            if (idparseResult)
-            {
-                var result = this.departments.GetDepartmentsNamesByDirectorate(id);
-                return Json(result);
-            }
-
-            return Json(null);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetSectors(string departmentId)
-        {
-            var idparseResult = int.TryParse(departmentId, out int id);
-            if (idparseResult)
-            {
-                var result = await this.sectors.GetSectorsNamesByDepartment(id);
-                return Json(result);
-            }
-
-            return Json(null);
-        }
         #endregion
     }
 }

@@ -1,0 +1,279 @@
+﻿@model UserRegisterViewModel
+
+@{
+    ViewData["Title"] = "Промяна на акаунт";
+}
+@{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @Html.HiddenFor(model => model.Id)
+    <div class="PrimeBox2" style="margin-top:20px; max-width:80%;">
+        <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
+            <h5 style="color:white; margin-left:15px;">Данни за акаунт:  @Model.DaeuAccaunt</h5>
+            <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">
+                X
+            </button>
+        </div>
+        @if (permisionType != Employee && (Model.Id.ToString() != this.User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault()))
+        {
+            <div class="row" @( Model.Id.Value.ToString() == this.User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault() ? "hidden" : "")>
+                <div class="col-md-6">
+                    @if (!Model.isDeleted)
+                    {
+                        <div class="switch-toggle">
+                            <input id="active" name="state-d" type="radio" checked="checked" />
+                            <label style="margin-bottom: 0px !important;" for="active" onclick="ActivateUser(@Model.Id ?? 0)">Активен</label>
+                        </div>
+                        <div class="red-try">
+                            <input id="notactive" name="state-d" type="radio" />
+                            <label style="margin-bottom: 0px !important;" for="notactive" onclick="DeactivateUser(@Model.Id ?? 0)">Неактивен</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="switch-toggle">
+                            <input id="active" name="state-d" type="radio" />
+                            <label style="margin-bottom: 0px !important;" for="active" onclick="ActivateUser(@Model.Id ?? 0)">Активен</label>
+                        </div>
+                        <div class="red-try">
+                            <input id="notactive" name="state-d" type="radio" checked="checked" />
+                            <label style="margin-bottom: 0px !important;" for="notactive" onclick="DeactivateUser(@Model.Id ?? 0)">Неактивен</label>
+                        </div>
+
+                    }
+                </div>
+                <div class="form-group row col-md-6">
+                    @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-md-2 col-form-label strong" })
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(model => model.DaeuAccaunt, new { @class = "form-control", id = "daeuaccauntId", name = "daeuaccaunt" })
+                        <span asp-validation-for="DaeuAccaunt" class="text-danger"></span>
+                    </div>
+                </div>
+
+            </div>
+
+        }
+        <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.DaeuAccaunt)
+        @if (permisionType != SuperAdmin)
+        {
+            @Html.HiddenFor(model => model.DirectorateId);
+        }
+        @if (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin)
+        {
+            @Html.HiddenFor(model => model.DepartmentId)
+        }
+        @if (permisionType == SectorAdmin || permisionType == Employee)
+        {
+            @Html.HiddenFor(model => model.SectorId)
+        }
+        @if (permisionType == Employee)
+        {
+            @Html.HiddenFor(model => model.JobTitleId)
+        }
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FullName, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Въведете трите си имена", id = "userNameId", name = "userName" })
+                    </div>
+                    @Html.LabelFor(model => model.Email, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", id = "emailId", name = "email" })
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    @Html.LabelFor(model => model.TelephoneNumber, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.TelephoneNumber, new { @class = "form-control", placeholder = "xxxx", id = "telNumberId", name = "telNumber" })
+                        <span asp-validation-for="TelephoneNumber" class="text-danger"></span>
+                    </div>
+                    @Html.LabelFor(model => model.MobileNumber, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control", placeholder = "0xxx xxxxxx", id = "mobNumberId", name = "mobNumber" })
+                        <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @*<div class="col-md-7"></div>*@
+                    @Html.LabelFor(model => model.JobTitles, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.JobTitleId, new SelectList(Model.JobTitles, "Value", "Text"),
+                       permisionType == Employee ? new { @disabled = "disabled" } as object :
+                              new
+                              {
+                                  @class = "form-control",
+                                  id = "jobTitleId",
+                                  name = "jobTitles"
+                              } as object)
+                    </div>
+                    @Html.LabelFor(model => model.Directorates, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.DirectorateId, new SelectList(Model.Directorates, "Value", "Text"),
+                          permisionType != SuperAdmin ?
+                              new
+                                  {
+                                       @class = "form-control",
+                                   id = "directorateId",
+                                   name = "directorates",
+                                   @disabled = "disabled"
+                                   } as object
+                                   :
+                              new
+                              {
+                                  @class = "form-control",
+                                  id = "directorateId",
+                                  name = "directorates",
+                                  onchange = "LoadDepartments(event)"
+
+                              } as object)
+                    </div>
+                    @Html.LabelFor(model => model.Departments, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(Model.Departments, "Value", "Text"),
+                       (Model.Departments.Count() == 0) ? new { @hidden = "hidden" } as object :
+                       (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) ? new { @class = "form-control", id = "departmentId", name = "departments", @disabled = "disabled" } as object :
+                       new { @class = "form-control", id = "departmentId", name = "departments", onchange = "LoadSectors(event)" })
+
+                    </div>
+                    @Html.LabelFor(model => model.Sectors, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.SectorId, new SelectList(Model.Sectors, "Value", "Text"),
+                       (Model.Sectors.Count() == 0) ? new { @hidden = "hidden" } as object :
+                       (permisionType == SectorAdmin || permisionType == Employee) ? new { @class = "form-control", name = "sectors", id = "sectorId", @disabled = "disabled" } as object :
+                      new { @class = "form-control", name = "sectors", id = "sectorId" })
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top:10px;">
+        <button type="button" class="button save" id="send">Запис</button>
+    </div>
+    <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
+</form>
+<script type="text/javascript">
+    function ActivateUser(userId) {
+        $.getJSON('\АctivateUser?userId=' + userId, { get_param: 'value' }, function (data) {
+            if (data) {
+                toastr.success('Акаунта е активиран');
+            }
+            else {
+                toastr.error('Грешка при активиране на акаунта');
+            }
+        });
+    }
+    function DeactivateUser(userId) {
+        swal({
+            //title: "Потвърждение",
+            text: "Акаунта ще бъде деактивиран. Сигурни ли сте?",
+            icon: "warning",
+            closeOnEsc: false,
+            buttons: ["Отказ", "Деактивиране!"],
+            dangerMode: true
+        }).then((willWrite) => {
+            if (willWrite) {
+                $.getJSON('\DeactivateUser?userId=' + userId, { get_param: 'value' }, function (data) {
+                    if (data) {
+                        toastr.success('Акаунта е деактивиран');
+                    }
+                    else {
+                        toastr.error('Грешка при деактивиране на акаунта');
+                    }
+                });
+            }
+            else {
+                $("#notactive").removeProp('checked');
+                $('#active').prop('checked', 'checked');
+            }
+
+        });
+    }
+
+    function LoadDepartments(event) {
+        $.getJSON('\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
+            if ($('#departmentId :selected').text() === 'Моля изберете...') {
+                $('#departmentId').children('option:not(:first)').remove();
+            }
+            else {
+                $('#departmentId').children('option').remove();
+                $('#departmentId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
+            $.each(data, function (key, value) {
+                $('#departmentId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#departmentId").attr('disabled', 'disabled');
+                //$("#sectorId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#departmentId").removeAttr('disabled');
+                //$("#sectorId").removeAttr('disabled');
+            }
+
+            $('#sectorId').children('option').remove();
+            $('#sectorId')
+                .append($("<option></option>")
+                    .attr("value", "0")
+                    .text('Моля изберете...'));
+            $("#sectorId").attr('disabled', 'disabled');
+        });
+    }
+    function LoadSectors(event) {
+        $.getJSON('\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
+            if ($('#sectorId :selected').text() === 'Моля изберете...') {
+                $('#sectorId').children('option:not(:first)').remove();
+            }
+            else {
+                $('#sectorId').children('option').remove();
+                $('#sectorId')
+                    .append($("<option></option>")
+                        .attr("value", "0")
+                        .text('Моля изберете...'));
+            }
+            $.each(data, function (key, value) {
+                $('#sectorId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#sectorId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#sectorId").removeAttr('disabled');
+            }
+        });
+    }
+</script>
+@section Scripts{
+    <script src="~/js/createNewUser.js" charset="utf-8"></script>
+    @*<script>
+               $(document).ready(function () {
+                   if ($('#directorateId :selected').text() != 'Моля изберете...') {
+                       $("#departmentId").removeAttr('disabled');
+                   }
+                   if ($('#departmentId :selected').text() != 'Моля изберете...') {
+                       $("#sectorId").removeAttr('disabled');
+                   }
+
+               });
+        </script>*@
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

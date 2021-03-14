@@ -1,11 +1,58 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+/*Включено-Изключено*/
+.switch-toggle {
+    float: left;
+    background: #fff;
+    border: 1px solid lightblue;
+}
+
+    .switch-toggle input {
+        position: absolute;
+        opacity: 0;
+    }
+
+        .switch-toggle input + label {
+            padding: 7px;
+            float: left;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .switch-toggle input:checked + label {
+            background: lightgreen;
+        }
+
+.red-try {
+    float: left;
+    background: #fff;
+    border: 1px solid lightblue;
+
+}
+
+    .red-try input {
+        position: absolute;
+        opacity: 0;
+    }
+
+        .red-try input + label {
+            padding: 7px;
+            float: left;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .red-try input:checked + label {
+            background: #f87467;
+        }
+
+/*Включено-Изключено*/
+
 .negative-offset20 {
     display: inline-block;
     position: relative;
     left: -20px;
-
 }
 
 @media screen and (max-width: 600px) {
@@ -17,18 +64,20 @@ for details on configuring this project to bundle and minify static web assets. 
         width: 28%;
         display: none;
     }
-    .widthmobile{
-        max-width:100% !important;
-        position:relative !important;
-        right:auto !important;
+
+    .widthmobile {
+        max-width: 100% !important;
+        position: relative !important;
+        right: auto !important;
     }
-    .marginbmobile{
-        margin-bottom:80px !important;
+
+    .marginbmobile {
+        margin-bottom: 80px !important;
     }
 }
 
 .displayno {
-    display:none;
+    display: none;
 }
 
 /* Копирано от Убд */
@@ -36,6 +85,7 @@ for details on configuring this project to bundle and minify static web assets. 
 .strong {
     font-weight: bold;
 }
+
 .button-invisible {
     display: none;
 }
@@ -627,3 +677,4 @@ div.menuspace {
 }
 
 /*FIXED TABLE*/
+

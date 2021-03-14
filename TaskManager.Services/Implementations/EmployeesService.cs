@@ -120,6 +120,19 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
+        public async Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false)
+        {
+                return await this.db.Employees
+                        .Where(t => t.isDeleted == withDeleted)
+                        .OrderBy(t => t.DirectorateId)
+                        .ThenBy(t => t.DepartmentId)
+                        .ThenBy(e => e.SectorId != null ? e.SectorId : 999)
+                        .ThenBy(t => t.FullName)
+                        .ProjectTo<UserServiceModel>()
+                        .ToListAsync();
+            
+        }
+
         public IEnumerable<SelectServiceModel> GetActiveEmployeesNames()
         {
             var names = this.db.Employees
@@ -216,6 +229,105 @@ namespace TaskManager.Services.Implementations
                 .Where(e => e.Id == userId)
                 .Select(e => e.FullName)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<UserServiceModel> GetEmployeeByIdAsync(int userId)
+        {
+            return await this.db.Employees
+                .Where(e => e.Id == userId)
+                .ProjectTo<UserServiceModel>()
+                .FirstOrDefaultAsync();
+        }
+
+
+        public async Task<bool> RegisterNewUserAsync(UserServiceModel newUser)
+        {
+            try
+            {
+                if (newUser != null)
+                {
+
+                    if (newUser.Id > 0)  //има такъв потребител
+                    {
+                        var userFromDB = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == newUser.Id);
+                        userFromDB.FullName = newUser.FullName;
+                        userFromDB.Email = newUser.Email;
+                        userFromDB.TelephoneNumber = newUser.TelephoneNumber;
+                        userFromDB.MobileNumber = newUser.MobileNumber;
+                        userFromDB.JobTitleId = newUser.JobTitleId;
+                        userFromDB.DirectorateId = newUser.DirectorateId;
+                        userFromDB.DepartmentId = newUser.DepartmentId;
+                        userFromDB.SectorId = newUser.SectorId;
+                        userFromDB.DaeuAccaunt = newUser.DaeuAccaunt;
+                        await this.db.SaveChangesAsync();
+                    }
+                    else  //няма такъв потребител
+                    {
+                        var employeeDb = new Employee()
+                        {
+                            FullName = newUser.FullName,
+                            Email = newUser.Email,
+                            TelephoneNumber = newUser.TelephoneNumber,
+                            MobileNumber = newUser.MobileNumber,
+                            JobTitleId = newUser.JobTitleId,
+                            DirectorateId = newUser.DirectorateId,
+                            DepartmentId = newUser.DepartmentId,
+                            SectorId = newUser.SectorId,
+                            DaeuAccaunt = newUser.DaeuAccaunt,
+                            RoleId = await this.db.Roles.Where(r => r.Name == DataConstants.Employee).Select(r => r.Id).FirstOrDefaultAsync(),
+                            isActive = false
+                        };
+                        await this.db.Employees.AddAsync(employeeDb);
+                        await this.db.SaveChangesAsync();
+                    }
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeactivateUserAsync(int userId)
+        {
+            try
+            {
+                var userToDeactivate = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
+                if (userToDeactivate == null)
+                {
+                    return false;
+                }
+                userToDeactivate.isDeleted = true;
+                await this.db.SaveChangesAsync();
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+        }
+        public async Task<bool> АctivateUserAsync(int userId)
+        {
+            try
+            {
+                var userToDeactivate = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
+                if (userToDeactivate == null)
+                {
+                    return false;
+                }
+                userToDeactivate.isDeleted = false;
+                await this.db.SaveChangesAsync();
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
     }

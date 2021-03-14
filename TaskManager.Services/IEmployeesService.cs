@@ -24,6 +24,8 @@ namespace TaskManager.Services
 
         Task<string> GetEmployeeNameByIdAsync(int userId);
 
+        Task<UserServiceModel> GetEmployeeByIdAsync(int userId);
+
         IEnumerable<SelectServiceModel> GetActiveEmployeesNames();
 
         IEnumerable<SelectServiceModel> GetEmployeesNamesBySector(int? sectorId);
@@ -33,7 +35,10 @@ namespace TaskManager.Services
         IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId);
 
         IEnumerable<ReportUserServiceModel> GetEmployeesByList(IEnumerable<int> employeesList);
+        Task<bool> RegisterNewUserAsync(UserServiceModel newUser);
+        Task<bool> DeactivateUserAsync(int userId);
+        Task<bool> АctivateUserAsync(int userId);
 
-
+        Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false);
     }
 }

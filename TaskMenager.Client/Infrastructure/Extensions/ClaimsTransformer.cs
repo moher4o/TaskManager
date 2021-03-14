@@ -78,7 +78,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                 else
                 {
 
-                    ci.AddClaim(new Claim("permissionType", "Guest"));
+                    ci.AddClaim(new Claim("permission", "Guest"));
                 }
             }
             else
@@ -87,7 +87,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                 {
                     ci.AddClaim(new Claim("permission", "Forbidden"));
                 }
-                ci.AddClaim(new Claim("permissionType", "Guest"));
+                ci.AddClaim(new Claim("permission", "Guest"));
             }
             var cp = new ClaimsPrincipal(ci);
 

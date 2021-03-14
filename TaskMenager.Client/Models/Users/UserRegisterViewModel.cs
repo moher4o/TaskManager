@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManager.Common.Mapping;
+using TaskManager.Services.Models;
 
 namespace TaskMenager.Client.Models.Users
 {
-    public class UserRegisterViewModel
+    public class UserRegisterViewModel : IMapFrom<UserServiceModel>
     {
         public int? Id { get; set; }
 
@@ -42,20 +44,21 @@ namespace TaskMenager.Client.Models.Users
         [Display(Name = "Дирекция:")]
         public IList<SelectListItem> Directorates { get; set; } = new List<SelectListItem>();
 
-        [Display(Name = "Телефонен номер*:")]
+        [Display(Name = "Телефонен номер(02 949)*:")]
         [Required(ErrorMessage = "Телефонния номер е задължителен")]
-        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Въведения телефонен номер не е валиден.")]
+        [RegularExpression(@"^\(?([0-9]{4})\)?$", ErrorMessage = "Въведения телефонен номер не е валиден.")]
         public string TelephoneNumber { get; set; }
 
         [Display(Name = "Мобилен номер:")]
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Въведения мобилен номер не е валиден.")]
         public string MobileNumber { get; set; }
 
-        [Display(Name = "Логин акаунт:")]
-        [Required]
+        [Display(Name = "Акаунт:")]
         [StringLength(50)]
         public string DaeuAccaunt { get; set; }
 
         public bool isActive { get; set; }
+
+        public bool isDeleted { get; set; }
     }
 }

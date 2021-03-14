@@ -15,9 +15,9 @@
         if (forbidden === 'false') {
             const loc = window.location.href;
             const path = loc.substr(0, loc.lastIndexOf('/') + 1);
-            content.innerHTML = 'Здравейте, <strong>' + name + '</strong>.</br>Нямате създаден акаунт за оторизация в <strong>\"Мениджър задачи\"</strong>. Желаете ли да го създадете сега?';
+            content.innerHTML = '<div style = \'text-align:left\'>Здравейте, <strong>' + name + '</strong>.</br>Нямате създаден акаунт в <strong>\"Мениджър задачи\"</strong>.</br>Желаете ли да го създадете сега?</div>';
             swal({
-                title: "Информация",
+                //title: "Информация",
                 content: content,
                 icon: "info",
                 closeOnClickOutside: false,
@@ -31,31 +31,41 @@
                 }
             });
         }
-        else {
-            content.innerHTML = 'Здравейте, <strong>' + name + '</strong>.</br>Вашия акаунт в <strong>\"Мениджър задачи\"</strong> е закрит. Свържете се с администратор';
-            swal({
-                title: "Информация",
-                content: content,
-                icon: "info",
-                closeOnClickOutside: false,
-                buttons: [false, "Ok"],
-            }).then((willRegister) => {
-                if (willRegister) {
-                    window.location.href = `https://staging.egov.bg/wps/portal/egov/home`;
-                }
-                else {
-                    window.location.href = `https://staging.egov.bg/wps/portal/egov/home`;
-                }
-            });
-        }
- 
+
     }
 
 </script>
 @section Scripts{
     <script>
         $(document).ready(function () {
-            showSweet();
+            var forbidden = $('#forbidden').text();
+            if (forbidden == 'true') {
+                var content = document.createElement('div');
+                var name = $('#accaunt').text();
+                content.innerHTML = 'Здравейте, <strong>' + name + '</strong>.</br>Вашия акаунт в <strong>\"Мениджър задачи\"</strong> е закрит.</br>Свържете се с администратор';
+                swal({
+                    //title: "Информация",
+                    content: content,
+                    icon: "info",
+                    closeOnClickOutside: false,
+                    buttons: [false, "Ok"],
+                }).then((willRegister) => {
+                    window.location.href = `https://staging.egov.bg/wps/portal/egov/home`;
+                });
+            }
+            else {
+                $.getJSON('\UserExistStatus', { get_param: 'value' }, function (data) {
+                    if (data) {
+                        const loc = window.location.href;
+                        const path = loc.substr(0, loc.lastIndexOf('/') + 1);
+                        window.location.href = `${path}Register`;
+                    }
+                    else {
+                        showSweet();
+                    }
+                });
+            }
+            
         });
     </script>
     @await Html.PartialAsync("_ValidationScriptsPartial")

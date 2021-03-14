@@ -143,7 +143,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="expertsSubmenu">
                         <li>
-                            <a asp-controller="Home" asp-action="NotImplemented">Списък</a>
+                            <a asp-controller="Users" asp-action="UsersList">Списък</a>
                             @*<a href="/Home/NotImplemented">Списък</a>*@
                         </li>
                         <li>
@@ -187,16 +187,16 @@
                     @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <i class="fas fa-align-justify"></i>
                         </button>*@
-                    <div id="notifications" style="position: relative; left: 20%;">
+                    @*<div id="notifications" style="position: relative; left: 20%;">
                         <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
                         <div id="infoBox" class="notification"><span>Информация</span></div>
                         <div id="errorBox" class="notification"><span>Грешка</span></div>
                         <div id="successBox" class="notification"><span>Успех</span></div>
-                    </div>
+                    </div>*@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
-                                <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Home" asp-action="NotImplemented">
+                                <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Users" asp-action="EditUser" asp-route-userId="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())">
                                     <i class=" fas fa-user-cog fa-lg"></i>
                                     @(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault())
                                 </a>

@@ -77,13 +77,13 @@
             @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"),
-                  permisionType != SuperAdmin ? new { @disabled = "disabled" } as object :
+                  permisionType != SuperAdmin ? new { @class = "form-control", @disabled = "disabled" } as object :
                   new
-                       {
-                           @class = "form-control",
-                           id = "directorateId",
-                           name = "directoratesId",
-                           onchange = "LoadDepartments(event)"
+                  {
+                      @class = "form-control",
+                      id = "directorateId",
+                      name = "directoratesId",
+                      onchange = "LoadDepartments(event)"
 
                   } as object)
             </div>
@@ -98,7 +98,7 @@
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"),
                (Model.Departments.Count() == 0) ? new { @hidden = "hidden" } as object :
-               (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) ? new { @disabled = "disabled" } as object :
+               (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) ? new { @class = "form-control", @disabled = "disabled" } as object :
                new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
             </div>
             @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label" })
@@ -114,7 +114,7 @@
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.SectorsId, new SelectList(Model.Sectors, "Value", "Text"),
                 (Model.Sectors.Count() == 0) ? new { @hidden = "hidden" } as object :
-                (permisionType == SectorAdmin || permisionType == Employee) ? new { @disabled = "disabled" } as object :
+                (permisionType == SectorAdmin || permisionType == Employee) ? new { @class = "form-control", @disabled = "disabled" } as object :
                new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
             </div>
             @Html.LabelFor(model => model.Valid_To, new { @class = "col-md-2 col-form-label" })
@@ -139,7 +139,7 @@
 
 <script type="text/javascript">
     function LoadDepartments(event) {
-        $.getJSON('\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
+        $.getJSON('..\\Users\\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
             if ($('#departmentsId :selected').text() === 'Моля изберете...') {
                 $('#departmentsId').children('option:not(:first)').remove();
             }
@@ -158,16 +158,23 @@
             });
             if (data.length <= 0) {
                 $("#departmentsId").attr('disabled', 'disabled');
-                $("#sectorsId").attr('disabled', 'disabled');
+                //$("#sectorsId").attr('disabled', 'disabled');
             }
             else {
                 $("#departmentsId").removeAttr('disabled');
-                $("#sectorsId").removeAttr('disabled');
+                //$("#sectorsId").removeAttr('disabled');
             }
+            $('#sectorsId').children('option').remove();
+            $('#sectorsId')
+                .append($("<option></option>")
+                    .attr("value", "0")
+                    .text('Моля изберете...'));
+            $("#sectorsId").attr('disabled', 'disabled');
+
         });
     }
     function LoadSectors(event) {
-        $.getJSON('\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
+        $.getJSON('..\\Users\\GetSectors\?departmentId=' + event.target.value, { get_param: 'value' }, function (data) {
             if ($('#sectorsId :selected').text() === 'Моля изберете...') {
                 $('#sectorsId').children('option:not(:first)').remove();
             }
