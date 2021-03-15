@@ -31,11 +31,11 @@ function loadDataTable(deleted) {
             "datatype": "json"
         },
         "columns": [
-            { "data": "directorateName", "wilth": "22%" },
-            { "data": "departmentName", "wilth": "23%" },
-            { "data": "sectorName", "wilth": "19%" },
-            { "data": "fullName", "wilth": "20%" },
-            { "data": "telephoneNumber", "wilth": "6%" },
+            { "data": "directorateName", "width": "24%" },
+            { "data": "departmentName", "width": "25%" },
+            { "data": "sectorName", "width": "20%" },
+            { "data": "fullName", "width": "18%" },
+            { "data": "telephoneNumber", "width": "3%" },
             {
                 "data": null,
                 "render": function (data, type, row) {
@@ -64,20 +64,20 @@ function loadDataTable(deleted) {
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
                        &nbsp;
-                        <a href='mailto:${row.email}' target="_top" style='cursor:pointer;' ${row.email ?? "hilden"}>
+                        <a href='mailto:${row.email}' target="_top" style='cursor:pointer;' ${row.email ?? "hidden"}>
                             <img class="chatnotifications" src="../png/email.png" />
                         </a>
 
                         </div>`;
                     }
 
-                }, "wilth": "10%"
+                }, "width": "10%"
             }
         ],
         "language": {
             "emptyTable": "Няма потребители"
         },
-        "wilth": "100%"
+        "width": "100%"
     });
 
 }

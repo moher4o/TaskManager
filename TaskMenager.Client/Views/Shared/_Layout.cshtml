@@ -100,7 +100,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-        {*@
+                            {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -139,17 +139,24 @@
                 <li>
                     <a href="#expertsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-user"></i>
-                        Експерти
+                        <span class="chatnotifications">Експерти</span>
+                        <span title="Чакащи одобрение" class="notificationsMenu" id="notActiveCount" hidden></span>
                     </a>
                     <ul class="collapse list-unstyled" id="expertsSubmenu">
                         <li>
                             <a asp-controller="Users" asp-action="UsersList">Списък</a>
-                            @*<a href="/Home/NotImplemented">Списък</a>*@
+                        </li>
+                        <li>
+                            <a asp-controller="Home" asp-action="NotImplemented">
+                                <span class="chatnotifications">Чакащи одобрение</span>
+                                <span title="Чакащи одобрение" class="notificationsMenuSmall" id="notActiveCountinner" hidden></span>
+                            </a>
                         </li>
                         <li>
                             <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
                             @*<a href="/Home/NotImplemented">Телефонен указател</a>*@
                         </li>
+
                     </ul>
                 </li>
 
@@ -159,9 +166,9 @@
                         Информация
                     </a>
                     @*<a href="/Home/NotImplemented">
-                        <i class="fas fa-question"></i>
-                        За приложението
-                    </a>*@
+                            <i class="fas fa-question"></i>
+                            За приложението
+                        </a>*@
                 </li>
                 <li>
                     <a asp-controller="Home" asp-action="NotImplemented">
@@ -169,9 +176,9 @@
                         Контакти
                     </a>
                     @*<a href="/Home/NotImplemented">
-                        <i class="fas fa-paper-plane"></i>
-                        Контакти
-                    </a>*@
+                            <i class="fas fa-paper-plane"></i>
+                            Контакти
+                        </a>*@
                 </li>
             </ul>
         </nav>
@@ -188,12 +195,12 @@
                             <i class="fas fa-align-justify"></i>
                         </button>*@
                     @*<div id="notifications" style="position: relative; left: 20%;">
-                        <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
-                        <div id="infoBox" class="notification"><span>Информация</span></div>
-                        <div id="errorBox" class="notification"><span>Грешка</span></div>
-                        <div id="successBox" class="notification"><span>Успех</span></div>
-                    </div>*@
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
+                            <div id="infoBox" class="notification"><span>Информация</span></div>
+                            <div id="errorBox" class="notification"><span>Грешка</span></div>
+                            <div id="successBox" class="notification"><span>Успех</span></div>
+                        </div>*@
+                   <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
                                 <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Users" asp-action="EditUser" asp-route-userId="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())">
@@ -280,6 +287,19 @@
                 $('#sidebar').toggleClass('active');
             });
             //$('#sidebar').height() = $('#content').height();
+            $.getJSON('..\\Users\\GetNotActivatedUsers', { get_param: 'value' }, function (data) {
+                if (data.data.length > 0) {
+                    $('#notActiveCount').removeAttr("hidden")
+                    $('#notActiveCount').text(data.data.length);
+                    $('#notActiveCountinner').removeAttr("hidden")
+                    $('#notActiveCountinner').text(data.data.length);
+                }
+                else {
+                    $('#notActiveCount').attr("hidden", true);
+                    $('#notActiveCountinner').attr("hidden", true);
+                }
+            });
+
         });
     </script>
 

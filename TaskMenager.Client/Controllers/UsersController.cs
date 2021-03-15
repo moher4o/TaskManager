@@ -418,6 +418,43 @@ namespace TaskMenager.Client.Controllers
 
         [Authorize(Policy = Employee)]
         [HttpGet]
+        public async Task<IActionResult> GetNotActivatedUsers()
+        {
+            var users = new List<UserServiceModel>();
+            if (currentUser.RoleName == SuperAdmin)
+            {
+                users = await this.employees.GetAllNotActivatedUsersAsync();
+            }
+            else if(currentUser.RoleName == DirectorateAdmin)
+            {
+                //users = await this.employees.GetDirNotActivatedUsersAsync(currentUser.DirectorateId);
+            }
+            else if (currentUser.RoleName == DepartmentAdmin)
+            {
+                //users = await this.employees.GetDepNotActivatedUsersAsync(currentUser.DepartmentId);
+            }
+            else if (currentUser.RoleName == SectorAdmin)
+            {
+                //users = await this.employees.GetSecNotActivatedUsersAsync(currentUser.SectorId);
+            }
+
+            var data = users.Select(u => new UsersListViewModel
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                Email = u.Email,
+                DirectorateName = u.DirectorateName,
+                DepartmentName = u.DepartmentName,
+                SectorName = u.SectorName,
+                TelephoneNumber = u.TelephoneNumber
+            }).ToList();
+
+            return Json(new { data });
+        }
+
+
+        [Authorize(Policy = Employee)]
+        [HttpGet]
         public async Task<IActionResult> GetUserInfo(int userId)
         {
             var userinfo = await this.employees.GetEmployeeByIdAsync(userId);

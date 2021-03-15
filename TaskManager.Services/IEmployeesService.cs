@@ -40,5 +40,6 @@ namespace TaskManager.Services
         Task<bool> АctivateUserAsync(int userId);
 
         Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false);
+        Task<List<UserServiceModel>> GetAllNotActivatedUsersAsync();
     }
 }

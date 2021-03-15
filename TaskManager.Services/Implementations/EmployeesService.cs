@@ -330,5 +330,13 @@ namespace TaskManager.Services.Implementations
             }
         }
 
+        public async Task<List<UserServiceModel>> GetAllNotActivatedUsersAsync()
+        {
+            return await this.db.Employees
+                .Where(t => t.isActive == false)
+                .OrderBy(t => t.DirectorateId)
+                .ProjectTo<UserServiceModel>()
+                .ToListAsync();
+        }
     }
 }
