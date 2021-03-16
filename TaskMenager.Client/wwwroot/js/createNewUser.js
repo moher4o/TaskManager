@@ -32,10 +32,10 @@
             $("#telNumberId").css('background-color', 'rgb(250, 204, 204)');
             result = false;
         }
-        
-        let ac = document.getElementById("daeuaccauntId").value;
-        console.log(ac)
-        if (ac == null || ac == "") {
+
+        let acd = $("#daeuaccauntId").text();
+        console.log(acd)
+        if (acd == null || acd == "") {
             $("#daeuaccauntId").css('background-color', 'rgb(250, 204, 204)');
             result = false;
         }

@@ -5,8 +5,8 @@
 }
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-     @Html.HiddenFor(model => model.Id)
-     <div class="PrimeBox2" style="margin-top:20px; max-width:80%;">
+    @Html.HiddenFor(model => model.Id)
+    <div class="PrimeBox2" style="margin-top:20px; max-width:80%;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">Създаване на потребител:  @this.User.Identities.FirstOrDefault().Name.ToLower()</h5>
             <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">
@@ -15,7 +15,7 @@
         </div>
         <div class="row" style="display: flex; justify-content: center;  align-items: center;">
             @*<label class="form-control" style="border:none; margin-bottom:5px !important;">@(!Model.isActive ? "Акаунта не е активиран от администратор" : "")</label>*@
-            @if(!Model.isActive)
+            @if (!Model.isActive)
             {
                 <label style="border:none; margin-bottom:5px !important; color:red;">Акаунта не е активиран от администратор</label>
             }
@@ -64,10 +64,12 @@
                     <div class="col-md-10">
                         @Html.DropDownListFor(m => m.SectorId, new SelectList(Model.Sectors, "Value", "Text"), new { @class = "form-control", id = "sectorId", name = "sectors", @disabled = "disabled" })
                     </div>
-                    @*@Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-form-label strong" })
-                        <div class="col-md-3">
-                            <label class="form-control" style="border:none; margin-bottom:0px !important;">@Model.DaeuAccaunt</label>
-                        </div>*@
+                    <div hidden>
+                        @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-form-label strong" })
+                            <div class="col-md-3">
+                                <label class="form-control" style="border:none; margin-bottom:0px !important;" id = "daeuaccauntId">@Model.DaeuAccaunt</label>
+                            </div>
+                    </div>
                 </div>
             </div>
         </div>

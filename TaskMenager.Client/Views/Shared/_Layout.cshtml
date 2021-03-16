@@ -287,19 +287,22 @@
                 $('#sidebar').toggleClass('active');
             });
             //$('#sidebar').height() = $('#content').height();
-            $.getJSON('..\\Users\\GetNotActivatedUsers', { get_param: 'value' }, function (data) {
-                if (data.data.length > 0) {
-                    $('#notActiveCount').removeAttr("hidden")
-                    $('#notActiveCount').text(data.data.length);
-                    $('#notActiveCountinner').removeAttr("hidden")
-                    $('#notActiveCountinner').text(data.data.length);
-                }
-                else {
-                    $('#notActiveCount').attr("hidden", true);
-                    $('#notActiveCountinner').attr("hidden", true);
+            $.getJSON('\UserExistStatus', { get_param: 'value' }, function (data) {
+                if (data) {
+                    $.getJSON('..\\Users\\GetNotActivatedUsers', { get_param: 'value' }, function (data) {
+                        if (data.data.length > 0) {
+                            $('#notActiveCount').removeAttr("hidden")
+                            $('#notActiveCount').text(data.data.length);
+                            $('#notActiveCountinner').removeAttr("hidden")
+                            $('#notActiveCountinner').text(data.data.length);
+                        }
+                        else {
+                            $('#notActiveCount').attr("hidden", true);
+                            $('#notActiveCountinner').attr("hidden", true);
+                        }
+                    });
                 }
             });
-
         });
     </script>
 

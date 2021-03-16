@@ -222,7 +222,7 @@ namespace TaskMenager.Client.Controllers
                     TelephoneNumber = model.TelephoneNumber,
                     MobileNumber = model.MobileNumber,
                     JobTitleId = model.JobTitleId,
-                   DaeuAccaunt = this.User.Identities.FirstOrDefault().Name.ToLower()
+                    DaeuAccaunt = this.User.Identities.FirstOrDefault().Name.ToLower()
                 };
 
                 if (model.DirectorateId == null || model.DirectorateId.Value == 0)
@@ -416,7 +416,7 @@ namespace TaskMenager.Client.Controllers
             return Json(new { data });
         }
 
-        [Authorize(Policy = Employee)]
+        //[Authorize(Policy = Employee)]
         [HttpGet]
         public async Task<IActionResult> GetNotActivatedUsers()
         {
