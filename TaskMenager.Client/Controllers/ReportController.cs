@@ -162,13 +162,14 @@ namespace TaskMenager.Client.Controllers
 
                 var sectorsList = await this.sectors.GetSectorsNamesByDirectorate(directorate.Id);
 
+                var formula = string.Empty;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var stream = new System.IO.MemoryStream();
                 using (ExcelPackage package = new ExcelPackage(stream))
                 {
                     foreach (var department in departmentsList)
                     {     //allExperts.Select(s => s.DepartmentId).ToList().Distinct().Contains(department.Id)
-                        if (allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() > 0)   //ако има експерти в отдела
+                        if (allExperts.Where(s => s.DepartmentId == department.Id && s.SectorId == null).ToList().Count() > 0)   //ако има експерти в отдела
                         {
                             ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
                             worksheet.View.ZoomScale = 70;
@@ -300,10 +301,15 @@ namespace TaskMenager.Client.Controllers
                                     taskExpertsColumn += 1;
                                 }
                                 int workedHoursByDepartment = task.Colleagues.Where(cl => expertsInDepWithNoSectorIds.Contains(cl.Id)).Sum(cl => cl.TaskWorkedHours ?? 0);
-                                worksheet.Cells[row, taskExpertsColumn].Formula = "=SUM(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо часове по задачата
+                                formula = "=SUM(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо часове по задачата
+                                worksheet.Cells[row, taskExpertsColumn].Formula = formula;
+
+                               // worksheet.Cells[row, taskExpertsColumn].Formula = "=SUM(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо часове по задачата
                                 worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = "=COUNTA(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо eksperti по задачата
+                                formula = "=COUNTA(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо eksperti по задачата
+                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
+                                //worksheet.Cells[row, taskExpertsColumn + 1].Formula = "=COUNTA(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо eksperti по задачата
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
 
@@ -351,9 +357,17 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[row, 5].Value = "Брой задачи по които е работено";
                             for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                             {
-                                worksheet.Cells[row, col].Formula = "=COUNTA(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 1).ToString() + ")";
+                                formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 1).ToString() + ")";
+
+                                worksheet.Cells[row, col].Formula = formula;
+
+                                //worksheet.Cells[row, col].Formula = "=COUNTA(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 1).ToString() + ")";
                             }
-                            worksheet.Cells[row, taskExpertsColumn].Formula = "=AVERAGE(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";     //по колко задачи средно е работено
+
+                            formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";
+                            worksheet.Cells[row, taskExpertsColumn].Formula = formula; //по колко задачи средно е работено
+
+                            //worksheet.Cells[row, taskExpertsColumn].Formula = "=AVERAGE(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";     //по колко задачи средно е работено
                             worksheet.Cells[row, taskExpertsColumn].Style.Numberformat.Format = "0.00";
                             var modelTableBroiZadachi = worksheet.Cells[row, 5, row, taskExpertsColumn];
                             modelTableBroiZadachi.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -362,7 +376,10 @@ namespace TaskMenager.Client.Controllers
                             modelTableBroiZadachi.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                             modelTableBroiZadachi.Style.Fill.PatternType = ExcelFillStyle.Solid;
                             modelTableBroiZadachi.Style.Fill.BackgroundColor.SetColor(Color.Orange);
-                            worksheet.Cells[row, taskExpertsColumn + 1].Formula = "=AVERAGE(" + ((char)('A' + (taskExpertsColumn))).ToString() + "3:" + ((char)('A' + (taskExpertsColumn))).ToString() + (row - 1).ToString() + ")";
+                            //worksheet.Cells[row, taskExpertsColumn + 1].Formula = "=AVERAGE(" + ((char)('A' + (taskExpertsColumn))).ToString() + "3:" + ((char)('A' + (taskExpertsColumn))).ToString() + (row - 1).ToString() + ")";
+                            formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
+                            worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
+
                             worksheet.Cells[row, taskExpertsColumn + 1].Style.Numberformat.Format = "0.00";
                             worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);  //средно колко човека са работили по задача
@@ -371,7 +388,11 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[row, 5].Value = "Общо часове на служителя";
                             for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                             {
-                                worksheet.Cells[row, col].Formula = "=SUM(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 2).ToString() + ")";
+                                formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 2).ToString() + ")";
+
+                                worksheet.Cells[row, col].Formula = formula;
+
+                                //worksheet.Cells[row, col].Formula = "=SUM(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 2).ToString() + ")";
                             }
                             var modelTableBroiChasove = worksheet.Cells[row, 5, row, taskExpertsColumn - 1];
                             modelTableBroiChasove.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -383,7 +404,10 @@ namespace TaskMenager.Client.Controllers
 
                             row += 1;
                             worksheet.Cells[row, 5].Value = "Общо часове на всички служители";
-                            worksheet.Cells[row, 6].Formula = "=SUM(F" + (row - 1).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+                            formula = "=SUM(F" + (row - 1).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+                            worksheet.Cells[row, 6].Formula = formula;
+                           // worksheet.Cells[row, 6].Formula = "=SUM(F" + (row - 1).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+
                             var modelTableSumHours = worksheet.Cells[row, 5, row, 6];
                             modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                             modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове
@@ -626,10 +650,15 @@ namespace TaskMenager.Client.Controllers
                                     taskExpertsColumn += 1;
                                 }
                                 int workedHoursByDepartment = task.Colleagues.Where(cl => expertsInSector.Contains(cl.Id)).Sum(cl => cl.TaskWorkedHours ?? 0);
-                                worksheet.Cells[row, taskExpertsColumn].Formula = "=SUM(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо часове по задачата
+                                formula = "=SUM(F" + (row).ToString() + ":" +(taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString()) ) + (row).ToString() + ")";  //общо часове по задачата
+                                worksheet.Cells[row, taskExpertsColumn].Formula = formula;
+                                //worksheet.Cells[row, taskExpertsColumn].Formula = "=SUM(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо часове по задачата
                                 worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = "=COUNTA(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо eksperti по задачата
+                                formula = "=COUNTA(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо eksperti по задачата
+                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
+
+                                //worksheet.Cells[row, taskExpertsColumn + 1].Formula = "=COUNTA(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";  //общо eksperti по задачата
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
 
@@ -677,9 +706,15 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[row, 5].Value = "Брой задачи по които е работено";
                             for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                             {
-                                worksheet.Cells[row, col].Formula = "=COUNTA(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 1).ToString() + ")";
+                                formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() :("A" + ((char)('A' + (col - 27))).ToString()) ) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 1).ToString() + ")";
+
+                                worksheet.Cells[row, col].Formula = formula;
+                                //worksheet.Cells[row, col].Formula = "=COUNTA(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 1).ToString() + ")";
                             }
-                            worksheet.Cells[row, taskExpertsColumn].Formula = "=AVERAGE(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";     //по колко задачи средно е работено
+                            formula = "=AVERAGE(F" + (row).ToString() + ":" +(taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() :("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString()) )+ (row).ToString() + ")";     
+                            worksheet.Cells[row, taskExpertsColumn].Formula = formula; //по колко задачи средно е работено
+
+                            //worksheet.Cells[row, taskExpertsColumn].Formula = "=AVERAGE(F" + (row).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row).ToString() + ")";     //по колко задачи средно е работено
                             worksheet.Cells[row, taskExpertsColumn].Style.Numberformat.Format = "0.00";
                             var modelTableBroiZadachi = worksheet.Cells[row, 5, row, taskExpertsColumn];
                             modelTableBroiZadachi.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -688,7 +723,8 @@ namespace TaskMenager.Client.Controllers
                             modelTableBroiZadachi.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                             modelTableBroiZadachi.Style.Fill.PatternType = ExcelFillStyle.Solid;
                             modelTableBroiZadachi.Style.Fill.BackgroundColor.SetColor(Color.Orange);
-                            worksheet.Cells[row, taskExpertsColumn + 1].Formula = "=AVERAGE(" + ((char)('A' + (taskExpertsColumn))).ToString() + "3:" + ((char)('A' + (taskExpertsColumn))).ToString() + (row - 1).ToString() + ")";
+                            formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
+                            worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
                             worksheet.Cells[row, taskExpertsColumn + 1].Style.Numberformat.Format = "0.00";
                             worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);  //средно колко човека са работили по задача
@@ -697,7 +733,11 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[row, 5].Value = "Общо часове на служителя";
                             for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                             {
-                                worksheet.Cells[row, col].Formula = "=SUM(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 2).ToString() + ")";
+                                formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 2).ToString() + ")";
+
+                                worksheet.Cells[row, col].Formula = formula;
+
+                                //worksheet.Cells[row, col].Formula = "=SUM(" + ((char)('A' + (col - 1))).ToString() + "3:" + ((char)('A' + (col - 1))).ToString() + (row - 2).ToString() + ")";
                             }
                             var modelTableBroiChasove = worksheet.Cells[row, 5, row, taskExpertsColumn - 1];
                             modelTableBroiChasove.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -709,7 +749,10 @@ namespace TaskMenager.Client.Controllers
 
                             row += 1;
                             worksheet.Cells[row, 5].Value = "Общо часове на всички служители";
-                            worksheet.Cells[row, 6].Formula = "=SUM(F" + (row - 1).ToString() + ":" + ((char)('A' + (taskExpertsColumn - 2))).ToString() + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+                            formula = "=SUM(F" + (row - 1).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+                            worksheet.Cells[row, 6].Formula = formula;
+                            //worksheet.Cells[row, 6].Formula = "=SUM(F" + (row - 1).ToString() + ":" +( ((char)('A' + (taskExpertsColumn - 2))).ToString() ) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+
                             var modelTableSumHours = worksheet.Cells[row, 5, row, 6];
                             modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                             modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове

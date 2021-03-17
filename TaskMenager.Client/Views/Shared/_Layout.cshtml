@@ -287,7 +287,7 @@
                 $('#sidebar').toggleClass('active');
             });
             //$('#sidebar').height() = $('#content').height();
-            $.getJSON('\UserExistStatus', { get_param: 'value' }, function (data) {
+            $.getJSON('..\\Users\\UserExistStatus', { get_param: 'value' }, function (data) {
                 if (data) {
                     $.getJSON('..\\Users\\GetNotActivatedUsers', { get_param: 'value' }, function (data) {
                         if (data.data.length > 0) {

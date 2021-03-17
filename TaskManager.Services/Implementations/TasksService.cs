@@ -280,32 +280,32 @@ namespace TaskManager.Services.Implementations
 
                 newTypeDb = new TasksType()
                 {
-
                     TypeName = DataConstants.TaskTypeProcurement
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
                 {
-
                     TypeName = DataConstants.TaskTypeLearning
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
                 {
-
                     TypeName = DataConstants.TaskTypeAdminActivity
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
                 {
-
                     TypeName = DataConstants.TaskTypeMeetings
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
                 newTypeDb = new TasksType()
                 {
-
                     TypeName = DataConstants.TaskTypeOther
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+                newTypeDb = new TasksType()
+                {
+                    TypeName = DataConstants.TaskTypeGlobal
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
 

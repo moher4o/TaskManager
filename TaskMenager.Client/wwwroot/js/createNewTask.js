@@ -14,7 +14,7 @@
 
     function CheckSelectedTaskType() {
         if ($('#parentsId :selected').text() != 'Моля изберете...' && $('#taskTypesId :selected').text() === 'Глобална') {
-            document.getElementById('taskTypesId').selectedIndex = 0;    //Индекса на "Специфични задачи"  !!!!! (индексите почват от 0)
+            document.getElementById('taskTypesId').selectedIndex = 4;    //Индекса на "Специфични задачи"  !!!!! (индексите почват от 0)
         }
         else if ($('#parentsId :selected').text() != 'Моля изберете...' && $('#taskTypesId :selected').text() != 'Глобална'){
             //document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
@@ -33,7 +33,7 @@
         }
         else if ($('#taskTypesId :selected').text() === 'Глобална' && $('#parentsId :selected').text() != 'Моля изберете...') {
                 swal("Информация", "Задачите от тип \"Глобална\", не трябва да имат задача родител. Изборът на родител ще бъде нулиран.", "info");
-                document.getElementById('parentsId').selectedIndex = 0;
+            document.getElementById('parentsId').selectedIndex = 0;    //Индекса на "Моля изберете..."  !!!!! (индексите почват от 0)
         }
     }
 
