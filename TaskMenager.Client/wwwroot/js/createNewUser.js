@@ -33,9 +33,11 @@
             result = false;
         }
 
-        let acd = $("#daeuaccauntId").text();
-        console.log(acd)
-        if (acd == null || acd == "") {
+        let acc = $("#daeuaccauntId").text();
+        if (acc == null || acc == "") {
+            acc = $('#daeuaccauntId').val();
+        }
+         if (acc == null || acc == "") {
             $("#daeuaccauntId").css('background-color', 'rgb(250, 204, 204)');
             result = false;
         }

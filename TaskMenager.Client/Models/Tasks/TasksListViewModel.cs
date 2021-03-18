@@ -18,6 +18,8 @@ namespace TaskMenager.Client.Models.Tasks
 
         public string TypeName { get; set; }
 
+        public string TaskAssigner { get; set; }
+
         public int AssignedExpertsCount { get; set; } = 0;
 
         public void ConfigureMapping(Profile profile)
@@ -25,6 +27,7 @@ namespace TaskMenager.Client.Models.Tasks
             profile.CreateMap<Task, TasksListViewModel>()
                   .ForMember(u => u.Status, cfg => cfg.MapFrom(s => s.TaskStatus.StatusName))
                   .ForMember(u => u.TypeName, cfg => cfg.MapFrom(s => s.TaskType.TypeName))
+                  .ForMember(u => u.TaskAssigner, cfg => cfg.MapFrom(s => s.Assigner.FullName))
                   .ForMember(u => u.AssignedExpertsCount, cfg => cfg.MapFrom(s => s.AssignedExperts.Count()));
         }
     }

@@ -29,6 +29,11 @@ namespace TaskMenager.Client.Models.Users
         [Display(Name = "Длъжност*:")]
         public IList<SelectListItem> JobTitles { get; set; } = new List<SelectListItem>();
 
+        public int? RoleId { get; set; }
+
+        [Display(Name = "Роля*:")]
+        public IList<SelectListItem> RolesNames { get; set; } = new List<SelectListItem>();
+
         public int? SectorId { get; set; }
 
         [Display(Name = "Сектор")]

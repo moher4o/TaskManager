@@ -65,13 +65,14 @@ namespace TaskMenager.Client.Controllers
                         isActive = currentEmployee.isActive,
                         isDeleted = currentEmployee.isDeleted,
                         DaeuAccaunt = currentEmployee.DaeuAccaunt
+                        
                     };
                     userToEdit = PrepareUserRegisterModel(userToEdit);
                     return View(userToEdit);
                 }
                 else
                 {
-                    TempData["Error"] = "Нямате права за редакция на профила. Обърнете се към администратор";
+                    TempData["Error"] = "Нямате права за редакция на акаунт: " + currentEmployee.FullName + ". Редакция е възможна само на личен акаунт или на подчинените ви.";
                     return RedirectToAction("UsersList", "Users");
                 }
             }
@@ -97,51 +98,51 @@ namespace TaskMenager.Client.Controllers
 
                 if (currentUser.RoleName == SuperAdmin || currentUser.Id == model.Id || (currentUser.RoleName == DirectorateAdmin && currentUser.DirectorateId == model.DirectorateId) || (currentUser.RoleName == DepartmentAdmin && currentUser.DepartmentId == model.DepartmentId) || (currentUser.RoleName == SectorAdmin && currentUser.SectorId == model.SectorId))
                 {
-                var newUser = new UserServiceModel()
-                {
-                    Id = model.Id ?? 0,
-                    FullName = model.FullName,
-                    Email = model.Email,
-                    TelephoneNumber = model.TelephoneNumber,
-                    MobileNumber = model.MobileNumber,
-                    JobTitleId = model.JobTitleId,
-                    DaeuAccaunt = model.DaeuAccaunt
-                };
+                    var newUser = new UserServiceModel()
+                    {
+                        Id = model.Id ?? 0,
+                        FullName = model.FullName,
+                        Email = model.Email,
+                        TelephoneNumber = model.TelephoneNumber,
+                        MobileNumber = model.MobileNumber,
+                        JobTitleId = model.JobTitleId,
+                        DaeuAccaunt = model.DaeuAccaunt
+                    };
 
-                if (model.DirectorateId == null || model.DirectorateId.Value == 0)
-                {
-                    newUser.DirectorateId = null;
-                }
-                else
-                {
-                    newUser.DirectorateId = model.DirectorateId.Value;
-                }
-                if (model.DepartmentId == null || model.DepartmentId.Value == 0)
-                {
-                    newUser.DepartmentId = null;
-                }
-                else
-                {
-                    newUser.DepartmentId = model.DepartmentId.Value;
-                }
-                if (model.SectorId == null || model.SectorId.Value == 0)
-                {
-                    newUser.SectorId = null;
-                }
-                else
-                {
-                    newUser.SectorId = model.SectorId.Value;
-                }
-                bool result = await this.employees.RegisterNewUserAsync(newUser);
-                if (result)
-                {
-                    TempData["Success"] = "Профила е променен успешно.";
-                }
-                else
-                {
-                    TempData["Error"] = "Грешка при промяната на профила. Обърнете се към администратор";
-                }
-                    return RedirectToAction("UsersList", "Users");
+                    if (model.DirectorateId == null || model.DirectorateId.Value == 0)
+                    {
+                        newUser.DirectorateId = null;
+                    }
+                    else
+                    {
+                        newUser.DirectorateId = model.DirectorateId.Value;
+                    }
+                    if (model.DepartmentId == null || model.DepartmentId.Value == 0)
+                    {
+                        newUser.DepartmentId = null;
+                    }
+                    else
+                    {
+                        newUser.DepartmentId = model.DepartmentId.Value;
+                    }
+                    if (model.SectorId == null || model.SectorId.Value == 0)
+                    {
+                        newUser.SectorId = null;
+                    }
+                    else
+                    {
+                        newUser.SectorId = model.SectorId.Value;
+                    }
+                    bool result = await this.employees.RegisterNewUserAsync(newUser);
+                    if (result)
+                    {
+                        TempData["Success"] = "Профила е променен успешно.";
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Грешка при промяната на профила в БД. Обърнете се към администратор";
+                    }
+                    return RedirectToAction("EditUser", "Users", new { userId = model.Id });
                 }
                 else
                 {
@@ -152,7 +153,7 @@ namespace TaskMenager.Client.Controllers
             catch (Exception)
             {
                 TempData["Error"] = "Основна грешка при промяната на профила. Обърнете се към администратор";
-                return RedirectToAction("EditUser", "Users", new { userId = model.Id});
+                return RedirectToAction("EditUser", "Users", new { userId = model.Id });
             }
         }
 
@@ -188,12 +189,13 @@ namespace TaskMenager.Client.Controllers
                         DirectorateId = currentEmployee.DirectorateId,
                         DepartmentId = currentEmployee.DepartmentId,
                         SectorId = currentEmployee.SectorId,
-                        isActive = currentEmployee.isActive
+                        isActive = currentEmployee.isActive,
+                        DaeuAccaunt = currentEmployee.DaeuAccaunt
                     };
                     notActiveUser = PrepareUserRegisterModel(notActiveUser);
                     return View(notActiveUser);
                 }
-                
+
             }
             else
             {
@@ -376,7 +378,7 @@ namespace TaskMenager.Client.Controllers
             if (currentEmployee != null)
             {
                 result = true;
-               
+
             }
             return Json(result);
         }
@@ -399,58 +401,131 @@ namespace TaskMenager.Client.Controllers
 
         [Authorize(Policy = Employee)]
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers(bool deleted = false)
+        public async Task<IActionResult> GetAllUsers(bool deleted = false, bool notActivated = false)
         {
-            var users = await this.employees.GetAllUsers(deleted);
-            var data = users.Select(u => new UsersListViewModel
+            if (notActivated)
             {
-                Id = u.Id,
-                FullName = u.FullName,
-                Email = u.Email,
-                DirectorateName = u.DirectorateName,
-                DepartmentName = u.DepartmentName,
-                SectorName = u.SectorName,
-                TelephoneNumber = u.TelephoneNumber
-            }).ToList();
-              
-            return Json(new { data });
-        }
+                return RedirectToAction(nameof(GetNotActivatedUsers));
+            }
+            else
+            {
+                var users = await this.employees.GetAllUsers(deleted);
+                var data = users.Select(u => new UsersListViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    DirectorateName = u.DirectorateName,
+                    DepartmentName = u.DepartmentName,
+                    SectorName = u.SectorName,
+                    TelephoneNumber = u.TelephoneNumber
+                }).ToList();
+                foreach (var user in data)
+                {
+                    if (currentUser.RoleName == SuperAdmin || currentUser.Id == user.Id || (currentUser.RoleName == DirectorateAdmin && currentUser.DirectorateName == user.DirectorateName) || (currentUser.RoleName == DepartmentAdmin && currentUser.DepartmentName == user.DepartmentName) || (currentUser.RoleName == SectorAdmin && currentUser.SectorName == user.SectorName))
+                    {
+                        user.Status = "editable";
+                    }
 
-        //[Authorize(Policy = Employee)]
+                }
+                return Json(new { data });
+            }
+        }
         [HttpGet]
         public async Task<IActionResult> GetNotActivatedUsers()
         {
-            var users = new List<UserServiceModel>();
+            var data = new List<UsersListViewModel>();
+            var users = await this.employees.GetAllNotActivatedUsersAsync();
             if (currentUser.RoleName == SuperAdmin)
             {
-                users = await this.employees.GetAllNotActivatedUsersAsync();
+                data = users.Select(u => new UsersListViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    DirectorateName = u.DirectorateName,
+                    DepartmentName = u.DepartmentName,
+                    SectorName = u.SectorName,
+                    TelephoneNumber = u.TelephoneNumber
+                }).ToList();
             }
-            else if(currentUser.RoleName == DirectorateAdmin)
+            else if (currentUser.RoleName == DirectorateAdmin)
             {
-                //users = await this.employees.GetDirNotActivatedUsersAsync(currentUser.DirectorateId);
+                data = users.Where(u => u.DirectorateId == currentUser.DirectorateId).Select(u => new UsersListViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    DirectorateName = u.DirectorateName,
+                    DepartmentName = u.DepartmentName,
+                    SectorName = u.SectorName,
+                    TelephoneNumber = u.TelephoneNumber
+                }).ToList();
             }
             else if (currentUser.RoleName == DepartmentAdmin)
             {
-                //users = await this.employees.GetDepNotActivatedUsersAsync(currentUser.DepartmentId);
+                data = users.Where(u => u.DepartmentId == currentUser.DepartmentId).Select(u => new UsersListViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    DirectorateName = u.DirectorateName,
+                    DepartmentName = u.DepartmentName,
+                    SectorName = u.SectorName,
+                    TelephoneNumber = u.TelephoneNumber
+                }).ToList();
             }
             else if (currentUser.RoleName == SectorAdmin)
             {
-                //users = await this.employees.GetSecNotActivatedUsersAsync(currentUser.SectorId);
+                data = users.Where(u => u.SectorId == currentUser.SectorId).Select(u => new UsersListViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    DirectorateName = u.DirectorateName,
+                    DepartmentName = u.DepartmentName,
+                    SectorName = u.SectorName,
+                    TelephoneNumber = u.TelephoneNumber
+                }).ToList();
             }
-
-            var data = users.Select(u => new UsersListViewModel
-            {
-                Id = u.Id,
-                FullName = u.FullName,
-                Email = u.Email,
-                DirectorateName = u.DirectorateName,
-                DepartmentName = u.DepartmentName,
-                SectorName = u.SectorName,
-                TelephoneNumber = u.TelephoneNumber
-            }).ToList();
-
             return Json(new { data });
         }
+
+        ////[Authorize(Policy = Employee)]
+        //[HttpGet]
+        //public async Task<IActionResult> GetNotActivatedUsers()
+        //{
+        //    var users = new List<UserServiceModel>();
+        //    if (currentUser.RoleName == SuperAdmin)
+        //    {
+        //        users = await this.employees.GetAllNotActivatedUsersAsync();
+        //    }
+        //    else if (currentUser.RoleName == DirectorateAdmin)
+        //    {
+        //        //users = await this.employees.GetDirNotActivatedUsersAsync(currentUser.DirectorateId);
+        //    }
+        //    else if (currentUser.RoleName == DepartmentAdmin)
+        //    {
+        //        //users = await this.employees.GetDepNotActivatedUsersAsync(currentUser.DepartmentId);
+        //    }
+        //    else if (currentUser.RoleName == SectorAdmin)
+        //    {
+        //        //users = await this.employees.GetSecNotActivatedUsersAsync(currentUser.SectorId);
+        //    }
+
+        //    var data = users.Select(u => new UsersListViewModel
+        //    {
+        //        Id = u.Id,
+        //        FullName = u.FullName,
+        //        Email = u.Email,
+        //        DirectorateName = u.DirectorateName,
+        //        DepartmentName = u.DepartmentName,
+        //        SectorName = u.SectorName,
+        //        TelephoneNumber = u.TelephoneNumber
+        //    }).ToList();
+
+        //    return Json(new { data });
+        //}
 
 
         [Authorize(Policy = Employee)]
@@ -470,7 +545,7 @@ namespace TaskMenager.Client.Controllers
                 MobileNumber = userinfo.MobileNumber,
                 JobTitleName = userinfo.JobTitleName,
                 RoleName = userinfo.RoleName,
-                Status = userinfo.isDeleted ? "Деактивиран акаунт" : "Активен акаунт"
+                Status = userinfo.isDeleted ? "Деактивиран акаунт" :(userinfo.isActive ? "Активен акаунт" : "Чакащ одобрение")
             };
             return Json(new { data });
         }

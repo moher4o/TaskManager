@@ -126,7 +126,7 @@ namespace TaskMenager.Client.Controllers
             }
             catch (Exception)
             {
-                TempData["Error"] = "Основна грешка. Моля проверете входните данни.";
+                TempData["Error"] = "Основна грешка. Моля проверете логиката на входните данни.";
                 return View(model);
             }
 

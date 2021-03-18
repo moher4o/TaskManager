@@ -48,15 +48,16 @@ function loadDataTable(getClosed, withDeleted) {
         },
         "columns": [
             { "data": "id", "width": "5%" },
-            { "data": "taskName", "width": "55%" },
+            { "data": "taskName", "width": "41%" },
+            { "data": "taskAssigner", "width": "18%" },
             { "data": "assignedExpertsCount", "width": "4%" },
             { "data": "status", "width": "12%" },
-            { "data": "typeName", "width": "12%" },
+            { "data": "typeName", "width": "14%" },
             {
                 "data": "id",
                 "render": function (data) {
                     if (withDeleted || permisionType != 'SuperAdmin') {
-                        return `<div class="text-center">
+                        return `<div>
                         
                         <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;'>
                             <img class="chatnotifications" src="../png/info2.png" />
@@ -64,24 +65,24 @@ function loadDataTable(getClosed, withDeleted) {
                         </div>`;
                     }
                     else {
-                        return `<div class="text-center">
+                        return `<div>
                         
                         <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                        &nbsp;
-                        <a style='cursor:pointer;'
+                        
+                        <a style='cursor:pointer; padding-left:5px;'
                             onclick=Delete('${path}Delete?taskId=${data}')>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
                         </div>`;
                     }
 
-                }, "width": "12%"
+                }, "width": "6%"
             }
         ],
         "language": {
-            "emptyTable": "Няма задачи"
+            "emptyTable": "Няма такива задачи"
         },
         "width": "100%"
     });

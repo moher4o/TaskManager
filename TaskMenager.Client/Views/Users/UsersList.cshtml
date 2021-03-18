@@ -10,9 +10,14 @@
     </div>
     @if (permision == "Admin")
     {
-        <div class="col-md-3 offset-md-3" style="padding-top:6px;">
+        <div class="col-md-3" style="padding-top:6px;">
+            <input style="margin-left:15px;" type="checkbox" name="showNotActive" id="showNotActive">
+            <span class="chatnotifications" for="showNotActive"> Чакащи одобрение</span>
+            <span title="Чакащи одобрение" class="notificationsMenuSmall" id="notActiveCountinner" hidden></span>
+        </div>
+        <div class="col-md-3" style="padding-top:6px;">
             <input style="margin-left:15px;" type="checkbox" name="showDeleted" id="showDeleted">
-            <label for="showDeleted"> Неактивни потребители</label>
+            <label for="showDeleted"> Изтрити потребители</label>
         </div>
 
         <div class="col-md-2">

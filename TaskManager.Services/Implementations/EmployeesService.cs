@@ -47,7 +47,7 @@ namespace TaskManager.Services.Implementations
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId)
         {
             var tasks = await this.db.Tasks
-                    .Where(et => et.AssignerId == userId)
+                    .Where(et => et.AssignerId == userId && et .isDeleted == false)
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
                     .ProjectTo<TaskFewInfoServiceModel>()
@@ -59,7 +59,7 @@ namespace TaskManager.Services.Implementations
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserCreatedTaskAsync(int userId)
         {
             var tasks = await this.db.Tasks
-                    .Where(et => et.OwnerId == userId)
+                    .Where(et => et.OwnerId == userId && et.isDeleted == false)
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
                     .ProjectTo<TaskFewInfoServiceModel>()
@@ -314,12 +314,13 @@ namespace TaskManager.Services.Implementations
         {
             try
             {
-                var userToDeactivate = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
-                if (userToDeactivate == null)
+                var userToActivate = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
+                if (userToActivate == null)
                 {
                     return false;
                 }
-                userToDeactivate.isDeleted = false;
+                userToActivate.isDeleted = false;
+                userToActivate.isActive = true;
                 await this.db.SaveChangesAsync();
                 return true;
 

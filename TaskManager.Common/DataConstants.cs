@@ -22,9 +22,9 @@ namespace TaskManager.Common
 
         public const string TaskTypeSpecificWork = "Специфична дейност";
         public const string TaskTypeProcurement = "Обществени поръчки";
-        public const string TaskTypeLearning = "Обучения, Презентации";
+        public const string TaskTypeLearning = "Обучения и Презентации";
         public const string TaskTypeAdminActivity = "Административна дейност";
-        public const string TaskTypeMeetings = "Работни групи, Комисии, Работни срещи";
+        public const string TaskTypeMeetings = "Работни групи и Комисии";
         public const string TaskTypeOther = "Други дейности";
         public const string TaskTypeGlobal = "Глобална";
         public const int TasksTypesCount = 7; // броя на типовете по-горе  !!!

@@ -19,8 +19,11 @@
     <link rel="stylesheet" href="~/css/notfound.css">
 
     <!-- Font Awesome JS -->
-    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+    @*<script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>*@
+    <script src="~/js/solid.js"></script>
+    <script src="~/js/fontawesome.js"></script>
+
 
     @*<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">*@
     <link rel="stylesheet" href="~/css/notifications.css" />
@@ -29,7 +32,7 @@
     @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>*@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @*<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>*@
-    <script src="~/js/notify.js"></script>
+    @*<script src="~/js/notify.js"></script>*@
 
 </head>
 <body>
@@ -146,12 +149,12 @@
                         <li>
                             <a asp-controller="Users" asp-action="UsersList">Списък</a>
                         </li>
-                        <li>
+                        @*<li>
                             <a asp-controller="Home" asp-action="NotImplemented">
                                 <span class="chatnotifications">Чакащи одобрение</span>
                                 <span title="Чакащи одобрение" class="notificationsMenuSmall" id="notActiveCountinner" hidden></span>
                             </a>
-                        </li>
+                        </li>*@
                         <li>
                             <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
                             @*<a href="/Home/NotImplemented">Телефонен указател</a>*@
