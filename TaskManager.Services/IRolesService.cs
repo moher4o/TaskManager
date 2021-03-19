@@ -14,6 +14,11 @@ namespace TaskManager.Services
 
         int RolesCount();
 
-        Task<string> UserRoleNameByRoleIdAsync(int roleId);
+        Task<string> GetUserRoleNameByRoleIdAsync(int roleId);
+
+        Task<int> GetUserRoleIdByRoleNameAsync(string roleName);
+
+        IEnumerable<SelectServiceModel> GetAllRoles();
+
     }
 }

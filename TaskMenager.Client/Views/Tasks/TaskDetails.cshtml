@@ -6,7 +6,7 @@
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 @{var isClosed = Model.TaskStatusName == DataConstants.TaskStatusClosed;}
 @{var isDeleted = Model.isDeleted;}
-<div class="PrimeBox2" style="margin-top:20px;">
+<div class="PrimeBox2" style="margin-top:20px; background-color:ghostwhite;">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
         <h5 style="color:white; margin-left:15px;">Подробна информация за задача N: @Model.Id.ToString()</h5>
         <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">

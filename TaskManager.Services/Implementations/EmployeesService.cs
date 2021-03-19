@@ -99,7 +99,8 @@ namespace TaskManager.Services.Implementations
                         DepartmentId = string.IsNullOrWhiteSpace(employees[i].Department) ? (int?)null : this.db.Departments.Where(d => d.DepartmentName == employees[i].Department).Select(d => d.Id).FirstOrDefault(),
                         DirectorateId = string.IsNullOrWhiteSpace(employees[i].Directorate) ? (int?)null : this.db.Directorates.Where(d => d.DirectorateName == employees[i].Directorate).Select(d => d.Id).FirstOrDefault(),
                         FullName = employees[i].FullName,
-                        isDeleted = employees[i].isDeleted
+                        isDeleted = employees[i].isDeleted,
+                        isActive = false
                     };
 
                     await this.db.Employees.AddAsync(newEmployeeDB);
@@ -123,7 +124,7 @@ namespace TaskManager.Services.Implementations
         public async Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false)
         {
                 return await this.db.Employees
-                        .Where(t => t.isDeleted == withDeleted)
+                        .Where(t => t.isDeleted == withDeleted && t.isActive == true)
                         .OrderBy(t => t.DirectorateId)
                         .ThenBy(t => t.DepartmentId)
                         .ThenBy(e => e.SectorId != null ? e.SectorId : 999)
@@ -136,7 +137,7 @@ namespace TaskManager.Services.Implementations
         public IEnumerable<SelectServiceModel> GetActiveEmployeesNames()
         {
             var names = this.db.Employees
-                .Where(c => c.isDeleted == false)
+                .Where(c => c.isDeleted == false && c.isActive == true)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
                 {
@@ -166,7 +167,7 @@ namespace TaskManager.Services.Implementations
                 return null;
             }
             var names = this.db.Employees
-                .Where(c => c.isDeleted == false && c.DepartmentId == departmentId)
+                .Where(c => c.isDeleted == false && c.DepartmentId == departmentId && c.isActive == true)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
                 {
@@ -184,7 +185,7 @@ namespace TaskManager.Services.Implementations
                 return null;
             }
             var names = this.db.Employees
-                .Where(c => c.isDeleted == false && c.DirectorateId == directorateId)
+                .Where(c => c.isDeleted == false && c.DirectorateId == directorateId && c.isActive == true)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
                 {
@@ -202,7 +203,7 @@ namespace TaskManager.Services.Implementations
                 return null;
             }
             var names = this.db.Employees
-                .Where(c => c.isDeleted == false && c.SectorId == sectorId)
+                .Where(c => c.isDeleted == false && c.SectorId == sectorId && c.isActive == true)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
                 {
@@ -259,6 +260,7 @@ namespace TaskManager.Services.Implementations
                         userFromDB.DepartmentId = newUser.DepartmentId;
                         userFromDB.SectorId = newUser.SectorId;
                         userFromDB.DaeuAccaunt = newUser.DaeuAccaunt;
+                        userFromDB.RoleId = newUser.RoleId;
                         await this.db.SaveChangesAsync();
                     }
                     else  //няма такъв потребител

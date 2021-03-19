@@ -6,7 +6,8 @@
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     @Html.HiddenFor(model => model.Id)
-    <div class="PrimeBox2" style="margin-top:20px; max-width:80%;">
+    @Html.HiddenFor(model => model.RoleId)
+    <div class="PrimeBox2" style="margin-top:20px; max-width:80%; background-color:ghostwhite;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">Създаване на потребител:  @this.User.Identities.FirstOrDefault().Name.ToLower()</h5>
             <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">
@@ -66,9 +67,9 @@
                     </div>
                     <div hidden>
                         @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-form-label strong" })
-                            <div class="col-md-3">
-                                <label class="form-control" style="border:none; margin-bottom:0px !important;" id = "daeuaccauntId">@Model.DaeuAccaunt</label>
-                            </div>
+                        <div class="col-md-3">
+                            <label class="form-control" style="border:none; margin-bottom:0px !important;" id="daeuaccauntId">@Model.DaeuAccaunt</label>
+                        </div>
                     </div>
                 </div>
             </div>

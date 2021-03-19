@@ -2,6 +2,14 @@
 for details on configuring this project to bundle and minify static web assets. */
 
 /*Включено-Изключено*/
+.vkl-izk {
+    display: inline-block;
+    position: relative;
+    left: +30px;
+    top:10px;
+}
+
+
 .switch-toggle {
     float: left;
     background: #fff;

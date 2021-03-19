@@ -145,9 +145,69 @@ namespace TaskManager.Services.Implementations
             return this.db.Roles.Count();
         }
 
-        public async Task<string> UserRoleNameByRoleIdAsync(int roleId)
+        public async Task<string> GetUserRoleNameByRoleIdAsync(int roleId)
         {
             return await this.db.Roles.Where(r => r.Id == roleId).Select(r => r.Name).FirstOrDefaultAsync();
         }
+
+        public async Task<int> GetUserRoleIdByRoleNameAsync(string roleName)
+        {
+            return await this.db.Roles.Where(r => r.Name == roleName).Select(r => r.Id).FirstOrDefaultAsync();
+        }
+
+
+        public IEnumerable<SelectServiceModel> GetAllRoles()
+        {
+            var roles = this.db.Roles
+                .Where(c => c.isDeleted == false)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.Name,
+                    Id = d.Id
+                })
+                .ToList();
+            return roles;
+        }
+
+        //public IEnumerable<SelectServiceModel> GetDirectorateRoles()
+        //{
+        //    var roles = this.db.Roles
+        //        .Where(c => c.isDeleted == false && c.Name != SuperAdmin)
+        //        .Select(d => new SelectServiceModel
+        //        {
+        //            TextValue = d.Name,
+        //            Id = d.Id
+        //        })
+        //        .ToList();
+        //    return roles;
+        //}
+
+        //public IEnumerable<SelectServiceModel> GetDepartmentRoles()
+        //{
+        //    var roles = this.db.Roles
+        //        .Where(c => c.isDeleted == false && c.Name != SuperAdmin && c.Name != DirectorateAdmin)
+        //        .Select(d => new SelectServiceModel
+        //        {
+        //            TextValue = d.Name,
+        //            Id = d.Id
+        //        })
+        //        .ToList();
+        //    return roles;
+        //}
+
+        //public IEnumerable<SelectServiceModel> GetSectorRoles()
+        //{
+        //    var roles = this.db.Roles
+        //        .Where(c => c.isDeleted == false && c.Name != SuperAdmin && c.Name != DirectorateAdmin && c.Name != DepartmentAdmin)
+        //        .Select(d => new SelectServiceModel
+        //        {
+        //            TextValue = d.Name,
+        //            Id = d.Id
+        //        })
+        //        .ToList();
+        //    return roles;
+        //}
+
+
     }
 }

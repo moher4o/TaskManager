@@ -6,8 +6,8 @@
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    @Html.HiddenFor(model => model.Id)
-    <div class="PrimeBox2" style="margin-top:20px; max-width:80%;">
+    @Html.HiddenFor(model => model.Id)    
+    <div class="PrimeBox2" style="margin-top:20px; max-width:80%; background-color:ghostwhite;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">Данни за акаунт:  @Model.DaeuAccaunt</h5>
             <button type="button" id="x" onclick="window.location.href='@Url.Action("UsersList", "Users")';">
@@ -17,7 +17,7 @@
         @if (permisionType != Employee && (Model.Id.ToString() != this.User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault()))
         {
             <div class="row" @( Model.Id.Value.ToString() == this.User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault() ? "hidden" : "")>
-                <div class="col-md-6">
+                <div class="col-md-6 vkl-izk">
                     @if (!Model.isActive)
                     {<div class="activation">
                             <div class="switch-toggle">
@@ -57,15 +57,34 @@
                         }
                     }
                 </div>
-                <div class="form-group row col-md-6">
-                    @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-md-2 col-form-label strong" })
-                    <div class="col-md-8">
-                        @Html.TextBoxFor(model => model.DaeuAccaunt, new { @class = "form-control", id = "daeuaccauntId" })
-                        <span asp-validation-for="DaeuAccaunt" class="text-danger"></span>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-md-2 col-form-label strong" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.DaeuAccaunt, new { @class = "form-control", id = "daeuaccauntId" })
+                            <span asp-validation-for="DaeuAccaunt" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(model => model.RolesNames, new { @class = "col-md-2 col-form-label strong" })
+                        <div class="col-md-8">
+                            @Html.DropDownListFor(m => m.RoleId, new SelectList(Model.RolesNames, "Value", "Text"),
+                           permisionType == Employee ? new { @disabled = "disabled" } as object :
+                                  new
+                                  {
+                                      @class = "form-control",
+                                      id = "roleId",
+                                      name = "rolesNames"
+                                  } as object)
+                        </div>
                     </div>
                 </div>
-
             </div>
+            @*<div class="row">
+                    <div class="col-md-6 offset-md-6">
+                    </div>
+                </div>*@
+
 
         }
         <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
