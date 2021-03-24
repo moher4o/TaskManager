@@ -174,7 +174,7 @@ namespace TaskManager.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<TaskNote>()
-                .HasKey(pc => new { pc.TaskId, pc.EmployeeId, pc.NoteDate });
+                .HasKey(pc => new { pc.Id});
 
             builder.Entity<Employee>()
                 .HasMany(tt => tt.Notes)
