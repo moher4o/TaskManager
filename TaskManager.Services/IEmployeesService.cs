@@ -29,14 +29,17 @@ namespace TaskManager.Services
         IEnumerable<SelectServiceModel> GetActiveEmployeesNames();
 
         IEnumerable<SelectServiceModel> GetEmployeesNamesBySector(int? sectorId);
+        Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesBySectorWithDeletedAsync(int? sectorId);
 
         IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId);
+        Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDepartmentWithDeletedAsync(int? departmentId);
 
         IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId);
+        Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDirectorateWithDeletedAsync(int? directorateId);
 
         IEnumerable<ReportUserServiceModel> GetEmployeesByList(IEnumerable<int> employeesList);
         Task<bool> RegisterNewUserAsync(UserServiceModel newUser);
-        Task<bool> DeactivateUserAsync(int userId);
+        Task<string> DeactivateUserAsync(int userId);
         Task<bool> АctivateUserAsync(int userId);
 
         Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false);

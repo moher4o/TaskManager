@@ -418,7 +418,7 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
-        #region API Calls
+         #region API Calls
         [HttpGet]
         public IActionResult GetDepartments(string direktorateId)
         {
@@ -463,7 +463,7 @@ namespace TaskMenager.Client.Controllers
         [HttpGet]
         public async Task<IActionResult> DeactivateUser(int userId)
         {
-            bool result = await this.employees.DeactivateUserAsync(userId);
+            var result = await this.employees.DeactivateUserAsync(userId);
             return Json(result);
         }
 

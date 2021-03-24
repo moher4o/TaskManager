@@ -64,10 +64,15 @@ namespace TaskMenager.Client.Models.Tasks
 
         public string TaskPriorityId { get; set; }
 
-        [Display(Name = "Отговорник *")]
-        public IList<SelectListItem> Assigners { get; set; } = new List<SelectListItem>();
+        //[Display(Name = "Отговорник *")]
+        //public IList<SelectListItem> Assigners { get; set; } = new List<SelectListItem>();
 
-        public string AssignerId { get; set; }
+        [Display(Name = "Отговорник *")]
+        public SelectList AssignersList { get; set; }
+
+        public int AssignerIdInt { get; set; }
+
+        //public string AssignerId { get; set; }
 
         [Display(Name = "Изпълнител")]
         public IList<SelectListItem> Employees { get; set; } = new List<SelectListItem>();

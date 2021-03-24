@@ -118,9 +118,13 @@ namespace TaskMenager.Client.Models.Tasks
                                                            .OrderBy(e => e.Employee.FullName)
                                                            .Select(e => new SelectServiceModel
                                                            {
-                                                               TextValue = string.Concat(e.Employee.JobTitle.TitleName, " ", e.Employee.FullName),
+                                                               //TextValue = string.Concat(e.Employee.JobTitle.TitleName, " ", e.Employee.FullName),
+                                                               TextValue = e.Employee.FullName,
                                                                Id = e.Employee.Id,
-                                                               isDeleted = e.isDeleted
+                                                               isDeleted = e.isDeleted,
+                                                               DepartmentName = e.Employee.Department.DepartmentName,
+                                                               DirectorateName = e.Employee.Directorate.DirectorateName,
+                                                               SectorName = e.Employee.Sector.SectorName
                                                            })
                                                            .ToList()));
         }

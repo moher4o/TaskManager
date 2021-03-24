@@ -142,7 +142,10 @@ namespace TaskManager.Services.Implementations
                 .Select(d => new SelectServiceModel
                 {
                     TextValue = d.FullName,
-                    Id = d.Id
+                    Id = d.Id,
+                    DepartmentName = d.Department.DepartmentName,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    SectorName = d.Sector.SectorName
                 })
                 .ToList();
             return names;
@@ -172,9 +175,34 @@ namespace TaskManager.Services.Implementations
                 .Select(d => new SelectServiceModel
                 {
                     TextValue = d.FullName,
-                    Id = d.Id
+                    Id = d.Id,
+                    DepartmentName = d.Department.DepartmentName,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    SectorName = d.Sector.SectorName
+
                 })
                 .ToList();
+            return names;
+        }
+        public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDepartmentWithDeletedAsync(int? departmentId)
+        {
+            if (departmentId == null)
+            {
+                return null;
+            }
+            var names = await this.db.Employees
+                .Where(c => c.DepartmentId == departmentId && c.isActive == true)
+                .OrderBy(e => e.FullName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.FullName,
+                    Id = d.Id,
+                    DepartmentName = d.Department.DepartmentName,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    SectorName = d.Sector.SectorName
+
+                })
+                .ToListAsync();
             return names;
         }
 
@@ -190,9 +218,35 @@ namespace TaskManager.Services.Implementations
                 .Select(d => new SelectServiceModel
                 {
                     TextValue = d.FullName,
-                    Id = d.Id
+                    Id = d.Id,
+                    DepartmentName = d.Department.DepartmentName,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    SectorName = d.Sector.SectorName
+
                 })
                 .ToList();
+            return names;
+        }
+
+        public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDirectorateWithDeletedAsync(int? directorateId)
+        {
+            if (directorateId == null)
+            {
+                return null;
+            }
+            var names = await this.db.Employees
+                .Where(c => c.DirectorateId == directorateId && c.isActive == true)
+                .OrderBy(e => e.FullName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.FullName,
+                    Id = d.Id,
+                    DepartmentName = d.Department.DepartmentName,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    SectorName = d.Sector.SectorName
+
+                })
+                .ToListAsync();
             return names;
         }
 
@@ -208,11 +262,37 @@ namespace TaskManager.Services.Implementations
                 .Select(d => new SelectServiceModel
                 {
                     TextValue = d.FullName,
-                    Id = d.Id
+                    Id = d.Id,
+                    DepartmentName = d.Department.DepartmentName,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    SectorName = d.Sector.SectorName
+
                 })
                 .ToList();
             return names;
         }
+        public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesBySectorWithDeletedAsync(int? sectorId)
+        {
+            if (sectorId == null)
+            {
+                return null;
+            }
+            var names = await this.db.Employees
+                .Where(c => c.SectorId == sectorId && c.isActive == true)
+                .OrderBy(e => e.FullName)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.FullName,
+                    Id = d.Id,
+                    DepartmentName = d.Department.DepartmentName,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    SectorName = d.Sector.SectorName
+
+                })
+                .ToListAsync();
+            return names;
+        }
+
 
         public UserServiceModel GetUserDataForCooky(string daeuAccaunt)
         {
@@ -292,23 +372,39 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-        public async Task<bool> DeactivateUserAsync(int userId)
+        public async Task<string> DeactivateUserAsync(int userId)
         {
             try
             {
-                var userToDeactivate = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
+                var userToDeactivate = await this.db.Employees
+                    .Where(e => e.Id == userId)
+                    .Include(e => e.TasksAssigner)
+                    .Include(e => e.Tasks)
+                    .FirstOrDefaultAsync();
                 if (userToDeactivate == null)
                 {
-                    return false;
+                    return "Няма акаунт с Id : " + userId.ToString();
+                }
+
+                var activeUserTask = userToDeactivate.TasksAssigner.Where(t => t.StatusId != this.db.TasksStatuses.Where(st => st.StatusName == TaskStatusClosed).Select(ts=>ts.Id).FirstOrDefault()).Count();
+                if (activeUserTask>0)
+                {
+                    return $"Потребителя е отговорник по ({activeUserTask}) активни задачи. Прехвърлете задачите на друг преди да го деактивирате.";
+                }
+                foreach (var taskInvolved in userToDeactivate.Tasks)
+                {
+                    taskInvolved.isDeleted = true;
+                    await this.db.SaveChangesAsync();
                 }
                 userToDeactivate.isDeleted = true;
                 await this.db.SaveChangesAsync();
-                return true;
+
+                return "success";
 
             }
             catch (Exception)
             {
-                return false;
+                return "[Service] Грешка в сървиса за обработка на заявката. Свържете се с разработчика.";
             }
 
         }

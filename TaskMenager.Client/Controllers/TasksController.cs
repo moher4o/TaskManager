@@ -157,14 +157,13 @@ namespace TaskMenager.Client.Controllers
                      DirectoratesId = taskDetails.DirectorateId.ToString(),
                      DepartmentsId = taskDetails.DepartmentId.ToString(),
                      SectorsId = taskDetails.SectorId.ToString(),
-                     AssignerId = taskDetails.AssignerId.ToString(),
+                     AssignerIdInt = taskDetails.AssignerId,
                      TaskPriorityId = taskDetails.PriorityId.ToString(),
                      TaskTypesId = taskDetails.TypeId.ToString(),
                      Valid_From = taskDetails.StartDate.Date,
                      Valid_To = taskDetails.EndDatePrognose.Value.Date
                 };
 
-                 //var assignedEmployees = new List<int>();
                 var assignedEmployees = new List<SelectServiceModel>();
                 assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
 
@@ -176,25 +175,43 @@ namespace TaskMenager.Client.Controllers
 
                 if (taskToEdit.Employees.Count < taskToEdit.EmployeesIds.Length)    //добавям членовете на задачата, които не са в йерархиата на отговорника
                 {
+                    var tempSelectListItems = new List<SelectListItem>();
                     foreach (var empId in taskToEdit.EmployeesIds)
                     {
                         if (taskToEdit.Employees.FirstOrDefault(e => e.Value == empId.ToString()) == null)
                         {
                             var curentEmployee = assignedEmployees.Where(e => e.Id == empId).FirstOrDefault();
-                            taskToEdit.Employees.Add(new SelectListItem
+                            if (this.employees.GetEmployeeByIdAsync(empId).Result.isDeleted == false)   //проверка дали колегата, който е вкл. в задачата, междувременно не е маркиран като изтрит акаунт
                             {
-                                Text = curentEmployee.TextValue,
-                                Value = empId.ToString(),
-                                Selected = curentEmployee.isDeleted ? false : true
-                            });
-                            taskToEdit.Assigners.Add(new SelectListItem
-                            {
-                                Text = curentEmployee.TextValue,
-                                Value = empId.ToString()
-                            });
-
+                                taskToEdit.Employees.Add(new SelectListItem
+                                {
+                                    Text = curentEmployee.TextValue,
+                                    Value = empId.ToString(),
+                                    Selected = curentEmployee.isDeleted ? false : true
+                                });
+                                /////
+                                tempSelectListItems.Add(new SelectListItem
+                                {
+                                    Text = curentEmployee.TextValue,
+                                    Value = curentEmployee.Id.ToString(),
+                                    Selected = false,
+                                    Group = new SelectListGroup { Name = curentEmployee.DepartmentName }
+                                });
+                                /////
+                            }
+                            //taskToEdit.Assigners.Add(new SelectListItem
+                            //{
+                            //    Text = curentEmployee.TextValue,
+                            //    Value = empId.ToString()
+                            //});
                         }
                     }
+                    //var tempSelectListItems = taskToEdit.AssignersList.Items.AsQueryable();
+                    if (tempSelectListItems.Count > 0)
+                    {
+                        taskToEdit.AssignersList = new SelectList(taskToEdit.AssignersList.Concat(tempSelectListItems.OrderBy(a => a.Group.Name).ToList()), "Value", "Text", "-1", "Group.Name");
+                    }
+
                 }
                 taskToEdit.EmployeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToArray();  //за да изключи премахнатите експерти
 
@@ -224,7 +241,7 @@ namespace TaskMenager.Client.Controllers
                 if (!ModelState.IsValid)
                 {
 
-                    model = await TasksModelPrepareForViewWithOldInfo(model);
+                   // model = await TasksModelPrepareForViewWithOldInfo(model);
 
                     TempData["Error"] = "Невалидни данни. Моля прегледайте въведената информация за новата задача.";
 
@@ -233,7 +250,7 @@ namespace TaskMenager.Client.Controllers
 
                 if (model.Valid_From > model.Valid_To)
                 {
-                    TempData["Error"] = "Невалидни дати";
+                    TempData["Error"] = "Некоректни дати за начало и край на задачата";
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
 
@@ -270,20 +287,30 @@ namespace TaskMenager.Client.Controllers
                 {
                     taskToEdit.SectorId = (sectorId != 0) ? sectorId : (int?)null;
                 }
-                if (int.TryParse(model.AssignerId, out int assignerId))
+                if (model.AssignerIdInt > 0)
                 {
-                    if (assignerId == 0)
-                    {
-                        TempData["Error"] = "Задачата трябва да има назначен отговорник";
-                        return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
-                    }
-                    taskToEdit.AssignerId = assignerId;
+                    taskToEdit.AssignerId = model.AssignerIdInt;
                 }
                 else
                 {
                     TempData["Error"] = "Задачата трябва да има назначен отговорник";
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
+
+                //if (int.TryParse(model.AssignerId, out int assignerId))
+                //{
+                //    if (assignerId == 0)
+                //    {
+                //        TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                //        return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                //    }
+                //    taskToEdit.AssignerId = assignerId;
+                //}
+                //else
+                //{
+                //    TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                //    return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                //}
                 if (int.TryParse(model.TaskPriorityId, out int priorityId))
                 {
                     if (priorityId == 0)
@@ -319,7 +346,7 @@ namespace TaskMenager.Client.Controllers
             }
             catch (Exception)
             {
-                TempData["Error"] = "Основна грешка. Неуспешен запис на промените.";
+                TempData["Error"] = "[Service]Основна грешка. Неуспешен запис на промените.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -400,20 +427,29 @@ namespace TaskMenager.Client.Controllers
                 {
                     newTask.SectorId = (sectorId != 0) ? sectorId : (int?)null;
                 }
-                if (int.TryParse(model.AssignerId, out int assignerId))
+                if (model.AssignerIdInt > 0)
                 {
-                    if (assignerId == 0)
-                    {
-                        TempData["Error"] = "Задачата трябва да има назначен отговорник";
-                        return View(model);
-                    }
-                    newTask.AssignerId = assignerId;
+                    newTask.AssignerId = model.AssignerIdInt;
                 }
                 else
                 {
                     TempData["Error"] = "Задачата трябва да има назначен отговорник";
                     return View(model);
                 }
+                //if (int.TryParse(model.AssignerId, out int assignerId))
+                //{
+                //    if (assignerId == 0)
+                //    {
+                //        TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                //        return View(model);
+                //    }
+                //    newTask.AssignerId = assignerId;
+                //}
+                //else
+                //{
+                //    TempData["Error"] = "Задачата трябва да има назначен отговорник";
+                //    return View(model);
+                //}
                 if (int.TryParse(model.TaskPriorityId, out int priorityId))
                 {
                     if (priorityId == 0)
@@ -513,19 +549,32 @@ namespace TaskMenager.Client.Controllers
                                                    })
                                                    .ToList();
                 newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
-                newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
-                                                   .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString()
-                                                   })
-                                                   .ToList();
-                newTask.Assigners.Insert(0, new SelectListItem
+
+                ////////
+                var data = this.employees.GetEmployeesNamesBySector(currentUser.SectorId);
+                var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
-                    Text = ChooseValue,
-                    Value = "0",
-                    Selected = true
-                });
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Group = sectors.Where(d => d.Name == item.SectorName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                newTask.AssignersList = dropdownList;
+                ///////
+
+                //newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                //                                   .Select(a => new SelectListItem
+                //                                   {
+                //                                       Text = a.TextValue,
+                //                                       Value = a.Id.ToString()
+                //                                   })
+                //                                   .ToList();
+                //newTask.Assigners.Insert(0, new SelectListItem
+                //{
+                //    Text = ChooseValue,
+                //    Value = "0",
+                //    Selected = true
+                //});
                 newTask.Employees = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
                                                    .Select(a => new SelectListItem
                                                    {
@@ -568,19 +617,34 @@ namespace TaskMenager.Client.Controllers
                     Value = "0",
                     Selected = true
                 });
-                newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
-                                                   .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString()
-                                                   })
-                                                   .ToList();
-                newTask.Assigners.Insert(0, new SelectListItem
+
+                ////////
+                var data = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId);
+                var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
-                    Text = ChooseValue,
-                    Value = "0",
-                    Selected = true
-                });
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Group = sectors.Where(d => d.Name == item.SectorName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+
+                newTask.AssignersList = dropdownList;
+
+                ///////
+
+                //newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                //                                   .Select(a => new SelectListItem
+                //                                   {
+                //                                       Text = a.TextValue,
+                //                                       Value = a.Id.ToString()
+                //                                   })
+                //                                   .ToList();
+                //newTask.Assigners.Insert(0, new SelectListItem
+                //{
+                //    Text = ChooseValue,
+                //    Value = "0",
+                //    Selected = true
+                //});
                 newTask.Employees = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
                                                    .Select(a => new SelectListItem
                                                    {
@@ -619,19 +683,34 @@ namespace TaskMenager.Client.Controllers
                     Value = "0",
                     Selected = true
                 });
-                newTask.Assigners = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
-                                   .Select(a => new SelectListItem
-                                   {
-                                       Text = a.TextValue,
-                                       Value = a.Id.ToString()
-                                   })
-                                   .ToList();
-                newTask.Assigners.Insert(0, new SelectListItem
+
+                ////////
+                var data = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId);
+                var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
-                    Text = ChooseValue,
-                    Value = "0",
-                    Selected = true
-                });
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+
+                newTask.AssignersList = dropdownList;
+
+                ///////
+
+                //newTask.Assigners = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
+                //                   .Select(a => new SelectListItem
+                //                   {
+                //                       Text = a.TextValue,
+                //                       Value = a.Id.ToString()
+                //                   })
+                //                   .ToList();
+                //newTask.Assigners.Insert(0, new SelectListItem
+                //{
+                //    Text = ChooseValue,
+                //    Value = "0",
+                //    Selected = true
+                //});
                 newTask.Employees = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
                                                    .Select(a => new SelectListItem
                                                    {
@@ -667,19 +746,37 @@ namespace TaskMenager.Client.Controllers
                     Value = "0",
                     Selected = true
                 });
-                newTask.Assigners = this.employees.GetActiveEmployeesNames()
-                                   .Select(a => new SelectListItem
-                                   {
-                                       Text = a.TextValue,
-                                       Value = a.Id.ToString()
-                                   })
-                                   .ToList();
-                newTask.Assigners.Insert(0, new SelectListItem
+
+                ///////
+                var data = this.employees.GetActiveEmployeesNames();
+                //data.Append<SelectServiceModel>(new SelectServiceModel { Id = 0, TextValue = "Моля изберете..." });
+                // Note - the -1 is needed at the end of this - pre-selected value is determined further down
+                // Note .OrderBy() determines the order in which the groups are displayed in the dropdown
+                var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
-                    Text = ChooseValue,
-                    Value = "0",
-                    Selected = true
-                });
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+
+                //newTask.AssignerIdInt = data.FirstOrDefault().Id;
+                newTask.AssignersList = dropdownList;
+                //////
+
+                //newTask.Assigners = this.employees.GetActiveEmployeesNames()
+                //                   .Select(a => new SelectListItem
+                //                   {
+                //                       Text = a.TextValue,
+                //                       Value = a.Id.ToString()
+                //                   })
+                //                   .ToList();
+                //newTask.Assigners.Insert(0, new SelectListItem
+                //{
+                //    Text = ChooseValue,
+                //    Value = "0",
+                //    Selected = true
+                //});
                 newTask.Employees = this.employees.GetActiveEmployeesNames()
                                                    .Select(a => new SelectListItem
                                                    {
@@ -762,17 +859,30 @@ namespace TaskMenager.Client.Controllers
                                                    })
                                                    .ToList();
                     newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
-                    newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
-                                                       .Select(a => new SelectListItem
-                                                       {
-                                                           Text = a.TextValue,
-                                                           Value = a.Id.ToString(),
-                                                           Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
-                                                       })
-                                                       .ToList();
 
-                    newTask.Employees = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
-                                                       .Select(a => new SelectListItem
+                    ////////
+                    var data = this.employees.GetEmployeesNamesBySector(currentUser.SectorId);
+                    var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                    var dropdownList = new SelectList(data.Select(item => new SelectListItem
+                    {
+                        Text = item.TextValue,
+                        Value = item.Id.ToString(),
+                        Selected = (oldTask.AssignerIdInt == item.Id) ? true : false,
+                        Group = sectors.Where(d => d.Name == item.SectorName).FirstOrDefault()
+                    }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                    newTask.AssignersList = dropdownList;
+                    ///////
+
+                    //newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                    //                                   .Select(a => new SelectListItem
+                    //                                   {
+                    //                                       Text = a.TextValue,
+                    //                                       Value = a.Id.ToString(),
+                    //                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                    //                                   })
+                    //                                   .ToList();
+
+                    newTask.Employees = data.Select(a => new SelectListItem
                                                        {
                                                            Text = a.TextValue,
                                                            Value = a.Id.ToString(),
@@ -782,17 +892,29 @@ namespace TaskMenager.Client.Controllers
                 }
                 else
                 {
-                    newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
-                                                       .Select(a => new SelectListItem
-                                                       {
-                                                           Text = a.TextValue,
-                                                           Value = a.Id.ToString(),
-                                                           Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
-                                                       })
-                                                       .ToList();
+                    ////////
+                    var data = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId);
+                    var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                    var dropdownList = new SelectList(data.Select(item => new SelectListItem
+                    {
+                        Text = item.TextValue,
+                        Value = item.Id.ToString(),
+                        Selected = (oldTask.AssignerIdInt == item.Id) ? true : false,
+                        Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                    }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                    newTask.AssignersList = dropdownList;
+                    ///////
 
-                    newTask.Employees = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
-                                                       .Select(a => new SelectListItem
+                    //newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                    //                                   .Select(a => new SelectListItem
+                    //                                   {
+                    //                                       Text = a.TextValue,
+                    //                                       Value = a.Id.ToString(),
+                    //                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                    //                                   })
+                    //                                   .ToList();
+
+                    newTask.Employees = data.Select(a => new SelectListItem
                                                        {
                                                            Text = a.TextValue,
                                                            Value = a.Id.ToString(),
@@ -831,14 +953,27 @@ namespace TaskMenager.Client.Controllers
                                                    })
                                                    .ToList();
                 newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
-                newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
-                                                   .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
-                                                   })
-                                                   .ToList();
+                ////////
+                var data = this.employees.GetEmployeesNamesBySector(currentUser.SectorId);
+                var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
+                {
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Selected = (oldTask.AssignerIdInt == item.Id) ? true : false,
+                    Group = sectors.Where(d => d.Name == item.SectorName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                newTask.AssignersList = dropdownList;
+                ///////
+
+                //newTask.Assigners = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                //                                   .Select(a => new SelectListItem
+                //                                   {
+                //                                       Text = a.TextValue,
+                //                                       Value = a.Id.ToString(),
+                //                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                //                                   })
+                //                                   .ToList();
 
                 newTask.Employees = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
                                                    .Select(a => new SelectListItem
@@ -892,17 +1027,29 @@ namespace TaskMenager.Client.Controllers
                 {
                     newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
                 }
-                newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
-                                                   .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
-                                                   })
-                                                   .ToList();
+                ////////
+                var data = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId);
+                var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
+                {
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Selected = (oldTask.AssignerIdInt == item.Id) ? true : false,
+                    Group = sectors.Where(d => d.Name == item.SectorName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                newTask.AssignersList = dropdownList;
+                ///////
 
-                newTask.Employees = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
-                                                   .Select(a => new SelectListItem
+                //newTask.Assigners = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                //                                   .Select(a => new SelectListItem
+                //                                   {
+                //                                       Text = a.TextValue,
+                //                                       Value = a.Id.ToString(),
+                //                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                //                                   })
+                //                                   .ToList();
+
+                newTask.Employees = data.Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
                                                        Value = a.Id.ToString(),
@@ -974,17 +1121,29 @@ namespace TaskMenager.Client.Controllers
                     }
 
                 }
-                newTask.Assigners = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
-                                   .Select(a => new SelectListItem
-                                   {
-                                       Text = a.TextValue,
-                                       Value = a.Id.ToString(),
-                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
-                                   })
-                                   .ToList();
+                ////////
+                var data = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId);
+                var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
+                {
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Selected = (oldTask.AssignerIdInt == item.Id) ? true : false,
+                    Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                newTask.AssignersList = dropdownList;
+                ///////
 
-                newTask.Employees = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
-                                                   .Select(a => new SelectListItem
+                //newTask.Assigners = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
+                //                   .Select(a => new SelectListItem
+                //                   {
+                //                       Text = a.TextValue,
+                //                       Value = a.Id.ToString(),
+                //                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                //                   })
+                //                   .ToList();
+
+                newTask.Employees = data.Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
                                                        Value = a.Id.ToString(),
@@ -1078,17 +1237,29 @@ namespace TaskMenager.Client.Controllers
                     }
 
                 }
-                newTask.Assigners = this.employees.GetActiveEmployeesNames()
-                                   .Select(a => new SelectListItem
-                                   {
-                                       Text = a.TextValue,
-                                       Value = a.Id.ToString(),
-                                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
-                                   })
-                                   .ToList();
+                ////////
+                var data = this.employees.GetActiveEmployeesNames();
+                var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
+                {
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Selected = (oldTask.AssignerIdInt == item.Id) ? true : false,
+                    Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                newTask.AssignersList = dropdownList;
+                ///////
 
-                newTask.Employees = this.employees.GetActiveEmployeesNames()
-                                                   .Select(a => new SelectListItem
+                //newTask.Assigners = this.employees.GetActiveEmployeesNames()
+                //                   .Select(a => new SelectListItem
+                //                   {
+                //                       Text = a.TextValue,
+                //                       Value = a.Id.ToString(),
+                //                       Selected = (oldTask.AssignerId == a.Id.ToString()) ? true : false
+                //                   })
+                //                   .ToList();
+
+                newTask.Employees = data.Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
                                                        Value = a.Id.ToString(),
@@ -1096,7 +1267,7 @@ namespace TaskMenager.Client.Controllers
                                                    })
                                                    .ToList();
             }
-            newTask.AssignerId = oldTask.AssignerId;
+            newTask.AssignerIdInt = oldTask.AssignerIdInt;
             newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId)
                    .Select(a => new SelectListItem
                    {
@@ -1111,16 +1282,6 @@ namespace TaskMenager.Client.Controllers
                 Value = "0",
                 Selected = oldTask.ParentTaskId > 0 ? false : true
             });
-            newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
-                   .Select(a => new SelectListItem
-                   {
-                       Text = a.TextValue,
-                       Value = a.Id.ToString(),
-                       Selected = a.Id.ToString() == oldTask.TaskTypesId ? true : false
-                   })
-                   .ToList();
-            newTask.TaskTypesId = oldTask.TaskTypesId;
-
             newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
                    .Select(a => new SelectListItem
                    {

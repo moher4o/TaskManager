@@ -2,7 +2,7 @@
     attachEvents();
 
     function attachEvents() {
-        $('#assignerId').on('click', function () { $("#assignerId").css('background-color', '#ffffff'); });
+        $('#assignerId').on('change', function () { $("#select2-assignerId-container").css('background-color', '#ffffff'); });
         $('#taskTypesId').on('change', CheckSelectedParent);
         $('#parentsId').on('change', CheckSelectedTaskType);
         $('#hourslimit').on('change', function () { $("#hourslimit").css('background-color', '#ffffff'); });
@@ -40,8 +40,9 @@
     function CheckFieldsChoose() {
         let result = true;
         let errormessage = "";
-        if ($('#assignerId :selected').text() === 'Моля изберете...') {
-            $("#assignerId").css('background-color', 'rgb(250, 204, 204)');
+        
+        if ($('#select2-assignerId-container').text() === 'Моля изберете...') {
+            $("#select2-assignerId-container").css('background-color', 'rgb(250, 204, 204)');
             $(':focus').blur()
             result = false;
         }
@@ -57,13 +58,15 @@
             $("#taskName").css('background-color', 'rgb(250, 204, 204)');
             result = false;
         }
-
+        
         if (result) {
             if ($('#parentsId :selected').text() === 'Моля изберете...') {
+               
                 ParentCheck();
                 $(':focus').blur();
             }
             else {
+                
                 $("#realsend").click();
             }
             

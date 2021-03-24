@@ -61,6 +61,11 @@ namespace TaskManager.Services.Implementations
                 }
                 taskToDelete.isDeleted = true;
                 taskToDelete.DeletedByUserId = expert.Id;
+                if (taskToDelete.TaskStatus.StatusName != TaskStatusClosed)
+                {
+                    taskToDelete.StatusId = this.db.TasksStatuses.Where(ts => ts.StatusName == TaskStatusClosed).Select(ts => ts.Id).FirstOrDefault();
+                    taskToDelete.EndNote = $"Задачата е приключена служебно при изтриването й на {DateTime.Now.Date} от {expert.FullName}";
+                }
                 if (!taskToDelete.EndDate.HasValue)
                 {
                     taskToDelete.EndDate = DateTime.Now;

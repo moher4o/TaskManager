@@ -6,7 +6,7 @@
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    @Html.HiddenFor(model => model.Id)    
+    @Html.HiddenFor(model => model.Id)
     <div class="PrimeBox2" style="margin-top:20px; max-width:80%; background-color:ghostwhite;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">Данни за акаунт:  @Model.DaeuAccaunt</h5>
@@ -14,7 +14,7 @@
                 X
             </button>
         </div>
-        @if (permisionType != Employee && (Model.Id.ToString() != this.User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault()))
+        @if (permisionType != Employee && Model.RoleId.Value >= this.User.Claims.Where(u => u.Type == "roleId").Select(u => int.Parse(u.Value)).FirstOrDefault())
         {
             <div class="row" @( Model.Id.Value.ToString() == this.User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault() ? "hidden" : "")>
                 <div class="col-md-6 vkl-izk">
@@ -79,17 +79,19 @@
                         </div>
                     </div>
                 </div>
+
             </div>
             @*<div class="row">
                     <div class="col-md-6 offset-md-6">
                     </div>
                 </div>*@
-
+            <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
 
         }
-        <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
+
         @Html.HiddenFor(model => model.Id)
         @Html.HiddenFor(model => model.DaeuAccaunt)
+        @Html.HiddenFor(model => model.RoleId)
         @if (permisionType != SuperAdmin)
         {
             @Html.HiddenFor(model => model.DirectorateId);
@@ -223,11 +225,14 @@
         }).then((willWrite) => {
             if (willWrite) {
                 $.getJSON('\DeactivateUser?userId=' + userId, { get_param: 'value' }, function (data) {
-                    if (data) {
+                    console.log(data);
+                    if (data == "success") {
                         toastr.success('Акаунта е деактивиран');
                     }
                     else {
-                        toastr.error('Грешка при деактивиране на акаунта');
+                        toastr.error(data);
+                        $("#notactive").removeProp('checked');
+                        $('#active').prop('checked', 'checked');
                     }
                 });
             }

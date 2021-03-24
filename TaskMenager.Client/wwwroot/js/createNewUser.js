@@ -33,15 +33,17 @@
             result = false;
         }
 
-        let acc = $("#daeuaccauntId").text();
-        if (acc == null || acc == "") {
-            acc = $('#daeuaccauntId').val();
+        if ($("#daeuaccauntId").length) {
+            console.log('inside')
+            let acc = $("#daeuaccauntId").text();
+            if (acc == null || acc == "") {
+                acc = $('#daeuaccauntId').val();
+            }
+            if (acc == null || acc == "") {
+                $("#daeuaccauntId").css('background-color', 'rgb(250, 204, 204)');
+                result = false;
+            }
         }
-         if (acc == null || acc == "") {
-            $("#daeuaccauntId").css('background-color', 'rgb(250, 204, 204)');
-            result = false;
-        }
-
 
         let un = document.getElementById("userNameId").value;
         if (un == null || un == "") {
@@ -69,7 +71,7 @@
             else {
                 $("#realsend").click();
             }
-          }
+        }
         else {
             toastr.error('Моля попълнете всички задължителни полета', { timeOut: 10000 });
         }

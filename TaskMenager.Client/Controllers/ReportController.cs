@@ -67,6 +67,11 @@ namespace TaskMenager.Client.Controllers
         {
             try
             {
+                if (model.StartDate > model.EndDate)
+                {
+                    TempData["Error"] = "Невалидни дати";
+                    return RedirectToAction(nameof(PeriodReport));
+                }
 
                 var newReport = new PeriodReportViewModel();
                 var employeesIds = new List<int>();
@@ -76,19 +81,19 @@ namespace TaskMenager.Client.Controllers
                 }
                 else if (currentUser.RoleName == SectorAdmin)
                 {
-                    employeesIds = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                    employeesIds = this.employees.GetEmployeesNamesBySectorWithDeletedAsync(currentUser.SectorId).Result
                                                         .Select(e => e.Id)
                                                         .ToList();
                 }
                 else if (currentUser.RoleName == DepartmentAdmin)
                 {
-                    employeesIds = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                    employeesIds =  this.employees.GetEmployeesNamesByDepartmentWithDeletedAsync(currentUser.DepartmentId).Result
                                                         .Select(e => e.Id)
                                                         .ToList();
                 }
                 else if (currentUser.RoleName == DirectorateAdmin)
                 {
-                    employeesIds = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
+                    employeesIds = this.employees.GetEmployeesNamesByDirectorateWithDeletedAsync(currentUser.DirectorateId).Result
                                                         .Select(e => e.Id)
                                                         .ToList();
                 }
@@ -99,16 +104,11 @@ namespace TaskMenager.Client.Controllers
                         TempData["Error"] = "Не е избрана дирекция";
                         return RedirectToAction(nameof(PeriodReport));
                     }
-                    employeesIds = this.employees.GetEmployeesNamesByDirectorate(int.Parse(model.DirectoratesId))
+                    employeesIds = this.employees.GetEmployeesNamesByDirectorateWithDeletedAsync(int.Parse(model.DirectoratesId)).Result
                                         .Select(e => e.Id)
                                         .ToList();
                 }
                 newReport.EmployeesIds = employeesIds.ToArray();
-                if (model.StartDate > model.EndDate)
-                {
-                    TempData["Error"] = "Невалидни дати";
-                    return RedirectToAction(nameof(PeriodReport));
-                }
                 newReport.StartDate = model.StartDate.Date;
                 newReport.EndDate = model.EndDate.Date;
 
@@ -127,8 +127,6 @@ namespace TaskMenager.Client.Controllers
         {
             try
             {
-
-
                 if (model.EmployeesIds.Count() < 1)
                 {
                     TempData["Error"] = "Няма включени експерти!";

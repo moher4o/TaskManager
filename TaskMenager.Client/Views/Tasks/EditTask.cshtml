@@ -17,7 +17,7 @@
 
         <div class="form-group row">
             @Html.LabelFor(model => model.TaskParetns, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-5">
+            <div class="col-md-10">
                 @Html.DropDownListFor(m => m.ParentTaskId, new SelectList(Model.TaskParetns, "Value", "Text"), new { @class = "form-control", id = "parentsId", name = "parentsId" })
             </div>
         </div>
@@ -53,10 +53,15 @@
         </div>
         <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
         <div class="form-group row">
-            @Html.LabelFor(model => model.Assigners, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.AssignersList, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
-                @Html.DropDownListFor(m => m.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
+                @Html.DropDownListFor(a => a.AssignerIdInt, Model.AssignersList, "Моля изберете...", new { @class = "form-control", id = "assignerId", name = "assignerId" })
             </div>
+
+            @*@Html.LabelFor(model => model.Assigners, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-5">
+            @Html.DropDownListFor(m => m.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
+        </div>*@
             @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">
                 @Html.TextBoxFor(model => model.HoursLimit, new { @class = "form-control", id = "hourslimit", name = "hourslimit" })
@@ -206,6 +211,8 @@
     <script>
         $(document).ready(function () {
             $('#Subjects_dropdown').multiselect();
+            $('#assignerId').select2();
+            $('#parentsId').select2();
         });
     </script>
     @await Html.PartialAsync("_ValidationScriptsPartial")
