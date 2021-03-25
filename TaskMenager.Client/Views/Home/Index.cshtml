@@ -54,7 +54,7 @@
                 <div class="col-md-3" style="color: #5f9fec;">
                     <div class="row">
                         <div style="padding-left:20px; min-width:100px;">
-                            <a asp-controller="Home" asp-action="NotImplemented">
+                            <a asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                                 <img class="chatnotifications" src="~/png/note.png" />
                                 <span class="notificationsTodayCountValue">0</span>
                             </a>
