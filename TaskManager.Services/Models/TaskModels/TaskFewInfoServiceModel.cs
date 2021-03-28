@@ -26,11 +26,15 @@ namespace TaskManager.Services.Models.TaskModels
 
         public int HoursLimit { get; set; }
 
+        public int NotesCount { get; set; }
+
         public int EmployeeHours { get; set; }
 
         public int EmployeeHoursToday { get; set; }
 
         IEnumerable<SelectServiceModel> Colleagues { get; set; } = new List<SelectServiceModel>();
+
+        
 
         public void ConfigureMapping(Profile profile)
         {
@@ -45,6 +49,9 @@ namespace TaskManager.Services.Models.TaskModels
                                                                    Id = e.Employee.Id
                                                                 })
                                                            .ToList()))
+                   .ForMember(u => u.NotesCount, cfg => cfg.MapFrom(s => s.Notes
+                                                                                .Where(n => n.isDeleted == false)
+                                                                                .Count()))
                    .ForMember(u => u.EmployeeHoursToday, cfg => cfg.MapFrom(s => s.WorkedHours
                                                                                 .Where(d => d.WorkDate.Date == DateTime.Now.Date && d.EmployeeId == currentEmployeeId)
                                                                                 .Sum(hr => hr.HoursSpend)))
