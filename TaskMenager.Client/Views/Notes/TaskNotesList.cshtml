@@ -28,7 +28,8 @@
     </div>
     <form method="post" asp-controller="Notes" asp-action="CreateNewNote" asp-route-taskId="@Model.Id">
     </form>*@
-<div id="contentcomm">
+
+<div id="contentcomm" style="padding-top:5px;">
     <div class="form-group row" style="display: flex; justify-content: center;  align-items: center;">
         <h5 style="margin-left:15px;">@Model.TaskName</h5>
     </div>
@@ -37,10 +38,10 @@
         @foreach (var comment in Model.Notes)
         {
 
-            <li>
+            <li  style="background-color:whitesmoke;">
                 <article id="comment_ @{comment.Id.ToString();}" class="hentry">
 
-                    <footer class="post-info">
+                    <footer class="post-info" >
                         <abbr class="published">
                             @comment.NoteDate.ToString("dd.MM.yyyy hh:MM")
                             <span style="float:right; margin-right:15px;">
@@ -62,4 +63,21 @@
         }
 
     </ol>
+
+</div>
+
+<div style="padding-left:3%;">
+    <div id="respond">
+        <h3>Напиши коментар</h3>
+        <form action="post_comment.php" method="post" id="commentform">
+
+            <label for="comment" class="required">Вашето съобщение</label>
+            <textarea name="comment" id="comment" rows="5" tabindex="4" required="required"></textarea>
+
+            @*<input name="submit" type="submit" value="Изпрати" />*@
+            <button type="button" class="button save" id="send">Изпрати</button>
+            <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
+        </form>
+
+    </div>
 </div>

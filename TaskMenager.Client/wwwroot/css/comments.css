@@ -1,5 +1,4 @@
 
-
 /*Extras
 *****************/
 #extras {
@@ -106,7 +105,7 @@ li:last-child .hentry, #content > .hentry {
 
         #posts-list .hentry:hover {
             /*background: #C64350;*/
-            background: #3388ed;
+            background: #498cef;
             color: #fff;
         }
 
@@ -239,6 +238,7 @@ li:last-child .hentry, #content > .hentry {
 
 #respond {
     margin-top: 40px;
+    
 }
 
     #respond input[type='text'],
