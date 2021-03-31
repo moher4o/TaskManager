@@ -34,7 +34,6 @@
         }
 
         if ($("#daeuaccauntId").length) {
-            console.log('inside')
             let acc = $("#daeuaccauntId").text();
             if (acc == null || acc == "") {
                 acc = $('#daeuaccauntId').val();

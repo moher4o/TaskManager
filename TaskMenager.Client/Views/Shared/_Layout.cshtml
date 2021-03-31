@@ -107,7 +107,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                            {*@
+                {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -116,8 +116,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                            <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                        </li>*@
+                    <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -134,13 +134,13 @@
                             <a asp-controller="Report" asp-action="PeriodReport">Организационен</a>
                         </li>
                         @*<li>
-                            <a asp-controller="Home" asp-action="NotImplemented">Експертен</a>
-                            
-                        </li>
-                        <li>
-                            <a asp-controller="Home" asp-action="NotImplemented">Лична справка</a>
-                            
-                        </li>*@
+                    <a asp-controller="Home" asp-action="NotImplemented">Експертен</a>
+
+                </li>
+                <li>
+                    <a asp-controller="Home" asp-action="NotImplemented">Лична справка</a>
+
+                </li>*@
                     </ul>
                 </li>
                 <li>
@@ -154,25 +154,43 @@
                             <a asp-controller="Users" asp-action="UsersList">Списък</a>
                         </li>
                         @*<li>
-                            <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
-                            
-                        </li>*@
+                    <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
+
+                </li>*@
+
+                    </ul>
+                </li>
+                <li @(User.Claims.Any(u => u.Value == DataConstants.SuperAdmin) ? "" : "hidden")>
+                    <a href="#optionsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-file-excel"></i>
+                        Номенклатури
+                    </a>
+                    <ul class="collapse list-unstyled" id="optionsSubmenu">
+                        <li>
+                            <a asp-controller="Structure" asp-action="DirectoratesList">Дирекции</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Structure" asp-action="DepartmentsList">Отдели</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Structure" asp-action="SectorsList">Сектори</a>
+                        </li>
 
                     </ul>
                 </li>
 
                 @*<li>
-                    <a asp-controller="Home" asp-action="NotImplemented">
-                        <i class="fas fa-question"></i>
-                        Информация
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Home" asp-action="NotImplemented">
-                        <i class="fas fa-paper-plane"></i>
-                        Контакти
-                    </a>
-                </li>*@
+            <a asp-controller="Home" asp-action="NotImplemented">
+                <i class="fas fa-question"></i>
+                Информация
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Home" asp-action="NotImplemented">
+                <i class="fas fa-paper-plane"></i>
+                Контакти
+            </a>
+        </li>*@
             </ul>
         </nav>
 

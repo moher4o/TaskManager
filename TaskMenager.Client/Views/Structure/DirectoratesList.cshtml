@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Дирекции";
+}
+<br />
+<div class="row p-0 m-0">
+    <div class="col-md-4">
+        <h2 class="text-info">Списък дирекции</h2>
+    </div>
+        <div class="col-md-3" style="padding-top:6px;">
+            <input style="margin-left:15px;" type="checkbox" name="showDeleted" id="showDeleted">
+            <label for="showDeleted"> Изтрити дирекции</label>
+        </div>
+        <div class="col-md-3"></div>
+        <div class="col-md-2">
+            <a asp-action="CreateNewDirectorate" asp-controller="Structure" class="btn btn-info form-control text-white">
+                Нова дирекция
+            </a>
+        </div>
+   
+    <div class="col-12 border p-3">
+        <table id="DT_load" class="table table-striped table-bordered compact" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Име на дирекция</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/directoratesList.js"></script>
+}

@@ -51,6 +51,28 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+        #region API Calls
+        [Authorize(Policy = DataConstants.Employee)]
+        [HttpGet]
+        public async Task<IActionResult> AddNote(string text, int taskId)
+        {
+            var taskFromDb = await this.tasks.CheckTaskByIdAsync(taskId);
+            if (!taskFromDb)
+            {
+                return Json(new { success = false, message = $"Няма задача с N:{taskId}" });
+            }
+            bool result = await this.taskNotes.AddNoteAsync(text, taskId, currentUser.Id);
+            if (result)
+            {
+                return Json(new { success = result, message = "Коментара е добавен успешно" });
+            }
+            {
+                return Json(new { success = false, message = "[Service] Коментара не е добавен" });
+            }
+            
+        }
+
+        #endregion
 
     }
 }

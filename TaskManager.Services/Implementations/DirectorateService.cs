@@ -23,6 +23,23 @@ namespace TaskManager.Services.Implementations
 
         private IConfiguration Configuration { get; }
 
+        public async Task<bool> CheckDirectorateByIdAsync(int dirId)
+        {
+            var employeesInDirectorate = this.db.Directorates.Where(d => d.Id == dirId).Select(d => Sum(d.Employees))
+        }
+        public async Task<List<AddNewDirectorateServiceModel>> GetDirectoratesAsync(bool deleted = false)
+        {
+            var result = await this.db.Directorates.Where(d => d.isDeleted == deleted)
+                .OrderByDescending(d => d.Employees.Count)
+                .Select(d => new AddNewDirectorateServiceModel
+                {
+                    Name = d.DirectorateName,
+                    Id = d.Id,
+                    isDeleted = d.isDeleted
+                }).ToListAsync();
+            return result;
+        }
+
         public async Task<string> AddDirectoratesCollection(List<AddNewDirectorateServiceModel> directorates)
         {
             var connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;

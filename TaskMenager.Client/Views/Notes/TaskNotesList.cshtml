@@ -3,6 +3,78 @@
 @{
     ViewData["Title"] = "Коментари";
 }
+<div >
+
+
+    <div id="contentcomm" style="padding-top:5px;">
+        <p id="taskIdNote" hidden>@Model.Id</p>
+        <div class="form-group row" style="display: flex; justify-content: center;  align-items: center;">
+            <h5 style="margin-left:15px;">@Model.TaskName</h5>
+        </div>
+        <ol id="posts-list" class="@(Model.Notes.Count > 0 ? "has-comments" : "")" style=" min-height: 435px; max-height: 436px; overflow:auto;">
+            <li class="no-comments">Добавете първия коментар.</li>
+            @foreach (var comment in Model.Notes)
+            {
+
+                <li style="background-color:whitesmoke;">
+                    <article id="comment_ @{comment.Id.ToString();}" class="hentry">
+
+                        <footer class="post-info">
+                            <abbr class="published">
+                                @comment.NoteDate.ToString("dd.MM.yyyy hh:MM")
+                            </abbr>
+
+                            <address class="vcard author">
+                                @*<a class="url fn" href="../Users/UserDetails">@comment.EmployeeName</a>*@
+                                От <a class="url fn" href="#" style="cursor:pointer;" onclick="InfoUser(@comment.EmployeeId)">@comment.EmployeeName</a>
+                            </address>
+                        </footer>
+                        <div class="entry-content" style="padding-left:15px; border-left: 1px solid #eee;">
+                            <p>@comment.Text</p>
+                        </div>
+                    </article>
+                </li>
+
+            }
+
+        </ol>
+
+    </div>
+</div>
+<div style="padding-left:3%;">
+    <div id="respond">
+        <h4>Напиши коментар</h4>
+        <form action="post_comment.php" method="post" id="commentform">
+
+            @*<label for="comment" class="required">Вашето съобщение</label>*@
+            <textarea name="comment" id="comment" rows="4" tabindex="4" required="required"></textarea>
+
+            @*<input name="submit" type="submit" value="Изпрати" />*@
+            <button type="button" class="button save" id="send">Изпрати</button>
+        </form>
+
+    </div>
+</div>
+<script type="text/javascript">
+    function InfoUser(userId) {
+        event.preventDefault();
+        var content = document.createElement('div');
+        $.getJSON('..\\Users\\GetUserInfo\?userId=' + userId, { get_param: 'value' }, function (data) {
+
+            content.innerHTML = '<div style = \'text-align:left;\'><div class="row"><div class="col-md-3">N:</div><div class="col-md-4"><label><strong>' + data.data.id + '</strong></label></div></div><div class="row"><div class="col-md-3">Име:</div><div class="col-md-9"><label><strong>' + data.data.fullName + '</strong></label></div></div><div class="row"><div class="col-md-3">Длъжност:</div><div class="col-md-9"><label><strong>' + data.data.jobTitleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Email:</div><div class="col-md-9"><label><strong>' + (data.data.email ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Роля:</div><div class="col-md-9"><label><strong>' + data.data.roleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Телефон:</div><div class="col-md-9"><label><strong>' + (data.data.telephoneNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Мобилен:</div><div class="col-md-9"><label><strong>' + (data.data.mobileNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Дирекция:</div><div class="col-md-9"><label><strong>' + (data.data.directorateName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Отдел:</div><div class="col-md-9"><label><strong>' + (data.data.departmentName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Сектор:</div><div class="col-md-9"><label><strong>' + (data.data.sectorName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Статус:</div><div class="col-md-9"><label><strong>' + (data.data.status == "Деактивиран акаунт" ? '<span style=\'color:red;\'>Деактивиран акаунт</span>' : (data.data.status == "Активен акаунт" ? '<span style=\'color:green;\'>Активен акаунт</span>' : '<span style=\'color:lightgreen;\'>Чакащ одобрение</span>')) + '</strong></label></div></div></div>';
+
+        });
+        swal({
+            content: content,
+            icon: "info",
+            buttons: [false, "Ok"]
+        })
+    }
+</script>
+@section Scripts{
+    <script src="~/js/notes.js" charset="utf-8"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
 
 @*<div class="PrimeBox2" style="margin-top:20px; background-color:ghostwhite;">
         <div class="form-group row" style="display: flex; justify-content: center;  align-items: center;">
@@ -28,56 +100,3 @@
     </div>
     <form method="post" asp-controller="Notes" asp-action="CreateNewNote" asp-route-taskId="@Model.Id">
     </form>*@
-
-<div id="contentcomm" style="padding-top:5px;">
-    <div class="form-group row" style="display: flex; justify-content: center;  align-items: center;">
-        <h5 style="margin-left:15px;">@Model.TaskName</h5>
-    </div>
-    <ol id="posts-list" class="@(Model.Notes.Count > 0 ? "has-comments" : "")">
-        <li class="no-comments">Добавете първия коментар.</li>
-        @foreach (var comment in Model.Notes)
-        {
-
-            <li  style="background-color:whitesmoke;">
-                <article id="comment_ @{comment.Id.ToString();}" class="hentry">
-
-                    <footer class="post-info" >
-                        <abbr class="published">
-                            @comment.NoteDate.ToString("dd.MM.yyyy hh:MM")
-                            <span style="float:right; margin-right:15px;">
-                                #@comment.Id
-                            </span>
-
-                        </abbr>
-
-                        <address class="vcard author">
-                            От <a class="url fn" href="../Users/UserDetails">@comment.EmployeeName</a>
-                        </address>
-                    </footer>
-                    <div class="entry-content" style="padding-left:15px; border-left: 1px solid #eee;">
-                        <p>@comment.Text</p>
-                    </div>
-                </article>
-            </li>
-
-        }
-
-    </ol>
-
-</div>
-
-<div style="padding-left:3%;">
-    <div id="respond">
-        <h3>Напиши коментар</h3>
-        <form action="post_comment.php" method="post" id="commentform">
-
-            <label for="comment" class="required">Вашето съобщение</label>
-            <textarea name="comment" id="comment" rows="5" tabindex="4" required="required"></textarea>
-
-            @*<input name="submit" type="submit" value="Изпрати" />*@
-            <button type="button" class="button save" id="send">Изпрати</button>
-            <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
-        </form>
-
-    </div>
-</div>

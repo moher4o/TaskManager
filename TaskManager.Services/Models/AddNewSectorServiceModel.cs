@@ -4,17 +4,9 @@ using System.Text;
 
 namespace TaskManager.Services.Models
 {
-    public class AddNewSectorServiceModel
+    public class AddNewSectorServiceModel : AddNewDepartmentServiceModel
     {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-
-        public int DirectorateId { get; set; }
-
         public int DepartmentId { get; set; }
-
-        public bool isDeleted { get; set; } = false;
 
     }
 }

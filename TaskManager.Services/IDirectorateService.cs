@@ -13,5 +13,7 @@ namespace TaskManager.Services
         //IEnumerable<SelectServiceModel> GetDirectoratesNames();
 
         IEnumerable<SelectServiceModel> GetDirectoratesNames(int? directorateId);
+
+        Task<List<AddNewDirectorateServiceModel>> GetDirectoratesAsync(bool deleted = false);
     }
 }

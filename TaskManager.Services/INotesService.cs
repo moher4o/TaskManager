@@ -9,5 +9,6 @@ namespace TaskManager.Services
     public interface INotesService
     {
         Task<TaskNotesListServiceModel> GetTaskNotesAsync(int taskId);
+        Task<bool> AddNoteAsync(string text, int taskId, int userId);
     }
 }
