@@ -14,6 +14,10 @@ namespace TaskMenager.Client.Models.Tasks
 
         public string TaskName { get; set; }
 
+        public string DirectorateName { get; set; }
+        public string DepartmentName { get; set; }
+        public string SectorName { get; set; }
+
         public string Status { get; set; }
 
         public string TypeName { get; set; }
@@ -28,6 +32,9 @@ namespace TaskMenager.Client.Models.Tasks
                   .ForMember(u => u.Status, cfg => cfg.MapFrom(s => s.TaskStatus.StatusName))
                   .ForMember(u => u.TypeName, cfg => cfg.MapFrom(s => s.TaskType.TypeName))
                   .ForMember(u => u.TaskAssigner, cfg => cfg.MapFrom(s => s.Assigner.FullName))
+                  .ForMember(u => u.DirectorateName, cfg => cfg.MapFrom(s => s.Directorate.DirectorateName))
+                  .ForMember(u => u.DepartmentName, cfg => cfg.MapFrom(s => s.Department.DepartmentName))
+                  .ForMember(u => u.SectorName, cfg => cfg.MapFrom(s => s.Sector.SectorName))
                   .ForMember(u => u.AssignedExpertsCount, cfg => cfg.MapFrom(s => s.AssignedExperts.Count()));
         }
     }

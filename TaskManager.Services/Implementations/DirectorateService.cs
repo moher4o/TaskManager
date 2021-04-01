@@ -23,9 +23,49 @@ namespace TaskManager.Services.Implementations
 
         private IConfiguration Configuration { get; }
 
-        public async Task<bool> CheckDirectorateByIdAsync(int dirId)
+        public async Task<string> MarkDirectorateDeleted(int dirId)
         {
-            var employeesInDirectorate = this.db.Directorates.Where(d => d.Id == dirId).Select(d => Sum(d.Employees))
+            var directorateToDelete = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == dirId);
+            if (directorateToDelete == null)
+            {
+                return $"Няма дирекция с номер: {dirId}";
+            }
+
+            var check = await this.CheckDirectorateByIdAsync(dirId);
+            if (check != "success")
+            {
+                return check;
+            }
+            directorateToDelete.isDeleted = true;
+            await this.db.SaveChangesAsync();
+            return "success";
+        }
+        private async Task<string> CheckDirectorateByIdAsync(int dirId)
+        {
+            int employeesInDirectorate = await this.db.Directorates.Where(d => d.Id == dirId).Select(d => d.Employees.Count).FirstOrDefaultAsync();
+            if (employeesInDirectorate > 0)
+            {
+                return "Има назначени служители в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+            }
+            int tasksInDirectorate = await this.db.Directorates.Where(d => d.Id == dirId).Select(d => d.Tasks.Count).FirstOrDefaultAsync();
+            if (tasksInDirectorate > 0)
+            {
+                return "Има задачи в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+            }
+
+            int departmentInDirectorate = await this.db.Directorates.Where(d => d.Id == dirId).Select(d => d.Departments.Count).FirstOrDefaultAsync();
+            if (departmentInDirectorate > 0)
+            {
+                return "Има отдели в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+            }
+
+            int sectorsInDirectorate = await this.db.Directorates.Where(d => d.Id == dirId).Select(d => d.Sectors.Count).FirstOrDefaultAsync();
+            if (sectorsInDirectorate > 0)
+            {
+                return "Има сектори в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+            }
+
+            return "success";
         }
         public async Task<List<AddNewDirectorateServiceModel>> GetDirectoratesAsync(bool deleted = false)
         {

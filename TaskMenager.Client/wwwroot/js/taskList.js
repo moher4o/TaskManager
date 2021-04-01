@@ -7,9 +7,27 @@ const path = loc.substr(0, loc.lastIndexOf('/') + 1);
 $(document).ready(function () {
     $('#showClosed').on('change', DeletedTasksShowOrHide);
     $('#showDeleted').on('change', DeletedTasksShowOrHide);
+    //$('#DT_load').DataTable({
+    //    "columnDefs": [
+    //        {
+    //            "targets": [3],
+    //            "visible": false
+    //            //"searchable": false
+    //        },
+    //        {
+    //            "targets": [4],
+    //            "visible": false
+    //        },
+    //        {
+    //            "targets": [5],
+    //            "visible": false
+    //        },
+
+    //    ]
+    //});
     loadDataTable(false, false);
     permisionType = $('#uid').val();
- 
+    
 });
 
 function LoadTasksTest() {
@@ -40,7 +58,7 @@ function DeletedTasksShowOrHide() {
 }
 function loadDataTable(getClosed, withDeleted) {
     var url = path + "getall?withClosed=" + getClosed + "&withDeleted=" + withDeleted;
-    dataTable = $('#DT_load').DataTable({
+     dataTable = $('#DT_load').DataTable({
         "ajax": {
             "url": url,
             "type": "GET",
@@ -48,11 +66,17 @@ function loadDataTable(getClosed, withDeleted) {
         },
         "columns": [
             { "data": "id", "width": "5%" },
+            //{ "data": "taskName", "width": "41%" },
             { "data": "taskName", "width": "41%" },
             { "data": "taskAssigner", "width": "18%" },
+            { "data": "directorateName", "width": "13%" },
+            { "data": "departmentName", "width": "12%" },
+            { "data": "sectorName", "width": "10%" },
             { "data": "assignedExpertsCount", "width": "4%" },
-            { "data": "status", "width": "12%" },
-            { "data": "typeName", "width": "14%" },
+            //{ "data": "status", "width": "12%" },
+            { "data": "status", "width": "5%" },
+            //{ "data": "typeName", "width": "14%" },
+            { "data": "typeName", "width": "7%" },
             {
                 "data": "id",
                 "render": function (data) {
@@ -80,12 +104,28 @@ function loadDataTable(getClosed, withDeleted) {
 
                 }, "width": "6%"
             }
-        ],
+         ],
+         "columnDefs": [
+             {
+                 "targets": [3],
+                 "visible": false
+                 //"searchable": false
+             },
+             {
+                 "targets": [4],
+                 "visible": false
+             },
+             {
+                 "targets": [5],
+                 "visible": false
+             },
+
+         ],
         "language": {
             "emptyTable": "Няма такива задачи"
         },
         "width": "100%"
-    });
+     });
 }
 
 function Delete(url) {
