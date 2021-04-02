@@ -27,8 +27,4 @@
     <ProjectReference Include="..\TaskManager.Services\TaskManager.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Structure\" />
-  </ItemGroup>
-
 </Project>

@@ -54,10 +54,10 @@ function loadDataTable(deleted, notActivated) {
                     if (deleted) {
                         return `<div>
                         <a style='cursor:pointer;'
-                            onclick=InfoUser(${row.id})>
+                            onclick=InfoUser(${row.id}) title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                        <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"}>
+                        <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"} title='Редакция'>
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
                         </div>`;
@@ -65,10 +65,10 @@ function loadDataTable(deleted, notActivated) {
                     else if (notActivated) {
                         return `<div>
                         <a style='cursor:pointer;'
-                            onclick=InfoUser(${row.id})>
+                            onclick=InfoUser(${row.id}) title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                        <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;'>
+                        <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' title='Редакция'>
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
                         </div>`;
@@ -76,14 +76,14 @@ function loadDataTable(deleted, notActivated) {
                     else {
                         return `<div>
                         <a style='cursor:pointer;'
-                            onclick=InfoUser(${row.id})>
+                            onclick=InfoUser(${row.id}) title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                         <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"}>
+                         <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"} title='Редакция'>
                            
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
-                        <a href='mailto:${row.email}' target="_top" style='cursor:pointer; padding-left:5px;' ${row.email == null ? "hidden" : ""}>
+                        <a href='mailto:${row.email}' target="_top" style='cursor:pointer; padding-left:5px;' ${row.email == null ? "hidden" : ""} title='Изпращане на email'>
                             <img class="chatnotifications" src="../png/email.png" />
                         </a>
                         </div>`;

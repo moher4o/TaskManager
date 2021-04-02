@@ -161,6 +161,17 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
+        public async Task<string> MarkDirectorateActiveAsync(int dirId)
+        {
+            var directorateToRestore = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == dirId);
+            if (directorateToRestore == null)
+            {
+                return $"Няма дирекция с номер: {dirId}";
+            }
+            directorateToRestore.isDeleted = false;
+            await this.db.SaveChangesAsync();
+            return "success";
 
+        }
     }
 }

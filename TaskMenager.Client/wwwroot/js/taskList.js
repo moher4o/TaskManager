@@ -83,7 +83,7 @@ function loadDataTable(getClosed, withDeleted) {
                     if (withDeleted || permisionType != 'SuperAdmin') {
                         return `<div>
                         
-                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;'>
+                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                         </div>`;
@@ -91,12 +91,12 @@ function loadDataTable(getClosed, withDeleted) {
                     else {
                         return `<div>
                         
-                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;'>
+                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                         
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=Delete('${path}Delete?taskId=${data}')>
+                            onclick=Delete('${path}Delete?taskId=${data}') title='Изтриване'>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
                         </div>`;

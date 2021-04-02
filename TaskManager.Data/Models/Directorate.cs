@@ -24,5 +24,7 @@ namespace TaskManager.Data.Models
 
         public bool isDeleted { get; set; } = false;
 
+
+
     }
 }
