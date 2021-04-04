@@ -162,8 +162,8 @@
                 </li>
                 <li @(User.Claims.Any(u => u.Value == DataConstants.SuperAdmin) ? "" : "hidden")>
                     <a href="#optionsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-file-excel"></i>
-                        Номенклатури
+                        <i class="fas fa-cog"></i>
+                        <span class="chatnotifications">Структура</span>
                     </a>
                     <ul class="collapse list-unstyled" id="optionsSubmenu">
                         <li>

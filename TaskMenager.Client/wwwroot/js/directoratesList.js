@@ -1,13 +1,15 @@
 ﻿var dataTable;
 const loc = window.location.href;
 const path = loc.substr(0, loc.lastIndexOf('/') + 1);
+let placeholderElement = $('#modal-placeholder');
+let newdirplaseholder = $('#newdir-placeholder');
 
 
 $(document).ready(function () {
     $('#showDeleted').on('change', DeletedUsersShowOrHile);
     loadDataTable(false);
-    
-
+    ModalAction();
+    NewDirModalAction();
 });
 
 function DeletedUsersShowOrHile() {
@@ -30,7 +32,8 @@ function loadDataTable(deleted) {
             "datatype": "json"
         },
         "columns": [
-            { "data": "name", "width": "90%" },
+            { "data": "id", "width": "5%" },
+            { "data": "name", "width": "85%" },
             {
                 "data": null,
                 "render": function (data, type, row) {
@@ -42,11 +45,10 @@ function loadDataTable(deleted) {
                         </div>`;
                     }
                    // <a href="${path}RenameDirectorate?dirId=${row.id}&dirName=${row.name}" style='cursor:pointer; padding-left:10px;' title='Редакция'>
-                   // <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle="ajax-modal" data-target="#add-contact" data-url="${path}RenameDirectorate" data-dirid="${row.id}" data-dirname="${row.name}">
+                   // <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle="ajax-modal" data-target="#add-contact" data-url="${path}RenameDirectorate" data-dirid="${row.id}" data-dirname="${row.name}">     onclick=DirModalShow('${path}RenameDirectorate?dirId=${row.id}&dirName=${row.name}')>
                     else {
                         return `<div>
-                            <div id="modal-placeholder"></div>
-                            <a style='cursor:pointer; padding-left:10px;' title='Редакция' onclick=PopModal(event) data-url="${path}RenameDirectorate?dirId=${row.id}&dirName=${row.name}" >
+                            <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle='ajax-modal' data-target='#add-contact' data-url='${path}RenameDirectorate' data-dirid='${row.id}' data-dirname='${row.name}' onclick=DirModalShow('${path}RenameDirectorate?dirId=${row.id}') >
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px;'
@@ -65,7 +67,7 @@ function loadDataTable(deleted) {
         },
         "width": "100%"
     });
-    attachEvents();
+ 
 }
 function Delete(url) {
     swal({
@@ -123,8 +125,7 @@ function Restore(url) {
     });
 }
 
-function PopModal(event) {
-    let url = $(this).data('url');
+function DirModalShow(url) {
     $.get(url).done(function (data) {
         placeholderElement.html(data);
         placeholderElement.find('.modal').modal('show');
@@ -132,21 +133,9 @@ function PopModal(event) {
 
 }
 
-function attachEvents() {
-    console.log(1);
-    let placeholderElement = $('#modal-placeholder');
-    $('a[data-toggle="ajax-modal"]').click(function (event) {
-        console.log(2);
-        let url = $(this).data('url') + '?dirId=' + $(this).data('dirid') + '&dirName=' + $(this).data('dirname');
-        $.get(url).done(function (data) {
-            placeholderElement.html(data);
-            placeholderElement.find('.modal').modal('show');
-        });
-    });
-
+function ModalAction() {
     placeholderElement.on('click', '[data-save="modal"]', function (event) {
         event.preventDefault();
-
         let form = $(this).parents('.modal').find('form');
         let actionUrl = form.attr('action');
         let dataToSend = form.serialize();
@@ -163,6 +152,33 @@ function attachEvents() {
 
         });
     });
+}
+
+function NewDirModalShow() {
+    $.get(`${path}CreateDirectorate`).done(function (data) {
+        newdirplaseholder.html(data);
+        newdirplaseholder .find('.modal').modal('show');
+    });
 
 }
 
+function NewDirModalAction() {
+    newdirplaseholder.on('click', '[data-save="modal"]', function (event) {
+        event.preventDefault();
+        let form = $(this).parents('.modal').find('form');
+        let actionUrl = form.attr('action');
+        let dataToSend = form.serialize();
+
+        $.post(actionUrl, dataToSend).done(function (data) {
+            let newBody = $('.modal-body', data);
+            newdirplaseholder.find('.modal-body').replaceWith(newBody);
+            let isValid = newBody.find('[name="IsValid"]').val() === 'True';
+
+            if (isValid) {
+                newdirplaseholder.find('.modal').modal('hide');
+                location.reload();
+            }
+
+        });
+    });
+}

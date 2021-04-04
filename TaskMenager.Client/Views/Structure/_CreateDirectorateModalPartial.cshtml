@@ -4,19 +4,16 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div style="background-color:whitesmoke;" class="modal-header">
-                <label style="font-size:small;" class="modal-title" id="addContactLabel"><strong>Дирекция: </strong></label>
-                <p style="margin-left:8px; color:black;"><span style="font-weight:700">@Model.DirectorateName</span></p>
+                <label style="font-size:medium; text-align:center" class="modal-title" id="addContactLabel"><strong>Създаване на дирекция</strong></label>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
                 </button>
             </div>
             <div class="modal-body">
-                <form asp-action="RenameDirectorate">
-                    <input asp-for="DirId" hidden />
+                <form asp-action="CreateDirectorate">
                     <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
                     <div class="form-group">
                         <label asp-for="DirectorateName">Име на дирекцията до 200 символа</label>
-                        @*@Html.TextBoxFor(model => model.DirectorateName, new { @class = "form-control", placeholder = "Въведете име на дирекцията", id = "dirname", name = "dirname" })*@
                         @Html.TextAreaFor(model => model.DirectorateName, new { @class = "form-control", placeholder = "Въведете име на дирекцията", rows = "3" })
                         <span asp-validation-for="DirectorateName" class="text-danger"></span>
                     </div>

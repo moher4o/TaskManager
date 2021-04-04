@@ -23,6 +23,37 @@ namespace TaskManager.Services.Implementations
 
         private IConfiguration Configuration { get; }
 
+        public async Task<string> CreateDirectorateAsync(string directorateName)
+        {
+            try
+            {
+                var newDirectorate = new Directorate();
+                newDirectorate.DirectorateName = directorateName;
+                await this.db.Directorates.AddAsync(newDirectorate);
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+        public async Task<string> RenameDirectorateAsync(int dirId, string directorateName)
+        {
+            var directorateToRename = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == dirId);
+            if (directorateToRename == null)
+            {
+                return $"Няма дирекция с номер: {dirId}";
+            }
+            directorateToRename.DirectorateName = directorateName;
+            await this.db.SaveChangesAsync();
+            return "success";
+
+        }
+
         public async Task<string> MarkDirectorateDeleted(int dirId)
         {
             var directorateToDelete = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == dirId);
@@ -173,5 +204,7 @@ namespace TaskManager.Services.Implementations
             return "success";
 
         }
+
+
     }
 }

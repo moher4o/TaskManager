@@ -26,14 +26,44 @@ namespace TaskMenager.Client.Controllers
             this.sectors = sectors;
         }
 
-        public IActionResult RenameDirectorate(int dirId, string dirName)
+        public IActionResult CreateDirectorate()
         {
             var model = new RenameDirectorateViewModel();
 
-            model.DirId = dirId;
-            model.DirectorateName = dirName;
+            model.DirId = -999;
 
-            return PartialView("_RenameDirectorateModalPartial", model);
+            return PartialView("_CreateDirectorateModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateDirectorate(RenameDirectorateViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string result = await this.directorates.CreateDirectorateAsync(model.DirectorateName);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Дирекция \"{model.DirectorateName}\" е създадена успешно";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_CreateDirectorateModalPartial", model);
+        }
+
+
+        public IActionResult RenameDirectorate(int dirId)
+        {
+                var model = new RenameDirectorateViewModel();
+
+                model.DirId = dirId;
+                model.DirectorateName = this.directorates.GetDirectoratesNames(dirId).Select(d => d.TextValue).FirstOrDefault();
+
+                return PartialView("_RenameDirectorateModalPartial", model);
         }
 
         [HttpPost]
@@ -42,14 +72,14 @@ namespace TaskMenager.Client.Controllers
         {
             if (ModelState.IsValid)
             {
-                //bool result = await this.directorates.RenameDirectorateAsync(model.DirId, model.DirectorateName);
-                if (true)
+                var result = await this.directorates.RenameDirectorateAsync(model.DirId, model.DirectorateName);
+                if (result == "success")
                 {
-                    TempData["Success"] = "Преименуването е успешно";
+                    TempData["Success"] = $"Името е успешно променено на \"{model.DirectorateName}\"";
                 }
                 else
                 {
-                    TempData["Error"] = "[Service error] Уведомете администратора.";
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
                 }
 
             }

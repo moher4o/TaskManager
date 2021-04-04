@@ -17,6 +17,10 @@ namespace TaskManager.Services
         Task<List<AddNewDirectorateServiceModel>> GetDirectoratesAsync(bool deleted = false);
 
         Task<string> MarkDirectorateDeleted(int dirId);
+
         Task<string> MarkDirectorateActiveAsync(int dirId);
+
+        Task<string> RenameDirectorateAsync(int dirId, string directorateName);
+        Task<string> CreateDirectorateAsync(string directorateName);
     }
 }
