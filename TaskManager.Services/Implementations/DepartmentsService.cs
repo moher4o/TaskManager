@@ -79,6 +79,35 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
+        public async Task<List<AddNewDepartmentServiceModel>> GetDepartmentsAsync(bool deleted = false)
+        {
+            var result = await this.db.Departments.Where(d => d.isDeleted == deleted)
+                .OrderByDescending(d => d.Employees.Count)
+                .Select(d => new AddNewDepartmentServiceModel
+                {
+                    Name = d.DepartmentName,
+                    Id = d.Id,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    isDeleted = d.isDeleted
+                }).ToListAsync();
+            return result;
+        }
+
+        public async Task<AddNewDepartmentServiceModel> GetDepartmentAsync(int depId)
+        {
+            var result = await this.db.Departments.Where(d => d.Id == depId)
+                .Select(d => new AddNewDepartmentServiceModel
+                {
+                    Name = d.DepartmentName,
+                    Id = d.Id,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    DirectorateId = d.DirectorateId,
+                    isDeleted = d.isDeleted
+                }).FirstOrDefaultAsync();
+            return result;
+        }
+
+
         public IEnumerable<SelectServiceModel> GetDepartmentsNames(int? departmentId)
         {
             if (departmentId == null)
@@ -113,6 +142,146 @@ namespace TaskManager.Services.Implementations
                 })
                 .ToList();
             return names;
+        }
+
+        public async Task<string> MarkDepartmentDeleted(int depId)
+        {
+            var departmentToDelete = await this.db.Departments
+                .FirstOrDefaultAsync(d => d.Id == depId);
+            if (departmentToDelete == null)
+            {
+                return $"Няма отдел с номер: {depId}";
+            }
+
+            var check = await this.CheckDepartmentByIdAsync(depId);
+            if (check != "success")
+            {
+                return check;
+            }
+            departmentToDelete.isDeleted = true;
+            await this.db.SaveChangesAsync();
+            return "success";
+        }
+
+        private async Task<string> CheckDepartmentByIdAsync(int depId)
+        {
+            try
+            {
+            var checkedDepartment = await this.db.Departments
+                .Where(d => d.Id == depId)
+                .Include(d => d.Sectors)
+                .Include(d => d.Tasks)
+                .Include(d => d.Employees)
+                .FirstOrDefaultAsync();
+            int employeesInDepartment = checkedDepartment.Employees.Where(e => e.isDeleted == false).Count();
+            if (employeesInDepartment > 0)
+            {
+                return "Има назначени служители в отдела. Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
+            }
+            int tasksInDepartment = checkedDepartment.Tasks.Where(e => e.isDeleted == false).Count();
+            if (tasksInDepartment > 0)
+            {
+                return "Има задачи в отдела. Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
+            }
+
+            int sectorsInDepartment = checkedDepartment.Sectors.Where(e => e.isDeleted == false).Count();
+            if (sectorsInDepartment > 0)
+            {
+                return "Има сектори в отдела. Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
+            }
+
+            return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+        public async Task<string> CreateDepartmentAsync(int directoratesId, string departmentName)
+        {
+            try
+            {
+
+                var directorate = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == directoratesId);
+                if (directorate == null)
+                {
+                    return $"Няма дирекция с номер: ${directoratesId}";
+                }
+                var newDepartment = new Department()
+                {
+                    DirectorateId = directoratesId,
+                    DepartmentName = departmentName
+                };
+                await this.db.Departments.AddAsync(newDepartment);
+                await this.db.SaveChangesAsync();
+
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+        public async Task<string> EditDepartmentDetails(int depId, int directorateId, string departmentName)
+        {
+            try
+            {
+                var departmentToEdit = await this.db.Departments.FirstOrDefaultAsync(d => d.Id == depId);
+                if (departmentToEdit == null)
+                {
+                    return $"Няма отдел с номер: {depId}";
+                }
+                if (departmentToEdit.DirectorateId != directorateId)
+                {
+                    var check = await CheckDepartmentByIdAsync(depId);
+                    if (check != "success")
+                    {
+                        return check;
+                    }
+                    var directorateTarget = await this.db.Directorates.Where(d => d.Id == directorateId && d.isDeleted == false).FirstOrDefaultAsync();
+                    if (directorateTarget == null)
+                    {
+                        return $"Няма активна дирекция с номер: {directorateId}";
+                    }
+                    departmentToEdit.DirectorateId = directorateTarget.Id;
+                }
+                if (string.IsNullOrWhiteSpace(departmentName))
+                {
+                    return "Името на отдела не може да е празен стринг!";
+                }
+
+                departmentToEdit.DepartmentName = departmentName;
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+
+        public async Task<string> MarkDepartmentActiveAsync(int depId)
+        {
+            var departmentToRestore = await this.db.Departments.FirstOrDefaultAsync(d => d.Id == depId);
+            if (departmentToRestore == null)
+            {
+                return $"Няма отдел с номер: {depId}";
+            }
+            var directorateHost = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == departmentToRestore.DirectorateId);
+            if (directorateHost.isDeleted == true)
+            {
+                return $"Дирекцията {directorateHost.DirectorateName}, към която принадлежи отдела е изтрита. Възстановете първо дирекцията.";
+            }
+            departmentToRestore.isDeleted = false;
+            await this.db.SaveChangesAsync();
+            return "success";
+
         }
 
     }

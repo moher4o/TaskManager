@@ -69,6 +69,39 @@ namespace TaskManager.Services.Implementations
             return "success";
         }
 
+        public async Task<string> CreateSectorAsync(int directoratesId, int depId, string sectorName)
+        {
+            try
+            {
+
+                var directorate = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == directoratesId);
+                if (directorate == null)
+                {
+                    return $"Няма дирекция с номер: ${directoratesId}";
+                }
+                var department = await this.db.Departments.FirstOrDefaultAsync(d => d.Id == depId);
+                if (department == null)
+                {
+                    return $"Няма отдел с номер: ${depId}";
+                }
+
+                var newSector = new Sector()
+                {
+                    DepartmentId = depId,
+                    DirectorateId = directoratesId,
+                    SectorName = sectorName
+                };
+                this.db.Sectors.Add(newSector);
+                await this.db.SaveChangesAsync();
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
         public IEnumerable<SelectServiceModel> GetSectorsNames()
         {
             var names = this.db.Sectors
@@ -81,6 +114,23 @@ namespace TaskManager.Services.Implementations
                 .ToList();
             return names;
         }
+
+        public async Task<List<AddNewSectorServiceModel>> GetSectorsAsync(bool deleted = false)
+        {
+            var result = await this.db.Sectors.Where(d => d.isDeleted == deleted)
+                .Select(d => new AddNewSectorServiceModel
+                {
+                    Name = d.SectorName,
+                    Id = d.Id,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    DirectorateId = d.DirectorateId.Value,
+                    DepartmentName = d.Department.DepartmentName,
+                    DepartmentId = d.DepartmentId.Value,
+                    isDeleted = d.isDeleted
+                }).ToListAsync();
+            return result;
+        }
+
 
         public IEnumerable<SelectServiceModel> GetSectorsNames(int? sectorId)
         {
@@ -132,6 +182,71 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
+        public async Task<string> MarkSectorDeleted(int secId)
+        {
+            var sectorToDelete = await this.db.Sectors
+                .FirstOrDefaultAsync(d => d.Id == secId);
+            if (sectorToDelete == null)
+            {
+                return $"Няма сектор с номер: {secId}";
+            }
+
+            var check = await this.CheckSectorByIdAsync(secId);
+            if (check != "success")
+            {
+                return check;
+            }
+            sectorToDelete.isDeleted = true;
+            await this.db.SaveChangesAsync();
+            return "success";
+        }
+
+        private async Task<string> CheckSectorByIdAsync(int secId)
+        {
+            try
+            {
+                var checkedSector = await this.db.Sectors
+                    .Where(d => d.Id == secId)
+                    .Include(d => d.Tasks)
+                    .Include(d => d.Employees)
+                    .FirstOrDefaultAsync();
+                int employeesInSector = checkedSector.Employees.Where(e => e.isDeleted == false).Count();
+                if (employeesInSector > 0)
+                {
+                    return "Има назначени служители в сектора. Преместете ги в друг сектор преди да бъде редактиран/изтрит този.";
+                }
+                int tasksInSector = checkedSector.Tasks.Where(e => e.isDeleted == false).Count();
+                if (tasksInSector > 0)
+                {
+                    return "Има задачи в сектора. Преместете ги в друг сектор преди да бъде редактиран/изтрит този.";
+                }
+
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+        public async Task<string> MarkSectorActiveAsync(int secId)
+        {
+            var sectorToRestore = await this.db.Sectors.FirstOrDefaultAsync(d => d.Id == secId);
+            if (sectorToRestore == null)
+            {
+                return $"Няма сектор с номер: {secId}";
+            }
+            var departmentHost = await this.db.Departments.FirstOrDefaultAsync(d => d.Id == sectorToRestore.DepartmentId);
+            if (departmentHost.isDeleted == true)
+            {
+                return $"Отдела {departmentHost.DepartmentName}, към който принадлежи сектора е изтрит. Възстановете първо отдела.";
+            }
+            sectorToRestore.isDeleted = false;
+            await this.db.SaveChangesAsync();
+            return "success";
+
+        }
 
     }
 }

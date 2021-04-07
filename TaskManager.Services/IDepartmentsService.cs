@@ -16,6 +16,13 @@ namespace TaskManager.Services
 
         IEnumerable<SelectServiceModel> GetDepartmentsNamesByDirectorate(int? directorateId);
 
+        Task<List<AddNewDepartmentServiceModel>> GetDepartmentsAsync(bool deleted = false);
 
+        Task<AddNewDepartmentServiceModel> GetDepartmentAsync(int depId);
+
+        Task<string> MarkDepartmentDeleted(int depId);
+        Task<string> CreateDepartmentAsync(int directoratesId, string departmentName);
+        Task<string> MarkDepartmentActiveAsync(int depId);
+        Task<string> EditDepartmentDetails(int depId, int directoratesId, string departmentName);
     }
 }

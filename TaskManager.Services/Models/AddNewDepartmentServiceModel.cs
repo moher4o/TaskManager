@@ -8,5 +8,7 @@ namespace TaskManager.Services.Models
     {
         public int DirectorateId { get; set; }
 
+        public string DirectorateName { get; set; }
+
     }
 }

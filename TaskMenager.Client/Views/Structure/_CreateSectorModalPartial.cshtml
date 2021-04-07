@@ -1,0 +1,30 @@
+﻿@model CreateDepViewModel
+<!-- Modal -->
+<div class="modal fade" id="add-contact" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div style="background-color:whitesmoke;" class="modal-header">
+                <label style="font-size:medium; text-align:center" class="modal-title" id="addContactLabel"><strong>Добавяне на сектор</strong></label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="AddSector">
+                    <input asp-for="DepId" hidden />
+                    <input asp-for="DirectoratesId" hidden />
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <div class="form-group">
+                        <label asp-for="DepartmentName"><strong>Име на сектора до 200 символа</strong></label>
+                        @Html.TextAreaFor(model => model.DepartmentName, new { @class = "form-control", placeholder = "Въведете име на сектора", rows = "3" })
+                        <span asp-validation-for="DepartmentName" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color:whitesmoke;">
+                <button type="button" class="button back-small" data-dismiss="modal">Отказ</button>
+                <button type="button" class="button save-small" data-save="modal">Запис</button>
+            </div>
+        </div>
+    </div>
+</div>

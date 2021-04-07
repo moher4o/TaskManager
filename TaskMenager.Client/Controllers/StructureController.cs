@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,117 @@ namespace TaskMenager.Client.Controllers
             this.departments = departments;
             this.sectors = sectors;
         }
+
+        public IActionResult CreateDepartment()
+        {
+            var model = new CreateDepViewModel();
+            var dirList = this.directorates.GetDirectoratesNames(null);
+            model.Directorates = dirList
+                                   .Select(a => new SelectListItem
+                                   {
+                                       Text = a.TextValue.Length <= 65 ? a.TextValue : a.TextValue.Substring(0, 61) + "...",
+                                       Value = a.Id.ToString(),
+                                       Selected = true
+                                   })
+                                   .ToList();
+            model.DirectoratesId = dirList.Select(d => d.Id).FirstOrDefault();
+
+            return PartialView("_CreateDepartmentModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateDepartment(CreateDepViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string result = await this.departments.CreateDepartmentAsync(model.DirectoratesId, model.DepartmentName);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Отдел \"{model.DepartmentName}\" е създаден успешно";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_CreateDepartmentModalPartial", model);
+
+        }
+
+        public async Task<IActionResult> AddSector(int depId)
+        {
+            var departmentHost = await this.departments.GetDepartmentAsync(depId);
+            var model = new CreateDepViewModel()
+            {
+                DepId = departmentHost.Id,
+                DirectoratesId = departmentHost.DirectorateId
+            };
+            return PartialView("_CreateSectorModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddSector(CreateDepViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string result = await this.sectors.CreateSectorAsync(model.DirectoratesId, model.DepId, model.DepartmentName);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Сектор \"{model.DepartmentName}\" е създаден успешно";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_CreateSectorModalPartial", model);
+        }
+
+
+        public async Task<IActionResult> EditDepartment(int depId)
+        {
+            var departmentToEdit = await this.departments.GetDepartmentAsync(depId);
+            var model = new CreateDepViewModel()
+            {
+                DepId = departmentToEdit.Id,
+                DepartmentName = departmentToEdit.Name,
+                DirectoratesId = departmentToEdit.DirectorateId,
+                Directorates = this.directorates.GetDirectoratesNames(null)
+                                   .Select(a => new SelectListItem
+                                   {
+                                       Text = a.TextValue.Length <= 65 ? a.TextValue : a.TextValue.Substring(0, 61) + "...",
+                                       Value = a.Id.ToString(),
+                                       Selected = a.Id == departmentToEdit.DirectorateId
+                                   })
+                                   .ToList()
+            };
+            return PartialView("_EditDepartmentModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditDepartment(CreateDepViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string result = await this.departments.EditDepartmentDetails(model.DepId, model.DirectoratesId, model.DepartmentName);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Отдел \"{model.DepartmentName}\" е успешно редактиран";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_EditDepartmentModalPartial", model);
+        }
+
 
         public IActionResult CreateDirectorate()
         {
@@ -58,12 +170,12 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult RenameDirectorate(int dirId)
         {
-                var model = new RenameDirectorateViewModel();
+            var model = new RenameDirectorateViewModel();
 
-                model.DirId = dirId;
-                model.DirectorateName = this.directorates.GetDirectoratesNames(dirId).Select(d => d.TextValue).FirstOrDefault();
+            model.DirId = dirId;
+            model.DirectorateName = this.directorates.GetDirectoratesNames(dirId).Select(d => d.TextValue).FirstOrDefault();
 
-                return PartialView("_RenameDirectorateModalPartial", model);
+            return PartialView("_RenameDirectorateModalPartial", model);
         }
 
         [HttpPost]
@@ -93,13 +205,44 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
+        public IActionResult DepartmentsList()
+        {
+            return View();
+        }
+
+        public IActionResult SectorsList()
+        {
+            return View();
+        }
+
+
+
         #region API Calls
+        [HttpGet]
+        public async Task<IActionResult> GetAllSectors(bool deleted = false)
+        {
+            var data = await this.sectors.GetSectorsAsync(deleted);
+            return Json(new { data });
+
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllDepartments(bool deleted = false)
+        {
+            var data = await this.departments.GetDepartmentsAsync(deleted);
+            return Json(new { data });
+
+        }
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetAllDirectorates(bool deleted = false)
         {
-                var data = await this.directorates.GetDirectoratesAsync(deleted);
-                return Json(new { data });
-            
+            var data = await this.directorates.GetDirectoratesAsync(deleted);
+            return Json(new { data });
+
         }
 
         [HttpGet]
@@ -114,6 +257,29 @@ namespace TaskMenager.Client.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> DeleteDepartment(int depId)
+        {
+            var check = await this.departments.MarkDepartmentDeleted(depId);
+            if (check != "success")
+            {
+                return Json(new { success = false, message = check });
+            }
+            return Json(new { success = true, message = "Отдела е изтрит" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteSector(int secId)
+        {
+            string check = await this.sectors.MarkSectorDeleted(secId);
+            if (check != "success")
+            {
+                return Json(new { success = false, message = check });
+            }
+            return Json(new { success = true, message = "Сектора е изтрит" });
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> RestoreDirectorate(int dirId)
         {
             string check = await this.directorates.MarkDirectorateActiveAsync(dirId);
@@ -123,6 +289,29 @@ namespace TaskMenager.Client.Controllers
             }
             return Json(new { success = true, message = "Дирекцията е възстановена" });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> RestoreDepartment(int depId)
+        {
+            string check = await this.departments.MarkDepartmentActiveAsync(depId);
+            if (check != "success")
+            {
+                return Json(new { success = false, message = check });
+            }
+            return Json(new { success = true, message = "Отдела е възстановен" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RestoreSector(int secId)
+        {
+            string check = await this.sectors.MarkSectorActiveAsync(secId);
+            if (check != "success")
+            {
+                return Json(new { success = false, message = check });
+            }
+            return Json(new { success = true, message = "Сектора е възстановен" });
+        }
+
 
         #endregion
     }

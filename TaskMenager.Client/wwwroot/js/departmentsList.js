@@ -3,15 +3,17 @@ const loc = window.location.href;
 const path = loc.substr(0, loc.lastIndexOf('/') + 1);
 let placeholderElement = $('#modal-placeholder');
 let newdirplaseholder = $('#newdir-placeholder');
+let newsecplaseholder = $('#newsec-placeholder');
 
 $(document).ready(function () {
-    $('#showDeleted').on('change', DeletedUsersShowOrHile);
+    $('#showDeleted').on('change', DeletedDepartShowOrHile);
     loadDataTable(false);
     ModalAction();
-    NewDirModalAction();
+    NewDepModalAction();
+    NewSecModalAction()
 });
 
-function DeletedUsersShowOrHile() {
+function DeletedDepartShowOrHile() {
     if ($("#showDeleted").prop('checked') == false) {
         dataTable.destroy();
         loadDataTable(false);
@@ -23,7 +25,7 @@ function DeletedUsersShowOrHile() {
 }
 
 function loadDataTable(deleted) {
-    var url = path + "getAllDirectorates?deleted=" + deleted;
+    var url = path + "getAllDepartments?deleted=" + deleted;
     dataTable = $('#DT_load').DataTable({
         "ajax": {
             "url": url,
@@ -32,26 +34,28 @@ function loadDataTable(deleted) {
         },
         "columns": [
             { "data": "id", "width": "5%" },
-            { "data": "name", "width": "85%" },
+            { "data": "directorateName", "width": "40%" },
+            { "data": "name", "width": "45%" },
             {
                 "data": null,
                 "render": function (data, type, row) {
                     if (deleted) {
                         return `<div>
-                        <a style='cursor:pointer; padding-left:10px;' onclick=Restore('${path}RestoreDirectorate?dirId=${row.id}') title='Възстановяване'>
+                        <a style='cursor:pointer; padding-left:10px;' onclick=Restore('${path}RestoreDepartment?depId=${row.id}') title='Възстановяване'>
                             <img class="chatnotifications" src="../png/restore-icon.png" />
                         </a>
                         </div>`;
                     }
-                   // <a href="${path}RenameDirectorate?dirId=${row.id}&dirName=${row.name}" style='cursor:pointer; padding-left:10px;' title='Редакция'>
-                   // <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle="ajax-modal" data-target="#add-contact" data-url="${path}RenameDirectorate" data-dirid="${row.id}" data-dirname="${row.name}">     onclick=DirModalShow('${path}RenameDirectorate?dirId=${row.id}&dirName=${row.name}')>
                     else {
                         return `<div>
-                            <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle='ajax-modal' data-target='#add-contact' data-url='${path}RenameDirectorate' data-dirid='${row.id}' data-dirname='${row.name}' onclick=DirModalShow('${path}RenameDirectorate?dirId=${row.id}') >
+                            <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle='ajax-modal' data-target='#add-contact' onclick=DirModalShow('${path}EditDepartment?depId=${row.id}') >
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
+                            <a style='cursor:pointer; padding-left:10px;' title='Добави сектор' data-toggle='ajax-modal' data-target='#add-contact' onclick=AddSecModalShow('${path}AddSector?depId=${row.id}') >
+                            <img class="chatnotifications" src="../png/plus.png" />
+                        </a>
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=Delete('${path}DeleteDirectorate?dirId=${row.id}') title='Изтриване'>
+                            onclick=Delete('${path}DeleteDepartment?depId=${row.id}') title='Изтриване'>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
 
@@ -62,16 +66,17 @@ function loadDataTable(deleted) {
             }
         ],
         "language": {
-            "emptyTable": "Няма дирекции отговарящи на условието"
+            "emptyTable": "Няма отдели отговарящи на условието"
         },
         "width": "100%"
     });
- 
+
 }
+
 function Delete(url) {
     swal({
         title: "Потвърждение",
-        text: "Сигурни ли сте, че искате да изтриете дирекцията?",
+        text: "Сигурни ли сте, че искате да изтриете отдела?",
         icon: "warning",
         closeOnEsc: false,
         buttons: ["Отказ", "Изтриване!"],
@@ -99,7 +104,7 @@ function Delete(url) {
 function Restore(url) {
     swal({
         title: "Потвърждение",
-        text: "Сигурни ли сте, че искате да възстановите дирекцията?",
+        text: "Сигурни ли сте, че искате да възстановите отдела?",
         icon: "warning",
         closeOnEsc: false,
         buttons: ["Отказ", "Възстановяване!"],
@@ -124,12 +129,41 @@ function Restore(url) {
     });
 }
 
+function AddSecModalShow(url) {
+    $.get(url).done(function (data) {
+        newsecplaseholder.html(data);
+        newsecplaseholder.find('.modal').modal('show');
+    });
+}
+
+function NewSecModalAction() {
+    newsecplaseholder.on('click', '[data-save="modal"]', function (event) {
+        event.preventDefault();
+        let form = $(this).parents('.modal').find('form');
+        let actionUrl = form.attr('action');
+        let dataToSend = form.serialize();
+
+        $.post(actionUrl, dataToSend).done(function (data) {
+            let newBody = $('.modal-body', data);
+            newsecplaseholder.find('.modal-body').replaceWith(newBody);
+            let isValid = newBody.find('[name="IsValid"]').val() === 'True';
+
+            if (isValid) {
+                newsecplaseholder.find('.modal').modal('hide');
+                location.reload();
+            }
+
+        });
+    });
+}
+
+
+
 function DirModalShow(url) {
     $.get(url).done(function (data) {
         placeholderElement.html(data);
         placeholderElement.find('.modal').modal('show');
     });
-
 }
 
 function ModalAction() {
@@ -153,15 +187,14 @@ function ModalAction() {
     });
 }
 
-function NewDirModalShow() {
-    $.get(`${path}CreateDirectorate`).done(function (data) {
+function NewDepModalShow() {
+    $.get(`${path}CreateDepartment`).done(function (data) {
         newdirplaseholder.html(data);
-        newdirplaseholder .find('.modal').modal('show');
+        newdirplaseholder.find('.modal').modal('show');
     });
-
 }
 
-function NewDirModalAction() {
+function NewDepModalAction() {
     newdirplaseholder.on('click', '[data-save="modal"]', function (event) {
         event.preventDefault();
         let form = $(this).parents('.modal').find('form');
