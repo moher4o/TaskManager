@@ -1,0 +1,72 @@
+﻿@model SectorViewModel
+<!-- Modal -->
+<div class="modal fade" id="add-contact" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div style="background-color:whitesmoke;" class="modal-header">
+                <label style="font-size:medium; text-align:center" class="modal-title" id="addContactLabel"><strong>Добавяне на сектор</strong></label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="CreateSector">
+                    <input asp-for="SecId" hidden />
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <div class="form-group">
+                        <label asp-for="Directorates"><strong>Дирекция</strong></label>
+                        @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"), new { @class = "form-control", name = "directorate", id = "directoratesId", onchange = "LoadDepartments(event)" })
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Departments"><strong>Отдел</strong></label>
+                        @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"), new { @class = "form-control", name = "department", id = "departmentsId" })
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SectorName"><strong>Име на сектора до 200 символа</strong></label>
+                        @Html.TextAreaFor(model => model.SectorName, new { @class = "form-control", placeholder = "Въведете име на сектора", rows = "3", id = "sectorNameId" })
+                        <span asp-validation-for="SectorName" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color:whitesmoke;">
+                <input type="submit" class="btn button-invisible" data-save="modal" value="REALSENDSEND" id="realsend" />
+                <button type="button" class="button back-small" data-dismiss="modal">Отказ</button>
+                <button type="button" class="button save-small" id="zapisId" onclick="CheckSectorName()">Запис</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function LoadDepartments(event) {
+        $.getJSON('..\\Users\\GetDepartments\?direktorateId=' + event.target.value, { get_param: 'value' }, function (data) {
+            $('#departmentsId').children('option').remove();
+            $.each(data, function (key, value) {
+                $('#departmentsId')
+                    .append($("<option></option>")
+                        .attr("value", value.id)
+                        .text(value.textValue));
+            });
+            if (data.length <= 0) {
+                $("#departmentsId").attr('disabled', 'disabled');
+                $("#zapisId").attr('disabled', 'disabled');
+            }
+            else {
+                $("#departmentsId").removeAttr('disabled');
+                $("#zapisId").removeAttr('disabled');
+            }
+        });
+    }
+
+    function CheckSectorName() {
+        let a = document.getElementById("sectorNameId").value;
+        if (a == null || a == "") {
+            toastr.error('Моля въведете име на сектора');
+        }
+        else {
+            $("#realsend").click();
+        }
+    }
+</script>
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

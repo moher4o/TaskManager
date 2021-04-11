@@ -49,7 +49,30 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-        public async Task<bool> MarkTaskDeletedAsync(int taskId, int userId)
+        public async Task<string> MarkTaskActiveAsync(int taskId, int userId)
+        {
+            try
+            {
+                var taskToRestore = await this.db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
+                var expert = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
+                taskToRestore.isDeleted = false;
+                try
+                {
+                    taskToRestore.EndNote += $"Задачата е възстановена след изтриване на {DateTime.Now.Date} от {expert.FullName}";
+                }
+                catch (Exception)
+                {
+                }
+                await this.db.SaveChangesAsync();
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task<string> MarkTaskDeletedAsync(int taskId, int userId)
         {
             try
             {
@@ -57,11 +80,11 @@ namespace TaskManager.Services.Implementations
                 var expert = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
                 if (expert == null || taskToDelete == null)
                 {
-                    return false;
+                    return "Няма такъв експерт или задача";
                 }
                 taskToDelete.isDeleted = true;
                 taskToDelete.DeletedByUserId = expert.Id;
-                if (taskToDelete.TaskStatus.StatusName != TaskStatusClosed)
+                if (taskToDelete.StatusId != await this.db.TasksStatuses.Where(ts => ts.StatusName == TaskStatusClosed).Select(ts => ts.Id).FirstOrDefaultAsync() )
                 {
                     taskToDelete.StatusId = this.db.TasksStatuses.Where(ts => ts.StatusName == TaskStatusClosed).Select(ts => ts.Id).FirstOrDefault();
                     taskToDelete.EndNote = $"Задачата е приключена служебно при изтриването й на {DateTime.Now.Date} от {expert.FullName}";
@@ -71,11 +94,11 @@ namespace TaskManager.Services.Implementations
                     taskToDelete.EndDate = DateTime.Now;
                 }
                 await this.db.SaveChangesAsync();
-                return true;
+                return "success";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                return ex.Message;
             }
             
             

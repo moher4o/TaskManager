@@ -131,6 +131,21 @@ namespace TaskManager.Services.Implementations
             return result;
         }
 
+        public async Task<AddNewSectorServiceModel> GetSectorAsync(int secId)
+        {
+            var result = await this.db.Sectors.Where(d => d.Id == secId)
+                .Select(d => new AddNewSectorServiceModel
+                {
+                    Name = d.SectorName,
+                    Id = d.Id,
+                    DirectorateName = d.Directorate.DirectorateName,
+                    DirectorateId = d.DirectorateId.Value,
+                    DepartmentName = d.Department.DepartmentName,
+                    DepartmentId = d.DepartmentId.Value,
+                    isDeleted = d.isDeleted
+                }).FirstOrDefaultAsync();
+            return result;
+        }
 
         public IEnumerable<SelectServiceModel> GetSectorsNames(int? sectorId)
         {
@@ -210,15 +225,15 @@ namespace TaskManager.Services.Implementations
                     .Include(d => d.Tasks)
                     .Include(d => d.Employees)
                     .FirstOrDefaultAsync();
-                int employeesInSector = checkedSector.Employees.Where(e => e.isDeleted == false).Count();
+                int employeesInSector = checkedSector.Employees.Count();
                 if (employeesInSector > 0)
                 {
-                    return "Има назначени служители в сектора. Преместете ги в друг сектор преди да бъде редактиран/изтрит този.";
+                    return "Има назначени служители в сектора(може да са неактивни). Преместете ги в друг сектор преди да бъде редактиран/изтрит този.";
                 }
-                int tasksInSector = checkedSector.Tasks.Where(e => e.isDeleted == false).Count();
+                int tasksInSector = checkedSector.Tasks.Count();
                 if (tasksInSector > 0)
                 {
-                    return "Има задачи в сектора. Преместете ги в друг сектор преди да бъде редактиран/изтрит този.";
+                    return "Има задачи в сектора(може и да са маркирани изтрити или приключени). Преместете ги в друг сектор преди да бъде редактиран/изтрит този.";
                 }
 
                 return "success";
@@ -248,5 +263,51 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<string> EditSectorAsync(int secId, int directoratesId, int departmentsId, string sectorName)
+        {
+            try
+            {
+                var sectorToEdit = await this.db.Sectors.FirstOrDefaultAsync(d => d.Id == secId);
+                if (sectorToEdit == null)
+                {
+                    return $"Няма сектор с номер: {secId}";
+                }
+                if (sectorToEdit.DepartmentId != departmentsId)
+                {
+                    var check = await CheckSectorByIdAsync(secId);
+                    if (check != "success")
+                    {
+                        return check;
+                    }
+                    var directorateTarget = await this.db.Directorates.Where(d => d.Id == directoratesId && d.isDeleted == false).FirstOrDefaultAsync();
+                    if (directorateTarget == null)
+                    {
+                        return $"Няма активна дирекция с номер: {directoratesId}";
+                    }
+                    sectorToEdit.DirectorateId = directorateTarget.Id;
+
+                    var departmentTarget = await this.db.Departments.Where(d => d.Id == departmentsId && d.isDeleted == false).FirstOrDefaultAsync();
+                    if (departmentTarget == null)
+                    {
+                        return $"Няма активен отдел с номер: {departmentsId}";
+                    }
+                    sectorToEdit.DepartmentId = departmentTarget.Id;
+
+                }
+                if (string.IsNullOrWhiteSpace(sectorName))
+                {
+                    return "Името на сектора не може да е празен стринг!";
+                }
+
+                sectorToEdit.SectorName = sectorName;
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }

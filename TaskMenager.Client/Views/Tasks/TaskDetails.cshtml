@@ -161,55 +161,83 @@
                 <label class="form-control" style="border:none;">@Model.OwnerName</label>
             </div>
             <div class="form-group col-md-5" style="margin-bottom: 0rem;">
-                <div class="col-md-4">
-                </div>
-                <div class="col-md-8">
-                    
+                @*<div class="col-md-4"></div>*@
+                <div class="col-md-12">
+
                     @if (isClosed && !isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-              || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+|| Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         var modalId = "modal" + Model.Id.ToString();
-                    <form method="post" asp-controller="Tasks" asp-action="ReopenTask" asp-route-taskId="@Model.Id">
-                        <img class="chatnotifications" style='cursor:pointer;' src="../png/info2.png" onclick="Info('@Model.CloserName', '@Model.DeleterName');" />
-                        <a title="Ново отваряне на задачата" style="background-color: #b2d6f8; " class="btn btn-secondary" data-toggle="modal" data-target="#@modalId">
-                            Ново отваряне
-                        </a>
-                        <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div style="background-color:white;" class="modal-content">
-                                    <div class="modal-body">
-                                        <h5>Сигурни ли сте, че искате да отворите отново задача: </h5> <h5><span style="font-weight:700">@Model.TaskName</span></h5>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отказ</button>
-                                        <button type="submit" class="btn btn-danger">Потвърди</button>
+                        <form method="post" asp-controller="Tasks" asp-action="ReopenTask" asp-route-taskId="@Model.Id">
+                            <img class="chatnotifications" style='cursor:pointer;' src="../png/info2.png" onclick="Info('@Model.CloserName', '@Model.DeleterName');" />
+                            <a title="Ново отваряне на задачата" style="background-color: #b2d6f8; " class="btn btn-secondary" data-toggle="modal" data-target="#@modalId">
+                                Ново отваряне
+                            </a>
+                            <a class="btn btn-info" style="margin-left:15px;" asp-action="TasksList" asp-controller="Tasks">
+                                Списък задачи
+                            </a>
+
+                            <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div style="background-color:white;" class="modal-content">
+                                        <div class="modal-body">
+                                            <h5>Сигурни ли сте, че искате да отворите отново задача: </h5> <h5><span style="font-weight:700">@Model.TaskName</span></h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отказ</button>
+                                            <button type="submit" class="btn btn-danger">Потвърди</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
                     }
                     @if (!isClosed && !isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-              || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+|| Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@Model.Id">
                             Редактиране
                         </a>
+                        <a class="btn btn-info" style="margin-left:15px;" asp-action="TasksList" asp-controller="Tasks">
+                            Списък задачи
+                        </a>
+
                     }
                     @if (isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-              || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+|| Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         <div class="row">
                             @*<a href="#" >*@
                             <img class="chatnotifications" style='cursor:pointer;' src="../png/info2.png" onclick="Info('@Model.CloserName', '@Model.DeleterName');" />
                             @*</a>*@
                             <label style="color:red; margin-right:15px; margin-left:15px;">Изтрита задача</label>
-                            <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="NotImplemented" asp-controller="Home" asp-route-taskId="@Model.Id">
-                                Възстановяване
+                            @*<a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="NotImplemented" asp-controller="Tasks" asp-route-taskId="@Model.Id">
+                                    Възстановяване
+                                </a>*@
+                            @{var modalId = "modal" + Model.Id.ToString();}
+                            <form method="post" asp-controller="Tasks" asp-action="UndeleteTask" asp-route-taskId="@Model.Id">
+                                <a title="Ново отваряне на задачата" style="background-color: #b2d6f8; " class="btn btn-secondary" data-toggle="modal" data-target="#@modalId">
+                                    Възстановяване
+                                </a>
+                                <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div style="background-color:white;" class="modal-content">
+                                            <div class="modal-body">
+                                                <h5>Сигурни ли сте, че искате да възстановите задача: </h5> <h5><span style="font-weight:700">@Model.TaskName</span></h5>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отказ</button>
+                                                <button type="submit" class="btn btn-danger">Потвърди</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <a class="btn btn-info" style="margin-left:15px;" asp-action="TasksList" asp-controller="Tasks">
+                                Списък задачи
                             </a>
                         </div>
                     }
-
                 </div>
             </div>
         </div>

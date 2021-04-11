@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 using TaskManager.Common.Mapping;
 using TaskManager.Data.Models;
+using TaskManager.Services.Models.ReportModels;
 
 namespace TaskManager.Services.Models.EmployeeModels
 {
@@ -70,16 +72,32 @@ namespace TaskManager.Services.Models.EmployeeModels
 
         public virtual ICollection<EmployeesTasks> Tasks { get; set; } = new List<EmployeesTasks>();
 
-        public virtual ICollection<WorkedHours> WorkedHoursByTask { get; set; } = new List<WorkedHours>();
+        //public virtual ICollection<WorkedHours> WorkedHoursByTask { get; set; } = new List<WorkedHours>();
+
+        public virtual ICollection<EmployeeWorkedHoursByDateServiceModel> WorkedHoursByTaskByPeriod { get; set; } = new List<EmployeeWorkedHoursByDateServiceModel>();
 
         public virtual ICollection<TaskNote> Notes { get; set; } = new List<TaskNote>();
 
         public void ConfigureMapping(Profile profile)
         {
+            DateTime startDate = DateTime.Now.Date.AddDays(-1);
+            DateTime endDate = DateTime.Now.Date;
             profile.CreateMap<Employee, EmployeeServiceModel>()
                    .ForMember(u => u.RoleName, cfg => cfg.MapFrom(s => s.Role.Name))
                    .ForMember(u => u.DirectorateName, cfg => cfg.MapFrom(s => s.Directorate.DirectorateName))
                    .ForMember(u => u.DepartmentName, cfg => cfg.MapFrom(s => s.Department.DepartmentName))
+                   .ForMember(u => u.WorkedHoursByTaskByPeriod, cfg => cfg.MapFrom(s => s.WorkedHoursByTask
+                                            .OrderBy(wh => wh.WorkDate)               
+                                            .Where(wh => !wh.isDeleted && wh.WorkDate.Date >= startDate.Date && wh.WorkDate.Date <= endDate.Date)
+                                            .Select(wh => new EmployeeWorkedHoursByDateServiceModel
+                                            {
+                                                TaskId = wh.TaskId,
+                                                TaskName = wh.Task.TaskName,
+                                                HoursSpend = wh.HoursSpend,
+                                                Text = wh.Text,
+                                                WorkDate = wh.WorkDate
+                                            })
+                                            .ToList() ))
                    .ForMember(u => u.SectorName, cfg => cfg.MapFrom(s => s.Sector.SectorName));
         }
     }

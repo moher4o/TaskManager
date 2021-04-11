@@ -107,7 +107,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                {*@
+                            {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -116,8 +116,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                    <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                </li>*@
+                                <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                            </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -134,13 +134,13 @@
                             <a asp-controller="Report" asp-action="PeriodReport">Организационен</a>
                         </li>
                         @*<li>
-                    <a asp-controller="Home" asp-action="NotImplemented">Експертен</a>
+                                <a asp-controller="Home" asp-action="NotImplemented">Експертен</a>
 
-                </li>
-                <li>
-                    <a asp-controller="Home" asp-action="NotImplemented">Лична справка</a>
+                         </li>*@
+                        <li>
+                            <a asp-controller="Report" asp-action="SetPersonalPeriodDate">Лична справка</a>
 
-                </li>*@
+                        </li>
                     </ul>
                 </li>
                 <li>
@@ -154,9 +154,9 @@
                             <a asp-controller="Users" asp-action="UsersList">Списък</a>
                         </li>
                         @*<li>
-                    <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
+                                <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
 
-                </li>*@
+                            </li>*@
 
                     </ul>
                 </li>
@@ -164,7 +164,7 @@
                     <a href="#optionsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-cog"></i>
                         <span class="chatnotifications">Структура</span>
-                     </a>
+                    </a>
                     <ul class="collapse list-unstyled" id="optionsSubmenu">
                         <li>
                             <a asp-controller="Structure" asp-action="DirectoratesList">Дирекции</a>
@@ -180,17 +180,17 @@
                 </li>
 
                 @*<li>
-            <a asp-controller="Home" asp-action="NotImplemented">
-                <i class="fas fa-question"></i>
-                Информация
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Home" asp-action="NotImplemented">
-                <i class="fas fa-paper-plane"></i>
-                Контакти
-            </a>
-        </li>*@
+                        <a asp-controller="Home" asp-action="NotImplemented">
+                            <i class="fas fa-question"></i>
+                            Информация
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="NotImplemented">
+                            <i class="fas fa-paper-plane"></i>
+                            Контакти
+                        </a>
+                    </li>*@
             </ul>
         </nav>
 
@@ -211,7 +211,7 @@
                             <div id="errorBox" class="notification"><span>Грешка</span></div>
                             <div id="successBox" class="notification"><span>Успех</span></div>
                         </div>*@
-                   <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
                                 <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Users" asp-action="EditUser" asp-route-userId="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())">

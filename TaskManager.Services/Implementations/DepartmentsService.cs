@@ -173,21 +173,21 @@ namespace TaskManager.Services.Implementations
                 .Include(d => d.Tasks)
                 .Include(d => d.Employees)
                 .FirstOrDefaultAsync();
-            int employeesInDepartment = checkedDepartment.Employees.Where(e => e.isDeleted == false).Count();
+            int employeesInDepartment = checkedDepartment.Employees.Count();
             if (employeesInDepartment > 0)
             {
-                return "Има назначени служители в отдела. Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
+                return "Има назначени служители в отдела(може да са неактивни). Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
             }
-            int tasksInDepartment = checkedDepartment.Tasks.Where(e => e.isDeleted == false).Count();
+            int tasksInDepartment = checkedDepartment.Tasks.Count();
             if (tasksInDepartment > 0)
             {
-                return "Има задачи в отдела. Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
+                return "Има задачи в отдела(може да са маркирани изтрити или приключени). Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
             }
 
-            int sectorsInDepartment = checkedDepartment.Sectors.Where(e => e.isDeleted == false).Count();
+            int sectorsInDepartment = checkedDepartment.Sectors.Count();
             if (sectorsInDepartment > 0)
             {
-                return "Има сектори в отдела. Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
+                return "Има сектори в отдела(може да са маркирани изтрити). Преместете ги в друг отдел преди да бъде редактиран/изтрит този.";
             }
 
             return "success";

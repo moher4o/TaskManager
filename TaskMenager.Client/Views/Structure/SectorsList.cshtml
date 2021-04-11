@@ -20,7 +20,6 @@
 
     <div class="col-12 border p-3">
         <div id="modal-placeholder"></div>
-        <div id="newsec-placeholder"></div>
         <table id="DT_load" class="table table-striped table-bordered compact" style="width:100%">
 
             <thead>
@@ -38,4 +37,5 @@
 
 @section Scripts{
     <script src="~/js/sectorsList.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

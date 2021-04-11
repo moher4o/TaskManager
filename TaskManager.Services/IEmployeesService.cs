@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Services.Models;
+using TaskManager.Services.Models.EmployeeModels;
 using TaskManager.Services.Models.ReportModels;
 using TaskManager.Services.Models.TaskModels;
 
@@ -44,5 +45,7 @@ namespace TaskManager.Services
 
         Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false);
         Task<List<UserServiceModel>> GetAllNotActivatedUsersAsync();
+
+        Task<EmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate);
     }
 }

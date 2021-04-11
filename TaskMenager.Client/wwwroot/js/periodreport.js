@@ -16,7 +16,7 @@
         var selectedDate = new Date(selectedText);
         var now = new Date();
         if (selectedDate > now) {
-            notify.showError('Въведете минала дата');
+            toastr.error('Въведете минала дата');
             $("#startdate").css('background-color', 'rgb(250, 204, 204)');
             return false;
         }
@@ -28,7 +28,7 @@
         var selectedDate = new Date(selectedText);
         var now = new Date();
         if (selectedDate > now) {
-            notify.showError('Въведете днешна или минала дата');
+            toastr.error('Въведете днешна или минала дата');
             $("#enddate").css('background-color', 'rgb(250, 204, 204)');
             return false;
         }
@@ -41,7 +41,7 @@
         selectedText = document.getElementById("enddate").value;
         var endDate = new Date(selectedText);
         if (startDate > endDate) {
-            notify.showError('Невалиден период!');
+            toastr.error('Невалиден период!');
             $("#startdate").css('background-color', 'rgb(250, 204, 204)');
             $("#enddate").css('background-color', 'rgb(250, 204, 204)');
             return false;
@@ -70,7 +70,8 @@
             $("#realsend").click();
         }
         else {
-            notify.showError('Моля въведете коректни стойности.');
+            //notify.showError('Моля въведете коректни стойности.');
+            toastr.error('Моля въведете коректни стойности.');
         }
     }
 

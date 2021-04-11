@@ -3,14 +3,14 @@ const loc = window.location.href;
 const path = loc.substr(0, loc.lastIndexOf('/') + 1);
 let placeholderElement = $('#modal-placeholder');
 let newdirplaseholder = $('#newdir-placeholder');
-let newsecplaseholder = $('#newsec-placeholder');
+//let newsecplaseholder = $('#newsec-placeholder');
 
 $(document).ready(function () {
     $('#showDeleted').on('change', DeletedSectorsShowOrHile);
     loadDataTable(false);
     ModalAction();
     NewDepModalAction();
-    NewSecModalAction()
+    //NewSecModalAction()
 });
 
 function DeletedSectorsShowOrHile() {
@@ -49,7 +49,7 @@ function loadDataTable(deleted) {
                     }
                     else {
                         return `<div>
-                            <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle='ajax-modal' data-target='#add-contact' onclick=DirModalShow('${path}EditSector?secId=${row.id}') >
+                            <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle='ajax-modal' data-target='#add-contact' onclick=EditSecModalShow('${path}EditSector?secId=${row.id}') >
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px;'
@@ -127,37 +127,37 @@ function Restore(url) {
     });
 }
 
-function AddSecModalShow(url) {
-    $.get(url).done(function (data) {
-        newsecplaseholder.html(data);
-        newsecplaseholder.find('.modal').modal('show');
-    });
-}
+//function AddSecModalShow(url) {
+//    $.get(url).done(function (data) {
+//        newsecplaseholder.html(data);
+//        newsecplaseholder.find('.modal').modal('show');
+//    });
+//}
 
-function NewSecModalAction() {
-    newsecplaseholder.on('click', '[data-save="modal"]', function (event) {
-        event.preventDefault();
-        let form = $(this).parents('.modal').find('form');
-        let actionUrl = form.attr('action');
-        let dataToSend = form.serialize();
+//function NewSecModalAction() {
+//    newsecplaseholder.on('click', '[data-save="modal"]', function (event) {
+//        event.preventDefault();
+//        let form = $(this).parents('.modal').find('form');
+//        let actionUrl = form.attr('action');
+//        let dataToSend = form.serialize();
 
-        $.post(actionUrl, dataToSend).done(function (data) {
-            let newBody = $('.modal-body', data);
-            newsecplaseholder.find('.modal-body').replaceWith(newBody);
-            let isValid = newBody.find('[name="IsValid"]').val() === 'True';
+//        $.post(actionUrl, dataToSend).done(function (data) {
+//            let newBody = $('.modal-body', data);
+//            newsecplaseholder.find('.modal-body').replaceWith(newBody);
+//            let isValid = newBody.find('[name="IsValid"]').val() === 'True';
 
-            if (isValid) {
-                newsecplaseholder.find('.modal').modal('hide');
-                location.reload();
-            }
+//            if (isValid) {
+//                newsecplaseholder.find('.modal').modal('hide');
+//                location.reload();
+//            }
 
-        });
-    });
-}
+//        });
+//    });
+//}
 
 
 
-function DirModalShow(url) {
+function EditSecModalShow(url) {
     $.get(url).done(function (data) {
         placeholderElement.html(data);
         placeholderElement.find('.modal').modal('show');
@@ -186,7 +186,7 @@ function ModalAction() {
 }
 
 function NewDepModalShow() {
-    $.get(`${path}CreateDepartment`).done(function (data) {
+    $.get(`${path}CreateSector`).done(function (data) {
         newdirplaseholder.html(data);
         newdirplaseholder.find('.modal').modal('show');
     });

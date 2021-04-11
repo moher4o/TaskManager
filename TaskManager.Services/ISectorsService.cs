@@ -16,11 +16,14 @@ namespace TaskManager.Services
 
         Task<List<AddNewSectorServiceModel>> GetSectorsAsync(bool deleted = false);
 
+        Task<AddNewSectorServiceModel> GetSectorAsync(int secId);
+
         Task<IEnumerable<SelectServiceModel>> GetSectorsNamesByDepartment(int? departmentId);
 
         Task<IEnumerable<SelectServiceModel>> GetSectorsNamesByDirectorate(int? directorateId);
         Task<string> CreateSectorAsync(int directoratesId, int depId, string sectorName);
         Task<string> MarkSectorDeleted(int secId);
         Task<string> MarkSectorActiveAsync(int secId);
+        Task<string> EditSectorAsync(int secId, int directoratesId, int departmentsId, string sectorName);
     }
 }

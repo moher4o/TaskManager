@@ -73,27 +73,27 @@ namespace TaskManager.Services.Implementations
         }
         private async Task<string> CheckDirectorateByIdAsync(int dirId)
         {
-            int employeesInDirectorate = await this.db.Employees.Where(s => s.DirectorateId == dirId && s.isDeleted == false).CountAsync();
+            int employeesInDirectorate = await this.db.Employees.Where(s => s.DirectorateId == dirId).CountAsync();
             if (employeesInDirectorate > 0)
             {
-                return "Има назначени служители в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+                return "Има назначени служители в дирекцията(може да са неактивни). Преместете ги в друга дирекция преди да бъде изтрита тази.";
             }
-            int tasksInDirectorate = await this.db.Tasks.Where(s => s.DirectorateId == dirId && s.isDeleted == false).CountAsync();
+            int tasksInDirectorate = await this.db.Tasks.Where(s => s.DirectorateId == dirId).CountAsync();
             if (tasksInDirectorate > 0)
             {
-                return "Има задачи в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+                return "Има задачи в дирекцията(изтрити или приключени също се отчитат). Преместете ги в друга дирекция преди да бъде изтрита тази.";
             }
 
-            int departmentInDirectorate = await this.db.Departments.Where(s => s.DirectorateId == dirId && s.isDeleted == false).CountAsync();
+            int departmentInDirectorate = await this.db.Departments.Where(s => s.DirectorateId == dirId).CountAsync();
             if (departmentInDirectorate > 0)
             {
-                return "Има отдели в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+                return "Има отдели в дирекцията(може да са маркирани изтрити). Преместете ги в друга дирекция преди да бъде изтрита тази.";
             }
 
-            int sectorsInDirectorate = await this.db.Sectors.Where(s => s.DirectorateId == dirId && s.isDeleted == false).CountAsync();
+            int sectorsInDirectorate = await this.db.Sectors.Where(s => s.DirectorateId == dirId).CountAsync();
             if (sectorsInDirectorate > 0)
             {
-                return "Има сектори в дирекцията. Преместете ги в друга дирекция преди да бъде изтрита тази.";
+                return "Има сектори в дирекцията(може да са маркирани изтрити) . Преместете ги в друга дирекция преди да бъде изтрита тази.";
             }
 
             return "success";

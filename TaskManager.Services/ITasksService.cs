@@ -38,7 +38,11 @@ namespace TaskManager.Services
         IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withClosed = false, bool withDeleted = false);
 
         Task<bool> CheckTaskByIdAsync(int taskId);
-        Task<bool> MarkTaskDeletedAsync(int taskId, int userId);
+
+        Task<string> MarkTaskDeletedAsync(int taskId, int userId);
+
+        Task<string> MarkTaskActiveAsync(int taskId, int userId);
+ 
         IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId);
     }
 }

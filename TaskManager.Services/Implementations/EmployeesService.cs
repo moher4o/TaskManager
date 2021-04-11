@@ -14,6 +14,7 @@ using TaskManager.Services.Models.TaskModels;
 using Microsoft.EntityFrameworkCore;
 using static TaskManager.Common.DataConstants;
 using TaskManager.Services.Models.ReportModels;
+using TaskManager.Services.Models.EmployeeModels;
 
 namespace TaskManager.Services.Implementations
 {
@@ -42,6 +43,16 @@ namespace TaskManager.Services.Implementations
                     .ToListAsync();
 
             return tasks;
+        }
+
+        public async Task<EmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate)
+        {
+            var report = await this.db.Employees
+                .Where(e => e.Id == userId)
+                .Include(e => e.WorkedHoursByTask)
+                .ProjectTo<EmployeeServiceModel>(new { startDate, endDate })
+                .FirstOrDefaultAsync();
+            return report;
         }
 
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId)

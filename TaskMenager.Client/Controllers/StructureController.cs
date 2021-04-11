@@ -27,6 +27,63 @@ namespace TaskMenager.Client.Controllers
             this.sectors = sectors;
         }
 
+        public IActionResult CreateSector()
+        {
+            var model = new SectorViewModel();
+            var dirList = this.directorates.GetDirectoratesNames(null);
+            model.Directorates = dirList
+                                   .Select(a => new SelectListItem
+                                   {
+                                       Text = a.TextValue.Length <= 65 ? a.TextValue : a.TextValue.Substring(0, 61) + "...",
+                                       Value = a.Id.ToString(),
+                                       Selected = true
+                                   })
+                                   .ToList();
+            model.DirectoratesId = dirList.Select(d => d.Id).FirstOrDefault();
+
+            var depList = this.departments.GetDepartmentsNamesByDirectorate(model.DirectoratesId);
+            model.Departments = depList
+                                   .Select(a => new SelectListItem
+                                   {
+                                       Text = a.TextValue.Length <= 65 ? a.TextValue : a.TextValue.Substring(0, 61) + "...",
+                                       Value = a.Id.ToString(),
+                                       Selected = true
+                                   })
+                                   .ToList();
+            model.DepartmentsId = depList.Select(d => d.Id).FirstOrDefault();
+
+
+            return PartialView("_CreateTotalNewSectorModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateSector(SectorViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.SecId > 0)
+                {
+                   string result = await this.sectors.EditSectorAsync(model.SecId, model.DirectoratesId, model.DepartmentsId, model.SectorName);
+                    if (result == "success")
+                    {
+                        TempData["Success"] = $"Сектор \"{model.SectorName}\" е успешно редактиран";
+                    }
+                    else
+                    {
+                        TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                    }
+
+                }
+                else
+                {
+                    await CreateSectorAsync(model.DirectoratesId, model.DepartmentsId, model.SectorName);
+                }
+                
+            }
+            return PartialView("_CreateTotalNewSectorModalPartial", model);
+        }
+
         public IActionResult CreateDepartment()
         {
             var model = new CreateDepViewModel();
@@ -82,19 +139,54 @@ namespace TaskMenager.Client.Controllers
         {
             if (ModelState.IsValid)
             {
-                string result = await this.sectors.CreateSectorAsync(model.DirectoratesId, model.DepId, model.DepartmentName);
-                if (result == "success")
-                {
-                    TempData["Success"] = $"Сектор \"{model.DepartmentName}\" е създаден успешно";
-                }
-                else
-                {
-                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
-                }
-
+                await CreateSectorAsync(model.DirectoratesId,model.DepId,model.DepartmentName);
             }
             return PartialView("_CreateSectorModalPartial", model);
         }
+
+        private async Task CreateSectorAsync(int dirId, int depId, string sectorName)
+        {
+            string result = await this.sectors.CreateSectorAsync(dirId, depId, sectorName);
+            if (result == "success")
+            {
+                TempData["Success"] = $"Сектор \"{sectorName}\" е създаден успешно";
+            }
+            else
+            {
+                TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+            }
+        }
+
+        public async Task<IActionResult> EditSector(int secId)
+        {
+            var sectorToEdit = await this.sectors.GetSectorAsync(secId);
+            var model = new SectorViewModel()
+            {
+
+                SecId = sectorToEdit.Id,
+                SectorName = sectorToEdit.Name,
+                DirectoratesId = sectorToEdit.DirectorateId,
+                Directorates = this.directorates.GetDirectoratesNames(null)
+                                   .Select(a => new SelectListItem
+                                   {
+                                       Text = a.TextValue.Length <= 65 ? a.TextValue : a.TextValue.Substring(0, 61) + "...",
+                                       Value = a.Id.ToString(),
+                                       Selected = a.Id == sectorToEdit.DirectorateId
+                                   })
+                                   .ToList(),
+                DepartmentsId = sectorToEdit.DepartmentId,
+                Departments = this.departments.GetDepartmentsNamesByDirectorate(sectorToEdit.DirectorateId)
+                                                   .Select(a => new SelectListItem
+                                                   {
+                                                       Text = a.TextValue.Length <= 65 ? a.TextValue : a.TextValue.Substring(0, 61) + "...",
+                                                       Value = a.Id.ToString(),
+                                                       Selected = a.Id == sectorToEdit.DepartmentId
+                                                   })
+                                   .ToList()
+            };
+            return PartialView("_CreateTotalNewSectorModalPartial", model);
+        }
+
 
 
         public async Task<IActionResult> EditDepartment(int depId)

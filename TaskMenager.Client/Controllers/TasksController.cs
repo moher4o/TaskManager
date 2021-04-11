@@ -1319,10 +1319,34 @@ namespace TaskMenager.Client.Controllers
 
         public async Task<IActionResult> ReopenTask(int taskId)
         {
-            var result = await this.tasks.ReopenTaskAsync(taskId);
-
-            return RedirectToAction(nameof(TaskDetails), new { taskId });
+            try
+            {
+                var result = await this.tasks.ReopenTaskAsync(taskId);
+                TempData["Success"] = "Задачата е отворена успешно!";
+                return RedirectToAction(nameof(TaskDetails), new { taskId });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"[ReopenTask] Сървиз грешка! Уведомете администратора. {ex.Message}";
+                return RedirectToAction(nameof(TaskDetails), new { taskId });
+            }
         }
+
+        public async Task<IActionResult> UndeleteTask(int taskId)
+        {
+            try
+            {
+                var result = await this.tasks.MarkTaskActiveAsync(taskId, currentUser.Id);
+                TempData["Success"] = "Задачата е възстановена успешно!";
+                return RedirectToAction(nameof(TaskDetails), new { taskId });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"[UndeleteTask] Сървиз грешка! Уведомете администратора. {ex.Message}";
+                return RedirectToAction(nameof(TaskDetails), new { taskId });
+            }
+        }
+
 
         #region API Calls
         [HttpGet]
@@ -1339,12 +1363,17 @@ namespace TaskMenager.Client.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int taskId)
         {
+            
             var taskFromDb = await this.tasks.CheckTaskByIdAsync(taskId);
             if (!taskFromDb)
             {
                 return Json(new { success = false, message = "Грешка при изтриване" });
             }
-            bool result = await this.tasks.MarkTaskDeletedAsync(taskId, currentUser.Id);
+            string result = await this.tasks.MarkTaskDeletedAsync(taskId, currentUser.Id);
+            if (result != "success")
+            {
+                return Json(new { success = false, message = $"[Грешка при изтриване] {result}" });
+            }
             return Json(new { success = result, message = "Задачата е изтрита" });
         }
 
