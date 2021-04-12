@@ -47,5 +47,7 @@ namespace TaskManager.Services
         Task<List<UserServiceModel>> GetAllNotActivatedUsersAsync();
 
         Task<EmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate);
+
+        Task<List<PersonalDateReportServiceModel>> GetDateReport(int userId, DateTime currentDate);
     }
 }

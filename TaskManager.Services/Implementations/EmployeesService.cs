@@ -45,6 +45,22 @@ namespace TaskManager.Services.Implementations
             return tasks;
         }
 
+        public async Task<List<PersonalDateReportServiceModel>> GetDateReport(int userId, DateTime currentDate)
+        {
+            var report = await this.db.WorkedHours
+                .Where(wh => wh.EmployeeId == userId && wh.WorkDate.Date == currentDate.Date)
+                .Include(wh => wh.Task)
+                .Include(wh => wh.Employee)
+                .Select(wh => new PersonalDateReportServiceModel
+                {
+                    TaskName = wh.Task.TaskName,
+                    WorkedHours = wh.HoursSpend,
+                    Note = wh.Text
+                }).ToListAsync();
+
+            return report;
+        }
+
         public async Task<EmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate)
         {
             var report = await this.db.Employees
@@ -58,7 +74,7 @@ namespace TaskManager.Services.Implementations
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId)
         {
             var tasks = await this.db.Tasks
-                    .Where(et => et.AssignerId == userId && et .isDeleted == false)
+                    .Where(et => et.AssignerId == userId && et.isDeleted == false)
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
                     .ProjectTo<TaskFewInfoServiceModel>()
@@ -134,15 +150,15 @@ namespace TaskManager.Services.Implementations
 
         public async Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false)
         {
-                return await this.db.Employees
-                        .Where(t => t.isDeleted == withDeleted && t.isActive == true)
-                        .OrderBy(t => t.DirectorateId)
-                        .ThenBy(t => t.DepartmentId)
-                        .ThenBy(e => e.SectorId != null ? e.SectorId : 999)
-                        .ThenBy(t => t.FullName)
-                        .ProjectTo<UserServiceModel>()
-                        .ToListAsync();
-            
+            return await this.db.Employees
+                    .Where(t => t.isDeleted == withDeleted && t.isActive == true)
+                    .OrderBy(t => t.DirectorateId)
+                    .ThenBy(t => t.DepartmentId)
+                    .ThenBy(e => e.SectorId != null ? e.SectorId : 999)
+                    .ThenBy(t => t.FullName)
+                    .ProjectTo<UserServiceModel>()
+                    .ToListAsync();
+
         }
 
         public IEnumerable<SelectServiceModel> GetActiveEmployeesNames()
@@ -397,8 +413,8 @@ namespace TaskManager.Services.Implementations
                     return "Няма акаунт с Id : " + userId.ToString();
                 }
 
-                var activeUserTask = userToDeactivate.TasksAssigner.Where(t => t.StatusId != this.db.TasksStatuses.Where(st => st.StatusName == TaskStatusClosed).Select(ts=>ts.Id).FirstOrDefault()).Count();
-                if (activeUserTask>0)
+                var activeUserTask = userToDeactivate.TasksAssigner.Where(t => t.StatusId != this.db.TasksStatuses.Where(st => st.StatusName == TaskStatusClosed).Select(ts => ts.Id).FirstOrDefault()).Count();
+                if (activeUserTask > 0)
                 {
                     return $"Потребителя е отговорник по ({activeUserTask}) активни задачи. Прехвърлете задачите на друг преди да го деактивирате.";
                 }

@@ -43,8 +43,6 @@ function loadDataTable(deleted) {
                         </a>
                         </div>`;
                     }
-                   // <a href="${path}RenameDirectorate?dirId=${row.id}&dirName=${row.name}" style='cursor:pointer; padding-left:10px;' title='Редакция'>
-                   // <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle="ajax-modal" data-target="#add-contact" data-url="${path}RenameDirectorate" data-dirid="${row.id}" data-dirname="${row.name}">     onclick=DirModalShow('${path}RenameDirectorate?dirId=${row.id}&dirName=${row.name}')>
                     else {
                         return `<div>
                             <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle='ajax-modal' data-target='#add-contact' data-url='${path}RenameDirectorate' data-dirid='${row.id}' data-dirname='${row.name}' onclick=DirModalShow('${path}RenameDirectorate?dirId=${row.id}') >
