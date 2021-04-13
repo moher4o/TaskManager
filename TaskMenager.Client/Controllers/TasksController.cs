@@ -95,12 +95,7 @@ namespace TaskMenager.Client.Controllers
                 {
                     return View(model);
                 }
-                if (model.HoursSpend <= 0)
-                {
-                    TempData["Error"] = ":) Часовете трябва да са положително цяло число по-голямо от 0";
-                    return View(model);
-                }
-                var workedHours = new TaskWorkedHoursServiceModel()
+                 var workedHours = new TaskWorkedHoursServiceModel()
                 {
                     EmployeeId = model.employeeId,
                     EmployeeName = model.employeeFullName,
@@ -114,8 +109,8 @@ namespace TaskMenager.Client.Controllers
                 string result = await this.tasks.SetWorkedHoursAsync(workedHours);
                 if (result == "success")
                 {
-                    TempData["Success"] = "Часовете са добавени успешно.";
-                    return RedirectToAction("Index", "Home");
+                    TempData["Success"] = "Часовете са актуализирани успешно.";
+                    return View(model);
                 }
                 else
                 {

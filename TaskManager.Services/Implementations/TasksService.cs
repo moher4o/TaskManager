@@ -382,10 +382,6 @@ namespace TaskManager.Services.Implementations
                 if (currentTask.TaskStatus.StatusName == TaskStatusClosed)
                 {
                     return "Задачата е приключена!";
-                    //if (currentTask.EndDate.Value.Date < workedHours.WorkDate.Date)
-                    //{
-                    //    return "Задачата е приключена на : " + currentTask.EndDate.Value.Date.ToString("dd/MM/yyyy") + "г.";
-                    //}
                 }
                 var currentTaskHours = await this.db.WorkedHours
                     .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId && d.TaskId == workedHours.TaskId)
@@ -400,6 +396,10 @@ namespace TaskManager.Services.Implementations
                 {
                     if (currentTaskHours == null)   // ако по конкретната задача не е работено за тази дата
                     {
+                        if (workedHours.HoursSpend < 1)
+                        {
+                            return "Няма данни да е работено по задачата за тази дата. Въвеждането на нулева или отрицателна стойност на часовете, е невалидно в този случай.";
+                        }
                         var workedHousDB = new WorkedHours()
                         {
                             EmployeeId = workedHours.EmployeeId,
@@ -412,7 +412,16 @@ namespace TaskManager.Services.Implementations
                     }
                     else
                     {
-                        currentTaskHours.HoursSpend += workedHours.HoursSpend;
+                        if ((currentTaskHours.HoursSpend + workedHours.HoursSpend) >= 0)  //проверка да не се окаже , че експерта е работил отрицателни часове
+                        {
+                            currentTaskHours.HoursSpend += workedHours.HoursSpend;
+                            currentTaskHours.Text = workedHours.Text;
+                        }
+                        else 
+                        {
+                            return $"Невалидна стойност! Можете да коригирате до {currentTaskHours.HoursSpend} часа по тази задача.";
+                        }
+                        
                     }
                     await this.db.SaveChangesAsync();
                     return "success";

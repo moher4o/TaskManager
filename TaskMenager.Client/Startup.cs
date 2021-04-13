@@ -38,6 +38,8 @@ namespace TaskMenager.Client
 
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
+            //services.AddTransient<IEmailSender, EmailSender>();
+
             services.AddHttpContextAccessor();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -80,7 +82,7 @@ namespace TaskMenager.Client
 
             services.AddSession();
 
-            
+            //services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
 
         }
 
