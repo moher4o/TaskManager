@@ -14,6 +14,7 @@ using NPOI.SS.UserModel;
 using TaskManager.Services;
 using Microsoft.AspNetCore.Authorization;
 using TaskManager.Common;
+using Microsoft.AspNetCore.Hosting;
 
 namespace TaskMenager.Client.Controllers
 {
@@ -27,7 +28,7 @@ namespace TaskMenager.Client.Controllers
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
         
-        public InsertDataFromFileController(IRolesService roles, ITitleService titles, IEmployeesService employees, ITasksService tasks, IDepartmentsService departments, ISectorsService sectors, IDirectorateService directorates, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, employees, tasks)
+        public InsertDataFromFileController(IRolesService roles, ITitleService titles, IEmployeesService employees, ITasksService tasks, IDepartmentsService departments, ISectorsService sectors, IDirectorateService directorates, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             //this.roles = roles;
             this.titles = titles;

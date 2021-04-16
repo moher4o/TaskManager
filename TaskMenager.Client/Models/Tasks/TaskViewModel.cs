@@ -118,7 +118,7 @@ namespace TaskMenager.Client.Models.Tasks
                                                            .OrderBy(e => e.Employee.FullName)
                                                            .Select(e => new SelectServiceModel
                                                            {
-                                                               //TextValue = string.Concat(e.Employee.JobTitle.TitleName, " ", e.Employee.FullName),
+                                                               Email = e.Employee.Email,
                                                                TextValue = e.Employee.FullName,
                                                                Id = e.Employee.Id,
                                                                isDeleted = e.isDeleted,

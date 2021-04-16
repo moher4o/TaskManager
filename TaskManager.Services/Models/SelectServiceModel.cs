@@ -17,5 +17,7 @@ namespace TaskManager.Services.Models
         public string DepartmentName { get; set; }
 
         public string SectorName { get; set; }
+
+        public string Email { get; set; }
     }
 }

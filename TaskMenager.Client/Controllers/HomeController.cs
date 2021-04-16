@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,7 @@ namespace TaskMenager.Client.Controllers
         private readonly IRolesService roles;
         //private readonly ITasksService tasks;
 
-        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, employees, tasks)
+        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             //_logger = logger;
             //this.employees = employees;

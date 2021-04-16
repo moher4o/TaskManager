@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,7 +23,7 @@ namespace TaskMenager.Client.Controllers
         private readonly ISectorsService sectors;
         private readonly IRolesService roles;
         private readonly ITitleService jobTitles;
-        public UsersController(IEmployeesService employees, ITitleService jobTitles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, employees, tasks)
+        public UsersController(IEmployeesService employees, ITitleService jobTitles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             this.roles = roles;
             this.directorates = directorates;

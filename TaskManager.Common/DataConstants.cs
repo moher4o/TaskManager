@@ -41,14 +41,41 @@ namespace TaskManager.Common
 
 
         //Developer Data
-        public const string DeveloperUsername = "ryzen7\\samso";
-        public const string DeveloperEmail = "samsoft@abv.bg";
+        public const string DeveloperUsername = "dc1\\avukov";
+        public const string DeveloperEmail = "avukov@e-gov.bg";
         public const string DeveloperFirstName = "Ангел";
         public const string DeveloperLastName = "Вуков";
         public const string DeveloperJobTitle = "Employee"; //for first use
 
         public const string FirmName = "ДАЕУ";
         public const bool IsoActive = false;
+
+
+        //Email настройки     <h3><a href=""https://172.23.40.111/TaskManager"">Мениджър задачи</a></h3>    
+        public const string FromEmailString = "";
+
+        public const string NotificationTemplate = @"
+                            <div class=""col-md-offset-1"">
+                            <p>Здравейте,  </p>
+                            <p>Добавен е коментар по задача: <p> {0}</p></p>
+                            </div>
+
+                            <div>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td style = ""padding-left:10px;"" >
+                                            <div>
+                                                <div class=""logo-text""><a href=""{1}"">Мениджър задачи</a></div>
+                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                            ";
+
 
         private static readonly Dictionary<string, string> MIMETypesDictionary = new Dictionary<string, string>
   {

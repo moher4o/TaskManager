@@ -1,4 +1,4 @@
-﻿using TaskManager.Services.Models;
+﻿using TaskManager.Services.Models.Email;
 using System.Collections.Generic;
 
 namespace TaskManager.Services
@@ -9,6 +9,6 @@ namespace TaskManager.Services
 
         List<EmailMessage> ReceiveEmail(int maxCount = 10);
 
-        void SendConfirmationEmailBody(EmailTransferServiceModel transfer);
+        //void SendConfirmationEmailBody(EmailTransferServiceModel transfer);
     }
 }

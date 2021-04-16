@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,7 +21,7 @@ namespace TaskMenager.Client.Controllers
         private readonly ITaskPrioritysService taskprioritys;
         private readonly IStatusService statuses;
         private readonly INotesService taskNotes;
-        public NotesController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, INotesService taskNotes) : base(httpContextAccessor, employees, tasks)
+        public NotesController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, INotesService taskNotes, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             this.statuses = statuses;
             this.directorates = directorates;
@@ -51,6 +52,8 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+
+
         #region API Calls
         [Authorize(Policy = DataConstants.Employee)]
         [HttpGet]
@@ -64,6 +67,7 @@ namespace TaskMenager.Client.Controllers
             bool result = await this.taskNotes.AddNoteAsync(text, taskId, currentUser.Id);
             if (result)
             {
+                var emailresult = await this.NotificationForNoteAsync(taskId);
                 return Json(new { success = result, message = "Коментара е добавен успешно" });
             }
             {

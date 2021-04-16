@@ -11,5 +11,6 @@
         int PopPort { get; }
         string PopUsername { get; }
         string PopPassword { get; }
+        public bool SendMails { get; set; }
     }
 }

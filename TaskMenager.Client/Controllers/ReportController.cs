@@ -19,7 +19,7 @@ using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Drawing.Chart.Style;
 using Microsoft.AspNetCore.Authorization;
 using TaskManager.Common;
-
+using Microsoft.AspNetCore.Hosting;
 
 namespace TaskMenager.Client.Controllers
 {
@@ -30,7 +30,7 @@ namespace TaskMenager.Client.Controllers
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
 
-        public ReportController(IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, employees, tasks)
+        public ReportController(IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             this.directorates = directorates;
             this.departments = departments;

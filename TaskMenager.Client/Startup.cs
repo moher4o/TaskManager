@@ -16,6 +16,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using TaskManager.Common;
 using TaskManager.Data;
+using TaskManager.Services;
+using TaskManager.Services.Implementations;
 using TaskManager.Data.Models;
 using TaskMenager.Client.Controllers;
 using TaskMenager.Client.Infrastructure.Extensions;
@@ -38,7 +40,7 @@ namespace TaskMenager.Client
 
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
-            //services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddHttpContextAccessor();
 
@@ -82,7 +84,7 @@ namespace TaskMenager.Client
 
             services.AddSession();
 
-            //services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
+            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
 
         }
 
