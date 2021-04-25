@@ -19,14 +19,81 @@ namespace TaskMenager.Client.Controllers
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
+        private readonly ITitleService titles;
 
 
-        public StructureController(IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
+        public StructureController(ITitleService titles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
+            this.titles = titles;
         }
+
+        public IActionResult RenameTitle(int jobId)
+        {
+            var model = new TitleViewModel();
+
+            model.TitleId = jobId;
+            model.TitleName = this.titles.GetJobTitlesNames().Where(j => j.Id == jobId).Select(j => j.TextValue).FirstOrDefault();
+
+            return PartialView("_RenameTitleModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RenameTitle(TitleViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await this.titles.RenameTitleAsync(model.TitleId, model.TitleName);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Името е успешно променено на \"{model.TitleName}\"";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_RenameTitleModalPartial", model);
+        }
+
+        public IActionResult CreateTitle()
+        {
+            var model = new TitleViewModel();
+
+            model.TitleId = -999;
+
+            return PartialView("_CreateTitleModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateTitle(TitleViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string result = await this.titles.CreateTitleAsync(model.TitleName);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Длъжност \"{model.TitleName}\" е създадена успешно";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_CreateTitleModalPartial", model);
+        }
+
+        public IActionResult JobtitlesList()
+        {
+            return View();
+        }
+
 
         public IActionResult CreateSector()
         {
@@ -312,30 +379,54 @@ namespace TaskMenager.Client.Controllers
 
         #region API Calls
         [HttpGet]
+        public async Task<IActionResult> getAllJobs(bool deleted = false)
+        {
+            var data = await this.titles.GetJobTitlesAsync(deleted);
+            return Json(new { data });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteTitle(int jobId)
+        {
+            var check = await this.titles.MarkTitleDeleted(jobId);
+            if (check != "success")
+            {
+                return Json(new { success = false, message = check });
+            }
+            return Json(new { success = true, message = "Длъжността е изтрита" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RestoreTitle(int jobId)
+        {
+            string check = await this.titles.MarkTitleActiveAsync(jobId);
+            if (check != "success")
+            {
+                return Json(new { success = false, message = check });
+            }
+            return Json(new { success = true, message = "Длъжността е възстановена" });
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> GetAllSectors(bool deleted = false)
         {
             var data = await this.sectors.GetSectorsAsync(deleted);
             return Json(new { data });
-
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetAllDepartments(bool deleted = false)
         {
             var data = await this.departments.GetDepartmentsAsync(deleted);
             return Json(new { data });
-
         }
-
-
 
         [HttpGet]
         public async Task<IActionResult> GetAllDirectorates(bool deleted = false)
         {
             var data = await this.directorates.GetDirectoratesAsync(deleted);
             return Json(new { data });
-
         }
 
         [HttpGet]

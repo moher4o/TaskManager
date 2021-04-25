@@ -16,6 +16,12 @@ using TaskMenager.Client.Models.Tasks;
 
 namespace TaskMenager.Client.Controllers
 {
+    public enum EmailType
+    {
+        Note,
+        Create,
+        Close
+    }
 
     public class BaseController : Controller
     {
@@ -40,7 +46,7 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
-        public async Task<string> NotificationForNoteAsync(int taskId)
+        public async Task<string> NotificationAsync(int taskId, EmailType _emailType)
         {
             try
             {
@@ -49,45 +55,76 @@ namespace TaskMenager.Client.Controllers
                     .FirstOrDefaultAsync();
                 if (currentTask != null)
                 {
-                    //string host = "https://" + _httpContextAccessor.HttpContext.Request.Host.Value + "/TaskManager";
                     string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value, "/TaskManager");
-                    var notesLink = host + "/Notes/TaskNotesList?taskId=" + taskId.ToString();
-                    string emailForm = string.Format(
-                                               NotificationTemplate,
-                                               //string.Concat("г-н/г-жо/г-це ", currentTask.AssignerName.Substring(currentTask.AssignerName.LastIndexOf(' ')+1)),
-                                               string.Concat("<a href=\"", notesLink, "\">", currentTask.TaskName, "</a>"),
-                                               host
-                                               );
-
-                    var assigner = await this.employees.GetEmployeeByIdAsync(currentTask.AssignerId);
-                    if (string.IsNullOrWhiteSpace(assigner.Email))
+                    
+                    var emailForm = string.Empty;
+                    if (_emailType == EmailType.Note)
                     {
-                        return $"{assigner.FullName} няма въведен email адрес";
+                        var notesLink = host + "/Notes/TaskNotesList?taskId=" + taskId.ToString();
+                        emailForm = string.Format(
+                                                   NotificationTemplate,
+                                                   //string.Concat("г-н/г-жо/г-це ", currentTask.AssignerName.Substring(currentTask.AssignerName.LastIndexOf(' ')+1)),
+                                                   string.Concat("<a href=\"", notesLink, "\">", currentTask.TaskName, "</a>"),
+                                                   host
+                                                   );
+                    }
+                    else if (_emailType == EmailType.Create)
+                    {
+                        var taskLink = host + "/Tasks/TaskDetails?taskId=" + taskId.ToString();
+                        emailForm = string.Format(
+                                                   CreateTemplate,
+                                                   string.Concat("<a href=\"", taskLink, "\">", currentTask.TaskName, "</a>"),
+                                                   host
+                                                   );
+                    }
+                    else if (_emailType == EmailType.Close)
+                    {
+                        var taskLink = host + "/Tasks/TaskDetails?taskId=" + taskId.ToString();
+                        emailForm = string.Format(
+                                                   CloseTemplate,
+                                                   string.Concat("<a href=\"", taskLink, "\">", currentTask.TaskName, "</a>"),
+                                                   host
+                                                   );
                     }
 
+
                     var emailAddressesToSent = currentTask.Colleagues
-                        .Where(e => e.isDeleted == false && !string.IsNullOrWhiteSpace(e.Email))
-                        .Select(e => new EmailAddress
-                        {
-                            Name = e.TextValue,
-                            Address = e.Email
-                        }).ToList();
+                            .Where(e => e.isDeleted == false && !string.IsNullOrWhiteSpace(e.Email) && e.Notify)
+                            .Select(e => new EmailAddress
+                            {
+                                Name = e.TextValue,
+                                Address = e.Email
+                            }).ToList();
 
-
-                    var assignerEmail = new EmailAddress()
+                    var assigner = await this.employees.GetEmployeeByIdAsync(currentTask.AssignerId);
+                    if (!string.IsNullOrWhiteSpace(assigner.Email) && assigner.Notify)
                     {
-                        Name = assigner.FullName,
-                        Address = assigner.Email
-                    };
-                    emailAddressesToSent.Add(assignerEmail);
+                        var assignerEmail = new EmailAddress()
+                        {
+                            Name = assigner.FullName,
+                            Address = assigner.Email
+                        };
+                        var index = emailAddressesToSent.FindIndex(i => i.Address == assignerEmail.Address);
+                        if (index > -1)
+                        {
+                            emailAddressesToSent.RemoveAt(index);
+                            emailAddressesToSent.Insert(0, assignerEmail);
+                        }                                                                                               //адреса на ръководителя се поставя/премества на първо място
+                        else
+                        {
+                            emailAddressesToSent.Insert(0, assignerEmail);    //съобщението се изпраща до този (първия) потребител. Останалите са в BCC
+                        }
+                    }
 
-                    var message = new EmailMessage();
-                    message.Content = emailForm;
-                    message.FromAddresses.Add(new EmailAddress { Name = FirmName, Address = FromEmailString });
-                    message.ToAddresses.AddRange(emailAddressesToSent);
-                    message.Subject = "Информация за активност по задача";
-
-                    this.email.Send(message);
+                    if (emailAddressesToSent.Count > 0)
+                    {
+                        var message = new EmailMessage();
+                        message.Content = emailForm;
+                        message.FromAddresses.Add(new EmailAddress { Name = FirmName, Address = FromEmailString });
+                        message.ToAddresses.AddRange(emailAddressesToSent);
+                        message.Subject = "Информация за активност по задача";
+                        await this.email.Send(message);
+                    }
 
                 }
 
@@ -99,6 +136,76 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+        public async Task<string> NotificationAsync(int taskId, List<int> oldColeagues)
+        {
+            try
+            {
+                var currentTask = await this.tasks.GetTaskDetails(taskId)
+                    .ProjectTo<TaskViewModel>()
+                    .FirstOrDefaultAsync();
+                if (currentTask != null)
+                {
+                    string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value, "/TaskManager");
+
+                    var emailForm = string.Empty;
+                        var taskLink = host + "/Tasks/TaskDetails?taskId=" + taskId.ToString();
+                        emailForm = string.Format(
+                                                   AddColeaguesTemplate,
+                                                   string.Concat("<a href=\"", taskLink, "\">", currentTask.TaskName, "</a>"),
+                                                   host
+                                                   );
+                    var emailAddressesToSent = currentTask.Colleagues
+                            .Where(e => e.isDeleted == false && !string.IsNullOrWhiteSpace(e.Email) && e.Notify)
+                            .Select(e => new EmailAddress
+                            {
+                                EmpId = e.Id,
+                                Name = e.TextValue,
+                                Address = e.Email
+                            }).ToList();
+
+                    var assigner = await this.employees.GetEmployeeByIdAsync(currentTask.AssignerId);
+                    if (!string.IsNullOrWhiteSpace(assigner.Email) && assigner.Notify)
+                    {
+                        var assignerEmail = new EmailAddress()
+                        {
+                            EmpId = assigner.Id,
+                            Name = assigner.FullName,
+                            Address = assigner.Email
+                        };
+                        var index = emailAddressesToSent.FindIndex(i => i.Address == assignerEmail.Address);
+                        if (index > -1)
+                        {
+                            emailAddressesToSent.RemoveAt(index);
+                            emailAddressesToSent.Insert(0, assignerEmail);
+                        }                                                                                               //адреса на ръководителя се поставя/премества на първо място
+                        else
+                        {
+                            emailAddressesToSent.Insert(0, assignerEmail);   //съобщението се изпраща до този (първия) потребител. Останалите са в BCC
+                        }
+                    }
+
+                    //проверка дали има нови колеги
+                    emailAddressesToSent = emailAddressesToSent.Except(emailAddressesToSent.Where(s => oldColeagues.Contains(s.EmpId)).ToArray()).ToList();
+
+                    if (emailAddressesToSent.Count > 0)
+                    {
+                        var message = new EmailMessage();
+                        message.Content = emailForm;
+                        message.FromAddresses.Add(new EmailAddress { Name = FirmName, Address = FromEmailString });
+                        message.ToAddresses.AddRange(emailAddressesToSent);
+                        message.Subject = "Информация за активност по задача";
+                        await this.email.Send(message);
+                    }
+
+                }
+
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return $"[SendNotificationForNote] Грешка при създаването на email {ex.Message}";
+            }
+        }
 
     }
 }

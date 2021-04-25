@@ -130,6 +130,9 @@
                         @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control", placeholder = "0xxx xxxxxx", id = "mobNumberId", name = "mobNumber" })
                         <span asp-validation-for="MobileNumber" class="text-danger"></span>
                     </div>
+                    <div class="col-md-10 checkbox" style="padding-top:10px;">
+                        <label>@Html.CheckBoxFor(model => model.Notify)&nbsp;@Html.DisplayNameFor(model => model.Notify)</label>
+                    </div>
 
                 </div>
             </div>

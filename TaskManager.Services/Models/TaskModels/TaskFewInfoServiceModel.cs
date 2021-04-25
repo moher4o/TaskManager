@@ -32,6 +32,8 @@ namespace TaskManager.Services.Models.TaskModels
 
         public int EmployeeHoursToday { get; set; }
 
+        public int FilesCount { get; set; }
+
         IEnumerable<SelectServiceModel> Colleagues { get; set; } = new List<SelectServiceModel>();
 
         

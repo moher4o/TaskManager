@@ -33,33 +33,15 @@
                 <div class="col-md-1">
                     <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
                 </div>
-                @*<div class="col-md-1" style="color: #5f9fec;">
-                        <div style="padding-left:20px; min-width:100px;">
-                            <img class="chatnotifications" src="~/png/note.png" />
-                            <span class="notificationsTodayCountValue">0</span>
-                        </div>
-                    </div>
-                    <div class="col-md-1" style="color: #5f9fec;">
-                        <div style="padding-left:20px; min-width:100px;">
-                            <a asp-controller="Tasks" asp-action="AddWorkHours"
-                               asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
-                               asp-route-taskId="@item.Id"
-                               asp-route-employeeId="@Model.userId">
-                                <img class="chatnotifications" src="~/png/3DClock.png" />
-                                <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
-                                <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
-                            </a>
-                        </div>
-                    </div>*@
                 <div class="col-md-3" style="color: #5f9fec;">
-                    <div class="row">
-                        <div style="padding-left:20px; min-width:100px;">
-                            <a asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
+                    <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                        <div style="min-width:50px;">
+                            <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                                 <img class="chatnotifications" src="~/png/note.png" />
                                 <span class="notificationsTodayCountValue">@item.NotesCount</span>
                             </a>
                         </div>
-                        <div style="padding-left:20px; min-width:100px;">
+                        <div style="min-width:50px;">
                             <a asp-controller="Tasks" asp-action="AddWorkHours"
                                asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
                                asp-route-taskId="@item.Id"
@@ -69,6 +51,15 @@
                                 <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
                             </a>
                         </div>
+                        <div style="min-width:50px;">
+                            <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
+                               asp-route-taskName="@item.TaskName"
+                               asp-route-taskId="@item.Id">
+                                <img class="chatnotifications3" src="~/png/files.png" />
+                                <span class="notificationsTodayCountValue">@item.FilesCount</span>
+                            </a>
+                        </div>
+
                     </div>
                 </div>
 

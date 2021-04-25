@@ -17,14 +17,23 @@
         <div class="col-md-1">
             <label style="padding-left:10px;">@(item.EndDate.HasValue ? item.EndDate.Value.Date.ToString("dd/MM/yyyy") : "")</label>
         </div>
-        <div class="col-md-1" style="color: #5f9fec;">
-            <div class="row">
-                <div style="padding-left:20px; min-width:100px;">
-                    <a asp-controller="Home" asp-action="NotImplemented">
+        <div class="col-md-3" style="color: #5f9fec;">
+            <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                <div style="min-width:50px;">
+                    <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                         <img class="chatnotifications" src="~/png/note.png" />
-                        <span class="notificationsTodayCountValue">0</span>
+                        <span class="notificationsTodayCountValue">@item.NotesCount</span>
                     </a>
                 </div>
+                <div style="min-width:50px;">
+                    <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
+                       asp-route-taskName="@item.TaskName"
+                       asp-route-taskId="@item.Id">
+                        <img class="chatnotifications3" src="~/png/files.png" />
+                        <span class="notificationsTodayCountValue">@item.FilesCount</span>
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>

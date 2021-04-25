@@ -10,7 +10,11 @@ namespace TaskManager.Services.Models
 
         public int Id { get; set; }
 
+        public int Count { get; set; }
+
         public bool isDeleted { get; set; } = false;
+
+        public bool Notify { get; set; } = true;
 
         public string DirectorateName { get; set; }
 

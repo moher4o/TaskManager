@@ -34,9 +34,6 @@ namespace TaskManager.Common
         public const string TaskPriorityHi = "Висок";
         public const int TasksPriorityCount = 3; // броя на типовете по-горе  !!!
 
-
-        public const string SuccessMessageKey = "SuccessMessage";
-        public const string ErrorMessageKey = "ErrorMessage";
         public const string ChooseValue = "Моля изберете...";
 
 
@@ -48,10 +45,10 @@ namespace TaskManager.Common
         public const string DeveloperJobTitle = "Employee"; //for first use
 
         public const string FirmName = "ДАЕУ";
-        public const bool IsoActive = false;
+        public const string ClassFilesSubDirectory = "TasksFiles";
 
 
-        //Email настройки     <h3><a href=""https://172.23.40.111/TaskManager"">Мениджър задачи</a></h3>    
+        //Email настройки        
         public const string FromEmailString = "";
 
         public const string NotificationTemplate = @"
@@ -66,7 +63,7 @@ namespace TaskManager.Common
                                     <tr>
                                         <td style = ""padding-left:10px;"" >
                                             <div>
-                                                <div class=""logo-text""><a href=""{1}"">Мениджър задачи</a></div>
+                                                <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
                                                 <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
                                             </div>
                                         </td>
@@ -75,6 +72,74 @@ namespace TaskManager.Common
                             </table>
                             </div>
                             ";
+
+        public const string CreateTemplate = @"
+                            <div class=""col-md-offset-1"">
+                            <p>Здравейте,  </p>
+                            <p>Създадена е задача: <p> {0}</p> в която сте участник</p>
+                            </div>
+
+                            <div>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td style = ""padding-left:10px;"" >
+                                            <div>
+                                                <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
+                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                            ";
+
+        public const string AddColeaguesTemplate = @"
+                            <div class=""col-md-offset-1"">
+                            <p>Здравейте,  </p>
+                            <p>Включен/а сте в задача: <p> {0}</p></p>
+                            </div>
+
+                            <div>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td style = ""padding-left:10px;"" >
+                                            <div>
+                                                <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
+                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                            ";
+
+
+        public const string CloseTemplate = @"
+                            <div class=""col-md-offset-1"">
+                            <p>Здравейте,  </p>
+                            <p>Задача: <p> {0}</p> в която сте участник е приключена</p>
+                            </div>
+
+                            <div>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td style = ""padding-left:10px;"" >
+                                            <div>
+                                                <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
+                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                            ";
+
 
 
         private static readonly Dictionary<string, string> MIMETypesDictionary = new Dictionary<string, string>
@@ -269,20 +334,20 @@ namespace TaskManager.Common
     {"zip", "application/zip"}
   };
 
-        public static string GetMIMEType(string fileName)
+    public static string GetMIMEType(string fileName)
+    {
+        //get file extension
+        string extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+        if (extension.Length > 0 &&
+            MIMETypesDictionary.ContainsKey(extension.Remove(0, 1)))
         {
-            //get file extension
-            string extension = Path.GetExtension(fileName).ToLowerInvariant();
-
-            if (extension.Length > 0 &&
-                MIMETypesDictionary.ContainsKey(extension.Remove(0, 1)))
-            {
-                return MIMETypesDictionary[extension.Remove(0, 1)];
-            }
-            return "unknown/unknown";
+            return MIMETypesDictionary[extension.Remove(0, 1)];
         }
-
+        return "unknown/unknown";
     }
+
+}
 
 
 }

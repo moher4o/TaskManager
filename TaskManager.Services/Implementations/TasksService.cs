@@ -26,6 +26,16 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<bool> CheckIfTaskIsClosed(int taskId)
+        {
+            var task = await this.db.Tasks.Include(t => t.TaskStatus).Where(t => t.Id == taskId).FirstOrDefaultAsync();
+            if (task.TaskStatus.StatusName == DataConstants.TaskStatusClosed)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withClosed = false, bool withDeleted = false)
         {
 
@@ -124,7 +134,7 @@ namespace TaskManager.Services.Implementations
             return taskData;
         }
 
-        public async Task<string> AddNewTaskAsync(AddNewTaskServiceModel newTask)
+        public async Task<int> AddNewTaskAsync(AddNewTaskServiceModel newTask)
         {
             try
             {
@@ -170,11 +180,11 @@ namespace TaskManager.Services.Implementations
 
                 await this.db.Tasks.AddAsync(taskDB);
                 await this.db.SaveChangesAsync();
-                return "success";
+                return taskDB.Id;
             }
             catch (Exception)
             {
-                return "Неуспешен запис. Проверете входните данни.";
+                return -1;
             }
         }
 

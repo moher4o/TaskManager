@@ -9,6 +9,7 @@ using System.Text;
 using TaskManager.Services.Models.Email;
 using System.Security.Authentication;
 using MailKit.Security;
+using System.Threading.Tasks;
 
 namespace TaskManager.Services.Implementations
 {
@@ -26,12 +27,15 @@ namespace TaskManager.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public void Send(EmailMessage emailMessage)
+        public async Task<bool> Send(EmailMessage emailMessage)
         {
             if (_emailConfiguration.SendMails)
             {
                 var message = new MimeMessage();
-                message.To.AddRange(emailMessage.ToAddresses.Select(x => new MailboxAddress(x.Name, x.Address)));
+                message.To.Add(emailMessage.ToAddresses.Select(x => new MailboxAddress(x.Name, x.Address)).FirstOrDefault());
+                emailMessage.ToAddresses.RemoveAt(0);
+                message.Bcc.AddRange(emailMessage.ToAddresses.Select(x => new MailboxAddress(x.Name, x.Address)));
+                
                 message.From.AddRange(emailMessage.FromAddresses.Select(x => new MailboxAddress(x.Name, x.Address)));
 
                 message.Subject = emailMessage.Subject;
@@ -53,20 +57,21 @@ namespace TaskManager.Services.Implementations
                     //emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);
 
 
-                    emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);     //1 вариант без автентикация
+                    await emailClient.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);     //1 вариант без автентикация
 
                     //emailClient.Connect(_emailConfiguration.SmtpServer, 587, SecureSocketOptions.StartTls);   //2 вариант с автентикация
                     //emailClient.Authenticate(sasl);
 
                     //Remove any OAuth functionality as we won't be using it. 
                     //emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
-                    //emailClient.Authenticate(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
+                    await emailClient.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
 
-                    emailClient.Send(message);
+                    await emailClient.SendAsync(message);
 
-                    emailClient.Disconnect(true);
+                    await emailClient.DisconnectAsync(true);
                 }
             }
+            return true;
         }
 
         public MimeEntity MessageBody(EmailMessage emailMessage)

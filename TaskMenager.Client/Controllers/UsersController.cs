@@ -66,7 +66,8 @@ namespace TaskMenager.Client.Controllers
                         isActive = currentEmployee.isActive,
                         isDeleted = currentEmployee.isDeleted,
                         DaeuAccaunt = currentEmployee.DaeuAccaunt,
-                        RoleId = currentEmployee.RoleId
+                        RoleId = currentEmployee.RoleId,
+                        Notify = currentEmployee.Notify
                     };
                     userToEdit = PrepareUserRegisterModel(userToEdit);
                     return View(userToEdit);
@@ -97,7 +98,7 @@ namespace TaskMenager.Client.Controllers
                     return View(model);
                 }
 
-                if ((model.RoleId.Value == await this.roles.GetUserRoleIdByRoleNameAsync(DirectorateAdmin) && (!model.DirectorateId.HasValue || model.DirectorateId == 0)) || (model.RoleId.Value == await this.roles.GetUserRoleIdByRoleNameAsync(DepartmentAdmin) && (!model.DepartmentId.HasValue) || model.DepartmentId == 0) || (model.RoleId.Value == await this.roles.GetUserRoleIdByRoleNameAsync(SectorAdmin) && (!model.SectorId.HasValue || model.SectorId == 0)))
+                if ((model.RoleId.Value == await this.roles.GetUserRoleIdByRoleNameAsync(DirectorateAdmin) && (!model.DirectorateId.HasValue || model.DirectorateId == 0)) || (model.RoleId.Value == await this.roles.GetUserRoleIdByRoleNameAsync(DepartmentAdmin) && (!model.DepartmentId.HasValue || model.DepartmentId == 0)) || (model.RoleId.Value == await this.roles.GetUserRoleIdByRoleNameAsync(SectorAdmin) && (!model.SectorId.HasValue || model.SectorId == 0)))
                 {
                     TempData["Error"] = "Има логическа грешка при определянето на роля и принадлежност към адм. единица. Пример: Роля \"SectorAdmin\" може да се присвои, когато е зададен \"Сектор\" и т.н.. Моля прегледайте данните или се свържете с администратор от по-горно ниво!";
                     model = PrepareUserRegisterModel(model);
@@ -115,6 +116,7 @@ namespace TaskMenager.Client.Controllers
                         MobileNumber = model.MobileNumber,
                         JobTitleId = model.JobTitleId,
                         DaeuAccaunt = model.DaeuAccaunt,
+                        Notify = model.Notify,
                         RoleId = model.RoleId.HasValue ? model.RoleId.Value : await this.roles.GetUserRoleIdByRoleNameAsync(Employee)
                     };
 

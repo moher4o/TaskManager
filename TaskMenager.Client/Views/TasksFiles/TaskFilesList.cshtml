@@ -1,0 +1,175 @@
+﻿@model TaskFilesViewModel
+
+@{
+    ViewData["Title"] = "Файлове";
+}
+@{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
+<div class="PrimeBox5">
+    <div id="contentcomm" style="padding-top:5px;">
+        <input id="taskIdFiles" value="@Model.Id" hidden>
+        <input id="status" value="@Model.Status" hidden>
+        <div class="form-group row" style="display: flex; justify-content: center;  align-items: center; padding-left:10px;">
+            <h5>@Model.TaskName</h5>
+        </div>
+        <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
+        <div id="FileBrowse" style="padding-left:5px; padding-bottom:5px;">
+            <div class="row">
+                <table class="table-hover table-bordered" align="center" style="min-width:60%;  max-height: 436px; overflow:auto; padding-left:5px; " id="ListofFiles">
+                    <thead>
+                        <tr style="background-color:whitesmoke;">
+                            <th>
+                                Име на файла
+                            </th>
+                            <th style="text-align:center;" @(Model.Status == "closed" ? "hidden" : "" )>
+                                Действия
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @*@foreach (var filename in Model.Files)
+                            {
+                                <tr>
+                                    <td style="min-width:80%; font-size:medium; color:Highlight; background-color:whitesmoke;">
+                                        <a href="/TasksFiles/ExportFile/?fileName=@filename&taskId=@Model.Id.ToString()">@filename</a>
+                                    </td>
+                                    <td>
+                                        <a href='#' onclick='DeleteFile(@filename)'><img class="chatnotifications" src ="../png/delete2.png"/></a>
+                                    </td>
+                                </tr>
+                            }*@
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.Status == "active")
+            {
+                <div style="padding-top:20px;">
+                    <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                        <label id="fileName" style="font-weight:bold; font-size:large;"></label>
+                    </div>
+                    <div class="row" style="padding-top:10px; padding-bottom:10px; min-width:90%; display:flex; justify-content: center; align-items: center;">
+
+                        <label for="myfile" class="button redaction">Избор на файл</label>
+                        <input name="myfile" id="myfile" style="visibility:hidden;" type="file" onchange="checkfile(this);">
+                        <input type="button" id="UploadBtn" class="button btndelete-small" value="Зареждане" />
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<script type="text/javascript" language="javascript">
+    $(document).ready(FileList);
+
+    function FileList() {
+        let status = "";
+        if ($('#status').val() == "closed") {
+            status = "hidden";
+        }
+        $.getJSON('/TasksFiles/GetFilesList/?taskId=' + $("#taskIdFiles").val(), { get_param: 'value' }, function (data) {
+            $("#ListofFiles tbody").html("");
+            for (var i = 0; i < data.length; i++) {
+                var markup = "<tr><td style=\"min-width:80%; font-size:medium; color:Highlight;\"><a href =\"/TasksFiles/ExportFile/?fileName=" + data[i] + "&taskId=" + $("#taskIdFiles").val() + "\">" + data[i] + "</a></td><td style=\"text-align: center;\" "+ status +"><a href='#' onclick='DeleteFile(\"" + data[i] + "\")'><img class=\"chatnotifications\"src=\"../png/delete2.png\"/></a></td></tr>"; // Binding the file name
+                $("#ListofFiles tbody").append(markup);
+            }
+            if (data.length == 0) {
+                $("#ListofFiles tbody").append("<td>Няма качени файлове за тази задача</td><td></td>");
+            }
+        });
+    }
+    function DeleteFile(fileName) {
+        var result = confirm("Потвърдете изтриването на " + fileName);
+        if(result){
+            console.log(result);
+            $.getJSON('\DeleteFile\?taskId=' + $("#taskIdFiles").val() + '&fileName=' + fileName, { get_param: 'value' }, function (data) {
+                if (data) {
+                    FileList();
+                    toastr.success('Файлът ' + fileName + ' беше успешно изтрит');
+                }
+                else {
+                    toastr.error('Възникна проблем при изтриването на ' + fileName);
+                }
+            })
+
+        };
+    }
+
+
+    function checkfile(sender) {
+
+        let sizeMb = sender.files[0].size / 1048576;
+        var validExts = new Array(".xlsx", ".xls", ".doc", ".docx", ".rar", ".zip", ".pdf", ".txt", ".jpg", ".7z", ".csv");
+        var fileExt = sender.value;
+        var fullName = fileExt.substring(fileExt.lastIndexOf('\\') + 1);
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            toastr.error("Избран е невалиден тип файл, валидните типове са " +
+                validExts.toString() + " .")
+            return false;
+        }
+        else if (sizeMb.toPrecision(5) > 10.5) {
+            toastr.error("Размера " + sizeMb.toPrecision(5).toString() + "MB на файла е по-голям от допустимия(10MB)");
+            return false;
+        }
+        else {
+            $("#fileName").text("Избран файл : " + fullName);
+            return true;
+        }
+    }
+
+    $('#UploadBtn').click(function () {
+
+        let file = $("#myfile")[0].files[0];
+        if (file === null) {
+            toastr.error("Не сте избрали файл")
+        }
+        else {
+            // Create FormData object
+        let data = new FormData();
+        data.append('file1', file);
+        data.append('taskId', $("#taskIdFiles").val());
+         let _url = '@Url.Action("UploadFiles", "TasksFiles")';
+            $.ajax({
+            url: _url,
+            type: 'post',
+            dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+            cache: false,
+            contentType: false, // Not to set any content header
+            processData: false, // Not to process data
+            data: data,
+            //async: false,
+            success: function (result) {
+                if (result == 'success') {
+                    //$('#FileBrowse').find("*").prop("disabled", true);
+                    $("#fileName").text("");
+                    toastr.success("Файла е зареден успешно.");
+                    FileList();
+                    //$('#FileBrowse').find("*").prop("disabled", false);
+                }
+                else {
+                    toastr.error(result);
+                }
+            },
+            error: function (err) {
+                toastr.error(err.statusText);
+            }
+        });
+        }
+    });
+</script>
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

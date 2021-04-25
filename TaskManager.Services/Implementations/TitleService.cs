@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -79,5 +80,87 @@ namespace TaskManager.Services.Implementations
                 .ToList();
             return names;
         }
+
+        public async Task<List<SelectServiceModel>> GetJobTitlesAsync(bool deleted = false)
+        {
+            var result = await this.db.JobTitles.Where(d => d.isDeleted == deleted)
+                .Select(d => new SelectServiceModel
+                {
+                    TextValue = d.TitleName,
+                    Id = d.Id,
+                    isDeleted = d.isDeleted,
+                    Count = this.db.Employees.Where(e => e.JobTitleId == d.Id).Count()
+                }).ToListAsync();
+            return result;
+        }
+
+        public async Task<string> MarkTitleDeleted(int jobId)
+        {
+            var jobToDelete = await this.db.JobTitles.FirstOrDefaultAsync(d => d.Id == jobId);
+            if (jobToDelete == null)
+            {
+                return $"Няма длъжност с номер: {jobId}";
+            }
+
+            var check = await this.CheckTitlesByIdAsync(jobId);
+            if (check != "success")
+            {
+                return check;
+            }
+            jobToDelete.isDeleted = true;
+            await this.db.SaveChangesAsync();
+            return "success";
+        }
+        private async Task<string> CheckTitlesByIdAsync(int jobId)
+        {
+            int employeesInTitle = await this.db.Employees.Where(s => s.JobTitleId == jobId && s.isDeleted == false).CountAsync();
+            if (employeesInTitle > 0)
+            {
+                return "Има служители с тази длъжност.";
+            }
+            return "success";
+        }
+
+        public async Task<string> MarkTitleActiveAsync(int jobId)
+        {
+            var titleToRestore = await this.db.JobTitles.FirstOrDefaultAsync(d => d.Id == jobId);
+            if (titleToRestore == null)
+            {
+                return $"Няма длъжност с номер: {jobId}";
+            }
+            titleToRestore.isDeleted = false;
+            await this.db.SaveChangesAsync();
+            return "success";
+        }
+
+        public async Task<string> CreateTitleAsync(string titleName)
+        {
+            try
+            {
+                var newTitle = new JobTitle();
+                newTitle.TitleName = titleName;
+                await this.db.JobTitles.AddAsync(newTitle);
+                await this.db.SaveChangesAsync();
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task<string> RenameTitleAsync(int jobId, string titleName)
+        {
+            var titleToRename = await this.db.JobTitles.FirstOrDefaultAsync(d => d.Id == jobId);
+            if (titleToRename == null)
+            {
+                return $"Няма дирекция с номер: {jobId}";
+            }
+            titleToRename.TitleName = titleName;
+            await this.db.SaveChangesAsync();
+            return "success";
+
+        }
+
     }
 }

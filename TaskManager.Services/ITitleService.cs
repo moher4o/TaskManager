@@ -11,5 +11,15 @@ namespace TaskManager.Services
         Task<string> AddTitlesCollection(List<AddNewJobTitlesServiceModel> jobTypes);
 
         IEnumerable<SelectServiceModel> GetJobTitlesNames();
+
+        Task<List<SelectServiceModel>> GetJobTitlesAsync(bool deleted = false);
+
+        Task<string> MarkTitleDeleted(int jobId);
+
+        Task<string> MarkTitleActiveAsync(int jobId);
+
+        Task<string> CreateTitleAsync(string titleName);
+
+        Task<string> RenameTitleAsync(int jobId, string titleName);
     }
 }

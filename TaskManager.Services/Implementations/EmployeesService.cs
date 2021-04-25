@@ -368,6 +368,7 @@ namespace TaskManager.Services.Implementations
                         userFromDB.SectorId = newUser.SectorId;
                         userFromDB.DaeuAccaunt = newUser.DaeuAccaunt;
                         userFromDB.RoleId = newUser.RoleId;
+                        userFromDB.Notify = newUser.Notify;
                         await this.db.SaveChangesAsync();
                     }
                     else  //няма такъв потребител

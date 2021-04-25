@@ -118,6 +118,7 @@ namespace TaskMenager.Client.Models.Tasks
                                                            .OrderBy(e => e.Employee.FullName)
                                                            .Select(e => new SelectServiceModel
                                                            {
+                                                               Notify = e.Employee.Notify,
                                                                Email = e.Employee.Email,
                                                                TextValue = e.Employee.FullName,
                                                                Id = e.Employee.Id,

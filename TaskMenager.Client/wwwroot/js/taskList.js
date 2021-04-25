@@ -68,7 +68,7 @@ function loadDataTable(getClosed, withDeleted) {
             { "data": "id", "width": "5%" },
             //{ "data": "taskName", "width": "41%" },
             { "data": "taskName", "width": "41%" },
-            { "data": "taskAssigner", "width": "18%" },
+            { "data": "taskAssigner", "width": "16%" },
             { "data": "directorateName", "width": "13%" },
             { "data": "departmentName", "width": "12%" },
             { "data": "sectorName", "width": "10%" },
@@ -86,6 +86,10 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
+                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
+                            <img class="chatnotifications3" src="../png/files.png" />
+                        </a>
+
                         </div>`;
                     }
                     else {
@@ -99,10 +103,14 @@ function loadDataTable(getClosed, withDeleted) {
                             onclick=Delete('${path}Delete?taskId=${data}') title='Изтриване'>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
+                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
+                            <img class="chatnotifications3" src="../png/files.png" />
+                        </a>
+
                         </div>`;
                     }
 
-                }, "width": "6%"
+                }, "width": "8%"
             }
          ],
          "columnDefs": [

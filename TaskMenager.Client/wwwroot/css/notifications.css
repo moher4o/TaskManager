@@ -62,6 +62,12 @@
     background-color:transparent;
 }
 
+.chatnotifications3 {
+    width: 35px;
+    height: 25px;
+    background-color: transparent;
+}
+
 .notificationsMenu {
     position: relative;
     background-color: #fa3e3e;

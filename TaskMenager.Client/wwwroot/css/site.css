@@ -210,6 +210,21 @@ body {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+.PrimeBox5 {
+    border: 1px solid #2a67ac;
+    border-right: 2px solid #2a67ac;
+    border-bottom: 3px solid #2a67ac;
+    background-color: rgba(42, 103, 172, 0.9);
+    box-shadow: 2px 2px 8px rgba(42, 103, 172, 0.5);
+    background: #fff;
+    width: 70%;
+    margin: 2% auto 0 auto;
+    padding: 0em 0.4em 0em 0.4em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 
 .modal-dialog {
     position: absolute;

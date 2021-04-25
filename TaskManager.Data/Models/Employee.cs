@@ -54,6 +54,8 @@ namespace TaskManager.Data.Models
 
         public bool isActive { get; set; } = true;
 
+        public bool Notify { get; set; } = true;
+
         public virtual ICollection<Task> TasksCreator { get; set; } = new List<Task>();
 
         public virtual ICollection<Task> TasksAssigner { get; set; } = new List<Task>();

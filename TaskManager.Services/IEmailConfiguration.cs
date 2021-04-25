@@ -11,6 +11,10 @@
         int PopPort { get; }
         string PopUsername { get; }
         string PopPassword { get; }
-        public bool SendMails { get; set; }
+        bool SendMails { get; set; }
+
+        bool StoreFiles { get; set; }
+
+        long TaskDirectorySize { get; }
     }
 }

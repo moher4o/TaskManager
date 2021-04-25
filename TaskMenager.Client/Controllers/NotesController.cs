@@ -67,7 +67,7 @@ namespace TaskMenager.Client.Controllers
             bool result = await this.taskNotes.AddNoteAsync(text, taskId, currentUser.Id);
             if (result)
             {
-                var emailresult = await this.NotificationForNoteAsync(taskId);
+                await this.NotificationAsync(taskId, EmailType.Note);
                 return Json(new { success = result, message = "Коментара е добавен успешно" });
             }
             {

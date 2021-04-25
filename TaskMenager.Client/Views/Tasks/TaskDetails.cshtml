@@ -68,7 +68,7 @@
                         @foreach (var emp in Model.Colleagues)
                         {
                             <tr>
-                                <td class="col-md-12" style="color: @(emp.isDeleted ? "#82b9f6" : "#0366d6")">
+                                <td class="col-md-12" style="color:@(emp.isDeleted ? "#82b9f6" : "#0366d6");  cursor:pointer;" onclick="InfoUser(@emp.Id)">
                                     @if (emp.isDeleted)
                                     {
                                         <i class="fas fa-user-slash"> </i>

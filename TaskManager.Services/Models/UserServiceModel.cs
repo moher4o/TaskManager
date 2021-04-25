@@ -45,6 +45,8 @@ namespace TaskManager.Services.Models
 
         public bool isActive { get; set; }
 
+        public bool Notify { get; set; }
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Employee, UserServiceModel>()

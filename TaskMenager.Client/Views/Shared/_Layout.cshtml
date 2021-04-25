@@ -127,20 +127,20 @@
                 <li>
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-file-excel"></i>
-                        Отчети
+                        Отчети и справки
                     </a>
                     <ul class="collapse list-unstyled" id="pageSubmenu">
                         <li>
-                            <a asp-controller="Report" asp-action="PeriodReport">Организационен</a>
+                            <a asp-controller="Report" asp-action="PeriodReport">Организационен отчет</a>
                         </li>
-                        @*<li>
-                                <a asp-controller="Home" asp-action="NotImplemented">Експертен</a>
-
-                         </li>*@
                         <li>
                             <a asp-controller="Report" asp-action="SetPersonalPeriodDate">Лична справка</a>
-
                         </li>
+                       @*<li>
+                                <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
+
+                        </li>*@
+
                     </ul>
                 </li>
                 <li>
@@ -153,11 +153,6 @@
                         <li>
                             <a asp-controller="Users" asp-action="UsersList">Списък</a>
                         </li>
-                        @*<li>
-                                <a asp-controller="Home" asp-action="NotImplemented">Телефонен указател</a>
-
-                            </li>*@
-
                     </ul>
                 </li>
                 <li @(User.Claims.Any(u => u.Value == DataConstants.SuperAdmin) ? "" : "hidden")>
@@ -174,6 +169,9 @@
                         </li>
                         <li>
                             <a asp-controller="Structure" asp-action="SectorsList">Сектори</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Structure" asp-action="JobTitlesList">Длъжности</a>
                         </li>
 
                     </ul>
@@ -315,6 +313,20 @@
                 }
             });
         });
+        function InfoUser(userId) {
+            event.preventDefault();
+            var content = document.createElement('div');
+            $.getJSON('..\\Users\\GetUserInfo\?userId=' + userId, { get_param: 'value' }, function (data) {
+
+                content.innerHTML = '<div style = \'text-align:left;\'><div class="row"><div class="col-md-3">N:</div><div class="col-md-4"><label><strong>' + data.data.id + '</strong></label></div></div><div class="row"><div class="col-md-3">Име:</div><div class="col-md-9"><label><strong>' + data.data.fullName + '</strong></label></div></div><div class="row"><div class="col-md-3">Длъжност:</div><div class="col-md-9"><label><strong>' + data.data.jobTitleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Email:</div><div class="col-md-9"><label><strong>' + (data.data.email ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Роля:</div><div class="col-md-9"><label><strong>' + data.data.roleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Телефон:</div><div class="col-md-9"><label><strong>' + (data.data.telephoneNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Мобилен:</div><div class="col-md-9"><label><strong>' + (data.data.mobileNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Дирекция:</div><div class="col-md-9"><label><strong>' + (data.data.directorateName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Отдел:</div><div class="col-md-9"><label><strong>' + (data.data.departmentName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Сектор:</div><div class="col-md-9"><label><strong>' + (data.data.sectorName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Статус:</div><div class="col-md-9"><label><strong>' + (data.data.status == "Деактивиран акаунт" ? '<span style=\'color:red;\'>Деактивиран акаунт</span>' : (data.data.status == "Активен акаунт" ? '<span style=\'color:green;\'>Активен акаунт</span>' : '<span style=\'color:lightgreen;\'>Чакащ одобрение</span>')) + '</strong></label></div></div></div>';
+
+            });
+            swal({
+                content: content,
+                icon: "info",
+                buttons: [false, "Ok"]
+            })
+        }
     </script>
 
 </body>

@@ -34,92 +34,36 @@
                 <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
             </div>
             <div class="col-md-3" style="color: #5f9fec;">
-                <div class="row">
-                    <div style="padding-left:20px; min-width:100px;">
-                        <a asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
+                <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                    <div style="min-width:50px;">
+                        <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
+                            <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+                        </a>
+                    </div>
+                    <div style="min-width:50px;">
+                        <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                             <img class="chatnotifications" src="~/png/note.png" />
                             <span class="notificationsTodayCountValue">@item.NotesCount</span>
                         </a>
                     </div>
-                    <div style="padding-left:20px; min-width:100px;">
-                        <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
-                            <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+                    <div style="min-width:50px;">
+                        <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
+                           asp-route-taskName="@item.TaskName"
+                           asp-route-taskId="@item.Id">
+                            <img class="chatnotifications3" src="~/png/files.png" />
+                            <span class="notificationsTodayCountValue">@item.FilesCount</span>
                         </a>
                     </div>
                     <!-- Modal placeholder -->
                     <div id="modal-placeholder"></div>
                     <!-- Button trigger modal -->
-                    <a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer;"
+                    <a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:10px;"
                        data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("CloseTask")" data-taskid="@item.Id" data-taskname="@item.TaskName">
                         <img class="chatnotifications2" src="~/png/Cansel2.png" />
                     </a>
                 </div>
             </div>
-            <!--<div class="col-md-1" style="color: #5f9fec;">
-                <div style="padding-left:20px; min-width:100px;">
-                    <img class="chatnotifications" src="~/png/note.png" />
-                    <span class="notificationsTodayCountValue">0</span>
-                </div>
-            </div>
-            <div class="col-md-1" style="color: #5f9fec;">
-                <div style="padding-left:20px; min-width:100px;">
-                    <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
-                        <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
-                    </a>
-                </div>
-            </div>
 
-            <div class="col-md-1" style="padding-left:30px;">-->
-                <!-- Modal placeholder -->
-                <!--<div id="modal-placeholder"></div>-->
-                <!-- Button trigger modal -->
-                <!--<a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer;"
-                   data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("CloseTask")" data-taskid="@item.Id" data-taskname="@item.TaskName">
-                    <img class="chatnotifications2" src="~/png/Cansel2.png" />
-                </a>
-
-            </div>-->
-
-            @*
-                       <form method="post" asp-controller="Tasks" asp-action="CloseTask" asp-route-taskId="@item.Id">
-            <a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer;" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#@modalId">
-                <img class="chatnotifications2" src="~/png/Cansel2.png" />
-            </a>
-            <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div style="background-color:white;" class="modal-content">
-                        <div class="modal-body">
-                            <h5>Сигурни ли сте, че искате да приключите задача: </h5> <h5><span style="font-weight:700">@item.TaskName</span></h5>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отказ</button>
-                            <button type="submit" class="btn btn-danger">Потвърди</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-
-
-            <div class="row">
-                <div style="padding-left:20px;">
-                    <a >
-
-                    </a>
-                    <i class="fas fa-info fa-lg"></i>
-                </div>
-                <div style="padding-left:20px;">
-                    <i class="fas fa-sticky-note fa-lg"></i>
-                </div>
-                <div style="padding-left:20px;">
-                    <i class="fas fa-clock fa-lg"></i>
-                </div>
-                <div style="padding-left:20px;">
-                    <i class="fas fa-plus fa-lg"></i>
-                </div>
-            </div>
-        </div>*@
         </div>
         }
         <div class="displayno">

@@ -55,7 +55,7 @@
 
     </div>
 </div>
-<script type="text/javascript">
+@*<script type="text/javascript">
     function InfoUser(userId) {
         event.preventDefault();
         var content = document.createElement('div');
@@ -70,33 +70,8 @@
             buttons: [false, "Ok"]
         })
     }
-</script>
+</script>*@
 @section Scripts{
     <script src="~/js/notes.js" charset="utf-8"></script>
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }
-
-@*<div class="PrimeBox2" style="margin-top:20px; background-color:ghostwhite;">
-        <div class="form-group row" style="display: flex; justify-content: center;  align-items: center;">
-            <h5 style="margin-left:15px;">@Model.TaskName</h5>
-        </div>
-        @foreach (var note in Model.Notes)
-        {
-            <div style="background-color: #69a0f1;">
-                <p style="color: white; text-align: left; margin-left:15px;">
-                    @note.NoteDate.ToString("dd.MM.yyyy hh:MM")
-                    <span style="float:right; margin-right:15px;">
-                        #@note.Id
-                    </span>
-                </p>
-            </div>
-            <div class="row border-info">
-                <div class="col-md-2 border-right">
-                    <h5>@note.EmployeeName</h5>
-                </div>
-                <div class="col-md-10">@note.Text</div>
-            </div>
-        }
-    </div>
-    <form method="post" asp-controller="Notes" asp-action="CreateNewNote" asp-route-taskId="@Model.Id">
-    </form>*@

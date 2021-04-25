@@ -1,11 +1,12 @@
 ﻿using TaskManager.Services.Models.Email;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TaskManager.Services
 {
     public interface IEmailService
     {
-        void Send(EmailMessage emailMessage);
+        Task<bool> Send(EmailMessage emailMessage);
 
         List<EmailMessage> ReceiveEmail(int maxCount = 10);
 

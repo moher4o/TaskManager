@@ -25,14 +25,15 @@ namespace TaskMenager.Client.Controllers
     {
         //private readonly ILogger<HomeController> _logger;
         //private readonly IEmployeesService employees;
-        private readonly IRolesService roles;
+        //private readonly IRolesService roles;
+        private readonly IManageFilesService files;
         //private readonly ITasksService tasks;
 
-        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
+        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IManageFilesService files, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             //_logger = logger;
-            //this.employees = employees;
-            this.roles = roles;
+            this.files = files;
+            //this.roles = roles;
             //this.tasks = tasks;
         }
 
@@ -58,6 +59,10 @@ namespace TaskMenager.Client.Controllers
                 ActiveTasks = await this.employees.GetUserActiveTaskAsync(currentUser.Id),
                 //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
+            foreach (var task in currentEmployee.ActiveTasks)
+            {
+                task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+            }
 
             currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
             return View(currentEmployee);

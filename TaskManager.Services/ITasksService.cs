@@ -11,10 +11,10 @@ namespace TaskManager.Services
 {
     public interface ITasksService
     {
-
+        Task<bool> CheckIfTaskIsClosed(int taskId);
         IQueryable<TaskInfoServiceModel> GetTaskDetails(int taskId);
 
-        Task<string> AddNewTaskAsync(AddNewTaskServiceModel newTask);
+        Task<int> AddNewTaskAsync(AddNewTaskServiceModel newTask);
 
         Task<string> CreateTasksStatusesAsync();
 

@@ -1,0 +1,28 @@
+﻿@model TitleViewModel
+<!-- Modal -->
+<div class="modal fade" id="add-contact" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div style="background-color:whitesmoke;" class="modal-header">
+                <label style="font-size:medium; text-align:center" class="modal-title" id="addContactLabel"><strong>Създаване на длъжност</strong></label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="CreateTitle">
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <div class="form-group">
+                        <label asp-for="TitleName">Име на длъжността до 200 символа</label>
+                        @Html.TextAreaFor(model => model.TitleName, new { @class = "form-control", placeholder = "Въведете име на длъжността", rows = "3" })
+                        <span asp-validation-for="TitleName" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button back-small" data-dismiss="modal">Отказ</button>
+                <button type="button" class="button save-small" data-save="modal">Запис</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -65,5 +65,8 @@ namespace TaskMenager.Client.Models.Users
         public bool isActive { get; set; }
 
         public bool isDeleted { get; set; }
+
+        [Display(Name = "email нотификации")]
+        public bool Notify { get; set; }
     }
 }

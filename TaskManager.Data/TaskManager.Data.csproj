@@ -21,6 +21,8 @@
     <Compile Remove="Migrations\20210111200330_IntsIds.Designer.cs" />
     <Compile Remove="Migrations\20210120113319_RoleNameChange.cs" />
     <Compile Remove="Migrations\20210120113319_RoleNameChange.Designer.cs" />
+    <Compile Remove="Migrations\20210417070555_notify.cs" />
+    <Compile Remove="Migrations\20210417070555_notify.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,7 +28,8 @@ namespace TaskMenager.Client.Controllers
         private readonly ITaskTypesService tasktypes;
         private readonly ITaskPrioritysService taskprioritys;
         private readonly IStatusService statuses;
-        public TasksController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
+        private readonly IManageFilesService files;
+        public TasksController(IManageFilesService files, IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
         {
             this.statuses = statuses;
             this.directorates = directorates;
@@ -36,7 +37,7 @@ namespace TaskMenager.Client.Controllers
             this.sectors = sectors;
             this.tasktypes = tasktypes;
             this.taskprioritys = taskprioritys;
-
+            this.files = files;
         }
 
         public IActionResult TasksList()
@@ -62,6 +63,11 @@ namespace TaskMenager.Client.Controllers
                 userId = currentUser.Id,
                 AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
+            foreach (var task in currentEmployee.AssignerTasks)
+            {
+                task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+            }
+
             return View(currentEmployee);
         }
 
@@ -250,6 +256,17 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
 
+                // номерата на старите колеги преди ъпдейта
+                var taskDetails = this.tasks.GetTaskDetails(model.Id)
+                                             .ProjectTo<TaskViewModel>()
+                                             .FirstOrDefault();
+                var assignedEmployees = new List<SelectServiceModel>();
+                assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
+
+                var oldActiveEmployeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToList(); //за да изключи премахнатите експерти
+                oldActiveEmployeesIds.Insert(0,taskDetails.AssignerId);
+                // номерата на старите колеги преди ъпдейта  край
+
                 AddNewTaskServiceModel taskToEdit = new AddNewTaskServiceModel();
 
                 taskToEdit.Id = model.Id;
@@ -293,20 +310,6 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
 
-                //if (int.TryParse(model.AssignerId, out int assignerId))
-                //{
-                //    if (assignerId == 0)
-                //    {
-                //        TempData["Error"] = "Задачата трябва да има назначен отговорник";
-                //        return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
-                //    }
-                //    taskToEdit.AssignerId = assignerId;
-                //}
-                //else
-                //{
-                //    TempData["Error"] = "Задачата трябва да има назначен отговорник";
-                //    return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
-                //}
                 if (int.TryParse(model.TaskPriorityId, out int priorityId))
                 {
                     if (priorityId == 0)
@@ -326,12 +329,28 @@ namespace TaskMenager.Client.Controllers
 
                 if (result == "success")
                 {
-                    TempData["Success"] = "Промените са записани успешно";
+                    try
+                    {
+                        await this.NotificationAsync(taskToEdit.Id, oldActiveEmployeesIds);
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Success"] = "Проблем с изпращането на уведомителни имейли. ";
+                    }
+                    TempData["Success"] = TempData["Success"] + "Промените са записани успешно";
                     return RedirectToAction(nameof(TaskDetails), new { taskId = model.Id });
                 }
                 else if(result == "halfsuccess")
                 {
-                    TempData["Success"] = "Промените са записани успешно, но началната дата е съобразена с първите отчетени часове!";
+                    try
+                    {
+                        await this.NotificationAsync(taskToEdit.Id, oldActiveEmployeesIds);
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Success"] = "Проблем с изпращането на уведомителни имейли. ";
+                    }
+                    TempData["Success"] = TempData["Success"] + "Промените са записани успешно, но началната дата е съобразена с първите отчетени часове!";
                     return RedirectToAction(nameof(TaskDetails), new { taskId = model.Id });
                 }
                 else
@@ -432,20 +451,6 @@ namespace TaskMenager.Client.Controllers
                     TempData["Error"] = "Задачата трябва да има назначен отговорник";
                     return View(model);
                 }
-                //if (int.TryParse(model.AssignerId, out int assignerId))
-                //{
-                //    if (assignerId == 0)
-                //    {
-                //        TempData["Error"] = "Задачата трябва да има назначен отговорник";
-                //        return View(model);
-                //    }
-                //    newTask.AssignerId = assignerId;
-                //}
-                //else
-                //{
-                //    TempData["Error"] = "Задачата трябва да има назначен отговорник";
-                //    return View(model);
-                //}
                 if (int.TryParse(model.TaskPriorityId, out int priorityId))
                 {
                     if (priorityId == 0)
@@ -461,17 +466,17 @@ namespace TaskMenager.Client.Controllers
                     return View(model);
                 }
 
-                var result = await this.tasks.AddNewTaskAsync(newTask);
+                var taskId = await this.tasks.AddNewTaskAsync(newTask);
 
-                if (result == "success")
+                if (taskId > 0)
                 {
+                    await this.NotificationAsync(taskId, EmailType.Create);
                     TempData["Success"] = "Задачата е създадена успешно";
                     return RedirectToAction(nameof(CreateNewTask));
-
                 }
                 else
                 {
-                    TempData["Error"] = result;
+                    TempData["Error"] = $"[Service] Задачата не е създадена {taskId}";
                     return View(model);
                 }
             }
@@ -496,18 +501,26 @@ namespace TaskMenager.Client.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CloseTask(CloseTaskViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                bool result = await this.tasks.CloseTaskAsync(model.TaskId, model.EndNote, currentUser.Id);
-                if (result)
+                if (ModelState.IsValid)
                 {
-                    TempData["Success"] = "Задачата е приключена успешно!";
-                }
-                else
-                {
-                    TempData["Error"] = "Сървиз грешка! Уведомете администратора.";
-                }
+                    bool result = await this.tasks.CloseTaskAsync(model.TaskId, model.EndNote, currentUser.Id);
+                    if (result)
+                    {
+                        await this.NotificationAsync(model.TaskId, EmailType.Close);
+                        TempData["Success"] = "Задачата е приключена успешно!";
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Сървиз грешка! Уведомете администратора.";
+                    }
 
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Сървиз грешка! Уведомете администратора. {ex.Message}";
             }
             return PartialView("_CloseTaskModalPartial", model);
         }
