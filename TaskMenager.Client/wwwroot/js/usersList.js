@@ -43,7 +43,7 @@ function loadDataTable(deleted, notActivated) {
             "datatype": "json"
         },
         "columns": [
-            { "data": "directorateName", "width": "24%" },
+            { "data": "directorateName", "width": "23%" },
             { "data": "departmentName", "width": "25%" },
             { "data": "sectorName", "width": "20%" },
             { "data": "fullName", "width": "18%" },
@@ -59,6 +59,9 @@ function loadDataTable(deleted, notActivated) {
                         </a>
                         <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"} title='Редакция'>
                             <img class="chatnotifications" src="../png/edit-icon.png" />
+                        </a>
+                        <a href="..\\Report\\SetEmployeePeriodDate?userId=${row.id}" style='cursor:pointer;' ${row.status == "editable" ? "" : "hidden"} title='Отчет за период на ${row.fullName}'>
+                            <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         </div>`;
                     }
@@ -80,16 +83,18 @@ function loadDataTable(deleted, notActivated) {
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                          <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"} title='Редакция'>
-                           
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
                         <a href='mailto:${row.email}' target="_top" style='cursor:pointer; padding-left:5px;' ${row.email == null ? "hidden" : ""} title='Изпращане на email'>
                             <img class="chatnotifications" src="../png/email.png" />
                         </a>
+                        <a href="..\\Report\\SetEmployeePeriodDate?userId=${row.id}" style='cursor:pointer;' ${row.status == "editable" ? "" : "hidden"} title='Отчет за период на ${row.fullName}'>
+                            <img class="chatnotifications" src="../png/report.png" />
+                        </a>
                         </div>`;
                     }
 
-                }, "width": "10%"
+                }, "width": "11%"
             }
         ],
         "language": {
@@ -99,17 +104,5 @@ function loadDataTable(deleted, notActivated) {
     });
 
 }
-//function InfoUser(userId) {
-//    var content = document.createElement('div');
-//    $.getJSON('..\\Users\\GetUserInfo\?userId=' + userId, { get_param: 'value' }, function (data) {
 
-//        content.innerHTML = '<div style = \'text-align:left;\'><div class="row"><div class="col-md-3">N:</div><div class="col-md-4"><label><strong>' + data.data.id + '</strong></label></div></div><div class="row"><div class="col-md-3">Име:</div><div class="col-md-9"><label><strong>' + data.data.fullName + '</strong></label></div></div><div class="row"><div class="col-md-3">Длъжност:</div><div class="col-md-9"><label><strong>' + data.data.jobTitleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Email:</div><div class="col-md-9"><label><strong>' + (data.data.email ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Роля:</div><div class="col-md-9"><label><strong>' + data.data.roleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Телефон:</div><div class="col-md-9"><label><strong>' + (data.data.telephoneNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Мобилен:</div><div class="col-md-9"><label><strong>' + (data.data.mobileNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Дирекция:</div><div class="col-md-9"><label><strong>' + (data.data.directorateName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Отдел:</div><div class="col-md-9"><label><strong>' + (data.data.departmentName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Сектор:</div><div class="col-md-9"><label><strong>' + (data.data.sectorName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Статус:</div><div class="col-md-9"><label><strong>' + (data.data.status == "Деактивиран акаунт" ? '<span style=\'color:red;\'>Деактивиран акаунт</span>' : (data.data.status == "Активен акаунт" ? '<span style=\'color:green;\'>Активен акаунт</span>' : '<span style=\'color:lightgreen;\'>Чакащ одобрение</span>')) + '</strong></label></div></div></div>';
-
-//    });
-//    swal({
-//        content: content,
-//        icon: "info",
-//        buttons: [false, "Ok"]
-//    })
-//}
 

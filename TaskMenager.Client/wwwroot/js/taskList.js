@@ -68,49 +68,61 @@ function loadDataTable(getClosed, withDeleted) {
             { "data": "id", "width": "5%" },
             //{ "data": "taskName", "width": "41%" },
             { "data": "taskName", "width": "41%" },
-            { "data": "taskAssigner", "width": "16%" },
-            { "data": "directorateName", "width": "13%" },
+            { "data": "taskAssigner", "width": "14%" },
+            { "data": "directorateName", "width": "10%" },
             { "data": "departmentName", "width": "12%" },
             { "data": "sectorName", "width": "10%" },
-            { "data": "assignedExpertsCount", "width": "4%" },
+            { "data": "parentTaskId", "width": "3%" },
+            { "data": "assignedExpertsCount", "width": "3%" },
             //{ "data": "status", "width": "12%" },
-            { "data": "status", "width": "5%" },
+            { "data": "status", "width": "6%" },
             //{ "data": "typeName", "width": "14%" },
             { "data": "typeName", "width": "7%" },
             {
-                "data": "id",
-                "render": function (data) {
+                "data": null,
+                "render": function (data, type, row) {
                     if (withDeleted || permisionType != 'SuperAdmin') {
                         return `<div>
                         
-                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
+                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer;' title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
+                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове'>
                             <img class="chatnotifications3" src="../png/files.png" />
                         </a>
-
+                        <a style='cursor:pointer; padding-left:5px;'
+                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"} title='Отчет по задача'>
+                            <img class="chatnotifications" src="../png/child.png" />
+                        </a>
                         </div>`;
                     }
                     else {
                         return `<div>
                         
-                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
+                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer;' title='Информация'>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                         
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=Delete('${path}Delete?taskId=${data}') title='Изтриване'>
+                            onclick=Delete('${path}Delete?taskId=${row.id}') title='Изтриване'>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
-                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
+                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове'>
                             <img class="chatnotifications3" src="../png/files.png" />
                         </a>
+                        <a href="..\\Report\\TaskReport?taskId=${row.id}" style='cursor:pointer;' ${row.assignedExpertsCount == 0 ? "hidden" : ""} title='Отчет по задача'>
+                            <img class="chatnotifications" src="../png/report.png" />
+                        </a>
+                        <a style='cursor:pointer; padding-left:5px;'
+                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"} title='Отчет по задача'>
+                            <img class="chatnotifications" src="../png/child.png" />
+                        </a>
+
 
                         </div>`;
                     }
 
-                }, "width": "8%"
+                }, "width": "10%"
             }
          ],
          "columnDefs": [
@@ -127,7 +139,10 @@ function loadDataTable(getClosed, withDeleted) {
                  "targets": [5],
                  "visible": false
              },
-
+             {
+                 "targets": [6],
+                 "visible": false
+             },
          ],
         "language": {
             "emptyTable": "Няма такива задачи"
@@ -168,44 +183,44 @@ function Delete(url) {
     });
 }
 
-//function TaskInfo(url) {
-//    var swal_html = '<div class="panel" style="background:aliceblue;font-weight:bold"><div class="panel-heading panel-info text-center btn-info"> <b>Import Status</b> </div> <div class="panel-body"><div class="text-center"><b><p style="font-weight:bold">Total number of not inserted  rows : add data</p><p style="font-weight:bold">Row numbers:Add data</p></b></div></div></div>';
-//    swal({ title: "Good Job!", content: (swal_html) });
-//}
+function CustomSearch(parentId) {
+        dataTable
+            .columns(6)
+            .search(parentId)
+            .draw();
+}
 
-//function loadDataTable() {
-//    dataTable = $('#DT_load').DataTable({
-//        "ajax": {
-//            "url": "/Tasks/getall/",
-//            "type": "GET",
-//            "datatype": "json"
-//        },
-//        "columns": [
-//            { "data": "id", "width": "6%" },
-//            { "data": "taskName", "width": "60%" },
-//            { "data": "assignedExpertsCount", "width": "5%" },
-//            { "data": "status", "width": "12%" },
-//            {
-//                "data": "id",
-//                "render": function (data) {
-//                    return `<div class="text-center">
+//"data": "id",
+//    "render": function (data) {
+//        if (withDeleted || permisionType != 'SuperAdmin') {
+//            return `<div>
                         
-//                        <a href="/Tasks/TaskDetails?taskId=${data}" style='cursor:pointer;'>
+//                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
 //                            <img class="chatnotifications" src="../png/info2.png" />
 //                        </a>
-//                        &nbsp;
-//                        <a style='cursor:pointer;'
-//                            onclick=Delete('/Tasks/Delete?id='+${data})>
+//                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
+//                            <img class="chatnotifications3" src="../png/files.png" />
+//                        </a>
+
+//                        </div>`;
+//        }
+//        else {
+//            return `<div>
+                        
+//                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
+//                            <img class="chatnotifications" src="../png/info2.png" />
+//                        </a>
+                        
+//                        <a style='cursor:pointer; padding-left:5px;'
+//                            onclick=Delete('${path}Delete?taskId=${data}') title='Изтриване'>
 //                            <img class="chatnotifications" src="../png/delete2.png" />
 //                        </a>
+//                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
+//                            <img class="chatnotifications3" src="../png/files.png" />
+//                        </a>
+
 //                        </div>`;
-//                }, "width": "27%"
+//        }
+
+//    }, "width": "11%"
 //            }
-//        ],
-//        "language": {
-//            "emptyTable": "Няма задачи"
-//        },
-//        "width": "100%"
-//    });
-//}
-//onclick=Delete('/Tasks/Delete?taskId=${data}')>

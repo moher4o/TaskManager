@@ -26,6 +26,8 @@ namespace TaskMenager.Client.Models.Tasks
 
         public int AssignedExpertsCount { get; set; } = 0;
 
+        public string ParentTaskId { get; set; }
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Task, TasksListViewModel>()
@@ -35,6 +37,7 @@ namespace TaskMenager.Client.Models.Tasks
                   .ForMember(u => u.DirectorateName, cfg => cfg.MapFrom(s => s.Directorate.DirectorateName))
                   .ForMember(u => u.DepartmentName, cfg => cfg.MapFrom(s => s.Department.DepartmentName))
                   .ForMember(u => u.SectorName, cfg => cfg.MapFrom(s => s.Sector.SectorName))
+                  .ForMember(u => u.ParentTaskId, cfg => cfg.MapFrom(s => s.ParentTaskId.HasValue ? s.ParentTaskId.ToString() : "-1"))
                   .ForMember(u => u.AssignedExpertsCount, cfg => cfg.MapFrom(s => s.AssignedExperts.Where(ae => ae.isDeleted == false).Count()));
         }
     }

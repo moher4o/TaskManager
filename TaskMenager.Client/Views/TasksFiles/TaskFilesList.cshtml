@@ -75,7 +75,7 @@
         if ($('#status').val() == "closed") {
             status = "hidden";
         }
-        $.getJSON('/TasksFiles/GetFilesList/?taskId=' + $("#taskIdFiles").val(), { get_param: 'value' }, function (data) {
+        $.getJSON('../TasksFiles/GetFilesList/?taskId=' + $("#taskIdFiles").val(), { get_param: 'value' }, function (data) {
             $("#ListofFiles tbody").html("");
             for (var i = 0; i < data.length; i++) {
                 var markup = "<tr><td style=\"min-width:80%; font-size:medium; color:Highlight;\"><a href =\"/TasksFiles/ExportFile/?fileName=" + data[i] + "&taskId=" + $("#taskIdFiles").val() + "\">" + data[i] + "</a></td><td style=\"text-align: center;\" "+ status +"><a href='#' onclick='DeleteFile(\"" + data[i] + "\")'><img class=\"chatnotifications\"src=\"../png/delete2.png\"/></a></td></tr>"; // Binding the file name

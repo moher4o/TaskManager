@@ -7,7 +7,9 @@
 <br />
 <div class="row p-0 m-0">
     <div class="col-md-3">
-        <h2 class="text-info">Списък задачи</h2>
+        <a asp-controller="Tasks" asp-action="TasksList">
+            <h2 class="text-info">Списък задачи</h2>
+        </a>
     </div>
     <div class="col-md-3" style="padding-top:6px;">
         <input style="margin-left:15px;" type="checkbox" name="showDeleted" id="showDeleted">
@@ -35,6 +37,7 @@
                     <th>Дирекция</th>
                     <th>Отдел</th>
                     <th>Сектор</th>
+                    <th>N: р.з.</th>
                     <th><i class="fas fa-users"></i></th>
                     <th>Статус</th>
                     <th>Тип задача</th>

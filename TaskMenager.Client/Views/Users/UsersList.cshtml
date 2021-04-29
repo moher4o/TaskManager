@@ -6,7 +6,9 @@
 <br />
 <div class="row p-0 m-0">
     <div class="col-md-4">
-        <h2 class="text-info">Списък потребители</h2>
+        <a asp-controller="Users" asp-action="UsersList">
+            <h2 class="text-info">Списък потребители</h2>
+        </a>
     </div>
     @if (permision == "Admin")
     {

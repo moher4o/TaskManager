@@ -64,7 +64,7 @@ namespace TaskManager.Services.Implementations
 
                     //Remove any OAuth functionality as we won't be using it. 
                     //emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
-                    await emailClient.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
+                    //await emailClient.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
 
                     await emailClient.SendAsync(message);
 

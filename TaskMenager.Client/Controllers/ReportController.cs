@@ -1036,6 +1036,22 @@ namespace TaskMenager.Client.Controllers
 
         }
 
+        public IActionResult SetEmployeePeriodDate(int userId)
+        {
+            try
+            {
+                var newPeriod = new PeriodViewModel();
+                newPeriod.userId = userId;
+                return RedirectToAction("Index", new { newPeriod});
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "[SetPersonalPeriodDate] Грешка при подготовка на модела за отчет";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+
         public IActionResult SetPersonalPeriodDate()
         {
             try
