@@ -48,6 +48,9 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     ci.AddClaim(new Claim("fullName", currentEmployee.FullName));
                     ci.AddClaim(new Claim("userId", currentEmployee.Id.ToString()));
                     ci.AddClaim(new Claim("roleId", currentEmployee.RoleId.ToString()));
+                    ci.AddClaim(new Claim("directorateId", currentEmployee.DirectorateId.HasValue ? currentEmployee.DirectorateId.ToString() : "-1"));
+                    ci.AddClaim(new Claim("departmentId", currentEmployee.DepartmentId.HasValue ? currentEmployee.DepartmentId.ToString() : "-1"));
+                    ci.AddClaim(new Claim("sectorId", currentEmployee.SectorId.HasValue ? currentEmployee.SectorId.ToString() : "-1"));
 
                     if (roleName != DataConstants.Employee)
                     {

@@ -125,7 +125,7 @@ namespace TaskMenager.Client.Controllers
 
         }
 
-        public IActionResult ExportSpravkaForEmployee(EmployeeServiceModel employeeWork, DateTime StartDate, DateTime EndDate)
+        public IActionResult ExportSpravkaForEmployee(ShortEmployeeServiceModel employeeWork, DateTime StartDate, DateTime EndDate)
         {
             try
             {
@@ -1036,29 +1036,21 @@ namespace TaskMenager.Client.Controllers
 
         }
 
-        public IActionResult SetEmployeePeriodDate(int userId)
+        public IActionResult SetPersonalPeriodDate(int userId = 0)
         {
             try
             {
-                var newPeriod = new PeriodViewModel();
-                newPeriod.userId = userId;
-                return RedirectToAction("Index", new { newPeriod});
-            }
-            catch (Exception)
-            {
-                TempData["Error"] = "[SetPersonalPeriodDate] Грешка при подготовка на модела за отчет";
-                return RedirectToAction("Index", "Home");
-            }
-        }
-
-
-        public IActionResult SetPersonalPeriodDate()
-        {
-            try
-            {
-                var newPeriod = new PeriodViewModel();
-                newPeriod.userId = currentUser.Id;
-                return View(newPeriod);
+                var myPeriod = new PeriodViewModel();
+                if (userId < 1)
+                {
+                    myPeriod.userId = currentUser.Id;
+                    
+                }
+                else
+                {
+                    myPeriod.userId = userId;
+                }
+                return View(myPeriod);
             }
             catch (Exception)
             {

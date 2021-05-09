@@ -375,6 +375,21 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
+        public async Task<IActionResult> RemoveEmptyEmails()
+        {
+            var result = await this.employees.GenerateEmailWhenEmpty();
+            if (result != "success")
+            {
+                TempData["Error"] = $"[Service error] {result}";
+            }
+            else
+            {
+                TempData["Success"] = "Всички празни имейли са генерирани автоматично";
+            }
+
+            return RedirectToAction("UsersList", "Users");
+        }
+
 
 
         #region API Calls

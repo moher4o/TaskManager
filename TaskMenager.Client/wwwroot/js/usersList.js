@@ -60,7 +60,7 @@ function loadDataTable(deleted, notActivated) {
                         <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"} title='Редакция'>
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
-                        <a href="..\\Report\\SetEmployeePeriodDate?userId=${row.id}" style='cursor:pointer;' ${row.status == "editable" ? "" : "hidden"} title='Отчет за период на ${row.fullName}'>
+                        <a href="..\\Report\\SetPersonalPeriodDate?userId=${row.id}" style='cursor:pointer;' ${row.status == "editable" ? "" : "hidden"} title='Отчет за период на ${row.fullName}'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         </div>`;
@@ -88,7 +88,7 @@ function loadDataTable(deleted, notActivated) {
                         <a href='mailto:${row.email}' target="_top" style='cursor:pointer; padding-left:5px;' ${row.email == null ? "hidden" : ""} title='Изпращане на email'>
                             <img class="chatnotifications" src="../png/email.png" />
                         </a>
-                        <a href="..\\Report\\SetEmployeePeriodDate?userId=${row.id}" style='cursor:pointer;' ${row.status == "editable" ? "" : "hidden"} title='Отчет за период на ${row.fullName}'>
+                        <a href="..\\Report\\SetPersonalPeriodDate?userId=${row.id}" style='cursor:pointer;' ${row.status == "editable" ? "" : "hidden"} title='Отчет за период на ${row.fullName}'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         </div>`;

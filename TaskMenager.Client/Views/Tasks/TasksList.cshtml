@@ -4,6 +4,12 @@
 
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 <input type='hidden' id='uid' value=@permisionType>
+@{var directorateId = User.Claims.Where(u => u.Type == "directorateId").Select(u => u.Value).FirstOrDefault();}
+<input type='hidden' id='dirid' value=@directorateId>
+@{var departmentId = User.Claims.Where(u => u.Type == "departmentId").Select(u => u.Value).FirstOrDefault();}
+<input type='hidden' id='depid' value=@departmentId>
+@{var sectorId = User.Claims.Where(u => u.Type == "sectorId").Select(u => u.Value).FirstOrDefault();}
+<input type='hidden' id='secid' value=@sectorId>
 <br />
 <div class="row p-0 m-0">
     <div class="col-md-3">
@@ -38,6 +44,9 @@
                     <th>Отдел</th>
                     <th>Сектор</th>
                     <th>N: р.з.</th>
+                    <th>Дир. Номер</th>
+                    <th>Отд. Номер</th>
+                    <th>Сек. Номер</th>
                     <th><i class="fas fa-users"></i></th>
                     <th>Статус</th>
                     <th>Тип задача</th>

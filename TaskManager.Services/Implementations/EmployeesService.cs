@@ -61,12 +61,12 @@ namespace TaskManager.Services.Implementations
             return report;
         }
 
-        public async Task<EmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate)
+        public async Task<ShortEmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate)
         {
             var report = await this.db.Employees
                 .Where(e => e.Id == userId)
                 .Include(e => e.WorkedHoursByTask)
-                .ProjectTo<EmployeeServiceModel>(new { startDate, endDate })
+                .ProjectTo<ShortEmployeeServiceModel>(new { startDate, endDate })
                 .FirstOrDefaultAsync();
             return report;
         }
@@ -464,6 +464,27 @@ namespace TaskManager.Services.Implementations
                 .OrderBy(t => t.DirectorateId)
                 .ProjectTo<UserServiceModel>()
                 .ToListAsync();
+        }
+
+        public async Task<string> GenerateEmailWhenEmpty()
+        {
+            try
+            {
+                var employeesWithoutMail = await this.db.Employees
+                    .Where(e => string.IsNullOrWhiteSpace(e.Email))
+                    .ToListAsync();
+                foreach (var emp in employeesWithoutMail)
+                {
+                    emp.Email = emp.DaeuAccaunt.Substring(emp.DaeuAccaunt.LastIndexOf("\\") + 1) + "@e-gov.bg";
+                }
+                await this.db.SaveChangesAsync();
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
         }
     }
 }

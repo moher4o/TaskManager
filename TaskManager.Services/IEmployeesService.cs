@@ -46,8 +46,9 @@ namespace TaskManager.Services
         Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false);
         Task<List<UserServiceModel>> GetAllNotActivatedUsersAsync();
 
-        Task<EmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate);
+        Task<ShortEmployeeServiceModel> GetPersonalReport(int userId, DateTime startDate, DateTime endDate);
 
         Task<List<PersonalDateReportServiceModel>> GetDateReport(int userId, DateTime currentDate);
+        Task<string> GenerateEmailWhenEmpty();
     }
 }

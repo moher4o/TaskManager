@@ -15,8 +15,16 @@ namespace TaskMenager.Client.Models.Tasks
         public string TaskName { get; set; }
 
         public string DirectorateName { get; set; }
+
         public string DepartmentName { get; set; }
+
         public string SectorName { get; set; }
+
+        public int? SectorId { get; set; }
+
+        public int? DepartmentId { get; set; }
+
+        public int? DirectorateId { get; set; }
 
         public string Status { get; set; }
 

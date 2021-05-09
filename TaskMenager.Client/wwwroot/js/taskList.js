@@ -1,5 +1,9 @@
 ﻿var dataTable;
 var permisionType;
+var empdirectorateId;
+var empdepartmentId;
+var empsectorId;
+var userFullName;
 const loc = window.location.href;
 const path = loc.substr(0, loc.lastIndexOf('/') + 1); 
 
@@ -7,27 +11,12 @@ const path = loc.substr(0, loc.lastIndexOf('/') + 1);
 $(document).ready(function () {
     $('#showClosed').on('change', DeletedTasksShowOrHide);
     $('#showDeleted').on('change', DeletedTasksShowOrHide);
-    //$('#DT_load').DataTable({
-    //    "columnDefs": [
-    //        {
-    //            "targets": [3],
-    //            "visible": false
-    //            //"searchable": false
-    //        },
-    //        {
-    //            "targets": [4],
-    //            "visible": false
-    //        },
-    //        {
-    //            "targets": [5],
-    //            "visible": false
-    //        },
-
-    //    ]
-    //});
     loadDataTable(false, false);
     permisionType = $('#uid').val();
-    
+    empdirectorateId = $('#dirid').val();
+    empdepartmentId = $('#depid').val();
+    empsectorId = $('#secid').val();
+    userFullName = $('#userFN').text();
 });
 
 function LoadTasksTest() {
@@ -73,6 +62,9 @@ function loadDataTable(getClosed, withDeleted) {
             { "data": "departmentName", "width": "12%" },
             { "data": "sectorName", "width": "10%" },
             { "data": "parentTaskId", "width": "3%" },
+            { "data": "directorateId", "width": "3%" },
+            { "data": "departmentId", "width": "3%" },
+            { "data": "sectorId", "width": "3%" },
             { "data": "assignedExpertsCount", "width": "3%" },
             //{ "data": "status", "width": "12%" },
             { "data": "status", "width": "6%" },
@@ -90,8 +82,11 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове'>
                             <img class="chatnotifications3" src="../png/files.png" />
                         </a>
+                        <a href="..\\Report\\TaskReport?taskId=${row.id}" style='cursor:pointer;' ${((row.assignedExpertsCount == 0) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
+                            <img class="chatnotifications" src="../png/report.png" />
+                        </a>
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"} title='Отчет по задача'>
+                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"}>
                             <img class="chatnotifications" src="../png/child.png" />
                         </a>
                         </div>`;
@@ -114,7 +109,7 @@ function loadDataTable(getClosed, withDeleted) {
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"} title='Отчет по задача'>
+                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"}>
                             <img class="chatnotifications" src="../png/child.png" />
                         </a>
 
@@ -141,6 +136,18 @@ function loadDataTable(getClosed, withDeleted) {
              },
              {
                  "targets": [6],
+                 "visible": false
+             },
+             {
+                 "targets": [7],
+                 "visible": false
+             },
+             {
+                 "targets": [8],
+                 "visible": false
+             },
+             {
+                 "targets": [9],
                  "visible": false
              },
          ],

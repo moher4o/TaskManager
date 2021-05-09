@@ -198,11 +198,11 @@
                         <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@Model.Id">
                             Редактиране
                         </a>
-                        <a class="btn btn-info" style="margin-left:15px;" asp-action="TasksList" asp-controller="Tasks">
-                            Списък задачи
-                        </a>
-
                     }
+                    <a class="btn btn-info" style="margin-left:15px;" asp-action="TasksList" asp-controller="Tasks">
+                        Списък задачи
+                    </a>
+
                     @if (isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
 || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
@@ -212,8 +212,8 @@
                             @*</a>*@
                             <label style="color:red; margin-right:15px; margin-left:15px;">Изтрита задача</label>
                             @*<a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="NotImplemented" asp-controller="Tasks" asp-route-taskId="@Model.Id">
-                                    Възстановяване
-                                </a>*@
+                    Възстановяване
+                </a>*@
                             @{var modalId = "modal" + Model.Id.ToString();}
                             <form method="post" asp-controller="Tasks" asp-action="UndeleteTask" asp-route-taskId="@Model.Id">
                                 <a title="Ново отваряне на задачата" style="background-color: #b2d6f8; " class="btn btn-secondary" data-toggle="modal" data-target="#@modalId">
