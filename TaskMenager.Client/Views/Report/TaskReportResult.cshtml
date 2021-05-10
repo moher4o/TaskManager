@@ -1,0 +1,55 @@
+﻿@model List<TaskWorkedHoursServiceModel>
+
+@{
+    ViewData["Title"] = "Отчет по задача";
+}
+
+@{ var employeesList = new Dictionary<int, int>();}
+@{ var dateList = new HashSet<DateTime>();}
+@{ int col = 1;}
+@{ DateTime currentDate = DateTime.Now.AddDays(100);}
+<div class="PrimeBox2 widthmobile" style="max-width:95%; position:relative; background-color:ghostwhite;">
+    <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
+        <h5 style="color:white; margin-left:15px;">Периодичен отчет на здача "@(Model.Select(t => t.TaskName).FirstOrDefault())"</h5>
+        @*<button asp-controller="Tasks" asp-action="TasksList" id="x">
+                X
+            </button>*@
+    </div>
+    <div>
+        <table class="table table-striped table-bordered compact" style="width:100%">
+            <thead>
+                <tr>
+                    <th></th>
+                    @foreach (var item in Model)
+                    {
+                        if (!employeesList.ContainsKey(item.EmployeeId))
+                        {
+                            employeesList.Add(item.EmployeeId, col);
+                            <th style="max-width:40px;">@item.EmployeeName</th>
+                            col = col + 1;
+                        }
+                        if (!dateList.Contains(item.WorkDate.Date))
+                        {
+                            dateList.Add(item.WorkDate.Date);
+                        }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var worckedDate in dateList)
+                {
+                <tr>
+                    <td>@worckedDate.Date.ToString("dd/MM/yyyy")</td>
+                    @foreach (var item in Model.Where(wd => wd.WorkDate.Date == worckedDate.Date).ToList())
+                    {
+
+                    }
+
+                </tr>
+                 }
+
+            </tbody>
+        </table>
+    </div>
+</div>

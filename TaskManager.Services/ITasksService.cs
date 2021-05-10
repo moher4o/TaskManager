@@ -44,5 +44,7 @@ namespace TaskManager.Services
         Task<string> MarkTaskActiveAsync(int taskId, int userId);
  
         IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId);
+
+        Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate);
     }
 }

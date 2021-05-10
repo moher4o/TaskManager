@@ -10,6 +10,8 @@ namespace TaskMenager.Client.Models.Report
     {
         public int userId { get; set; }
 
+        public int taskId { get; set; }
+
         [Required(ErrorMessage = "Полето е задължително")]
         [DataType(DataType.Date)]
         [Display(Name = "Начална дата *")]

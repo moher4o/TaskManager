@@ -38,6 +38,55 @@ namespace TaskMenager.Client.Controllers
 
         }
 
+        public IActionResult TaskReportPeriod(int taskId)
+        {
+            try
+            {
+                var currentTask = this.tasks.GetTaskDetails(taskId).FirstOrDefault();
+                if ((((currentUser.RoleName == DataConstants.DirectorateAdmin) && (currentTask.DirectorateId != currentUser.DirectorateId)) || ((currentUser.RoleName == DataConstants.DepartmentAdmin) && (currentTask.DepartmentId != currentUser.DepartmentId)) || ((currentUser.RoleName == DataConstants.SectorAdmin) && (currentTask.SectorId != currentUser.SectorId)) || (currentUser.RoleName == DataConstants.Employee)) && (currentTask.AssignerId != currentUser.Id))
+                {
+                    TempData["Error"] = "[TaskReport] Текущия потребител няма права за този отчет";
+                    return RedirectToAction("TasksList", "Tasks");
+                }
+
+                var taskPeriod = new PeriodViewModel();
+                taskPeriod.taskId = taskId;
+                return View(taskPeriod);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "[TaskReport] Грешка при подготовка на модела за отчет";
+                return RedirectToAction("TasksList", "Tasks");
+            }
+        }
+
+        public async Task<IActionResult> TaskReportResult(PeriodViewModel model)
+        {
+            try
+            {
+                if (model.StartDate > model.EndDate)
+                {
+                    TempData["Error"] = "[TaskReport] Невалидни дати";
+                    return RedirectToAction("TasksList", "Tasks");
+                }
+
+                if (model.taskId < 1)
+                {
+                    TempData["Error"] = "[TaskReport] Невалиден номер на задача";
+                    return RedirectToAction("TasksList", "Tasks");
+                }
+
+                var taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                return View(taskReportForPeriod);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "[TaskReport] Грешка при обработката на модела за отчет";
+                return RedirectToAction("TasksList", "Tasks");
+            }
+        }
+
+
         public IActionResult PeriodReport()
         {
             try

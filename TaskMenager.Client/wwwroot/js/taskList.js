@@ -82,7 +82,7 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове'>
                             <img class="chatnotifications3" src="../png/files.png" />
                         </a>
-                        <a href="..\\Report\\TaskReport?taskId=${row.id}" style='cursor:pointer;' ${((row.assignedExpertsCount == 0) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
+                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer;' ${((row.assignedExpertsCount == 0) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px;'
@@ -105,7 +105,7 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове'>
                             <img class="chatnotifications3" src="../png/files.png" />
                         </a>
-                        <a href="..\\Report\\TaskReport?taskId=${row.id}" style='cursor:pointer;' ${row.assignedExpertsCount == 0 ? "hidden" : ""} title='Отчет по задача'>
+                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer;' ${row.assignedExpertsCount == 0 ? "hidden" : ""} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px;'

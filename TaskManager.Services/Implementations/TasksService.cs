@@ -26,6 +26,18 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate)
+        {
+            var report = await this.db.WorkedHours
+                .Where(wh => wh.TaskId == taskId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate.Date <= endDate.Date && !wh.isDeleted)
+                .OrderBy(wh => wh.WorkDate.Date)
+                .ThenBy(wh => wh.EmployeeId)
+                .ProjectTo<TaskWorkedHoursServiceModel>()
+                .ToListAsync();
+            return report;
+        }
+
+
         public async Task<bool> CheckIfTaskIsClosed(int taskId)
         {
             var task = await this.db.Tasks.Include(t => t.TaskStatus).Where(t => t.Id == taskId).FirstOrDefaultAsync();
