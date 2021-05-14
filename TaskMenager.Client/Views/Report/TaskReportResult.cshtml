@@ -1,55 +1,94 @@
-﻿@model List<TaskWorkedHoursServiceModel>
+﻿@model PeriodViewModel
 
 @{
     ViewData["Title"] = "Отчет по задача";
 }
 
-@{ var employeesList = new Dictionary<int, int>();}
+@{ var employeesList = new List<int>();}
 @{ var dateList = new HashSet<DateTime>();}
-@{ int col = 1;}
+@{ int hours = 1;}
+@{ int sum = 0;}
 @{ DateTime currentDate = DateTime.Now.AddDays(100);}
-<div class="PrimeBox2 widthmobile" style="max-width:95%; position:relative; background-color:ghostwhite;">
+<div class="PrimeBox2 widthmobile" style="max-width:100%; position:relative; background-color:ghostwhite; margin-top:10px !important">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
-        <h5 style="color:white; margin-left:15px;">Периодичен отчет на здача "@(Model.Select(t => t.TaskName).FirstOrDefault())"</h5>
+        <h5 style="color:white; margin-left:15px;">Периодичен отчет на здача "@(Model.DateList.Select(t => t.TaskName).FirstOrDefault())"</h5>
         @*<button asp-controller="Tasks" asp-action="TasksList" id="x">
                 X
             </button>*@
     </div>
     <div>
         <table class="table table-striped table-bordered compact" style="width:100%">
-            <thead>
+            <thead style="display:table; width:100%; table-layout:fixed; width:calc( 100% - 1em );">
                 <tr>
-                    <th></th>
-                    @foreach (var item in Model)
+                    <th style="min-width:29px; max-width:30px;"></th>
+                    @foreach (var item in Model.DateList)
                     {
-                        if (!employeesList.ContainsKey(item.EmployeeId))
+                        if (!employeesList.Contains(item.EmployeeId))
                         {
-                            employeesList.Add(item.EmployeeId, col);
-                            <th style="max-width:40px;">@item.EmployeeName</th>
-                            col = col + 1;
+                            employeesList.Add(item.EmployeeId);
+                    <th style="min-width:30px;">@item.EmployeeName</th>
                         }
+
                         if (!dateList.Contains(item.WorkDate.Date))
                         {
                             dateList.Add(item.WorkDate.Date);
                         }
                     }
+                    <th>Общо:</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="display: block; height: 500px; overflow: auto;">
 
                 @foreach (var worckedDate in dateList)
                 {
-                <tr>
+                    sum = 0;
+                <tr style=" display: table; width: 100%; table-layout: fixed; /* even columns width , fix width of table too*/ ">
                     <td>@worckedDate.Date.ToString("dd/MM/yyyy")</td>
-                    @foreach (var item in Model.Where(wd => wd.WorkDate.Date == worckedDate.Date).ToList())
-                    {
-
-                    }
-
+                    @foreach (var id in employeesList)
+                        {
+                            hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
+                            sum = sum + hours;
+                            if (hours > 0)
+                            {
+                    <td>@hours</td>
+                            }
+                            else
+                            {
+                    <td></td>
+                            }
+                        }
+                    <td style="background-color:ivory; font-size:medium;"><strong>@sum</strong></td>
                 </tr>
-                 }
-
+                }
+                <tr style="background-color:ivory; font-size:medium; display: table; width: 100%; table-layout: fixed;">
+                    <td>Общо:</td>
+                    @{sum = 0; }
+                    @foreach (var id in employeesList)
+                    {
+                        hours = Model.DateList.Where(wh => wh.EmployeeId == id).Sum(wh => wh.HoursSpend);
+                    <td><strong>@hours</strong></td>
+                        sum += hours;
+                    }
+                    <td><strong>@sum</strong></td>
+                </tr>
             </tbody>
         </table>
+        <form method="get" asp-action="ExportSpravkaForTask" asp-controller="Report">
+            <input asp-for="taskId" class="form-control" nopicker="true" hidden />
+            <input asp-for="StartDate" class="form-control" nopicker="true" hidden />
+            <input asp-for="EndDate" class="form-control" nopicker="true" hidden />
+            <input type="submit" class="btn button save" value="Експорт в Ексел" id="realsend" />
+            <a class="button btncansel" style="margin-left:15px;" asp-action="TasksList" asp-controller="Tasks">
+                Списък задачи
+            </a>
+        </form>
+        @*<a asp-action="ExportSpravkaForTask" asp-controller="Report" asp-route-taskId="@Model.Select(wh => wh.TaskId).FirstOrDefault()" asp-route-stDate="@Model.Select(wh => wh.WorkDate.Date.ToString("o")).FirstOrDefault()" asp-route-lastDate="@Model.Select(wh => wh.WorkDate.Date.ToString("o")).LastOrDefault()" type="button" class="button save">Експорт в Ексел</a>*@
+        @*<a href="@Url.Action("ExportSpravkaForTask", "Report", new {taskId = Model.Select(wh => wh.TaskId).FirstOrDefault(), stDate =  @Model.Select(wh => wh.WorkDate.ToString("dd/MM/yyyy")).FirstOrDefault(), lastDate = @Model.Select(wh => wh.WorkDate.ToString("dd/MM/yyyy")).LastOrDefault()})" type="button" class="button save">Експорт в Ексел</a>*@
+
+
+        @*<a class="button btncansel" style="margin-left:15px;" asp-action="TasksList" asp-controller="Tasks">
+            Списък задачи
+        </a>*@
+
     </div>
 </div>

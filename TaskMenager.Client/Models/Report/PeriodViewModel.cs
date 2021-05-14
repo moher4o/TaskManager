@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManager.Services.Models.TaskModels;
 
 namespace TaskMenager.Client.Models.Report
 {
@@ -21,5 +22,7 @@ namespace TaskMenager.Client.Models.Report
         [DataType(DataType.Date)]
         [Display(Name = "Крайна дата *")]
         public DateTime EndDate { get; set; } = DateTime.Now.Date;
+
+        public List<TaskWorkedHoursServiceModel> DateList { get; set; } = new List<TaskWorkedHoursServiceModel>();
     }
 }

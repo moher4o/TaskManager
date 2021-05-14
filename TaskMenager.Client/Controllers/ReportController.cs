@@ -20,6 +20,7 @@ using OfficeOpenXml.Drawing.Chart.Style;
 using Microsoft.AspNetCore.Authorization;
 using TaskManager.Common;
 using Microsoft.AspNetCore.Hosting;
+using System.Globalization;
 
 namespace TaskMenager.Client.Controllers
 {
@@ -76,8 +77,13 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction("TasksList", "Tasks");
                 }
 
-                var taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
-                return View(taskReportForPeriod);
+                model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                if (model.DateList.Count < 1)
+                {
+                    TempData["Error"] = "[TaskReport] Няма отчет по задачата за този период.";
+                    return RedirectToAction("TaskReportPeriod", new { taskId = model.taskId});
+                }
+                return View(model);
             }
             catch (Exception)
             {
@@ -174,6 +180,205 @@ namespace TaskMenager.Client.Controllers
 
         }
 
+        public async Task<IActionResult> ExportSpravkaForTask(PeriodViewModel model)
+        {
+            try
+            {
+                var employeesList = new List<int>();
+                var dateList = new HashSet<DateTime>();
+                if (model.StartDate > model.EndDate)
+                {
+                    TempData["Error"] = "[ExportSpravkaForTask] Невалидни дати";
+                    return RedirectToAction("TasksList", "Tasks");
+                }
+
+                if (model.taskId < 1)
+                {
+                    TempData["Error"] = "[ExportSpravkaForTask] Невалиден номер на задача";
+                    return RedirectToAction("TasksList", "Tasks");
+                }
+
+                var taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+
+                foreach (var item in taskReportForPeriod)
+                {
+                    if (!employeesList.Contains(item.EmployeeId))
+                    {
+                        employeesList.Add(item.EmployeeId);             //намират се всички служители и дати на които е работено за периода
+                    }
+                    if (!dateList.Contains(item.WorkDate.Date))
+                    {
+                        dateList.Add(item.WorkDate.Date);
+                    }
+                }
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                var stream = new System.IO.MemoryStream();
+                using (ExcelPackage package = new ExcelPackage(stream))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
+                    worksheet.View.ZoomScale = 100;
+                    try
+                    {
+                        worksheet.Name = "Отчет за период";
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Error"] = "Грешка при създаването на tab за отчета: " + taskReportForPeriod.Select(wh => wh.TaskName).FirstOrDefault().Substring(0, 50) + "...";
+                        return RedirectToAction("TasksList", "Tasks");
+                    }
+
+                    worksheet.Row(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheet.Row(2).Height = 48;
+                    var headerrange = worksheet.Cells[2, 1, 2, employeesList.Count() + 1];
+                    headerrange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    headerrange.Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+                    worksheet.Row(2).Style.Font.Size = 12;
+                    worksheet.Column(1).Width = 12;
+                    worksheet.Cells[2, 1].Value = "Дата";
+                    int column = 2;
+                    var tableEmpColumn = new Dictionary<int, int>();
+                    foreach (var employeeId in employeesList)
+                    {
+                        worksheet.Column(column).Width = 11;
+                        worksheet.Cells[2, column].Style.WrapText = true;
+                        worksheet.Cells[2, column].Style.Font.Size = 8;
+                        worksheet.Cells[2, column].Value = taskReportForPeriod.Where(wh => wh.EmployeeId == employeeId).Select(wh => wh.EmployeeName).FirstOrDefault();
+                        worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+                        tableEmpColumn.Add(employeeId, column);
+                        column += 1;
+                    }
+                    int col = column;
+                    worksheet.Cells[2, column].Style.WrapText = true;
+                    worksheet.Cells[2, column].Style.Font.Size = 12;
+                    worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
+                    worksheet.Column(column).Width = 10;
+                    worksheet.Cells[2, column].Value = "Общо за дата :";
+
+                    worksheet.Cells[1, 1, 1, column > 14 ? column : 14].Merge = true;
+                    worksheet.Row(1).Height = 25;
+                    worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                    worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                    worksheet.Cells[1, 1].Style.Indent = 10;
+                    worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheet.Cells[1, 1].Value = taskReportForPeriod.Select(wh => wh.TaskName).FirstOrDefault() + "  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                    worksheet.Cells[1, 1].Style.Font.Size = 14;
+                    worksheet.Cells[1, 1].Style.Font.Bold = true;
+                    //worksheet.View.FreezePanes(400, 2);
+                    var row = 3;
+
+                    foreach (var date in dateList)
+                    {
+
+                        worksheet.Cells[row, 1].Style.Font.Size = 10;
+                        worksheet.Cells[row, 1].Value = date.Date.ToString("dd/MM/yyyy") + "г.";
+                        worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+
+                        foreach (var empid in employeesList)
+                        {
+                            var hours = taskReportForPeriod.Where(wh => wh.EmployeeId == empid && wh.WorkDate.Date == date.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
+                            if (hours > 0)
+                            {
+                                worksheet.Cells[row, tableEmpColumn[empid]].Value = hours;
+                            }
+
+                        }
+                        worksheet.Cells[row, col].Style.WrapText = true;
+                        worksheet.Cells[row, col].Style.Font.Size = 12;
+                        worksheet.Cells[row, col].Style.Font.Bold = true;
+                        worksheet.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
+                        worksheet.Column(col).Width = 10;
+                        worksheet.Cells[row, col].Value = taskReportForPeriod.Where(wh => wh.WorkDate.Date == date.Date).Sum(wh => wh.HoursSpend);
+                        row += 1;
+                    }
+
+                    worksheet.Cells[row, 1].Value = "Общо :";
+                    worksheet.Cells[row, 1].Style.Font.Size = 11;
+                    worksheet.Cells[row, 1].Style.Font.Bold = true;
+                    worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
+
+
+                    foreach (var employeeId in employeesList)
+                    {
+                        worksheet.Cells[row, tableEmpColumn[employeeId]].Style.Font.Size = 12;
+                        worksheet.Cells[row, tableEmpColumn[employeeId]].Style.Font.Bold = true;
+                        worksheet.Cells[row, tableEmpColumn[employeeId]].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, tableEmpColumn[employeeId]].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
+
+                        var hours = taskReportForPeriod.Where(wh => wh.EmployeeId == employeeId).Sum(wh => wh.HoursSpend);
+                        worksheet.Cells[row, tableEmpColumn[employeeId]].Value = hours;
+
+                    }
+                    worksheet.Cells[row, col].Value = taskReportForPeriod.Sum(wh => wh.HoursSpend);
+                    worksheet.Cells[row, col].Style.Font.Size = 13;
+                    worksheet.Cells[row, col].Style.Font.Bold = true;
+                    worksheet.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
+
+
+                    var bodyrange = worksheet.Cells[3, 2, row, col];
+                    bodyrange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheet.View.ShowGridLines = true;
+                    worksheet.PrinterSettings.ShowGridLines = true;
+                    worksheet.PrinterSettings.Orientation = eOrientation.Landscape;
+
+                    //create a new piechart of type Doughnut
+                    var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
+                    //Set position to row 1 column 7 and 16 pixels offset
+                    doughtnutChart.SetPosition(row + 2, 0, 1, 10);
+                    doughtnutChart.SetSize(500, 500);
+                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row, 2, row, col - 1), ExcelRange.GetAddress(2, 2, 2, col - 1));
+                    doughtnutChart.Title.Text = "ЕКСПЕРТ / ЧАСОВЕ";
+                    doughtnutChart.DataLabel.ShowPercent = true;
+                    //doughtnutChart.DataLabel.ShowLeaderLines = true;
+                    doughtnutChart.Style = eChartStyle.Style26; //3D look
+
+                    ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
+                    pieChart.Title.Text = "Дата / Часове";
+                    //select the ranges for the pie. First the values, then the header range
+                    pieChart.Legend.Position = eLegendPosition.Bottom;
+                    pieChart.DataLabel.ShowPercent = true;
+                    pieChart.DataLabel.ShowLeaderLines = true;
+                    pieChart.DataLabel.ShowCategory = true;
+                    pieChart.Legend.Remove();
+                    var rangeTitles = ExcelRange.GetAddress(3, 1, row - 1, 1);
+                    pieChart.Series.Add(ExcelRange.GetAddress(3, col, row - 1, col), rangeTitles);
+                    pieChart.SetSize(600, 500);
+                    pieChart.SetPosition(row + 2, 0, 10, 0);
+                    pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette3);
+                    pieChart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
+                    pieChart.DataLabel.Font.Fill.Color = Color.Black;
+                    pieChart.DataLabel.Font.Size = 12;
+                    //pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle7);
+
+
+                    package.Save();
+                }
+
+                string fileName = "TaskReport_" + DateTime.Now.ToShortTimeString() + ".xlsx";
+                string fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                stream.Position = 0;
+                return File(stream, fileType, fileName);
+
+                //TempData["Success"] = $"[ExportSpravkaForTask] {model.StartDate}, {model.EndDate}";
+                //return RedirectToAction("TasksList", "Tasks");
+
+
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = $"[ExportSpravkaForTask] Грешка при обработката на модела за създаване на файла. {model.StartDate}, {model.EndDate}";
+                return RedirectToAction("TasksList", "Tasks");
+            }
+
+        }
+
         public IActionResult ExportSpravkaForEmployee(ShortEmployeeServiceModel employeeWork, DateTime StartDate, DateTime EndDate)
         {
             try
@@ -192,7 +397,7 @@ namespace TaskMenager.Client.Controllers
                     .ToList();
 
                 var employeePeriodTasks = employeePeriodTasksAll.GroupBy(l => new { l.Id, l.TextValue })   //Важно!!! Премахвам дублиращи се елементи в лист
-                    .Select(d => new SelectServiceModel   
+                    .Select(d => new SelectServiceModel
                     {
                         Id = d.First().Id,
                         TextValue = d.Key.TextValue
@@ -232,7 +437,7 @@ namespace TaskMenager.Client.Controllers
                         worksheet.Cells[2, column].Value = empTask.TextValue;
                         worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
                         worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                        tableTaskColumn.Add(empTask.Id,column);
+                        tableTaskColumn.Add(empTask.Id, column);
                         column += 1;
                     }
                     int col = column;
@@ -255,7 +460,7 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Cells[1, 1].Value = employeeWork.FullName + "  (" + StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                     worksheet.Cells[1, 1].Style.Font.Size = 14;
                     worksheet.Cells[1, 1].Style.Font.Bold = true;
-                    worksheet.View.FreezePanes(400, 2);
+                    //worksheet.View.FreezePanes(400, 2);
 
                     column = 1;
                     int row = 2;
@@ -267,7 +472,7 @@ namespace TaskMenager.Client.Controllers
                             row += 1;
                             if (row > 2 && col > 2) //не сочи амфетката с имената на задачите и има поне една задача
                             {
-                                formula = "=SUM(B" +row.ToString() +  ":" + (col <= 27 ? ((char)('A' + (col - 2))).ToString() : ("A" + ((char)('A' + (col - 28))).ToString())) + row.ToString() + ")";
+                                formula = "=SUM(B" + row.ToString() + ":" + (col <= 27 ? ((char)('A' + (col - 2))).ToString() : ("A" + ((char)('A' + (col - 28))).ToString())) + row.ToString() + ")";
                                 worksheet.Cells[row, col].Formula = formula;
                                 worksheet.Cells[row, col].Style.Font.Size = 12;
                                 worksheet.Cells[row, col].Style.Font.Bold = true;
@@ -287,7 +492,7 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[row, column].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
                             worksheet.Cells[row, tableTaskColumn[item.TaskId]].Value = item.HoursSpend;
                             tempDate = item.WorkDate;
-                            
+
                         }
                         else
                         {
@@ -302,7 +507,7 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
 
-                    for (column = 2; column < col; column++)
+                    for (column = 2; column <= col; column++)
                     {
                         formula = "=SUM(" + (column <= 26 ? ((char)('A' + (column - 1))).ToString() : ("A" + ((char)('A' + (column - 27))).ToString())) + "3:" + (column <= 26 ? ((char)('A' + (column - 1))).ToString() : ("A" + ((char)('A' + (column - 27))).ToString())) + (row - 1).ToString() + ")";
 
@@ -315,6 +520,18 @@ namespace TaskMenager.Client.Controllers
                     }
                     var bodyrange = worksheet.Cells[3, 2, row, col];
                     bodyrange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                    //create a new piechart of type Doughnut
+                    var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
+                    //Set position to row 1 column 7 and 16 pixels offset
+                    doughtnutChart.SetPosition(row + 2, 0, 1, 10);
+                    doughtnutChart.SetSize(500, 500);
+                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row, 2, row, col - 1), ExcelRange.GetAddress(2, 2, 2, col - 1));
+                    doughtnutChart.Title.Text = "Задача / Часове";
+                    doughtnutChart.DataLabel.ShowPercent = true;
+                    //doughtnutChart.DataLabel.ShowLeaderLines = true;
+                    doughtnutChart.Style = eChartStyle.Style26; //3D look
+
                     package.Save();
                 }
                 string fileName = "PersonalReport_" + DateTime.Now.ToShortTimeString() + ".xlsx";
@@ -1093,7 +1310,7 @@ namespace TaskMenager.Client.Controllers
                 if (userId < 1)
                 {
                     myPeriod.userId = currentUser.Id;
-                    
+
                 }
                 else
                 {
