@@ -59,7 +59,7 @@ namespace TaskMenager.Client.Controllers
                 TempData["Error"] = "[TaskReport] Грешка при подготовка на модела за отчет";
                 return RedirectToAction("TasksList", "Tasks");
             }
-        }
+        }    //task 1 step
 
         public async Task<IActionResult> TaskReportResult(PeriodViewModel model)
         {
@@ -67,30 +67,30 @@ namespace TaskMenager.Client.Controllers
             {
                 if (model.StartDate > model.EndDate)
                 {
-                    TempData["Error"] = "[TaskReport] Невалидни дати";
+                    TempData["Error"] = "[TaskReportResult] Невалидни дати";
                     return RedirectToAction("TasksList", "Tasks");
                 }
 
                 if (model.taskId < 1)
                 {
-                    TempData["Error"] = "[TaskReport] Невалиден номер на задача";
+                    TempData["Error"] = "[TaskReportResult] Невалиден номер на задача";
                     return RedirectToAction("TasksList", "Tasks");
                 }
 
                 model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
                 if (model.DateList.Count < 1)
                 {
-                    TempData["Error"] = "[TaskReport] Няма отчет по задачата за този период.";
+                    TempData["Error"] = "[TaskReportResult] Няма отчет по задачата за този период.";
                     return RedirectToAction("TaskReportPeriod", new { taskId = model.taskId});
                 }
                 return View(model);
             }
             catch (Exception)
             {
-                TempData["Error"] = "[TaskReport] Грешка при обработката на модела за отчет";
+                TempData["Error"] = "[TaskReportResult] Грешка при обработката на модела за отчет";
                 return RedirectToAction("TasksList", "Tasks");
             }
-        }
+        }  //task 2 step
 
 
         public IActionResult PeriodReport()
@@ -377,12 +377,14 @@ namespace TaskMenager.Client.Controllers
                 return RedirectToAction("TasksList", "Tasks");
             }
 
-        }
+        }   //task 3 step
 
-        public IActionResult ExportSpravkaForEmployee(ShortEmployeeServiceModel employeeWork, DateTime StartDate, DateTime EndDate)
+        public async Task<IActionResult> ExportSpravkaForEmployee(PeriodViewModel model)
         {
             try
             {
+                var employeeWork = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
+
                 if (employeeWork.WorkedHoursByTaskByPeriod.Count < 1)
                 {
                     TempData["Error"] = $"Няма задачи по които да е работил {employeeWork.FullName} за избрания период";
@@ -457,7 +459,7 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     //worksheet.Cells[1, 1].Value = employeeWork.FullName + "  (" + employeeWork.WorkedHoursByTaskByPeriod.Select(wh => wh.WorkDate.Date).FirstOrDefault().ToString("dd/MM/yyyy") +
                     //    "г. - " + employeeWork.WorkedHoursByTaskByPeriod.Select(wh => wh.WorkDate.Date).LastOrDefault().ToString("dd/MM/yyyy") + "г.)";
-                    worksheet.Cells[1, 1].Value = employeeWork.FullName + "  (" + StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                    worksheet.Cells[1, 1].Value = employeeWork.FullName + "  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                     worksheet.Cells[1, 1].Style.Font.Size = 14;
                     worksheet.Cells[1, 1].Style.Font.Bold = true;
                     //worksheet.View.FreezePanes(400, 2);
@@ -544,7 +546,7 @@ namespace TaskMenager.Client.Controllers
                 TempData["Error"] = $"[ExportSpravkaForEmployee] Грешка при експорта. {ex}";
                 return RedirectToAction("Index", "Home");
             }
-        }
+        }   //employee 3 step
 
         public async Task<IActionResult> ExportReport(PeriodReportViewModel model)
         {
@@ -1302,7 +1304,7 @@ namespace TaskMenager.Client.Controllers
 
         }
 
-        public IActionResult SetPersonalPeriodDate(int userId = 0)
+        public IActionResult SetPersonalPeriodDate(int userId = 0)    //employee 1 step
         {
             try
             {
@@ -1323,9 +1325,9 @@ namespace TaskMenager.Client.Controllers
                 TempData["Error"] = "[SetPersonalPeriodDate] Грешка при подготовка на модела за отчет";
                 return RedirectToAction("Index", "Home");
             }
-        }
+        }    
 
-        public async Task<IActionResult> PersonalPeriodReport(PeriodViewModel model)
+        public async Task<IActionResult> PersonalPeriodReport(PeriodViewModel model)   //employee 2 step
         {
             try
             {
@@ -1341,8 +1343,9 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
-                var employeeWorkForPeriod = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
-                return ExportSpravkaForEmployee(employeeWorkForPeriod, model.StartDate.Date, model.EndDate.Date);
+                model.PersonalDateList = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
+                return View(model);
+                //return ExportSpravkaForEmployee(employeeWorkForPeriod, model.StartDate.Date, model.EndDate.Date);
             }
             catch (Exception)
             {
@@ -1351,7 +1354,7 @@ namespace TaskMenager.Client.Controllers
             }
 
 
-        }
+        }   
 
 
     }

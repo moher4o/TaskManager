@@ -11,7 +11,7 @@
 @{ DateTime currentDate = DateTime.Now.AddDays(100);}
 <div class="PrimeBox2 widthmobile" style="max-width:100%; position:relative; background-color:ghostwhite; margin-top:10px !important">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
-        <h5 style="color:white; margin-left:15px;">Периодичен отчет на здача "@(Model.DateList.Select(t => t.TaskName).FirstOrDefault())"</h5>
+        <h5 style="color:white; margin-left:15px;">Периодичен отчет на задача "@(Model.DateList.Select(t => t.TaskName).FirstOrDefault())"</h5>
         @*<button asp-controller="Tasks" asp-action="TasksList" id="x">
                 X
             </button>*@
