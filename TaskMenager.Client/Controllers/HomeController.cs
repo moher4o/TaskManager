@@ -66,68 +66,6 @@ namespace TaskMenager.Client.Controllers
 
             currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
             return View(currentEmployee);
-            //string result = string.Empty;
-            //if (this.roles.RolesCount() != DataConstants.RolesCount)
-            //{
-            //    result = await this.roles.CreateRolesAsync();
-            //    if (!result.Equals("success"))
-            //    {
-            //        TempData["Error"] = "Грешка след опит за инициализиране на ролите : " + result + " ";
-            //    }
-            //    else
-            //    {
-            //        TempData["Success"] = "Заредени ролите";
-            //    }
-
-
-            //    if (this.tasks.TasksStatusCount() != DataConstants.TasksStatusCount)
-            //    {
-            //        result = await this.tasks.CreateTasksStatusesAsync();
-            //        if (!result.Equals("success"))
-            //        {
-            //            TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на статусите на задачите : " + result;
-            //        }
-            //        else
-            //        {
-            //            TempData["Success"] = TempData["Success"] + "<  >" + "Заредени статусите на задачите";
-            //        }
-
-            //    }
-            //    if (this.tasks.TasksPrioritysCount() != DataConstants.TasksPriorityCount)
-            //    {
-            //        result = await this.tasks.CreateTasksPrioritiesAsync();
-            //        if (!result.Equals("success"))
-            //        {
-            //            TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на приоритетите на задачите : " + result;
-            //        }
-            //        else
-            //        {
-            //            TempData["Success"] = TempData["Success"] + "<  >" + "Заредени приоритетите на задачите";
-            //        }
-
-            //    }
-            //    if (this.tasks.TasksTypesCount() != DataConstants.TasksTypesCount)
-            //    {
-            //        result = await this.tasks.CreateTasksTypesAsync();
-            //        if (!result.Equals("success"))
-            //        {
-            //            TempData["Error"] = TempData["Error"] + "<  >" + "Грешка след опит за инициализиране на типовете задачи : " + result;
-            //        }
-            //        else
-            //        {
-            //            TempData["Success"] = TempData["Success"] + "<  >" + "Заредени типовете задачи";
-            //        }
-
-            //    }
-
-            //    return RedirectToAction("NotAuthorized");
-            //}
-
-
-
-            //var logedUser = this.User.Identities.FirstOrDefault().Name.ToLower();
-            //var currentEmployee = this.employees.GetUserDataForCooky(logedUser);
-
         }
 
         public IActionResult Privacy()

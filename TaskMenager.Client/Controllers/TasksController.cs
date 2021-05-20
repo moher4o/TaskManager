@@ -1386,9 +1386,9 @@ namespace TaskMenager.Client.Controllers
             return Json(new { success = result, message = "Задачата е изтрита" });
         }
 
-        public async Task<IActionResult> GetDateWorkedHours(DateTime searchedDate)
+        public async Task<IActionResult> GetDateWorkedHours(DateTime searchedDate, int userId)
         {
-            var data = await this.employees.GetDateReport(currentUser.Id, searchedDate);
+            var data = await this.employees.GetDateReport(userId, searchedDate);
             return Json(new { data });
         }
 

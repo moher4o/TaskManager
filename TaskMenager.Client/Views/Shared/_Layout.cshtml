@@ -38,6 +38,11 @@
     <link href="~/dist/css/select2.min.css" rel="stylesheet" />
     <script src="~/dist/js/select2.min.js"></script>
 
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+
 </head>
 <body>
     <header>
@@ -137,10 +142,8 @@
                             <a asp-controller="Report" asp-action="SetPersonalPeriodDate">Лична справка</a>
                         </li>
                         @*<li>
-                        <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
-
-                </li>*@
-
+                            <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
+                        </li>*@
                     </ul>
                 </li>
                 <li>
@@ -176,6 +179,10 @@
 
                     </ul>
                 </li>
+                <li>
+                    <a asp-controller="Report" asp-action="PhonesAndEmails"><i class="fas fa-phone"></i>Тел. указател</a>
+                </li>
+
                 <li @(User.Identities.Any(u => u.Name.Contains("avukov") || u.Name.Contains("samso")) ? "" : "hidden")>
                     <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-cog"></i>
@@ -186,14 +193,14 @@
                             <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Add emails</a>
                         </li>
                         @*<li>
-                            <a asp-controller="Structure" asp-action="DepartmentsList">Отдели</a>
-                        </li>
-                        <li>
-                            <a asp-controller="Structure" asp-action="SectorsList">Сектори</a>
-                        </li>
-                        <li>
-                            <a asp-controller="Structure" asp-action="JobTitlesList">Длъжности</a>
-                        </li>*@
+                    <a asp-controller="Structure" asp-action="DepartmentsList">Отдели</a>
+                </li>
+                <li>
+                    <a asp-controller="Structure" asp-action="SectorsList">Сектори</a>
+                </li>
+                <li>
+                    <a asp-controller="Structure" asp-action="JobTitlesList">Длъжности</a>
+                </li>*@
 
                     </ul>
                 </li>
@@ -237,7 +244,7 @@
                             <li class="nav-item">
                                 <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Users" asp-action="EditUser" asp-route-userId="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())">
                                     <i class=" fas fa-user-cog fa-lg"></i>
-                                    <span id = "userFN">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault())</span>
+                                    <span id="userFN">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault())</span>
                                 </a>
                             </li>
                         </ul>

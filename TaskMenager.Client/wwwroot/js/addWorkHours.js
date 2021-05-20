@@ -24,6 +24,8 @@
     }
 
     function GetDateInfo() {
+        var userId = document.getElementById("employeeId").value;
+        console.log(userId);
         var selectedText = document.getElementById("workdate").value;
         var selectedDate = new Date(selectedText);
         var now = new Date();
@@ -34,7 +36,7 @@
         else {
             $("tr:has(th)").remove();
             $("tr:has(td)").remove();
-            $.getJSON('..\\Tasks\\GetDateWorkedHours\?searchedDate=' + selectedDate.toUTCString(), { get_param: 'value' }, function (response) {
+            $.getJSON('..\\Tasks\\GetDateWorkedHours\?searchedDate=' + selectedDate.toUTCString() + "&userId=" + userId, { get_param: 'value' }, function (response) {
                 if (response.data.length > 0) {
                     $head = $('<thead>').append(
                         $('<tr>').append(

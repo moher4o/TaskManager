@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using TaskManager.Common;
 using Microsoft.AspNetCore.Hosting;
 using System.Globalization;
+using TaskMenager.Client.Models.Users;
 
 namespace TaskMenager.Client.Controllers
 {
@@ -81,7 +82,7 @@ namespace TaskMenager.Client.Controllers
                 if (model.DateList.Count < 1)
                 {
                     TempData["Error"] = "[TaskReportResult] Няма отчет по задачата за този период.";
-                    return RedirectToAction("TaskReportPeriod", new { taskId = model.taskId});
+                    return RedirectToAction("TaskReportPeriod", new { taskId = model.taskId });
                 }
                 return View(model);
             }
@@ -211,6 +212,9 @@ namespace TaskMenager.Client.Controllers
                         dateList.Add(item.WorkDate.Date);
                     }
                 }
+
+                // var employeePeriodTasks = employeePeriodTasksAll.GroupBy(l => new { l.Id, l.TextValue })   //Важно!!! Премахвам дублиращи се елементи в лист
+
 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var stream = new System.IO.MemoryStream();
@@ -383,27 +387,23 @@ namespace TaskMenager.Client.Controllers
         {
             try
             {
+                var taskList = new List<int>();
                 var employeeWork = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
 
                 if (employeeWork.WorkedHoursByTaskByPeriod.Count < 1)
                 {
                     TempData["Error"] = $"Няма задачи по които да е работил {employeeWork.FullName} за избрания период";
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("UsersList", "Users");
                 }
-                var employeePeriodTasksAll = employeeWork.WorkedHoursByTaskByPeriod
-                    .Select(wh => new SelectServiceModel
-                    {
-                        Id = wh.TaskId,
-                        TextValue = wh.TaskName
-                    })
-                    .ToList();
 
-                var employeePeriodTasks = employeePeriodTasksAll.GroupBy(l => new { l.Id, l.TextValue })   //Важно!!! Премахвам дублиращи се елементи в лист
-                    .Select(d => new SelectServiceModel
+                foreach (var item in employeeWork.WorkedHoursByTaskByPeriod)
+                {
+                    if (!taskList.Contains(item.TaskId))
                     {
-                        Id = d.First().Id,
-                        TextValue = d.Key.TextValue
-                    });
+                        taskList.Add(item.TaskId);             //намират се всички служители и дати на които е работено за периода
+                    }
+                }
+
 
                 var formula = string.Empty;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -419,11 +419,11 @@ namespace TaskMenager.Client.Controllers
                     catch (Exception)
                     {
                         TempData["Error"] = "Грешка при създаването на tab за експерта: " + employeeWork.FullName.Substring(0, 50) + "...";
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("UsersList", "Users");
                     }
                     worksheet.Row(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.Row(2).Height = 48;
-                    var headerrange = worksheet.Cells[2, 1, 2, employeePeriodTasks.Count() + 1];
+                    var headerrange = worksheet.Cells[2, 1, 2, taskList.Count() + 1];
                     headerrange.Style.Fill.PatternType = ExcelFillStyle.Solid;
                     headerrange.Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
                     worksheet.Row(2).Style.Font.Size = 12;
@@ -431,15 +431,15 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Cells[2, 1].Value = "Дата";
                     int column = 2;
                     var tableTaskColumn = new Dictionary<int, int>();
-                    foreach (var empTask in employeePeriodTasks.OrderBy(e => e.Id))
+                    foreach (var taskId in taskList)
                     {
                         worksheet.Column(column).Width = 11;
                         worksheet.Cells[2, column].Style.WrapText = true;
                         worksheet.Cells[2, column].Style.Font.Size = 8;
-                        worksheet.Cells[2, column].Value = empTask.TextValue;
+                        worksheet.Cells[2, column].Value = employeeWork.WorkedHoursByTaskByPeriod.Where(wh => wh.TaskId == taskId).Select(wh => wh.TaskName).FirstOrDefault();
                         worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
                         worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                        tableTaskColumn.Add(empTask.Id, column);
+                        tableTaskColumn.Add(taskId, column);
                         column += 1;
                     }
                     int col = column;
@@ -457,8 +457,6 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                     worksheet.Cells[1, 1].Style.Indent = 10;
                     worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                    //worksheet.Cells[1, 1].Value = employeeWork.FullName + "  (" + employeeWork.WorkedHoursByTaskByPeriod.Select(wh => wh.WorkDate.Date).FirstOrDefault().ToString("dd/MM/yyyy") +
-                    //    "г. - " + employeeWork.WorkedHoursByTaskByPeriod.Select(wh => wh.WorkDate.Date).LastOrDefault().ToString("dd/MM/yyyy") + "г.)";
                     worksheet.Cells[1, 1].Value = employeeWork.FullName + "  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                     worksheet.Cells[1, 1].Style.Font.Size = 14;
                     worksheet.Cells[1, 1].Style.Font.Bold = true;
@@ -544,7 +542,7 @@ namespace TaskMenager.Client.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = $"[ExportSpravkaForEmployee] Грешка при експорта. {ex}";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("UsersList", "Users");
             }
         }   //employee 3 step
 
@@ -1325,13 +1323,13 @@ namespace TaskMenager.Client.Controllers
                 TempData["Error"] = "[SetPersonalPeriodDate] Грешка при подготовка на модела за отчет";
                 return RedirectToAction("Index", "Home");
             }
-        }    
+        }
 
         public async Task<IActionResult> PersonalPeriodReport(PeriodViewModel model)   //employee 2 step
         {
             try
             {
-                if (model.StartDate > model.EndDate)
+                if (model.StartDate.Date > model.EndDate.Date)
                 {
                     TempData["Error"] = "[PersonalPeriodReport] Невалидни дати";
                     return RedirectToAction("Index", "Home");
@@ -1340,22 +1338,169 @@ namespace TaskMenager.Client.Controllers
                 if (model.userId < 1)
                 {
                     TempData["Error"] = "[PersonalPeriodReport] Невалиден потребител";
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("UsersList", "Users");
                 }
 
                 model.PersonalDateList = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
+
+                if (model.PersonalDateList.WorkedHoursByTaskByPeriod.Count < 1)
+                {
+                    TempData["Error"] = $"Няма задачи по които да е работил {model.PersonalDateList.FullName} за избрания период";
+                    return RedirectToAction("UsersList", "Users");
+                }
                 return View(model);
                 //return ExportSpravkaForEmployee(employeeWorkForPeriod, model.StartDate.Date, model.EndDate.Date);
             }
             catch (Exception)
             {
                 TempData["Error"] = "[PersonalPeriodReport] Грешка при обработката на модела за отчет";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("UsersList", "Users");
             }
 
 
-        }   
+        }
 
+        public async Task<IActionResult> PhonesAndEmails()
+        {
+            try
+            {
+                var users = await this.employees.GetAllUsers(false);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                var stream = new System.IO.MemoryStream();
+                using (ExcelPackage package = new ExcelPackage(stream))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
+                    worksheet.View.ZoomScale = 100;
+                    try
+                    {
+                        worksheet.Name = "Телефонен указател";
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Error"] = "Грешка при създаването на tab";
+                        return RedirectToAction("Index", "Home");
+                    }
+                    worksheet.Cells[1, 1, 1, 4].Merge = true;
+                    worksheet.Row(1).Height = 25;
+                    worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                    worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    //worksheet.Cells[1, 1].Style.Indent = 10;
+                    worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheet.Cells[1, 1].Value = "Телефонен указател към дата: " + DateTime.Now.Date.ToString("dd/MM/yyyy");
+                    worksheet.Cells[1, 1].Style.Font.Size = 14;
+                    worksheet.Cells[1, 1].Style.Font.Bold = true;
+                    int row = 2;
+                    int col = 1;
+                    worksheet.Column(1).Width = 40;
+                    worksheet.Column(2).Width = 50;
+                    worksheet.Column(3).Width = 10;
+                    worksheet.Column(4).Width = 16;
+                    var directorates = users.Select(u => u.DirectorateId).ToHashSet();
+                    foreach (var dirId in directorates)
+                    {
+                        worksheet.Cells[row, 1, row, 4].Merge = true;
+                        worksheet.Row(row).Height = 15;
+                        worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                        worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        //worksheet.Cells[row, 1].Style.Indent = 10;
+                        worksheet.Cells[row, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                        worksheet.Cells[row, 1].Value = users.Where(u => u.DirectorateId == dirId).Select(u => !string.IsNullOrWhiteSpace(u.DirectorateName) ? u.DirectorateName.ToUpper() : "").FirstOrDefault();
+                        worksheet.Cells[row, 1].Style.Font.Size = 14;
+                        worksheet.Cells[row, 1].Style.Font.Bold = true;
+                        row += 1;
+                        var directors = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == null && u.SectorId == null).ToList();
+                        foreach (var user in directors)
+                        {
+                            worksheet.Row(row).Style.Indent = 1;
+                            worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                            worksheet.Row(row).Style.Font.Size = 13;
+                            worksheet.Cells[row, 1].Value = user.JobTitleName;
+                            worksheet.Cells[row, 2].Value = user.FullName;
+                            worksheet.Cells[row, 3].Value = user.TelephoneNumber;
+                            worksheet.Cells[row, 4].Value = user.MobileNumber;
+                            row += 1;
+                        }
+                        var departments = users.Where(u => u.DirectorateId == dirId && u.DepartmentId != null).Select(u => u.DepartmentId).ToHashSet();
+                        foreach (var depId in departments)
+                        {
+                            worksheet.Cells[row, 1, row, 4].Merge = true;
+                            worksheet.Row(row).Height = 15;
+                            worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                            worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            //worksheet.Cells[row, 1].Style.Indent = 12;
+                            worksheet.Cells[row, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                            worksheet.Cells[row, 1].Value = "Отдел: " + users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId).Select(u => !string.IsNullOrWhiteSpace(u.DepartmentName) ? u.DepartmentName.ToUpper() : "").FirstOrDefault();
+                            worksheet.Cells[row, 1].Style.Font.Size = 13;
+                            worksheet.Cells[row, 1].Style.Font.Bold = true;
+                            row += 1;
+                            var expertsInDepartment = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == null).ToList();
+                            foreach (var userInDepartment in expertsInDepartment)
+                            {
+                                worksheet.Row(row).Style.Indent = 1;
+                                worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                                worksheet.Row(row).Style.Font.Size = 13;
+                                worksheet.Cells[row, 1].Value = userInDepartment.JobTitleName;
+                                worksheet.Cells[row, 2].Value = userInDepartment.FullName;
+                                worksheet.Cells[row, 3].Value = userInDepartment.TelephoneNumber;
+                                worksheet.Cells[row, 4].Value = userInDepartment.MobileNumber;
+                                row += 1;
+                            }
+                            var sectors = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId != null).Select(u => u.SectorId).ToHashSet();
+                            foreach (var sectorId in sectors)
+                            {
+                                worksheet.Cells[row, 1, row, 4].Merge = true;
+                                worksheet.Row(row).Height = 15;
+                                worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                                worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                                //worksheet.Cells[row, 1].Style.Indent = 13;
+                                worksheet.Cells[row, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                                worksheet.Cells[row, 1].Value = "Сектор: " + users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == sectorId).Select(u => !string.IsNullOrWhiteSpace(u.SectorName) ? u.SectorName.ToUpper() : "").FirstOrDefault();
+                                worksheet.Cells[row, 1].Style.Font.Size = 13;
+                                worksheet.Cells[row, 1].Style.Font.Bold = true;
+                                row += 1;
+                                var expertsInSector = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == sectorId).ToList();
+                                foreach (var userInSector in expertsInSector)
+                                {
+                                    worksheet.Row(row).Style.Indent = 1;
+                                    worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                                    worksheet.Row(row).Style.Font.Size = 13;
+                                    worksheet.Cells[row, 1].Value = userInSector.JobTitleName;
+                                    worksheet.Cells[row, 2].Value = userInSector.FullName;
+                                    worksheet.Cells[row, 3].Value = userInSector.TelephoneNumber;
+                                    worksheet.Cells[row, 4].Value = userInSector.MobileNumber;
+                                    row += 1;
+                                }
+
+                            }
+                        }
+                    }
+                    worksheet.View.ShowGridLines = true;
+                    worksheet.PrinterSettings.PaperSize = ePaperSize.A4;
+                    worksheet.PrinterSettings.ShowGridLines = true;
+                    worksheet.PrinterSettings.Orientation = eOrientation.Portrait;
+                    worksheet.PrinterSettings.FitToWidth = 1;
+                    package.Save();
+                }
+                string fileName = "PhoneBook_" + DateTime.Now.ToShortTimeString() + ".xlsx";
+                string fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                stream.Position = 0;
+                return File(stream, fileType, fileName);
+
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "[PhonesAndEmails] Грешка при подготовка на модела за тел. указател";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        #region API Calls
+
+        #endregion
 
     }
 }
