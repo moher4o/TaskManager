@@ -3,6 +3,7 @@
     ViewData["Title"] = "Моите задачи";
 }
 <div style="min-height:640px; max-height:641px;">
+    @Html.HiddenFor(model => model.userId, new { id = "employeeId" })
     <div class="row" style="position: relative;">
         <div class="col-md-4">
             <label style="font-size:large;"><b>Активни задачи</b></label>
@@ -70,8 +71,7 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-</script>
 @section Scripts {
+    <script src="~/js/index.js" charset="utf-8"></script>
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

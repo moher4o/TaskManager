@@ -182,6 +182,12 @@ namespace TaskManager.Data
                 .HasForeignKey(t => t.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Employee>()
+                .HasMany(u => u.UsersRepresentative)
+                .WithOne(u => u.Representative)
+                .HasForeignKey(t => t.RepresentativeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Task>()
                 .HasMany(tt => tt.Notes)
                 .WithOne(t => t.Task)

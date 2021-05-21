@@ -47,6 +47,11 @@ namespace TaskManager.Services.Models
 
         public bool Notify { get; set; }
 
+        public int? RepresentativeId { get; set; }
+
+        public string RepresentativeName { get; set; }
+
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Employee, UserServiceModel>()
@@ -54,6 +59,7 @@ namespace TaskManager.Services.Models
                    .ForMember(u => u.DepartmentName, cfg => cfg.MapFrom(r => r.Department.DepartmentName))
                    .ForMember(u => u.SectorName, cfg => cfg.MapFrom(r => r.Sector.SectorName))
                    .ForMember(u => u.JobTitleName, cfg => cfg.MapFrom(r => r.JobTitle.TitleName))
+                   //.ForMember(u => u.RepresentativeName, cfg => cfg.MapFrom(r => r.Representative.FullName))
                    .ForMember(u => u.RoleName, cfg => cfg.MapFrom(r => r.Role.Name));
         }
     }

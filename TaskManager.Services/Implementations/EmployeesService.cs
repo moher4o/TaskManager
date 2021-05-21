@@ -71,6 +71,20 @@ namespace TaskManager.Services.Implementations
             return report;
         }
 
+        public async Task<IEnumerable<SelectServiceModel>> GetUserDominions(int userId)
+        {
+            var users = new List<SelectServiceModel>();
+            var searchedUser = await this.db.Employees.Where(e => e.Id == userId).Include(e => e.UsersRepresentative).FirstOrDefaultAsync();
+            foreach (var user in searchedUser.UsersRepresentative)
+            {
+                users.Add(new SelectServiceModel { 
+                Id = user.Id,
+                TextValue = user.FullName
+                });
+            }
+            return users;
+        }
+
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId)
         {
             var tasks = await this.db.Tasks
@@ -369,6 +383,7 @@ namespace TaskManager.Services.Implementations
                         userFromDB.DaeuAccaunt = newUser.DaeuAccaunt;
                         userFromDB.RoleId = newUser.RoleId;
                         userFromDB.Notify = newUser.Notify;
+                        userFromDB.RepresentativeId = newUser.RepresentativeId;
                         await this.db.SaveChangesAsync();
                     }
                     else  //няма такъв потребител

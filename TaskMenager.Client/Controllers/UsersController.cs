@@ -67,7 +67,8 @@ namespace TaskMenager.Client.Controllers
                         isDeleted = currentEmployee.isDeleted,
                         DaeuAccaunt = currentEmployee.DaeuAccaunt,
                         RoleId = currentEmployee.RoleId,
-                        Notify = currentEmployee.Notify
+                        Notify = currentEmployee.Notify,
+                        RepresentativeId = currentEmployee.RepresentativeId
                     };
                     userToEdit = PrepareUserRegisterModel(userToEdit);
                     return View(userToEdit);
@@ -117,8 +118,16 @@ namespace TaskMenager.Client.Controllers
                         JobTitleId = model.JobTitleId,
                         DaeuAccaunt = model.DaeuAccaunt,
                         Notify = model.Notify,
-                        RoleId = model.RoleId.HasValue ? model.RoleId.Value : await this.roles.GetUserRoleIdByRoleNameAsync(Employee)
+                        RoleId = model.RoleId.HasValue ? model.RoleId.Value : await this.roles.GetUserRoleIdByRoleNameAsync(Employee),
                     };
+                    if (model.RepresentativeId == null || model.RepresentativeId.Value == 0)
+                    {
+                        newUser.RepresentativeId = null;
+                    }
+                    else
+                    {
+                        newUser.RepresentativeId = model.RepresentativeId.Value;
+                    }
 
                     if (model.DirectorateId == null || model.DirectorateId.Value == 0)
                     {
@@ -410,6 +419,19 @@ namespace TaskMenager.Client.Controllers
                                                        })
                                                        .ToList();
                 }
+                ////////
+                var data = this.employees.GetActiveEmployeesNames();
+                var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                var dropdownList = new SelectList(data.Select(item => new SelectListItem
+                {
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Selected = (newUser.RepresentativeId == item.Id) ? true : false,
+                    Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                newUser.RepresentativeList = dropdownList;
+                ///////
+
             }
 
             return newUser;
@@ -628,140 +650,146 @@ namespace TaskMenager.Client.Controllers
             };
             return Json(new { data });
         }
-        #endregion
 
-        //private UserRegisterViewModel PrepareUserRegisterModel(UserRegisterViewModel newUser)
-        //{
-        //    newUser.JobTitles = this.jobTitles.GetJobTitlesNames()
-        //                       .Select(a => new SelectListItem
-        //                       {
-        //                           Text = a.TextValue,
-        //                           Value = a.Id.ToString()
-        //                       })
-        //                       .ToList();
-        //    newUser.JobTitles.Insert(0, new SelectListItem
-        //    {
-        //        Text = ChooseValue,
-        //        Value = "0",
-        //        Selected = true
-        //    });
-        //    newUser.Directorates = this.directorates.GetDirectoratesNames(null)
-        //                       .Select(a => new SelectListItem
-        //                       {
-        //                           Text = a.TextValue,
-        //                           Value = a.Id.ToString()
-        //                       })
-        //                       .ToList();
-        //    newUser.Directorates.Insert(0, new SelectListItem
-        //    {
-        //        Text = ChooseValue,
-        //        Value = "0",
-        //        Selected = true
-        //    });
-        //    if (newUser.DepartmentId.HasValue)
-        //    {
-        //        newUser.Departments = this.departments.GetDepartmentsNamesByDirectorate(newUser.DirectorateId)
-        //                                           .Select(a => new SelectListItem
-        //                                           {
-        //                                               Text = a.TextValue,
-        //                                               Value = a.Id.ToString(),
-        //                                               Selected = newUser.DepartmentId.Value == a.Id ? true : false
-        //                                           })
-        //                                           .ToList();
-        //        if (true)
-        //        {
+        public async Task<IActionResult> GetDominionUsers()
+        {
+            var data = await this.employees.GetUserDominions(currentUser.Id);
+            return Json(new { data });
+        }
+            #endregion
 
-        //        }
-        //    }
-        //    newUser.Departments.Insert(0, new SelectListItem
-        //    {
-        //        Text = ChooseValue,
-        //        Value = "0",
-        //        Selected = true
-        //    });
-        //    if (newUser.SectorId.HasValue)
-        //    {
-        //        newUser.Sectors = this.sectors.GetSectorsNamesByDepartment(newUser.DepartmentId)
-        //                                           .Result
-        //                                           .Select(a => new SelectListItem
-        //                                           {
-        //                                               Text = a.TextValue,
-        //                                               Value = a.Id.ToString(),
-        //                                               Selected = newUser.SectorId.Value == a.Id ? true : false
-        //                                           })
-        //                                           .ToList();
-        //    }
-        //    newUser.Sectors.Insert(0, new SelectListItem
-        //    {
-        //        Text = ChooseValue,
-        //        Value = "0",
-        //        Selected = true
-        //    });
-        //    if (currentUser != null)   //при първоначална регистрация е null
-        //    {
-        //        if (currentUser.RoleName == SuperAdmin)
-        //        {
-        //            newUser.RolesNames = this.roles.GetAllRoles()
-        //                                               .Select(a => new SelectListItem
-        //                                               {
-        //                                                   Text = a.TextValue,
-        //                                                   Value = a.Id.ToString(),
-        //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
-        //                                               })
-        //                                               .ToList();
-        //        }
-        //        else if (currentUser.RoleName == DirectorateAdmin)
-        //        {
-        //            newUser.RolesNames = this.roles.GetAllRoles()
-        //                                               .Where(r => r.TextValue != SuperAdmin)
-        //                                               .Select(a => new SelectListItem
-        //                                               {
-        //                                                   Text = a.TextValue,
-        //                                                   Value = a.Id.ToString(),
-        //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
-        //                                               })
-        //                                               .ToList();
-        //        }
-        //        else if (currentUser.RoleName == DepartmentAdmin)
-        //        {
-        //            newUser.RolesNames = this.roles.GetAllRoles()
-        //                                               .Where(r => r.TextValue != SuperAdmin && r.TextValue != DirectorateAdmin)
-        //                                               .Select(a => new SelectListItem
-        //                                               {
-        //                                                   Text = a.TextValue,
-        //                                                   Value = a.Id.ToString(),
-        //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
-        //                                               })
-        //                                               .ToList();
-        //        }
-        //        else if (currentUser.RoleName == SectorAdmin)
-        //        {
-        //            newUser.RolesNames = this.roles.GetAllRoles()
-        //                                               .Where(r => r.TextValue != SuperAdmin && r.TextValue != DirectorateAdmin && r.TextValue != DepartmentAdmin)
-        //                                               .Select(a => new SelectListItem
-        //                                               {
-        //                                                   Text = a.TextValue,
-        //                                                   Value = a.Id.ToString(),
-        //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
-        //                                               })
-        //                                               .ToList();
-        //        }
-        //        else if (currentUser.RoleName == Employee)
-        //        {
-        //            newUser.RolesNames = this.roles.GetAllRoles()
-        //                                               .Where(r => r.TextValue == Employee)
-        //                                               .Select(a => new SelectListItem
-        //                                               {
-        //                                                   Text = a.TextValue,
-        //                                                   Value = a.Id.ToString(),
-        //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
-        //                                               })
-        //                                               .ToList();
-        //        }
-        //    }
+            //private UserRegisterViewModel PrepareUserRegisterModel(UserRegisterViewModel newUser)
+            //{
+            //    newUser.JobTitles = this.jobTitles.GetJobTitlesNames()
+            //                       .Select(a => new SelectListItem
+            //                       {
+            //                           Text = a.TextValue,
+            //                           Value = a.Id.ToString()
+            //                       })
+            //                       .ToList();
+            //    newUser.JobTitles.Insert(0, new SelectListItem
+            //    {
+            //        Text = ChooseValue,
+            //        Value = "0",
+            //        Selected = true
+            //    });
+            //    newUser.Directorates = this.directorates.GetDirectoratesNames(null)
+            //                       .Select(a => new SelectListItem
+            //                       {
+            //                           Text = a.TextValue,
+            //                           Value = a.Id.ToString()
+            //                       })
+            //                       .ToList();
+            //    newUser.Directorates.Insert(0, new SelectListItem
+            //    {
+            //        Text = ChooseValue,
+            //        Value = "0",
+            //        Selected = true
+            //    });
+            //    if (newUser.DepartmentId.HasValue)
+            //    {
+            //        newUser.Departments = this.departments.GetDepartmentsNamesByDirectorate(newUser.DirectorateId)
+            //                                           .Select(a => new SelectListItem
+            //                                           {
+            //                                               Text = a.TextValue,
+            //                                               Value = a.Id.ToString(),
+            //                                               Selected = newUser.DepartmentId.Value == a.Id ? true : false
+            //                                           })
+            //                                           .ToList();
+            //        if (true)
+            //        {
 
-        //    return newUser;
-        //}
+            //        }
+            //    }
+            //    newUser.Departments.Insert(0, new SelectListItem
+            //    {
+            //        Text = ChooseValue,
+            //        Value = "0",
+            //        Selected = true
+            //    });
+            //    if (newUser.SectorId.HasValue)
+            //    {
+            //        newUser.Sectors = this.sectors.GetSectorsNamesByDepartment(newUser.DepartmentId)
+            //                                           .Result
+            //                                           .Select(a => new SelectListItem
+            //                                           {
+            //                                               Text = a.TextValue,
+            //                                               Value = a.Id.ToString(),
+            //                                               Selected = newUser.SectorId.Value == a.Id ? true : false
+            //                                           })
+            //                                           .ToList();
+            //    }
+            //    newUser.Sectors.Insert(0, new SelectListItem
+            //    {
+            //        Text = ChooseValue,
+            //        Value = "0",
+            //        Selected = true
+            //    });
+            //    if (currentUser != null)   //при първоначална регистрация е null
+            //    {
+            //        if (currentUser.RoleName == SuperAdmin)
+            //        {
+            //            newUser.RolesNames = this.roles.GetAllRoles()
+            //                                               .Select(a => new SelectListItem
+            //                                               {
+            //                                                   Text = a.TextValue,
+            //                                                   Value = a.Id.ToString(),
+            //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
+            //                                               })
+            //                                               .ToList();
+            //        }
+            //        else if (currentUser.RoleName == DirectorateAdmin)
+            //        {
+            //            newUser.RolesNames = this.roles.GetAllRoles()
+            //                                               .Where(r => r.TextValue != SuperAdmin)
+            //                                               .Select(a => new SelectListItem
+            //                                               {
+            //                                                   Text = a.TextValue,
+            //                                                   Value = a.Id.ToString(),
+            //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
+            //                                               })
+            //                                               .ToList();
+            //        }
+            //        else if (currentUser.RoleName == DepartmentAdmin)
+            //        {
+            //            newUser.RolesNames = this.roles.GetAllRoles()
+            //                                               .Where(r => r.TextValue != SuperAdmin && r.TextValue != DirectorateAdmin)
+            //                                               .Select(a => new SelectListItem
+            //                                               {
+            //                                                   Text = a.TextValue,
+            //                                                   Value = a.Id.ToString(),
+            //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
+            //                                               })
+            //                                               .ToList();
+            //        }
+            //        else if (currentUser.RoleName == SectorAdmin)
+            //        {
+            //            newUser.RolesNames = this.roles.GetAllRoles()
+            //                                               .Where(r => r.TextValue != SuperAdmin && r.TextValue != DirectorateAdmin && r.TextValue != DepartmentAdmin)
+            //                                               .Select(a => new SelectListItem
+            //                                               {
+            //                                                   Text = a.TextValue,
+            //                                                   Value = a.Id.ToString(),
+            //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
+            //                                               })
+            //                                               .ToList();
+            //        }
+            //        else if (currentUser.RoleName == Employee)
+            //        {
+            //            newUser.RolesNames = this.roles.GetAllRoles()
+            //                                               .Where(r => r.TextValue == Employee)
+            //                                               .Select(a => new SelectListItem
+            //                                               {
+            //                                                   Text = a.TextValue,
+            //                                                   Value = a.Id.ToString(),
+            //                                                   Selected = newUser.RoleId.Value == a.Id ? true : false
+            //                                               })
+            //                                               .ToList();
+            //        }
+            //    }
 
+            //    return newUser;
+            //}
+
+        }
     }
-}

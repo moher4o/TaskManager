@@ -25,7 +25,6 @@
 
     function GetDateInfo() {
         var userId = document.getElementById("employeeId").value;
-        console.log(userId);
         var selectedText = document.getElementById("workdate").value;
         var selectedDate = new Date(selectedText);
         var now = new Date();

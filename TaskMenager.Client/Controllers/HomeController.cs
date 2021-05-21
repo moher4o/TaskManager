@@ -39,11 +39,40 @@ namespace TaskMenager.Client.Controllers
 
 
         
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    if (this.User.Claims.Any(cl => cl.Value == "Guest"))
+        //    {
+        //       return RedirectToAction("WellCome", "Users");
+        //    }
+
+
+        //    if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
+        //    {
+        //        TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
+        //        return RedirectToAction("NotAuthorized", "Base");
+        //    }
+
+        //    var currentEmployee = new UserTasksViewModel()
+        //    {
+        //        userId = currentUser.Id,
+        //        ActiveTasks = await this.employees.GetUserActiveTaskAsync(currentUser.Id),
+        //        //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
+        //    };
+        //    foreach (var task in currentEmployee.ActiveTasks)
+        //    {
+        //        task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+        //    }
+
+        //    currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
+        //    return View(currentEmployee);
+        //}
+
+        public async Task<IActionResult> Index(int? userId)
         {
             if (this.User.Claims.Any(cl => cl.Value == "Guest"))
             {
-               return RedirectToAction("WellCome", "Users");
+                return RedirectToAction("WellCome", "Users");
             }
 
 
@@ -53,10 +82,11 @@ namespace TaskMenager.Client.Controllers
                 return RedirectToAction("NotAuthorized", "Base");
             }
 
+            int identityId = userId.HasValue ? userId.Value : currentUser.Id;
             var currentEmployee = new UserTasksViewModel()
             {
-                userId = currentUser.Id,
-                ActiveTasks = await this.employees.GetUserActiveTaskAsync(currentUser.Id),
+                userId = identityId,
+                ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId),
                 //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
             foreach (var task in currentEmployee.ActiveTasks)

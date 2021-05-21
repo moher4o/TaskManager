@@ -49,6 +49,11 @@ namespace TaskMenager.Client.Models.Users
         [Display(Name = "Дирекция:")]
         public IList<SelectListItem> Directorates { get; set; } = new List<SelectListItem>();
 
+        public int? RepresentativeId { get; set; }
+
+        [Display(Name = "Представител")]
+        public SelectList RepresentativeList { get; set; }
+
         [Display(Name = "Телефонен номер(02 949)*:")]
         [Required(ErrorMessage = "Телефонния номер е задължителен")]
         [RegularExpression(@"^\(?([0-9]{4})\)?$", ErrorMessage = "Въведения телефонен номер не е валиден.")]

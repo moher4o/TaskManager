@@ -130,10 +130,9 @@
                         @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control", placeholder = "0xxx xxxxxx", id = "mobNumberId", name = "mobNumber" })
                         <span asp-validation-for="MobileNumber" class="text-danger"></span>
                     </div>
-                    <div class="col-md-10 checkbox" style="padding-top:10px;">
+                    <div class="col-md-10 checkbox" style="padding-top:15px;">
                         <label>@Html.CheckBoxFor(model => model.Notify)&nbsp;@Html.DisplayNameFor(model => model.Notify)</label>
                     </div>
-
                 </div>
             </div>
             <div class="col-md-6">
@@ -187,6 +186,11 @@
                       new { @class = "form-control", name = "sectors", id = "sectorId" })
 
                     </div>
+                    @Html.LabelFor(model => model.RepresentativeList, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(a => a.RepresentativeId, Model.RepresentativeList, "Потребителя няма представител", new { @class = "form-control", id = "representativeId", name = "represantativeId" })
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -311,17 +315,11 @@
 </script>
 @section Scripts{
     <script src="~/js/createNewUser.js" charset="utf-8"></script>
-    @*<script>
+    <script>
                $(document).ready(function () {
-                   if ($('#directorateId :selected').text() != 'Моля изберете...') {
-                       $("#departmentId").removeAttr('disabled');
-                   }
-                   if ($('#departmentId :selected').text() != 'Моля изберете...') {
-                       $("#sectorId").removeAttr('disabled');
-                   }
-
+                   $('#representativeId').select2();
                });
-        </script>*@
+        </script>
 
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

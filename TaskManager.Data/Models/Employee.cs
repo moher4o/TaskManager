@@ -56,6 +56,12 @@ namespace TaskManager.Data.Models
 
         public bool Notify { get; set; } = true;
 
+        public int? RepresentativeId { get; set; }
+
+        public Employee Representative { get; set; }
+
+        public virtual ICollection<Employee> UsersRepresentative { get; set; } = new List<Employee>();
+
         public virtual ICollection<Task> TasksCreator { get; set; } = new List<Task>();
 
         public virtual ICollection<Task> TasksAssigner { get; set; } = new List<Task>();
