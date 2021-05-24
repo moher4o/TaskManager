@@ -9,7 +9,7 @@
     <div class="PrimeBox2 widthmobile" style="max-width:60%; position:relative; right:80px; background-color:ghostwhite;">
         <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
             <h5 style="color:white; margin-left:15px;">@Model.TaskName</h5>
-            <button asp-controller="Home" asp-action="Index" id="x">
+            <button asp-controller="Home" asp-action="Index" asp-route-userId="@Model.employeeId" id="x">
                 X
             </button>
         </div>

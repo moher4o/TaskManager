@@ -83,6 +83,19 @@ namespace TaskMenager.Client.Controllers
             }
 
             int identityId = userId.HasValue ? userId.Value : currentUser.Id;
+
+            if (identityId != currentUser.Id)
+            {
+                var dominions = await this.employees.GetUserDominions(currentUser.Id);
+                if (!dominions.Any(d => d.Id == identityId))
+                {
+                    var targetEmployee = await this.employees.GetEmployeeByIdAsync(identityId);
+                    TempData["Error"] = $"[Index]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
+
             var currentEmployee = new UserTasksViewModel()
             {
                 userId = identityId,

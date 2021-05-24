@@ -50,5 +50,6 @@ namespace TaskManager.Services
 
         Task<List<PersonalDateReportServiceModel>> GetDateReport(int userId, DateTime currentDate);
         Task<string> GenerateEmailWhenEmpty();
+
     }
 }

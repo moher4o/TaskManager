@@ -75,6 +75,17 @@ namespace TaskMenager.Client.Controllers
         {
             try
             {
+                if (employeeId != currentUser.Id)
+                {
+                    var dominions = await this.employees.GetUserDominions(currentUser.Id);
+                    if (!dominions.Any(d => d.Id == employeeId))
+                    {
+                        var targetEmployee = await this.employees.GetEmployeeByIdAsync(employeeId);
+                        TempData["Error"] = $"[AddWorkHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+
                 var newWork = new AddWorkedHoursViewModel()
                 {
                     employeeId = employeeId,
@@ -86,7 +97,7 @@ namespace TaskMenager.Client.Controllers
             }
             catch (Exception)
             {
-                TempData["Error"] = "Основна грешка. Неуспешно генериране на модела за отчитане на часове.";
+                TempData["Error"] = "[AddWorkHours]. Неуспешно генериране на модела за отчитане на часове.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -102,7 +113,20 @@ namespace TaskMenager.Client.Controllers
                 {
                     return View(model);
                 }
-                 var workedHours = new TaskWorkedHoursServiceModel()
+
+                if (model.employeeId != currentUser.Id)
+                {
+                    var dominions = await this.employees.GetUserDominions(currentUser.Id);
+                    if (!dominions.Any(d => d.Id == model.employeeId))
+                    {
+                        var targetEmployee = await this.employees.GetEmployeeByIdAsync(model.employeeId);
+                        TempData["Error"] = $"[AddWorkHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+
+
+                var workedHours = new TaskWorkedHoursServiceModel()
                 {
                     EmployeeId = model.employeeId,
                     EmployeeName = model.employeeFullName,

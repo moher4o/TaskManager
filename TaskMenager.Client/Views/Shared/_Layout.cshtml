@@ -19,6 +19,12 @@
     <link rel="stylesheet" href="~/css/notfound.css">
     <link rel="stylesheet" href="~/css/comments.css">
 
+    <!-- балонни съобщения -->
+    @*<link rel="stylesheet" href="~/css/balloon.css">*@
+    <link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">
+
+
+
     <!-- Font Awesome JS -->
     @*<script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
         <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>*@
@@ -230,19 +236,23 @@
                         <i class="fas fa-align-left"></i>
                         @*<span>Toggle Sidebar</span>*@
                     </button>
+                    <div class="tooltip-big-text" id="dominions" style="position: relative; left: 25%;" data-balloon-length="xlarge" aria-label="Смяната на сесия дава възможност да бъдат отчитани часове за друг(виртуален) потребител. Текушия потребител не наследява правата на виртуалния такъв! Всяко действие различно от отчитане на часове, връща сесията към текущия потребител." data-balloon-pos="up">
+                    </div>
+
                     @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <i class="fas fa-align-justify"></i>
-                        </button>*@
+            <i class="fas fa-align-justify"></i>
+        </button>*@
+
                     @*<div id="notifications" style="position: relative; left: 20%;">
-                            <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
-                            <div id="infoBox" class="notification"><span>Информация</span></div>
-                            <div id="errorBox" class="notification"><span>Грешка</span></div>
-                            <div id="successBox" class="notification"><span>Успех</span></div>
-                        </div>*@
+            <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
+            <div id="infoBox" class="notification"><span>Информация</span></div>
+            <div id="errorBox" class="notification"><span>Грешка</span></div>
+            <div id="successBox" class="notification"><span>Успех</span></div>
+        </div>*@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
-                            <li class="nav-item" id="dominions">
-                            </li>
+                            @*<li class="nav-item" id="dominions">
+                </li>*@
 
                             <li class="nav-item">
                                 <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Users" asp-action="EditUser" asp-route-userId="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())">
@@ -329,9 +339,22 @@
                 $('#sidebar').toggleClass('active');
             });
             //$('#sidebar').height() = $('#content').height();
-            $.getJSON('..\\Users\\UserExistStatus', { get_param: 'value' }, function (data) {
+            const lochref = window.location.href;
+            const locOrigin = window.location.origin;
+            let path;
+            if (lochref.toLowerCase().indexOf("taskmanager") >= 0) {
+                path = locOrigin + "\\TaskManager";
+            }
+            else {
+                path = locOrigin;
+            }
+           
+            let urlExist = path + "\\Users\\UserExistStatus";
+            let urlNotActive = path + "\\Users\\GetNotActivatedUsers";
+            
+            $.getJSON(urlExist, { get_param: 'value' }, function (data) {
                 if (data) {
-                    $.getJSON('..\\Users\\GetNotActivatedUsers', { get_param: 'value' }, function (data) {
+                    $.getJSON(urlNotActive, { get_param: 'value' }, function (data) {
                         if (data.data.length > 0) {
                             $('#notActiveCount').removeAttr("hidden")
                             $('#notActiveCount').text(data.data.length);
@@ -348,8 +371,9 @@
         });
         function InfoUser(userId) {
             event.preventDefault();
+            //let urlUserInfo = window.location.origin + "..\\Users\\GetUserInfo\?userId=";
             var content = document.createElement('div');
-            $.getJSON('..\\Users\\GetUserInfo\?userId=' + userId, { get_param: 'value' }, function (data) {
+            $.getJSON("..\\Users\\GetUserInfo\?userId=" + userId, { get_param: 'value' }, function (data) {
 
                 content.innerHTML = '<div style = \'text-align:left;\'><div class="row"><div class="col-md-3">N:</div><div class="col-md-4"><label><strong>' + data.data.id + '</strong></label></div></div><div class="row"><div class="col-md-3">Име:</div><div class="col-md-9"><label><strong>' + data.data.fullName + '</strong></label></div></div><div class="row"><div class="col-md-3">Длъжност:</div><div class="col-md-9"><label><strong>' + data.data.jobTitleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Email:</div><div class="col-md-9"><label><strong>' + (data.data.email ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Роля:</div><div class="col-md-9"><label><strong>' + data.data.roleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Телефон:</div><div class="col-md-9"><label><strong>' + (data.data.telephoneNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Мобилен:</div><div class="col-md-9"><label><strong>' + (data.data.mobileNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Дирекция:</div><div class="col-md-9"><label><strong>' + (data.data.directorateName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Отдел:</div><div class="col-md-9"><label><strong>' + (data.data.departmentName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Сектор:</div><div class="col-md-9"><label><strong>' + (data.data.sectorName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Статус:</div><div class="col-md-9"><label><strong>' + (data.data.status == "Деактивиран акаунт" ? '<span style=\'color:red;\'>Деактивиран акаунт</span>' : (data.data.status == "Активен акаунт" ? '<span style=\'color:green;\'>Активен акаунт</span>' : '<span style=\'color:lightgreen;\'>Чакащ одобрение</span>')) + '</strong></label></div></div></div>';
 
