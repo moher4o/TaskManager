@@ -674,7 +674,7 @@ namespace TaskMenager.Client.Controllers
                                 "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             worksheet.Cells[1, 1].Style.Font.Size = 14;
                             worksheet.Cells[1, 1].Style.Font.Bold = true;
-                            worksheet.View.FreezePanes(100, 6);
+                            //worksheet.View.FreezePanes(100, 6);
                             //дотук се създават първите два реда за отдела в екселския файл
                             var parentTaskId = 0;
                             var row = 3;

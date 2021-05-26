@@ -45,7 +45,7 @@ function loadDataTable(deleted, notActivated) {
         "columns": [
             { "data": "directorateName", "width": "23%" },
             { "data": "departmentName", "width": "25%" },
-            { "data": "sectorName", "width": "20%" },
+            { "data": "sectorName", "width": "18%" },
             { "data": "fullName", "width": "18%" },
             { "data": "telephoneNumber", "width": "3%" },
             {
@@ -94,7 +94,7 @@ function loadDataTable(deleted, notActivated) {
                         </div>`;
                     }
 
-                }, "width": "11%"
+                }, "width": "13%"
             }
         ],
         "language": {

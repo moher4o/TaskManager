@@ -60,7 +60,7 @@ function loadDataTable(getClosed, withDeleted) {
             { "data": "taskAssigner", "width": "14%" },
             { "data": "directorateName", "width": "10%" },
             { "data": "departmentName", "width": "12%" },
-            { "data": "sectorName", "width": "10%" },
+            { "data": "sectorName", "width": "8%" },
             { "data": "parentTaskId", "width": "3%" },
             { "data": "directorateId", "width": "3%" },
             { "data": "departmentId", "width": "3%" },
@@ -117,7 +117,7 @@ function loadDataTable(getClosed, withDeleted) {
                         </div>`;
                     }
 
-                }, "width": "10%"
+                }, "width": "12%"
             }
          ],
          "columnDefs": [

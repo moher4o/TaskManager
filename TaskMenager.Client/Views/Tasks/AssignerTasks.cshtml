@@ -43,7 +43,7 @@
                     <div style="min-width:50px;">
                         <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                             <img class="chatnotifications" src="~/png/note.png" />
-                            <span class="notificationsTodayCountValue">@item.NotesCount</span>
+                            <span class="notificationsTodayCountValue" @(item.NotesCount>0 ? "" : "hidden")>@item.NotesCount</span>
                         </a>
                     </div>
                     <div style="min-width:50px;">
@@ -51,7 +51,7 @@
                            asp-route-taskName="@item.TaskName"
                            asp-route-taskId="@item.Id">
                             <img class="chatnotifications3" src="~/png/files.png" />
-                            <span class="notificationsTodayCountValue">@item.FilesCount</span>
+                            <span class="notificationsTodayCountValue" @(item.FilesCount>0 ? "" : "hidden")>@item.FilesCount</span>
                         </a>
                     </div>
                     <!-- Modal placeholder -->

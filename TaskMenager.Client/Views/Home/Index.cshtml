@@ -36,28 +36,28 @@
                 </div>
                 <div class="col-md-3" style="color: #5f9fec;">
                     <div class="row" style="display: flex; justify-content: center; align-items: center;">
-                        <div style="min-width:50px;">
+                        <div style="min-width:60px;">
                             <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                                 <img class="chatnotifications" src="~/png/note.png" />
-                                <span class="notificationsTodayCountValue">@item.NotesCount</span>
+                                <span class="notificationsTodayCountValue" @(item.NotesCount>0 ? "" : "hidden")>@item.NotesCount</span>
                             </a>
                         </div>
-                        <div style="min-width:50px;">
+                        <div style="min-width:60px;">
                             <a asp-controller="Tasks" asp-action="AddWorkHours"
                                asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
                                asp-route-taskId="@item.Id"
                                asp-route-employeeId="@Model.userId">
                                 <img class="chatnotifications" src="~/png/3DClock.png" />
-                                <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue">@item.EmployeeHoursToday</span>
-                                <span title="Отчетени часове" class="notificationsCountValue">@item.EmployeeHours</span>
+                                <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue" @(item.EmployeeHoursToday>0 ? "" : "hidden")>@item.EmployeeHoursToday</span>
+                                <span title="Отчетени часове" class="notificationsCountValue" @(item.EmployeeHoursToday>0 ? "hidden" : "")>@item.EmployeeHours</span>
                             </a>
                         </div>
-                        <div style="min-width:50px;">
+                        <div style="min-width:60px;">
                             <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
                                asp-route-taskName="@item.TaskName"
                                asp-route-taskId="@item.Id">
-                                <img class="chatnotifications3" src="~/png/files.png" />
-                                <span class="notificationsTodayCountValue">@item.FilesCount</span>
+                                <img class="chatnotifications3"  src="~/png/files.png" />
+                                <span class="notificationsTodayCountValue" @(item.FilesCount>0 ? "" : "hidden")>@item.FilesCount</span>
                             </a>
                         </div>
 
