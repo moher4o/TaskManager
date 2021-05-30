@@ -9,21 +9,24 @@
         path = locOrigin;
     }
     var userId = document.getElementById("employeeId").value;
+    AddDatePicker();
     GetDominions();
-    attachEvents();
+    //attachEvents();
 
     function attachEvents() {
-    }
+     }
 
     function CheckSelectedDominion() {
         var url = window.location.href;
+        let newDate = $('#dateSelector2').datepicker("getDate");
         if (url.indexOf('?') > -1) {
-            url = url.substring(0, url.indexOf('?')) + '?userId=' + $('#bosses :selected').val();
+            url = url.substring(0, url.indexOf('?')) + '?userId=' + $('#bosses :selected').val() + '&workDate=' + newDate.toUTCString();
         } else {
-            url += '?userId=' + $('#bosses :selected').val();
+            url += '?userId=' + $('#bosses :selected').val() + '&workDate=' + newDate.toUTCString();
         }
-        
+        console.log(newDate);
         window.location.href = url;
+
     }
 
     function GetDominions() {
@@ -43,10 +46,11 @@
                         })
                    
                 )
-                //var img = $('<img class="chatnotifications" style="padding-left:3px; cursor: pointer;" id="domInfo">'); //Equivalent: $(document.createElement('img'))
-                //img.attr('src', '../png/info2.png');
-                //img.appendTo('#dominions');
-                $('#bosses').on('change', CheckSelectedDominion);
+                //$('#bosses').on('change', CheckSelectedDominion());
+                $('#bosses').change(function () {
+                    CheckSelectedDominion();
+                });
+
             }
             $.each(response.data, function (i, item) {
                 if (userId == item.id) {
@@ -62,4 +66,24 @@
         
     }
 
+    function AddDatePicker() {
+        var selectedText = document.getElementById("workDate").value;
+        //var selectedDate = new Date(selectedText);
+
+        $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+0d" });
+        $('#dateSelector2').datepicker('setDate', new Date(selectedText));
+        //$('#dateSelector2').datepicker("refresh");
+        //let date2 = $('#dateSelector2').datepicker("getDate");
+        //console.log(date2);
+        $('#dateSelector2').datepicker({
+            onSelect: function (d, i) {
+                if (d !== i.lastVal) {
+                    $(this).change();
+                }
+            }
+        });
+        $('#dateSelector2').change(function () {
+                CheckSelectedDominion();
+         });
+    }
 });

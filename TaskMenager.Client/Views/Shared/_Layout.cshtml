@@ -36,9 +36,11 @@
     <link rel="stylesheet" href="~/css/notifications.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/bootstrap-multiselect.css" rel="stylesheet" />
-    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>*@
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    @*<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>*@
+    @*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
     @*<script src="~/js/notify.js"></script>*@
 
     <link href="~/dist/css/select2.min.css" rel="stylesheet" />
@@ -118,7 +120,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                {*@
+                            {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -127,8 +129,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                    <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                </li>*@
+                                <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                            </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -148,8 +150,8 @@
                             <a asp-controller="Report" asp-action="SetPersonalPeriodDate">Лична справка</a>
                         </li>
                         @*<li>
-                            <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
-                        </li>*@
+                                <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
+                            </li>*@
                     </ul>
                 </li>
                 <li>
@@ -199,14 +201,14 @@
                             <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Add emails</a>
                         </li>
                         @*<li>
-                    <a asp-controller="Structure" asp-action="DepartmentsList">Отдели</a>
-                </li>
-                <li>
-                    <a asp-controller="Structure" asp-action="SectorsList">Сектори</a>
-                </li>
-                <li>
-                    <a asp-controller="Structure" asp-action="JobTitlesList">Длъжности</a>
-                </li>*@
+                                <a asp-controller="Structure" asp-action="DepartmentsList">Отдели</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="SectorsList">Сектори</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="JobTitlesList">Длъжности</a>
+                            </li>*@
 
                     </ul>
                 </li>
@@ -214,17 +216,17 @@
 
 
                 @*<li>
-            <a asp-controller="Home" asp-action="NotImplemented">
-                <i class="fas fa-question"></i>
-                Информация
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Home" asp-action="NotImplemented">
-                <i class="fas fa-paper-plane"></i>
-                Контакти
-            </a>
-        </li>*@
+                        <a asp-controller="Home" asp-action="NotImplemented">
+                            <i class="fas fa-question"></i>
+                            Информация
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="NotImplemented">
+                            <i class="fas fa-paper-plane"></i>
+                            Контакти
+                        </a>
+                    </li>*@
             </ul>
         </nav>
 
@@ -240,19 +242,19 @@
                     </div>
 
                     @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fas fa-align-justify"></i>
-        </button>*@
+                    <i class="fas fa-align-justify"></i>
+                </button>*@
 
                     @*<div id="notifications" style="position: relative; left: 20%;">
-            <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
-            <div id="infoBox" class="notification"><span>Информация</span></div>
-            <div id="errorBox" class="notification"><span>Грешка</span></div>
-            <div id="successBox" class="notification"><span>Успех</span></div>
-        </div>*@
+                    <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
+                    <div id="infoBox" class="notification"><span>Информация</span></div>
+                    <div id="errorBox" class="notification"><span>Грешка</span></div>
+                    <div id="successBox" class="notification"><span>Успех</span></div>
+                </div>*@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             @*<li class="nav-item" id="dominions">
-                </li>*@
+                        </li>*@
 
                             <li class="nav-item">
                                 <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Users" asp-action="EditUser" asp-route-userId="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())">
@@ -267,25 +269,26 @@
             </nav>
 
             @*<div>
-                    <div class="menuspace">
-                        <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() + "  -  " + User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+1))</a><br />
+            <div class="menuspace">
+                <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">@(User.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() + "  -  " + User.Identity.Name.Substring(User.Identity.Name.LastIndexOf('\\')+1))</a><br />
 
 
-                        <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">Начало</a><br />
+                <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Home" asp-action="Index">Начало</a><br />
 
-                        @if (User.Claims.Any(u => u.Value == "Admin"))
-                        {
+                @if (User.Claims.Any(u => u.Value == "Admin"))
+                {
 
-                            <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a><br />
+                    <a style="position:absolute; left:40px; font-size:1.2em;" asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a><br />
 
-                        }
-                        @if (User.Claims.Any(c => c.Value == DataConstants.SuperAdmin))
-                        {
-                            <a style="position:absolute; left:40px; font-size:1.2em; color:red;" asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Импорт на данни</a><br />
-                        }
-                    </div>
-                </div>*@
-            <div class="container widthmobile" style="max-width:90%;">
+                }
+                @if (User.Claims.Any(c => c.Value == DataConstants.SuperAdmin))
+                {
+                    <a style="position:absolute; left:40px; font-size:1.2em; color:red;" asp-area="" asp-controller="InsertDataFromFile" asp-action="SelectFileWithData">Импорт на данни</a><br />
+                }
+            </div>
+        </div>*@
+        <div class="row">
+            <div class="container widthmobile col-md-11">
 
                 <main role="main" class="pb-3">
                     @RenderBody()
@@ -313,8 +316,10 @@
                         <p class="alert alert-danger" id="errorMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
                     }
                 </main>
-
             </div>
+            <div class=" widthmobile col-md-1" id="dateSelector2" style="padding-top:37px;">
+            </div>
+        </div>
         </div>
         <footer class="border-top footer text-muted hideonmobile">
             <div class="container">
@@ -348,10 +353,10 @@
             else {
                 path = locOrigin;
             }
-           
+
             let urlExist = path + "\\Users\\UserExistStatus";
             let urlNotActive = path + "\\Users\\GetNotActivatedUsers";
-            
+
             $.getJSON(urlExist, { get_param: 'value' }, function (data) {
                 if (data) {
                     $.getJSON(urlNotActive, { get_param: 'value' }, function (data) {

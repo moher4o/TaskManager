@@ -68,7 +68,7 @@ namespace TaskMenager.Client.Controllers
         //    return View(currentEmployee);
         //}
 
-        public async Task<IActionResult> Index(int? userId)
+        public async Task<IActionResult> Index(int? userId, DateTime? workDate)
         {
             if (this.User.Claims.Any(cl => cl.Value == "Guest"))
             {
@@ -83,6 +83,7 @@ namespace TaskMenager.Client.Controllers
             }
 
             int identityId = userId.HasValue ? userId.Value : currentUser.Id;
+            DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
 
             if (identityId != currentUser.Id)
             {
@@ -99,7 +100,8 @@ namespace TaskMenager.Client.Controllers
             var currentEmployee = new UserTasksViewModel()
             {
                 userId = identityId,
-                ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId),
+                workDate = dateToProcess.Date,
+                ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
                 //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
             foreach (var task in currentEmployee.ActiveTasks)

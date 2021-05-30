@@ -30,16 +30,16 @@ namespace TaskManager.Services.Implementations
 
         private IConfiguration Configuration { get; }
 
-        public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(int userId)
+        public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(int userId, DateTime dateToProcess)
         {
             var tasks = await this.db.EmployeesTasks
                     .Where(et => et.EmployeeId == userId && et.isDeleted == false)
                     .Select(t => t.Task)
-                    .Where(t => t.isDeleted == false)
+                    .Where(t => t.isDeleted == false && t.StartDate.Date <= dateToProcess.Date)
                     .Distinct()
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
-                    .ProjectTo<TaskFewInfoServiceModel>(new { currentEmployeeId = userId })
+                    .ProjectTo<TaskFewInfoServiceModel>(new { currentEmployeeId = userId, workDate = dateToProcess.Date })
                     .ToListAsync();
 
             return tasks;

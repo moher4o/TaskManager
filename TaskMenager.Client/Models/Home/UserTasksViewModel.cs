@@ -12,6 +12,8 @@ namespace TaskMenager.Client.Models.Home
 
         public int totalHoursPerDay { get; set; } = 0;
 
+        public DateTime workDate { get; set; } = DateTime.Now.Date;
+
         public IEnumerable<TaskFewInfoServiceModel> ActiveTasks { get; set; } = new List<TaskFewInfoServiceModel>();
 
         public IEnumerable<TaskFewInfoServiceModel> AssignerTasks { get; set; } = new List<TaskFewInfoServiceModel>();

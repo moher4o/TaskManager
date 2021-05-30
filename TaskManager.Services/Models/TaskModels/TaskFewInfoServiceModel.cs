@@ -41,6 +41,7 @@ namespace TaskManager.Services.Models.TaskModels
         public void ConfigureMapping(Profile profile)
         {
             int currentEmployeeId = 0;
+            DateTime workDate = DateTime.Now.Date;
             profile.CreateMap<Task, TaskFewInfoServiceModel>()
                    .ForMember(u => u.TaskStatusName, cfg => cfg.MapFrom(s => s.TaskStatus.StatusName))
                    .ForMember(u => u.TaskPriorityName, cfg => cfg.MapFrom(s => s.TaskPriority.PriorityName))
@@ -55,7 +56,7 @@ namespace TaskManager.Services.Models.TaskModels
                                                                                 .Where(n => n.isDeleted == false)
                                                                                 .Count()))
                    .ForMember(u => u.EmployeeHoursToday, cfg => cfg.MapFrom(s => s.WorkedHours
-                                                                                .Where(d => d.WorkDate.Date == DateTime.Now.Date && d.EmployeeId == currentEmployeeId)
+                                                                                .Where(d => d.WorkDate.Date == workDate.Date && d.EmployeeId == currentEmployeeId)
                                                                                 .Sum(hr => hr.HoursSpend)))
                    .ForMember(u => u.EmployeeHours, cfg => cfg.MapFrom(s => s.WorkedHours
                                                                                 .Where(hr => hr.EmployeeId == currentEmployeeId)
