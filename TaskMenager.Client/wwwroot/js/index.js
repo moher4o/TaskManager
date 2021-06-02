@@ -107,23 +107,24 @@
                 $('#AREA_PARTIAL_VIEW').html("");
                 $('#AREA_PARTIAL_VIEW').html(result);
                 slideSource.classList.toggle('fade');
+                //setTimeout(function () {
+                    $('.PrimeBox3').click(function () {
+                        var serviceID = this.id;
+                        $('.PrimeBox3').css('background-color', '#fff');
+                        $(this).css('background-color', '#cadefd');
+                    });
+                    $('#showInactive').click(function () {
+                        document.getElementById('showclosedTasks').classList.toggle('displayno');
+                        //$('#showclosedTasks').toggleClass('displayno');
+                    });
+                //}, 1000);
             }
         });
     }
 
     $(function () { //jQuery shortcut for .ready (ensures DOM ready)
         GetUserTaskForDate();
-        setTimeout(function () {
-            $('.PrimeBox3').click(function () {
-                var serviceID = this.id;
-                $('.PrimeBox3').css('background-color', '#fff');
-                $(this).css('background-color', '#cadefd');
-            });
-            $('#showInactive').click(function () {
-                document.getElementById('showclosedTasks').classList.toggle('displayno');
-                //$('#showclosedTasks').toggleClass('displayno');
-            });
-        }, 1000);
+
         //GetUserTaskForDate();
     });
 
