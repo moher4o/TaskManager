@@ -18,6 +18,8 @@ using TaskManager.Services.Models;
 using TaskMenager.Client.Infrastructure.Extensions;
 using TaskMenager.Client.Models;
 using TaskMenager.Client.Models.Home;
+using static TaskManager.Common.DataConstants;
+
 
 namespace TaskMenager.Client.Controllers
 {
@@ -68,50 +70,55 @@ namespace TaskMenager.Client.Controllers
         //    return View(currentEmployee);
         //}
 
-        public async Task<IActionResult> Index(int? userId, DateTime? workDate)
+        public IActionResult Index()
         {
-            if (this.User.Claims.Any(cl => cl.Value == "Guest"))
-            {
-                return RedirectToAction("WellCome", "Users");
-            }
-
-
-            if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
-            {
-                TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
-                return RedirectToAction("NotAuthorized", "Base");
-            }
-
-            int identityId = userId.HasValue ? userId.Value : currentUser.Id;
-            DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
-
-            if (identityId != currentUser.Id)
-            {
-                var dominions = await this.employees.GetUserDominions(currentUser.Id);
-                if (!dominions.Any(d => d.Id == identityId))
-                {
-                    var targetEmployee = await this.employees.GetEmployeeByIdAsync(identityId);
-                    TempData["Error"] = $"[Index]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
-                    return RedirectToAction("Index", "Home");
-                }
-            }
-
-
-            var currentEmployee = new UserTasksViewModel()
-            {
-                userId = identityId,
-                workDate = dateToProcess.Date,
-                ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
-                //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
-            };
-            foreach (var task in currentEmployee.ActiveTasks)
-            {
-                task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
-            }
-
-            currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
-            return View(currentEmployee);
+            return View();
         }
+
+        //public async Task<IActionResult> Index(int? userId, DateTime? workDate)
+        //{
+        //    if (this.User.Claims.Any(cl => cl.Value == "Guest"))
+        //    {
+        //        return RedirectToAction("WellCome", "Users");
+        //    }
+
+
+        //    if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
+        //    {
+        //        TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
+        //        return RedirectToAction("NotAuthorized", "Base");
+        //    }
+
+        //    int identityId = userId.HasValue ? userId.Value : currentUser.Id;
+        //    DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
+
+        //    if (identityId != currentUser.Id)
+        //    {
+        //        var dominions = await this.employees.GetUserDominions(currentUser.Id);
+        //        if (!dominions.Any(d => d.Id == identityId))
+        //        {
+        //            var targetEmployee = await this.employees.GetEmployeeByIdAsync(identityId);
+        //            TempData["Error"] = $"[Index]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
+        //            return RedirectToAction("Index", "Home");
+        //        }
+        //    }
+
+
+        //    var currentEmployee = new UserTasksViewModel()
+        //    {
+        //        userId = identityId,
+        //        workDate = dateToProcess.Date,
+        //        ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
+        //        //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
+        //    };
+        //    foreach (var task in currentEmployee.ActiveTasks)
+        //    {
+        //        task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+        //    }
+
+        //    currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
+        //    return View(currentEmployee);
+        //}
 
         public IActionResult Privacy()
         {
@@ -129,6 +136,52 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<PartialViewResult> GetDateTasks(int? userId, DateTime? workDate)
+        {
+            int identityId = userId.HasValue ? userId.Value : currentUser.Id;
+            DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
+
+            var currentEmployee = new UserTasksViewModel()
+            {
+                userId = identityId,
+                workDate = dateToProcess.Date,
+                ActiveTasks =await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
+                //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
+            };
+            foreach (var task in currentEmployee.ActiveTasks)
+            {
+                task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+            }
+
+            currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
+
+            return PartialView("~/Views/Home/_ShowTasksPartial.cshtml", currentEmployee);
+        }
+        #region API Calls
+        //[Authorize(Policy = Employee)]
+        //[HttpGet]
+        public async Task<IActionResult> GetDateTasksAsync(int? userId, DateTime? workDate)
+        {
+            int identityId = userId.HasValue ? userId.Value : currentUser.Id;
+            DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
+
+            var currentEmployee = new UserTasksViewModel()
+            {
+                userId = identityId,
+                workDate = dateToProcess.Date,
+                ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
+                //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
+            };
+            foreach (var task in currentEmployee.ActiveTasks)
+            {
+                task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+            }
+
+            currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
+            return Json(new { currentEmployee });
+        }
+        #endregion
 
     }
 }

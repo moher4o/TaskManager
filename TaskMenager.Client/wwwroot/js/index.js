@@ -1,4 +1,5 @@
 ﻿$(() => {
+    const delayInMilliseconds = 200;
     const lochref = window.location.href;
     const locOrigin = window.location.origin;
     let path;
@@ -8,13 +9,16 @@
     else {
         path = locOrigin;
     }
-    var userId = document.getElementById("employeeId").value;
+    var currentUserId = document.getElementById("currentUserId").value;
+    var userId = document.getElementById("employeeId") == null ? currentUserId : document.getElementById("employeeId").value;
+    var slideSource = document.getElementById('AREA_PARTIAL_VIEW');
+
     AddDatePicker();
     GetDominions();
     //attachEvents();
 
     function attachEvents() {
-     }
+    }
 
     function CheckSelectedDominion() {
         var url = window.location.href;
@@ -24,9 +28,8 @@
         } else {
             url += '?userId=' + $('#bosses :selected').val() + '&workDate=' + newDate.toUTCString();
         }
-        console.log(newDate);
-        window.location.href = url;
-
+        //console.log($('#bosses :selected').val());
+        // window.location.href = url;
     }
 
     function GetDominions() {
@@ -44,13 +47,13 @@
                             id: 'bosses',
                             name: 'bosses'
                         })
-                   
-                )
-                //$('#bosses').on('change', CheckSelectedDominion());
+                    )
                 $('#bosses').change(function () {
-                    CheckSelectedDominion();
+                    slideSource.classList.toggle('fade');
+                    setTimeout(function () {
+                        GetUserTaskForDate();
+                    }, delayInMilliseconds);
                 });
-
             }
             $.each(response.data, function (i, item) {
                 if (userId == item.id) {
@@ -59,18 +62,15 @@
                 else {
                     $("#bosses").append(new Option(item.textValue, item.id));
                 }
-                
             });
-
         });
-        
     }
 
     function AddDatePicker() {
-        var selectedText = document.getElementById("workDate").value;
-        //var selectedDate = new Date(selectedText);
-
-        $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+0d" });
+        //var selectedText = document.getElementById("workDate").value
+        var selectedText = document.getElementById("workDate") == null ? new Date().toDateString() : document.getElementById("workDate").value;
+        //console.log(selectedText);
+        $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+0d", inline: true });
         $('#dateSelector2').datepicker('setDate', new Date(selectedText));
         //$('#dateSelector2').datepicker("refresh");
         //let date2 = $('#dateSelector2').datepicker("getDate");
@@ -83,7 +83,48 @@
             }
         });
         $('#dateSelector2').change(function () {
-                CheckSelectedDominion();
-         });
+            slideSource.classList.toggle('fade');
+            setTimeout(function () {
+                GetUserTaskForDate();
+            }, delayInMilliseconds);
+
+        });
     }
+
+    function GetUserTaskForDate() {
+        var currentUrl = window.location.href;
+        let newDate = $('#dateSelector2').datepicker("getDate");
+        let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+
+        $.ajax({
+            type: 'GET',
+            url: '..\\Home\\GetDateTasks',
+            data: {
+                userId: bossUserId,
+                workDate: newDate.toUTCString()
+            },
+            success: function (result) {
+                $('#AREA_PARTIAL_VIEW').html("");
+                $('#AREA_PARTIAL_VIEW').html(result);
+                slideSource.classList.toggle('fade');
+            }
+        });
+    }
+
+    $(function () { //jQuery shortcut for .ready (ensures DOM ready)
+        GetUserTaskForDate();
+        setTimeout(function () {
+            $('.PrimeBox3').click(function () {
+                var serviceID = this.id;
+                $('.PrimeBox3').css('background-color', '#fff');
+                $(this).css('background-color', '#cadefd');
+            });
+            $('#showInactive').click(function () {
+                document.getElementById('showclosedTasks').classList.toggle('displayno');
+                //$('#showclosedTasks').toggleClass('displayno');
+            });
+        }, 1000);
+        //GetUserTaskForDate();
+    });
+
 });

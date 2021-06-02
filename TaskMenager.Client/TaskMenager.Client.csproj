@@ -28,5 +28,6 @@
 
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="wwwroot\css\images\" />
   </ItemGroup>
  </Project>
