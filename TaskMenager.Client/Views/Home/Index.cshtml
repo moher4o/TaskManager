@@ -3,7 +3,10 @@
 }
 <input id="currentUserId" value="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())" hidden />
 <div class="fade" id="AREA_PARTIAL_VIEW">
-
+    Здравейте,
+    Приложението не работи с браузър Internet explorer(IE).
+    Ако виждате това съобщение, значи или ползвате IE или трябва да изчистите кеша на браузъра си.
+    Пробвайте с поредица от клавиши F12, F5, F12.
 </div>
 
 @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@

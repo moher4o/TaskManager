@@ -95,6 +95,11 @@
         var currentUrl = window.location.href;
         let newDate = $('#dateSelector2').datepicker("getDate");
         let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+        // stop animation of button Zapis
+        var element = document.getElementById("btnZapis");
+        if (element.classList.contains("special")) {
+            element.classList.remove("special");
+        }
 
         $.ajax({
             type: 'GET',
@@ -104,28 +109,165 @@
                 workDate: newDate.toUTCString()
             },
             success: function (result) {
+                // "избухване" на данните за новата дата
                 $('#AREA_PARTIAL_VIEW').html("");
                 $('#AREA_PARTIAL_VIEW').html(result);
-                slideSource.classList.toggle('fade');
-                //setTimeout(function () {
-                    $('.PrimeBox3').click(function () {
-                        var serviceID = this.id;
-                        $('.PrimeBox3').css('background-color', '#fff');
-                        $(this).css('background-color', '#cadefd');
-                    });
+                slideSource.classList.toggle('fade');   
+                //добавяне на eventListener
+                    document.querySelectorAll('.PrimeBox3').forEach(item => {
+                        item.addEventListener('mouseover', event => {
+                            item.style["background-color"] = "#e7f6fb";
+                        })
+                        item.addEventListener('mouseout', event => {
+                            item.style["background-color"] = "#fff";
+                        })
+                    })
+                //onclick евент за показване на приключените задачи 
                     $('#showInactive').click(function () {
                         document.getElementById('showclosedTasks').classList.toggle('displayno');
-                        //$('#showclosedTasks').toggleClass('displayno');
                     });
-                //}, 1000);
+                //функцията добавя елемента за отчитане на часовете
+                AddHoursCounter();
+
             }
         });
     }
 
+    function UpdateHours() {
+        let newDate = $('#dateSelector2').datepicker("getDate");
+        let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+        let totallSuccess = true;
+        let messageInfo = '';
+        $('.PrimeBox3:visible').each(function () {
+            let currenttaskId = $(this).attr('id');
+            if (currenttaskId!= 'closedTask') {
+                let todayhours = $(this).find('input').first().val();
+                // заявка за запис на часовете
+                $.ajax({
+                    type: 'POST',
+                    url: '..\\Tasks\\SetDateTasksHours',
+                    data: {
+                        userId: bossUserId,
+                        workDate: newDate.toUTCString(),
+                        taskId: currenttaskId,
+                        hours: todayhours
+                    },
+                    error: function (data) {
+                        totallSuccess = false;
+                        messageInfo += data.message;
+                    },
+                });
+
+
+                //console.log(taskId + ' ' + hours + newDate + bossUserId);
+            }
+        });
+        if (!totallSuccess) {
+            toastr.error('');
+        }
+    }
+
     $(function () { //jQuery shortcut for .ready (ensures DOM ready)
         GetUserTaskForDate();
-
-        //GetUserTaskForDate();
+        $('#divbtnZapis').show();
+        //onclick евент за бутон Запис
+        $('#btnZapis').click(function () {
+            UpdateHours()
+        });
+        
     });
+
+    function AddHoursCounter() {
+        /////////////////////
+        //setTimeout(function () {
+            $('.btn-number').click(function (e) {
+                e.preventDefault();
+
+                fieldName = $(this).attr('data-field');
+                type = $(this).attr('data-type');
+                var input = $("input[name='" + fieldName + "']");
+                var currentVal = parseInt(input.val());
+                if (!isNaN(currentVal)) {
+                    if (type == 'minus') {
+
+                        if (currentVal > input.attr('min')) {
+                            input.val(currentVal - 1).change();
+                        }
+                        if (parseInt(input.val()) == input.attr('min')) {
+                            input.css('color', 'dodgerblue');
+                            $(this).attr('disabled', true);
+                        }
+
+                    } else if (type == 'plus') {
+
+                        if (currentVal < input.attr('max')) {
+                            if (currentVal == 0) {
+                                input.css('color', 'red');
+                            }
+                            input.val(currentVal + 1).change();
+                        }
+                        if (parseInt(input.val()) == input.attr('max')) {
+                            $(this).attr('disabled', true);
+                        }
+
+                    }
+                } else {
+                    input.val(0);
+                }
+            });
+            $('.input-number').focusin(function () {
+                $(this).data('oldValue', $(this).val());
+            });
+        $('.input-number').change(function () {
+            // start animation of button Zapis
+            var element = document.getElementById("btnZapis");
+            if (!element.classList.contains("special")) {
+                element.classList.add("special");
+            }
+                minValue = parseInt($(this).attr('min'));
+                maxValue = parseInt($(this).attr('max'));
+                valueCurrent = parseInt($(this).val());
+
+                name = $(this).attr('name');
+                if (valueCurrent >= minValue) {
+                    $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled')
+                    if (valueCurrent > minValue) {
+                        $(this).css('color', 'red');
+                    }
+                } else {
+                    toastr.error('Въведеното число е по-малко от допустимото');
+                    $(this).val($(this).data('oldValue'));
+                }
+                if (valueCurrent <= maxValue) {
+                    $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled')
+                } else {
+                    toastr.error('Въведеното число е по-голямо от допустимото');
+                    $(this).val($(this).data('oldValue'));
+                    if ($(this).data('oldValue') == 0) {
+                        $(this).css('color', 'dodgerblue');
+                    }
+                    
+                }
+
+
+            });
+            $(".input-number").keydown(function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                    // Allow: Ctrl+A
+                    (e.keyCode == 65 && e.ctrlKey === true) ||
+                    // Allow: home, end, left, right
+                    (e.keyCode >= 35 && e.keyCode <= 39)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+        //}, 1000);
+        ///////////////////
+    }
 
 });

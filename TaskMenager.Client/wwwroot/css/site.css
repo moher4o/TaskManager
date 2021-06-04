@@ -1,6 +1,15 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+.button.focus, .button:focus {
+    outline: 0;
+    box-shadow: none !important;
+}
+
+.center {
+    width: 120px;
+}
+
 #slideSource {
     opacity: 1;
     transition: opacity 0.5s;
@@ -211,7 +220,8 @@ body {
     border: 1px solid #2a67ac;
     border-right: 2px solid #2a67ac;
     border-bottom: 3px solid #2a67ac;
-    background-color: rgba(42, 103, 172, 0.9);
+    /*background-color: rgba(42, 103, 172, 0.9);*/
+    background-color: ghostwhite;
     box-shadow: 2px 2px 8px rgba(42, 103, 172, 0.5);
     background: #fff;
     width: 100%;

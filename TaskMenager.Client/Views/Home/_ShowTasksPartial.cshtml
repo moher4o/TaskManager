@@ -24,7 +24,7 @@
             @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@
             @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed))
             {
-                <div class="row PrimeBox3" style="margin-top:5px; font-size:small;" id=@("task" + item.Id.ToString())>
+                <div class="row PrimeBox3" style="margin-top:5px; font-size:small;" id=@(item.Id)>
                     @{var name = item.TaskName.Length > 50 ? (item.TaskName).Substring(0, 50) + "..." : item.TaskName;}
                     <div class="col-md-5">
                         <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
@@ -47,23 +47,40 @@
                                 </a>
                             </div>
                             <div style="min-width:60px;">
-                                @*<a asp-controller="Tasks" asp-action="AddWorkHours"
-                                       asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
-                                       asp-route-taskId="@item.Id"
-                                       asp-route-employeeId="@Model.userId">
-                                        <img class="chatnotifications" src="~/png/3DClock.png" />
-                                        <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue" @(item.EmployeeHoursToday > 0 ? "" : "hidden")>@item.EmployeeHoursToday</span>
-                                        <span title="Отчетени часове" class="notificationsCountValue" @(item.EmployeeHoursToday > 0 ? "hidden" : "")>@item.EmployeeHours</span>
-                                    </a>*@
-                                <label style="cursor:pointer; font-size:large;"><strong>@(item.EmployeeHoursToday > 0 ? item.EmployeeHoursToday.ToString() : "")</strong></label>
-                            </div>
-                            <div style="min-width:60px;">
                                 <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
                                    asp-route-taskName="@item.TaskName"
                                    asp-route-taskId="@item.Id">
                                     <img class="chatnotifications3" src="~/png/files.png" />
                                     <span class="notificationsTodayCountValue" @(item.FilesCount > 0 ? "" : "hidden")>@item.FilesCount</span>
                                 </a>
+                            </div>
+                            <div style="min-width:60px; max-height:35px;">
+                                @*<a asp-controller="Tasks" asp-action="AddWorkHours"
+                                   asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"
+                                   asp-route-taskId="@item.Id"
+                                   asp-route-employeeId="@Model.userId">                                    
+                                    <img class="chatnotifications" src="~/png/3DClock.png" />
+                                    <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue" @(item.EmployeeHoursToday > 0 ? "" : "hidden")>@item.EmployeeHoursToday</span>
+                                    <span title="Отчетени часове" class="notificationsCountValue" @(item.EmployeeHoursToday > 0 ? "hidden" : "")>@item.EmployeeHours</span>
+                                </a>*@
+                                @*<label style="cursor:pointer; font-size:large;"><strong>@(item.EmployeeHoursToday > 0 ? item.EmployeeHoursToday.ToString() : "")</strong></label>*@
+                                <div class="center">
+                                   
+                                   <div class="input-group">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-number" style="background-color:#fcdede" data-type="minus" data-field="@item.Id">
+                                                <i class="fas fa-minus fa-sm"></i>
+                                            </button>
+                                        </span>
+                                        <input style="font-size:large; font-weight:600; color:@(item.EmployeeHoursToday > 0 ? "red;" : "dodgerblue")" type="text" name="@item.Id" class="form-control input-number" value="@item.EmployeeHoursToday" min="0" max="8">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-number" style="background-color:#dfffde" data-type="plus" data-field="@item.Id">
+                                                <i class=" fas fa-plus fa-sm"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                   
+                                </div>
                             </div>
 
                         </div>

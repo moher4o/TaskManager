@@ -53,12 +53,12 @@ namespace TaskManager.Services.Implementations
 
             if (withClosed)
             {
-               return this.db.Tasks
-                        .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == withDeleted)
-                        .Include(te => te.AssignedExperts)
-                        .OrderBy(t => t.StatusId)
-                        .ThenBy(t => t.isDeleted)
-                        .AsQueryable();
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == withDeleted)
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.StatusId)
+                         .ThenBy(t => t.isDeleted)
+                         .AsQueryable();
             }
             else
             {
@@ -106,7 +106,7 @@ namespace TaskManager.Services.Implementations
                 }
                 taskToDelete.isDeleted = true;
                 taskToDelete.DeletedByUserId = expert.Id;
-                if (taskToDelete.StatusId != await this.db.TasksStatuses.Where(ts => ts.StatusName == TaskStatusClosed).Select(ts => ts.Id).FirstOrDefaultAsync() )
+                if (taskToDelete.StatusId != await this.db.TasksStatuses.Where(ts => ts.StatusName == TaskStatusClosed).Select(ts => ts.Id).FirstOrDefaultAsync())
                 {
                     taskToDelete.StatusId = this.db.TasksStatuses.Where(ts => ts.StatusName == TaskStatusClosed).Select(ts => ts.Id).FirstOrDefault();
                     taskToDelete.EndNote = $"Задачата е приключена служебно при изтриването й на {DateTime.Now.Date} от {expert.FullName}";
@@ -122,8 +122,8 @@ namespace TaskManager.Services.Implementations
             {
                 return ex.Message;
             }
-            
-            
+
+
         }
         public async Task<bool> CheckTaskByIdAsync(int taskId)
         {
@@ -383,7 +383,7 @@ namespace TaskManager.Services.Implementations
             return this.db.TasksTypes.Count();
         }
 
-        public async Task<string> SetWorkedHoursAsync(TaskWorkedHoursServiceModel workedHours)
+        public async Task<string> SetWorkedHoursAsyncOld(TaskWorkedHoursServiceModel workedHours)
         {
             try
             {
@@ -439,11 +439,11 @@ namespace TaskManager.Services.Implementations
                             currentTaskHours.HoursSpend += workedHours.HoursSpend;
                             currentTaskHours.Text = workedHours.Text;
                         }
-                        else 
+                        else
                         {
                             return $"Невалидна стойност! Можете да коригирате до {currentTaskHours.HoursSpend} часа по тази задача.";
                         }
-                        
+
                     }
                     await this.db.SaveChangesAsync();
                     return "success";
@@ -460,6 +460,58 @@ namespace TaskManager.Services.Implementations
                 return "Неуспешен запис. Проверете входните данни.";
             }
         }
+
+        public async Task<string> SetWorkedHoursAsync(TaskWorkedHoursServiceModel workedHours)
+        {
+            try
+            {
+                var isDeletedEmployee = await this.db.EmployeesTasks
+                    .Where(e => e.EmployeeId == workedHours.EmployeeId && e.TaskId == workedHours.TaskId)
+                    .Select(t => t.isDeleted).FirstOrDefaultAsync();
+
+                if (isDeletedEmployee)
+                {
+                    return workedHours.EmployeeName + " не е активен участник по задача: " + workedHours.TaskName;
+                }
+
+                var currentTask = await this.db.Tasks.Where(t => t.Id == workedHours.TaskId && t.isDeleted == false).Include(t => t.TaskStatus).FirstOrDefaultAsync();
+                if (currentTask.StartDate.Date > workedHours.WorkDate.Date)
+                {
+                    return "Началната дата на задачата е : " + currentTask.StartDate.Date.ToString("dd/MM/yyyy") + "г.";
+                }
+                if (currentTask.TaskStatus.StatusName == TaskStatusClosed)
+                {
+                    return "Задачата е приключена!";
+                }
+                var currentTaskHours = await this.db.WorkedHours
+                    .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId && d.TaskId == workedHours.TaskId)
+                    .FirstOrDefaultAsync();
+
+                if (currentTaskHours == null)   // ако по конкретната задача не е работено за тази дата
+                {
+                    var workedHoursDB = new WorkedHours()
+                    {
+                        EmployeeId = workedHours.EmployeeId,
+                        TaskId = workedHours.TaskId,
+                        HoursSpend = workedHours.HoursSpend,
+                        WorkDate = workedHours.WorkDate
+                    };
+                    await this.db.WorkedHours.AddAsync(workedHoursDB);
+                }
+                else
+                {
+                    currentTaskHours.HoursSpend = workedHours.HoursSpend;
+                }
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception)
+            {
+                return "Service[SetWorkedHoursAsync]. Неуспешен запис.";
+            }
+        }
+
 
         public async Task<bool> CloseTaskAsync(int taskId, string endNote, int closerid)
         {
@@ -552,7 +604,7 @@ namespace TaskManager.Services.Implementations
                 else
                 {
                     currentTask.StartDate = taskToEdit.StartDate.Date;
-                    
+
                 }
 
                 if (taskToEdit.ParentTaskId.Value == 0 || taskToEdit.ParentTaskId == null)
@@ -560,7 +612,7 @@ namespace TaskManager.Services.Implementations
                     currentTask.TypeId = await this.db.TasksTypes.Where(tt => tt.TypeName == TaskTypeGlobal).Select(tt => tt.Id).FirstOrDefaultAsync();
                     currentTask.ParentTaskId = null;
                 }
- 
+
 
                 this.db.EmployeesTasks.Where(et => et.TaskId == currentTask.Id)
                                       .ToList()
@@ -569,7 +621,7 @@ namespace TaskManager.Services.Implementations
 
                 if (taskToEdit.EmployeesIds != null && taskToEdit.EmployeesIds.Length > 0)    //добавям експерти
                 {
-                    
+
                     foreach (var employee in taskToEdit.EmployeesIds)
                     {
                         var expert = await this.db.EmployeesTasks.Where(e => e.EmployeeId == employee && e.TaskId == currentTask.Id).FirstOrDefaultAsync();
@@ -591,11 +643,11 @@ namespace TaskManager.Services.Implementations
 
                     }
                 }
-                
+
                 await this.db.SaveChangesAsync();
 
                 return result;
-               
+
             }
             catch (Exception)
             {
@@ -623,7 +675,7 @@ namespace TaskManager.Services.Implementations
             var searchedTasks = await this.db.Tasks
                 .Where(t => tasksIdList.Contains(t.Id))
                 .OrderBy(t => t.Id)
-                .ProjectTo<ReportServiceModel>(new {employeesIds = employeesIds.ToArray(), startDate, endDate})
+                .ProjectTo<ReportServiceModel>(new { employeesIds = employeesIds.ToArray(), startDate, endDate })
                 .ToListAsync();
 
             return searchedTasks;

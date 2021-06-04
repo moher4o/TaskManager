@@ -137,7 +137,7 @@ namespace TaskMenager.Client.Controllers
                     WorkDate = model.WorkDate.Date
                 };
 
-                string result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                string result = await this.tasks.SetWorkedHoursAsyncOld(workedHours);
                 if (result == "success")
                 {
                     TempData["Success"] = "Часовете са актуализирани успешно.";
@@ -1382,6 +1382,48 @@ namespace TaskMenager.Client.Controllers
 
 
         #region API Calls
+        [HttpPost]
+        public async Task<IActionResult> SetDateTasksHours(int userId, DateTime workDate, int taskId, int hours)
+        {
+            try
+            {
+                if (userId != currentUser.Id)
+                {
+                    var dominions = await this.employees.GetUserDominions(currentUser.Id);
+                    if (!dominions.Any(d => d.Id == userId))
+                    {
+                        var targetEmployee = await this.employees.GetEmployeeByIdAsync(userId);
+                        return Json(new { success = false, message = $"[SetDateTasksHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} "});
+                    }
+                }
+
+
+                var workedHours = new TaskWorkedHoursServiceModel()
+                {
+                    EmployeeId = userId,
+                    TaskId = taskId,
+                    HoursSpend = hours,
+                    WorkDate = workDate.Date
+                };
+
+                string result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                if (result == "success")
+                {
+                    return Json(new { success = true, message = "Часовете са отразени успешно" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "Основна грешка. Моля проверете логиката на входните данни." });
+            }
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetAll(bool withClosed = false, bool withDeleted = false)
         {
