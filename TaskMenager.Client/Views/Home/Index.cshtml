@@ -2,21 +2,26 @@
     ViewData["Title"] = "Моите задачи";
 }
 <input id="currentUserId" value="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())" hidden />
+<div id="apiNotWorking" style="padding-top:40px; padding-left:50px;  max-width:500px;">
+    <p style="background-color: whitesmoke;">
+        Здравейте,
+        Приложението <span style="color:red; font-weight:500;">не работи</span> с браузър Internet explorer(IE).
+        Ако виждате това съобщение, значи или ползвате IE или трябва да изчистите кеша на браузъра си.
+        Пробвайте с поредица от клавиши F12, F5, F12 или се обърнете към администратор.
+    </p>
+</div>
 <div class="fade" id="AREA_PARTIAL_VIEW">
-    Здравейте,
-    Приложението не работи с браузър Internet explorer(IE).
-    Ако виждате това съобщение, значи или ползвате IE или трябва да изчистите кеша на браузъра си.
-    Пробвайте с поредица от клавиши F12, F5, F12.
+
 </div>
 
 @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@
-
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @section Scripts {
     <script src="~/js/index.js" charset="utf-8"></script>
     @*<script>
-                $(document).ready(function () {
-                });
-    </script>*@
+                    $(document).ready(function () {
+                    });
+        </script>*@
 
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

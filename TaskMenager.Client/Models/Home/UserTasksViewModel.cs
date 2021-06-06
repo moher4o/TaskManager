@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TaskManager.Services.Models.TaskModels;
+using static TaskManager.Common.DataConstants;
 
 namespace TaskMenager.Client.Models.Home
 {
@@ -11,6 +12,8 @@ namespace TaskMenager.Client.Models.Home
         public int userId { get; set; }
 
         public int totalHoursPerDay { get; set; } = 0;
+
+        public int totalHoursPerDayMax { get; set; } = TotalHoursPerDay;
 
         public DateTime workDate { get; set; } = DateTime.Now.Date;
 

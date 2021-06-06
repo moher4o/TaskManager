@@ -71,7 +71,7 @@
 .notificationsMenu {
     position: relative;
     background-color: #fa3e3e;
-    border-radius: 2px;
+    border-radius: 10px;
     padding: 1px 3px;
     color: #fff;
     right: 0px;
@@ -82,7 +82,7 @@
 .notificationsMenuSmall {
     position: relative;
     background-color: #fa3e3e;
-    border-radius: 2px;
+    border-radius: 10px;
     padding: 1px 3px;
     color: #fff;
     right: 0px;

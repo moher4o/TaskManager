@@ -13,11 +13,31 @@
     var userId = document.getElementById("employeeId") == null ? currentUserId : document.getElementById("employeeId").value;
     var slideSource = document.getElementById('AREA_PARTIAL_VIEW');
 
+    document.getElementById("apiNotWorking").hidden = true;
     AddDatePicker();
     GetDominions();
-    //attachEvents();
 
-    function attachEvents() {
+    function CheckMaxHours() {
+        var totalMaxHours = document.getElementById("maxHours") == null ? 16 : parseInt(document.getElementById("maxHours").value);
+        //var currentTotal = document.getElementById("totalLabel") == null ? 16 : parseInt(document.getElementById("totalLabel").textContent);
+        var sum = parseInt(0);
+        $('.PrimeBox3').each(function () {
+            let currenttaskId = $(this).attr('id');
+            if (currenttaskId != 'closedTask') {
+                let todayhours = parseInt($(this).find('input').first().val());
+                sum = sum + todayhours;
+            }
+        });
+        if (sum > totalMaxHours) {
+            return false;
+        }
+        else {
+            if (sum > 8) {
+                toastr.error('Въведени са повече от 8 часа за деня. Максималния брой е: ' + totalMaxHours);
+            }
+            document.getElementById('totalLabel').innerHTML = sum;
+            return true;
+            }
     }
 
     function CheckSelectedDominion() {
@@ -92,7 +112,7 @@
     }
 
     function GetUserTaskForDate() {
-        var currentUrl = window.location.href;
+        var currentUrl = path + '\\Home\\GetDateTasks';
         let newDate = $('#dateSelector2').datepicker("getDate");
         let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
         // stop animation of button Zapis
@@ -100,10 +120,9 @@
         if (element.classList.contains("special")) {
             element.classList.remove("special");
         }
-
         $.ajax({
             type: 'GET',
-            url: '..\\Home\\GetDateTasks',
+            url: currentUrl,   //'..\\Home\\GetDateTasks'
             data: {
                 userId: bossUserId,
                 workDate: newDate.toUTCString()
@@ -112,20 +131,20 @@
                 // "избухване" на данните за новата дата
                 $('#AREA_PARTIAL_VIEW').html("");
                 $('#AREA_PARTIAL_VIEW').html(result);
-                slideSource.classList.toggle('fade');   
+                slideSource.classList.toggle('fade');
                 //добавяне на eventListener
-                    document.querySelectorAll('.PrimeBox3').forEach(item => {
-                        item.addEventListener('mouseover', event => {
-                            item.style["background-color"] = "#e7f6fb";
-                        })
-                        item.addEventListener('mouseout', event => {
-                            item.style["background-color"] = "#fff";
-                        })
+                document.querySelectorAll('.PrimeBox3').forEach(item => {
+                    item.addEventListener('mouseover', event => {
+                        item.style["background-color"] = "#e7f6fb";
                     })
+                    item.addEventListener('mouseout', event => {
+                        item.style["background-color"] = "#fff";
+                    })
+                })
                 //onclick евент за показване на приключените задачи 
-                    $('#showInactive').click(function () {
-                        document.getElementById('showclosedTasks').classList.toggle('displayno');
-                    });
+                $('#showInactive').click(function () {
+                    document.getElementById('showclosedTasks').classList.toggle('displayno');
+                });
                 //функцията добавя елемента за отчитане на часовете
                 AddHoursCounter();
 
@@ -134,138 +153,160 @@
     }
 
     function UpdateHours() {
+        var currentUrl = path + '\/Tasks\/SetDateTasksHours';
         let newDate = $('#dateSelector2').datepicker("getDate");
         let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
         let totallSuccess = true;
-        let messageInfo = '';
-        $('.PrimeBox3:visible').each(function () {
+        var messageInfo = 'Часовете са записани успешно';
+        $('.PrimeBox3').each(function () {
             let currenttaskId = $(this).attr('id');
-            if (currenttaskId!= 'closedTask') {
+            if (currenttaskId != 'closedTask') {
                 let todayhours = $(this).find('input').first().val();
                 // заявка за запис на часовете
                 $.ajax({
-                    type: 'POST',
-                    url: '..\\Tasks\\SetDateTasksHours',
+                    type: 'GET',
+                    url: currentUrl,   // '..\\Tasks\\SetDateTasksHours'
                     data: {
                         userId: bossUserId,
                         workDate: newDate.toUTCString(),
                         taskId: currenttaskId,
                         hours: todayhours
                     },
+                    success: function (data) {
+                        if (data.success) {
+                        }
+                        else {
+                            totallSuccess = false;
+                            messageInfo = data.message;
+                        }
+                    },
                     error: function (data) {
                         totallSuccess = false;
-                        messageInfo += data.message;
-                    },
+                        messageInfo = data.message;
+                    }
                 });
-
-
-                //console.log(taskId + ' ' + hours + newDate + bossUserId);
             }
         });
-        if (!totallSuccess) {
-            toastr.error('');
-        }
+        setTimeout(function () {
+            if (totallSuccess == false) {
+                toastr.error(messageInfo);
+                $('#btnZapis').blur();
+            }
+            else {
+                var element = document.getElementById("btnZapis");
+                if (element.classList.contains("special")) {
+                    element.classList.remove("special");
+                }
+                $('#btnZapis').blur();
+                toastr.success(messageInfo);
+            }
+        }, 1200);
     }
 
     $(function () { //jQuery shortcut for .ready (ensures DOM ready)
         GetUserTaskForDate();
         $('#divbtnZapis').show();
         //onclick евент за бутон Запис
-        $('#btnZapis').click(function () {
-            UpdateHours()
-        });
-        
+        $('#btnZapis').on('click', UpdateHours);
     });
+
 
     function AddHoursCounter() {
         /////////////////////
         //setTimeout(function () {
-            $('.btn-number').click(function (e) {
-                e.preventDefault();
+        $('.btn-number').click(function (e) {
+            e.preventDefault();
 
-                fieldName = $(this).attr('data-field');
-                type = $(this).attr('data-type');
-                var input = $("input[name='" + fieldName + "']");
-                var currentVal = parseInt(input.val());
-                if (!isNaN(currentVal)) {
-                    if (type == 'minus') {
+            fieldName = $(this).attr('data-field');
+            type = $(this).attr('data-type');
+            var input = $("input[name='" + fieldName + "']");
+            var currentVal = parseInt(input.val());    //запис на старата стойност, за да се върне, ако се окаже, че новия сбор е по голям от максимума
+            input.data('oldValue', currentVal);
+            if (!isNaN(currentVal)) {
+                if (type == 'minus') {
 
-                        if (currentVal > input.attr('min')) {
-                            input.val(currentVal - 1).change();
-                        }
-                        if (parseInt(input.val()) == input.attr('min')) {
-                            input.css('color', 'dodgerblue');
-                            $(this).attr('disabled', true);
-                        }
-
-                    } else if (type == 'plus') {
-
-                        if (currentVal < input.attr('max')) {
-                            if (currentVal == 0) {
-                                input.css('color', 'red');
-                            }
-                            input.val(currentVal + 1).change();
-                        }
-                        if (parseInt(input.val()) == input.attr('max')) {
-                            $(this).attr('disabled', true);
-                        }
-
+                    if (currentVal > input.attr('min')) {
+                        input.val(currentVal - 1).change();
                     }
-                } else {
-                    input.val(0);
+                    if (parseInt(input.val()) == input.attr('min')) {
+                        input.css('color', 'dodgerblue');
+                        $(this).attr('disabled', true);
+                    }
+
+                } else if (type == 'plus') {
+
+                    if (currentVal < input.attr('max')) {
+                        if (currentVal == 0) {
+                            input.css('color', 'red');
+                        }
+                        input.val(currentVal + 1).change();
+                    }
+                    if (parseInt(input.val()) == input.attr('max')) {
+                        $(this).attr('disabled', true);
+                    }
+
                 }
-            });
-            $('.input-number').focusin(function () {
-                $(this).data('oldValue', $(this).val());
-            });
-        $('.input-number').change(function () {
+            } else {
+                input.val(0);
+            }
+        });
+        $('.input-number').focusin(function () {
+            $(this).data('oldValue', $(this).val());
+        });
+
+        $('.input-number').change(function (lastval) {
             // start animation of button Zapis
             var element = document.getElementById("btnZapis");
             if (!element.classList.contains("special")) {
                 element.classList.add("special");
             }
-                minValue = parseInt($(this).attr('min'));
-                maxValue = parseInt($(this).attr('max'));
-                valueCurrent = parseInt($(this).val());
+            minValue = parseInt($(this).attr('min'));
+            maxValue = parseInt($(this).attr('max'));
+            valueCurrent = parseInt($(this).val());
 
-                name = $(this).attr('name');
-                if (valueCurrent >= minValue) {
-                    $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled')
-                    if (valueCurrent > minValue) {
-                        $(this).css('color', 'red');
-                    }
-                } else {
-                    toastr.error('Въведеното число е по-малко от допустимото');
+            name = $(this).attr('name');
+            if (valueCurrent >= minValue) {
+                $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled')
+                if (valueCurrent > minValue) {
+                    $(this).css('color', 'red');
+                }
+            } else {
+                toastr.error('Въведеното число е по-малко от допустимото');
+                $(this).val($(this).data('oldValue'));
+            }
+            if (valueCurrent <= maxValue) {
+                $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled')
+            } else {
+                toastr.error('Въведеното число е по-голямо от допустимото');
+                $(this).val($(this).data('oldValue'));
+                if ($(this).data('oldValue') == 0) {
+                    $(this).css('color', 'dodgerblue');
+                }
+            }
+            //проверка за общия сбор и ако трябва се връща старата стойност на полето инпут
+            if (valueCurrent <= maxValue && valueCurrent >= minValue) {
+                if (!CheckMaxHours()) {
                     $(this).val($(this).data('oldValue'));
+                    toastr.error('Общия брой часове надвишава максимално допустимия за деня');
                 }
-                if (valueCurrent <= maxValue) {
-                    $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled')
-                } else {
-                    toastr.error('Въведеното число е по-голямо от допустимото');
-                    $(this).val($(this).data('oldValue'));
-                    if ($(this).data('oldValue') == 0) {
-                        $(this).css('color', 'dodgerblue');
-                    }
-                    
-                }
+            }
 
-
-            });
-            $(".input-number").keydown(function (e) {
-                // Allow: backspace, delete, tab, escape, enter and .
-                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
-                    // Allow: Ctrl+A
-                    (e.keyCode == 65 && e.ctrlKey === true) ||
-                    // Allow: home, end, left, right
-                    (e.keyCode >= 35 && e.keyCode <= 39)) {
-                    // let it happen, don't do anything
-                    return;
-                }
-                // Ensure that it is a number and stop the keypress
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-                    e.preventDefault();
-                }
-            });
+        });
+        $(".input-number").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
         //}, 1000);
         ///////////////////
     }

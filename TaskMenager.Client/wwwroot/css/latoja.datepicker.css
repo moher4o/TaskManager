@@ -1,10 +1,12 @@
 .ll-skin-latoja {
     font-size: 90%;
+    
 }
 
     .ll-skin-latoja .ui-widget {
         font-family: "Helvetica Neue","Trebuchet MS",Tahoma,Verdana,Arial,sans-serif;
         background: #fff;
+        box-shadow: 0 0 30px #9da7af;
     }
 
     .ll-skin-latoja .ui-datepicker {

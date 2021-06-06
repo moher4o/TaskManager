@@ -3,12 +3,12 @@
 @foreach (var item in Model)
 {
     <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:#e4e4e4;" id="closedTask">
-        @{var name = item.TaskName.Length > 50 ? (item.TaskName).Substring(0, 50) + "..." : item.TaskName;}
-        <div class="col-md-5">
+        @{var name = item.TaskName.Length > 90 ? (item.TaskName).Substring(0, 90) + "..." : item.TaskName;}
+        <div class="col-md-6">
             <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
         </div>
-        <div class="col-md-2">
-            <label style="padding-left:10px;">@item.TaskStatusName</label>
+        <div class="col-md-1">
+            <label style="color:#e62121;">@item.TaskStatusName</label>
         </div>
         <div class="col-md-1">
             <label style="padding-left:10px;">@item.TaskPriorityName</label>
@@ -17,7 +17,7 @@
             <label style="padding-left:10px;">@(item.EndDate.HasValue ? item.EndDate.Value.Date.ToString("dd/MM/yyyy") : "")</label>
         </div>
         <div class="col-md-3" style="color: #5f9fec;">
-            <div class="row" style="display: flex; justify-content: center; align-items: center;">
+            <div class="row" style="padding-left:15%;">
                 <div style="min-width:60px;">
                     <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                         <img class="chatnotifications" src="~/png/note.png" />

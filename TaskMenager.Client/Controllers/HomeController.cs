@@ -161,26 +161,25 @@ namespace TaskMenager.Client.Controllers
         #region API Calls
         //[Authorize(Policy = Employee)]
         //[HttpGet]
-        public async Task<IActionResult> GetDateTasksAsync(int? userId, DateTime? workDate)
-        {
-            int identityId = userId.HasValue ? userId.Value : currentUser.Id;
-            DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
+        //public async Task<IActionResult> GetDateTasksAsync(int? userId, DateTime? workDate)
+        //{
+        //    int identityId = userId.HasValue ? userId.Value : currentUser.Id;
+        //    DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
 
-            var currentEmployee = new UserTasksViewModel()
-            {
-                userId = identityId,
-                workDate = dateToProcess.Date,
-                ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
-                //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
-            };
-            foreach (var task in currentEmployee.ActiveTasks)
-            {
-                task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
-            }
+        //    var currentEmployee = new UserTasksViewModel()
+        //    {
+        //        userId = identityId,
+        //        workDate = dateToProcess.Date,
+        //        ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
+        //    };
+        //    foreach (var task in currentEmployee.ActiveTasks)
+        //    {
+        //        task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+        //    }
 
-            currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
-            return Json(new { currentEmployee });
-        }
+        //    currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
+        //    return Json(new { currentEmployee });
+        //}
         #endregion
 
     }

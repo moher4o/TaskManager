@@ -1382,7 +1382,7 @@ namespace TaskMenager.Client.Controllers
 
 
         #region API Calls
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> SetDateTasksHours(int userId, DateTime workDate, int taskId, int hours)
         {
             try
@@ -1409,7 +1409,7 @@ namespace TaskMenager.Client.Controllers
                 string result = await this.tasks.SetWorkedHoursAsync(workedHours);
                 if (result == "success")
                 {
-                    return Json(new { success = true, message = "Часовете са отразени успешно" });
+                    return Json(new { success = true, message = ("Часовете са отразени успешно" + Environment.NewLine) });
                 }
                 else
                 {
