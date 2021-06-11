@@ -14,7 +14,7 @@ namespace TaskMenager.Client.Models.Tasks
 
         [Required(ErrorMessage = "Полето е задължително")]
         [MaxLength(250)]
-        [Display(Name = "Име *")]
+        [Display(Name = "Име на новата задача *")]
         public string TaskName { get; set; }
 
         
@@ -22,7 +22,7 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Описание")]
         public string Description { get; set; }
 
-        [Display(Name = "Глобална задача(родител)")]
+        [Display(Name = "Подзадача на:")]
         public IList<SelectListItem> TaskParetns { get; set; } = new List<SelectListItem>();
 
         public int? ParentTaskId { get; set; }
@@ -54,7 +54,7 @@ namespace TaskMenager.Client.Models.Tasks
         [Display(Name = "Крайна дата")]
         public DateTime? Valid_To { get; set; } = DateTime.Now.Date.AddDays(1);
 
-        [Display(Name = "Обхват")]
+        [Display(Name = "Обхват/тип на задачата")]
         public IList<SelectListItem> TaskTypes { get; set; } = new List<SelectListItem>();
 
         public string TaskTypesId { get; set; }
@@ -74,7 +74,7 @@ namespace TaskMenager.Client.Models.Tasks
 
         //public string AssignerId { get; set; }
 
-        [Display(Name = "Изпълнител")]
+        [Display(Name = "Изпълнители")]
         public IList<SelectListItem> Employees { get; set; } = new List<SelectListItem>();
 
         [Display(Name = "Subjects")]

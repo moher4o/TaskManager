@@ -90,7 +90,7 @@
         //var selectedText = document.getElementById("workDate").value
         var selectedText = document.getElementById("workDate") == null ? new Date().toDateString() : document.getElementById("workDate").value;
         //console.log(selectedText);
-        $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+0d", inline: true });
+        $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+1d", inline: true });
         $('#dateSelector2').datepicker('setDate', new Date(selectedText));
         //$('#dateSelector2').datepicker("refresh");
         //let date2 = $('#dateSelector2').datepicker("getDate");

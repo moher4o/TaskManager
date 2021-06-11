@@ -72,6 +72,19 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult Index()
         {
+            if (this.User.Claims.Any(cl => cl.Value == "Guest"))
+            {
+                return RedirectToAction("WellCome", "Users");
+            }
+
+
+            if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
+            {
+                TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
+                return RedirectToAction("NotAuthorized", "Base");
+            }
+
+
             return View();
         }
 

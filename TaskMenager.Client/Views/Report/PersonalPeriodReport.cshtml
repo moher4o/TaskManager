@@ -80,7 +80,12 @@
         </form>
     </div>
 </div>
+<script src="~/js/core.js"></script>
+<script src="~/js/charts.js"></script>
+<script src="~/js/animated.js"></script>
+
 <script type="text/javascript">
+
     function GetData() {
         let pieData = [];
         let elements = $(".tasks").toArray();
@@ -96,18 +101,18 @@
         return pieData;
     }
 
-        am4core.ready(function () {
+    am4core.ready(function () {
 
         // Themes begin
-            am4core.useTheme(am4themes_animated);
+        am4core.useTheme(am4themes_animated);
 
         // Themes end
 
         // Create chart instance
         var chart = am4core.create("chartdiv", am4charts.PieChart);
 
-            // Add data
-            chart.data = GetData();
+        // Add data
+        chart.data = GetData();
 
 
         // Add and configure Series
@@ -116,8 +121,8 @@
         pieSeries.dataFields.category = "name";
         pieSeries.slices.template.stroke = am4core.color("#fff");
         pieSeries.slices.template.strokeWidth = 2;
-            pieSeries.slices.template.strokeOpacity = 1;
-            pieSeries.alignLabels = true;
+        pieSeries.slices.template.strokeOpacity = 1;
+        pieSeries.alignLabels = true;
 
         // This creates initial animation
         pieSeries.hiddenState.properties.opacity = 1;

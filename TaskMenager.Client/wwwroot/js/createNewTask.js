@@ -15,6 +15,8 @@
     function CheckSelectedTaskType() {
         if ($('#parentsId :selected').text() != 'Моля изберете...' && document.getElementById('taskTypesId').selectedIndex === 6) {
             document.getElementById('taskTypesId').selectedIndex = 4;    //Индекса на "Специфични задачи"  !!!!! (индексите почват от 0)    --> $('#taskTypesId :selected').text() === 'Глобална'
+            $(".multiselect").prop('disabled', false);
+            document.querySelector(".multiselect").classList.remove("disabled");
         }
         //else if ($('#parentsId :selected').text() != 'Моля изберете...' && $('#taskTypesId :selected').text() != 'Глобална'){
         //    //document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
@@ -24,17 +26,31 @@
         }
 
     }
+    function DeselectEmployees() {
+        $('#Subjects_dropdown').multiselect('deselectAll', false);
+        $('#Subjects_dropdown').multiselect('updateButtonText');
+        //$('#Subjects_dropdown').multiselect('disable');
+        //$(".multiselect").prop('disabled', true);
+        //document.querySelector(".multiselect").classList.add("disabled");
 
+    }
 
     function CheckSelectedParent() {
         if (document.getElementById('taskTypesId').selectedIndex != 6 && $('#parentsId :selected').text() === 'Моля изберете...') {    // $('#taskTypesId :selected').text() != 'Глобална'
             swal("Информация", "Изберете глобална задача(родител), преди да смените типа.", "info");
             document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
+            DeselectEmployees()
         }
         else if (document.getElementById('taskTypesId').selectedIndex === 6 && $('#parentsId :selected').text() != 'Моля изберете...') {
-                swal("Информация", "Задачите от тип \"Глобална\", не трябва да имат задача родител. Изборът на родител ще бъде нулиран.", "info");
+                swal("Информация", "Задачите от тип \"Глобална\", не трябва да имат задача родител. Изборът на родител ще бъде нулиран и назначените експерти(ако има такива) ще бъдат премахнати", "info");
             document.getElementById('parentsId').selectedIndex = 0;    //Индекса на "Моля изберете..."  !!!!! (индексите почват от 0)
+            DeselectEmployees()
         }
+        else if (document.getElementById('taskTypesId').selectedIndex != 6 && $('#parentsId :selected').text() != 'Моля изберете...') {
+            $(".multiselect").prop('disabled', false);
+            document.querySelector(".multiselect").classList.remove("disabled");
+        }
+
     }
 
     function CheckFieldsChoose() {

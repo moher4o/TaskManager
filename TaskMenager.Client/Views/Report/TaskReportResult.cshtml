@@ -88,6 +88,9 @@
         </form>
     </div>
 </div>
+<script src="~/js/core.js"></script>
+<script src="~/js/charts.js"></script>
+<script src="~/js/animated.js"></script>
 <script type="text/javascript">
     function GetData() {
         let pieData = [];
@@ -100,23 +103,23 @@
                 var person = { name: current.textContent, hours: hoursSum[i].textContent };
                 pieData.push(person);
             }
-        } 
+        }
         return pieData;
     }
 
-        am4core.ready(function () {
+    am4core.ready(function () {
 
         // Themes begin
-            am4core.useTheme(am4themes_animated);
-            
+        am4core.useTheme(am4themes_animated);
+
         // Themes end
 
         // Create chart instance
         var chart = am4core.create("chartdiv", am4charts.PieChart);
 
-            // Add data
-            chart.data = GetData();
-            
+        // Add data
+        chart.data = GetData();
+
 
         // Add and configure Series
         var pieSeries = chart.series.push(new am4charts.PieSeries());
@@ -126,7 +129,7 @@
         pieSeries.slices.template.strokeWidth = 2;
         pieSeries.slices.template.strokeOpacity = 1;
         pieSeries.alignLabels = true;
-            
+
 
         // This creates initial animation
         pieSeries.hiddenState.properties.opacity = 1;
@@ -135,11 +138,3 @@
 
     }); // end am4core.ready()
 </script>
-@section Scripts{
-    <script>
-        //$(document).ready(function () {
-        //    //GetData();
-        //});
-    </script>
-    
-}
