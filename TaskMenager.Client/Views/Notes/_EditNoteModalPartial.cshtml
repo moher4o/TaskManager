@@ -1,0 +1,29 @@
+﻿@model EditNoteViewModel
+<!-- Modal -->
+<div class="modal fade" id="add-contact" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div style="background-color:whitesmoke;" class="modal-header">
+                <label style="font-size:small;" class="modal-title" id="addContactLabel"><strong>Редакция на коментар</strong></label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="EditNote">
+                    <input asp-for="NoteId" hidden />
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <div class="form-group">
+                        <label asp-for="NoteText">Коментар до 500 символа</label>
+                         @Html.TextAreaFor(model => model.NoteText, new { @class = "form-control", placeholder = "Въведете коментар", rows = "4" })
+                        <span asp-validation-for="NoteText" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button back-small" data-dismiss="modal">Отказ</button>
+                <button type="button" class="button save-small" data-save="modal">Редакция</button>
+            </div>
+        </div>
+    </div>
+</div>

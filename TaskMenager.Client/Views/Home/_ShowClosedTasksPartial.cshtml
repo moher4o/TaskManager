@@ -10,13 +10,13 @@
         <div class="col-md-1">
             <label style="color:#e62121;">@item.TaskStatusName</label>
         </div>
-        <div class="col-md-1">
+        @*<div class="col-md-1">
             <label style="padding-left:10px;">@item.TaskPriorityName</label>
-        </div>
+        </div>*@
         <div class="col-md-1">
             <label style="padding-left:10px;">@(item.EndDate.HasValue ? item.EndDate.Value.Date.ToString("dd/MM/yyyy") : "")</label>
         </div>
-        <div class="col-md-3" style="color: #5f9fec;">
+        <div class="col-md-4" style="color: #5f9fec;">
             <div class="row" style="padding-left:15%;">
                 <div style="min-width:60px;">
                     <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">

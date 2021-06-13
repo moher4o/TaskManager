@@ -1,15 +1,18 @@
 ﻿$(() => {
     const loc = window.location.href;
     const path = loc.substr(0, loc.lastIndexOf('/') + 1);
+    let taskId = document.getElementById('taskIdNote').textContent;
     
+   
     attachEvents();
 
     function attachEvents() {
         $('#comment').on('change', function () { $("#comment").css('background-color', '#ffffff'); });
         $('#comment').on('click', function () { $("#comment").css('background-color', '#ffffff'); });
-
         $('#send').on('click', CheckFieldsChoose);
     }
+
+
 
     function CheckFieldsChoose() {
         let result = true;
@@ -21,17 +24,14 @@
         }
 
         if (result) {
-            let taskId = document.getElementById('taskIdNote').textContent;;
-            SendNote(noteText, taskId);
+            SendNote(noteText);
         }
         else {
-            toastr.error('Моля въведете коментар', { timeOut: 10000 });
+            toastr.error('Моля въведете коментар');
         }
     }
 
-    function SendNote(noteText, taskId) {
-        console.log(taskId);
-        console.log(noteText);
+    function SendNote(noteText) {
         var url = path + "addNote?text=" + noteText + "&taskId=" + taskId;
         $.ajax({
             type: "Get",
@@ -48,5 +48,6 @@
             }
         });
     }
+
 
 });

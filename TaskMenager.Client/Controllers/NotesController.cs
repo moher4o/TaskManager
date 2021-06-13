@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TaskManager.Common;
 using TaskManager.Services;
+using TaskMenager.Client.Models.Notes;
 
 namespace TaskMenager.Client.Controllers
 {
@@ -52,6 +53,55 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+        public async Task<IActionResult> EditNote(int noteId)
+        {
+            var model = new EditNoteViewModel();
+            var noteOwnerId = await this.taskNotes.GetNoteEmployeeIdAsync(noteId);
+            var permisionToEdit = ((currentUser.RoleName == DataConstants.SuperAdmin) || (currentUser.Id == noteOwnerId)) ? true : false;
+            if (permisionToEdit)
+            {
+                model.NoteId = noteId;
+                model.NoteText = await this.taskNotes.GetNoteText(noteId);
+                if (model.NoteText == "[Service Error]")
+                {
+                    TempData["Error"] = "[Service error]";
+                }
+                return PartialView("_EditNoteModalPartial", model);
+            }
+            else
+            {
+                return PartialView("_RenameDirectorateModalPartial", model);
+            }
+            
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditNote(EditNoteViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var noteOwnerId = await this.taskNotes.GetNoteEmployeeIdAsync(model.NoteId);
+                var permisionToEdit = ((currentUser.RoleName == DataConstants.SuperAdmin) || (currentUser.Id == noteOwnerId)) ? true : false;
+                if (permisionToEdit)
+                {
+                    string result = await this.taskNotes.SetNoteText(model.NoteId, model.NoteText);
+                    if (result != "success")
+                    {
+                        TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                    }
+                    return PartialView("_EditNoteModalPartial", model);
+                }
+                {
+                    return PartialView("_RenameDirectorateModalPartial", model);
+                }
+            }
+            else
+            {
+                return PartialView("_EditNoteModalPartial", model);
+            }
+            
+        }
 
 
         #region API Calls
@@ -73,8 +123,34 @@ namespace TaskMenager.Client.Controllers
             {
                 return Json(new { success = false, message = "[Service] Коментара не е добавен" });
             }
-            
         }
+
+        [Authorize(Policy = DataConstants.Employee)]
+        [HttpGet]
+        public async Task<IActionResult> DeleteNote(int noteId)
+        {
+            var noteOwnerId = await this.taskNotes.GetNoteEmployeeIdAsync(noteId);
+            var permisionToEdit = ((currentUser.RoleName == DataConstants.SuperAdmin) || (currentUser.Id == noteOwnerId)) ? true : false;
+            if (permisionToEdit)
+            {
+                bool result = await this.taskNotes.DeleteNoteAsync(noteId);
+                if (result)
+                {
+                    return Json(new { success = result, message = "Коментара е премахнат" });
+                }
+                else
+                {
+                    return Json(new { success = result, message = "[Service Error]" });
+                }
+
+            }
+            else 
+            {
+                return Json(new { success = false, message = "Липса на права за изтриване на коментара" });
+            }
+
+        }
+
 
         #endregion
 

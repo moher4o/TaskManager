@@ -9,8 +9,8 @@ const path = loc.substr(0, loc.lastIndexOf('/') + 1);
 
 
 $(document).ready(function () {
-    $('#showClosed').on('change', DeletedTasksShowOrHide);
-    $('#showDeleted').on('change', DeletedTasksShowOrHide);
+    $('#showClosed').on('click', ClosedTasksShowOrHide);
+    $('#showDeleted').on('click', DeletedTasksShowOrHide);
     loadDataTable(false, false);
     permisionType = $('#uid').val();
     empdirectorateId = $('#dirid').val();
@@ -25,26 +25,57 @@ function LoadTasksTest() {
     });
 }
 
-function DeletedTasksShowOrHide() {
-    if ($("#showClosed").prop('checked') == true && $("#showDeleted").prop('checked') == true) {
-        dataTable.destroy();
-        loadDataTable(true, true);
-    }
-    else if ($("#showClosed").prop('checked') == true && $("#showDeleted").prop('checked') == false){
+//function DeletedTasksShowOrHideOld() {
+//    if ($("#showClosed").prop('checked') == true && $("#showDeleted").prop('checked') == true) {
+//        dataTable.destroy();
+//        loadDataTable(true, true);
+//    }
+//    else if ($("#showClosed").prop('checked') == true && $("#showDeleted").prop('checked') == false){
+//        dataTable.destroy();
+//        loadDataTable(true, false);
+//    }
+//    else if ($("#showClosed").prop('checked') == false && $("#showDeleted").prop('checked') ==true) {
+//        dataTable.destroy();
+//        loadDataTable(false, true);
+//    }
+//    else if ($("#showClosed").prop('checked') == false && $("#showDeleted").prop('checked') == false) {
+//        dataTable.destroy();
+//        loadDataTable(false, false);
+//    }
+
+
+//}
+
+function ClosedTasksShowOrHide() {
+    if ($("#showClosed").prop('checked') == true) {
+        $("#showDeleted").prop('checked', false); 
         dataTable.destroy();
         loadDataTable(true, false);
+        
     }
-    else if ($("#showClosed").prop('checked') == false && $("#showDeleted").prop('checked') ==true) {
-        dataTable.destroy();
-        loadDataTable(false, true);
-    }
-    else if ($("#showClosed").prop('checked') == false && $("#showDeleted").prop('checked') == false) {
+    else {
+        $("#showDeleted").prop('checked', false); 
         dataTable.destroy();
         loadDataTable(false, false);
+        
     }
-
-
 }
+function DeletedTasksShowOrHide() {
+    if ($("#showDeleted").prop('checked') == true) {
+        $("#showClosed").prop('checked', false); 
+        dataTable.destroy();
+        loadDataTable(false, true);
+        
+    }
+    else {
+        $("#showClosed").prop('checked', false);
+        dataTable.destroy();
+        loadDataTable(false, false);
+         
+    }
+}
+
+
 function loadDataTable(getClosed, withDeleted) {
     var url = path + "getall?withClosed=" + getClosed + "&withDeleted=" + withDeleted;
      dataTable = $('#DT_load').DataTable({

@@ -48,26 +48,179 @@ namespace TaskManager.Services.Implementations
             return false;
         }
 
-        public IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withClosed = false, bool withDeleted = false)
+        public IQueryable<TaskManager.Data.Models.Task> GetAllTasks(int userId, bool withClosed = false, bool withDeleted = false)
         {
+            var currentUser = this.db.Employees.Include(e => e.Role).FirstOrDefault(u => u.Id == userId);
+
+            if (currentUser.Role.Name == SuperAdmin)
+            {
+                return GetSuperAdminTasks(withClosed, withDeleted);
+            }
+            else if (currentUser.Role.Name == DirectorateAdmin)
+            {
+                return GetDirectorateAdminTasks(withClosed, withDeleted, currentUser.DirectorateId.HasValue ? currentUser.DirectorateId.Value : 1);
+            }
+            else if (currentUser.Role.Name == DepartmentAdmin)
+            {
+                return GetDepartmentAdminTasks(withClosed, withDeleted, currentUser.DirectorateId.Value, currentUser.DepartmentId.Value);
+            }
+            else if (currentUser.Role.Name == SectorAdmin)
+            {
+                return GetSectorAdminTasks(withClosed, withDeleted, currentUser.DirectorateId.Value, currentUser.DepartmentId.Value, currentUser.SectorId.Value);
+            }
+            else
+            {
+                return GetEmployeeListTasks(withClosed, withDeleted, currentUser.Id);
+            }
+
+
+
+        }
+
+        private IQueryable<Data.Models.Task> GetEmployeeListTasks(bool withClosed, bool withDeleted, int userId)
+        {
+            var empTaskIds = this.db.EmployeesTasks
+                    .Where(wh => wh.EmployeeId == userId && !wh.isDeleted)
+                    .OrderBy(wh => wh.TaskId)
+                    .Select(wh => wh.TaskId)
+                    .Distinct()
+                    .ToList();
 
             if (withClosed)
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == withDeleted)
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id))
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
-                         .ThenBy(t => t.isDeleted)
                          .AsQueryable();
+            }
+            else if (withDeleted)
+            {
+                return this.db.Tasks
+                        .Where(t => t.isDeleted == true && empTaskIds.Contains(t.Id))
+                        .Include(te => te.AssignedExperts)
+                        .OrderBy(t => t.StatusId)
+                        .AsQueryable();
             }
             else
             {
                 return this.db.Tasks
-                        .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == withDeleted)
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id))
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.Id)
+                         .AsQueryable();
+                
+            }
+        }
+        private IQueryable<Data.Models.Task> GetSectorAdminTasks(bool withClosed, bool withDeleted, int dirId, int depId, int secId)
+        {
+            if (withClosed)
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.StatusId)
+                         .AsQueryable();
+            }
+            else if (withDeleted)
+            {
+                return this.db.Tasks
+                        .Where(t => t.isDeleted == true && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
-                        .ThenBy(t => t.isDeleted)
                         .AsQueryable();
+            }
+            else
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.Id)
+                         .AsQueryable();
+            }
+        }
+
+        private IQueryable<Data.Models.Task> GetDepartmentAdminTasks(bool withClosed, bool withDeleted, int dirId, int depId)
+        {
+            if (withClosed)
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.StatusId)
+                         .AsQueryable();
+            }
+            else if (withDeleted)
+            {
+                return this.db.Tasks
+                        .Where(t => t.isDeleted == true && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                        .Include(te => te.AssignedExperts)
+                        .OrderBy(t => t.StatusId)
+                        .AsQueryable();
+            }
+            else
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.Id)
+                         .AsQueryable();
+            }
+        }
+
+        private IQueryable<Data.Models.Task> GetDirectorateAdminTasks(bool withClosed, bool withDeleted, int dirId)
+        {
+            if (withClosed)
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null))
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.StatusId)
+                         .AsQueryable();
+            }
+            else if (withDeleted)
+            {
+                return this.db.Tasks
+                        .Where(t => t.isDeleted == true && (t.DirectorateId == dirId || t.DirectorateId == null))
+                        .Include(te => te.AssignedExperts)
+                        .OrderBy(t => t.StatusId)
+                        .AsQueryable();
+            }
+            else
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null))
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.Id)
+                         .AsQueryable();
+            }
+        }
+
+        private IQueryable<Data.Models.Task> GetSuperAdminTasks(bool withClosed, bool withDeleted)
+        {
+            if (withClosed)
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false)
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.StatusId)
+                         .AsQueryable();
+            }
+            else if (withDeleted)
+            {
+                return this.db.Tasks
+                        .Where(t => t.isDeleted == true)
+                        .Include(te => te.AssignedExperts)
+                        .OrderBy(t => t.StatusId)
+                        .AsQueryable();
+            }
+            else
+            {
+                return this.db.Tasks
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false)
+                         .Include(te => te.AssignedExperts)
+                         .OrderBy(t => t.Id)
+                         .AsQueryable();
             }
         }
 

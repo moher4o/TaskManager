@@ -37,7 +37,7 @@ namespace TaskManager.Services
         Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate);
         Task<TaskServiceModel> GetParentTaskAsync(int parentTaskId);
 
-        IQueryable<TaskManager.Data.Models.Task> GetAllTasks(bool withClosed = false, bool withDeleted = false);
+        IQueryable<TaskManager.Data.Models.Task> GetAllTasks(int userId, bool withClosed = false, bool withDeleted = false);
 
         Task<bool> CheckTaskByIdAsync(int taskId);
 

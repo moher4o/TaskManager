@@ -89,7 +89,7 @@
 
         }
 
-        @Html.HiddenFor(model => model.Id)
+        @*@Html.HiddenFor(model => model.Id)*@
         @Html.HiddenFor(model => model.DaeuAccaunt)
         @Html.HiddenFor(model => model.RoleId)
         @if (permisionType != SuperAdmin)
@@ -187,9 +187,9 @@
 
                     </div>
                     @Html.LabelFor(model => model.RepresentativeList, new { @class = "col-form-label strong" })
-                    <div class="col-md-10">
-                        @Html.DropDownListFor(a => a.RepresentativeId, Model.RepresentativeList, "Потребителя няма представител", new { @class = "form-control", id = "representativeId", name = "represantativeId" })
-                    </div>
+                <div class="col-md-10">
+                    @Html.DropDownListFor(a => a.RepresentativeId, Model.RepresentativeList, "***Без представител***", new { @class = "form-control", id = "representativeId", name = "represantativeId" })
+                </div>
 
                 </div>
             </div>
@@ -317,7 +317,9 @@
     <script src="~/js/createNewUser.js" charset="utf-8"></script>
     <script>
                $(document).ready(function () {
-                   $('#representativeId').select2();
+                   $('#representativeId').select2({
+                       width: '100%'
+                   });
                });
         </script>
 

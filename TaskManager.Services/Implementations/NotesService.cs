@@ -41,6 +41,49 @@ namespace TaskManager.Services.Implementations
             }
         }
 
+        public async Task<bool> DeleteNoteAsync(int noteId)
+        {
+            try
+            {
+                var noteToDelete = await this.db.Notes.FirstOrDefaultAsync(n => n.Id == noteId);
+                this.db.Notes.Remove(noteToDelete);
+                await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<string> GetNoteText(int noteId)
+        {
+            try
+            {
+                var noteToEdit = await this.db.Notes.FirstOrDefaultAsync(n => n.Id == noteId);
+                return noteToEdit.Text;
+            }
+            catch (Exception)
+            {
+                return "[Service Error]";
+            }
+        }
+
+        public async Task<string> SetNoteText(int noteId, string noteText)
+        {
+            try
+            {
+                var noteToEdit = await this.db.Notes.FirstOrDefaultAsync(n => n.Id == noteId);
+                noteToEdit.Text = noteText;
+                await this.db.SaveChangesAsync();
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return $"[Service Error] {ex.Message}";
+            }
+        }
+
         public async Task<TaskNotesListServiceModel> GetTaskNotesAsync(int taskId)
         {
             var taskWithNotes = await this.db.Tasks.Where(t => t.Id == taskId)
@@ -58,6 +101,12 @@ namespace TaskManager.Services.Implementations
                 .ToListAsync();
 
             return taskWithNotes;
+        }
+
+        public async Task<int> GetNoteEmployeeIdAsync(int noteId)
+        {
+            int noteEmployeeId = await this.db.Notes.Where(n => n.Id == noteId).Select(n => n.EmployeeId).FirstOrDefaultAsync();
+            return noteEmployeeId;
         }
     }
 }

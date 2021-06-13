@@ -57,7 +57,7 @@ namespace TaskMenager.Client.Models.Tasks
 
         public int? ParentTaskId { get; set; }
 
-        [Display(Name = "Задача родител: ")]
+        [Display(Name = "Подзадача на: ")]
         public string ParentTaskName { get; set; }
 
         public int OwnerId { get; set; }

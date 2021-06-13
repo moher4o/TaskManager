@@ -1427,7 +1427,7 @@ namespace TaskMenager.Client.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(bool withClosed = false, bool withDeleted = false)
         {
-            var data = this.tasks.GetAllTasks(withClosed, withDeleted)
+            var data = this.tasks.GetAllTasks(currentUser.Id, withClosed, withDeleted)
                 .ProjectTo<TasksListViewModel>()
                 .ToList();
 

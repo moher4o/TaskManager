@@ -207,8 +207,13 @@
             $('#Subjects_dropdown').multiselect({
                 maxHeight: 300
             });
-            $('#assignerId').select2();
-            $('#parentsId').select2();
+            $('#Subjects_dropdown').multiselect('disable');
+            $('#assignerId').select2({
+                width: '100%'
+            });
+            $('#parentsId').select2({
+                width: '100%'
+            });
         });
     </script>
     @await Html.PartialAsync("_ValidationScriptsPartial")

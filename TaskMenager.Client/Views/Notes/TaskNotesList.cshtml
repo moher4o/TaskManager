@@ -3,9 +3,10 @@
 @{
     ViewData["Title"] = "Коментари";
 }
-<div >
+@{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
 
-
+<div>
+    <div id="modal-placeholder"></div>
     <div id="contentcomm" style="padding-top:5px;">
         <p id="taskIdNote" hidden>@Model.Id</p>
         <div class="form-group row" style="display: flex; justify-content: center;  align-items: center;">
@@ -26,11 +27,27 @@
 
                             <address class="vcard author">
                                 @*<a class="url fn" href="../Users/UserDetails">@comment.EmployeeName</a>*@
+                                @*<div class="row">*@
                                 От <a class="url fn" href="#" style="cursor:pointer;" onclick="InfoUser(@comment.EmployeeId)">@comment.EmployeeName</a>
+                                @*</div>*@
+                                <div class="row">
+                                    @*@if (comment.EmployeeId.ToString() == (User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault()))
+                                        {
+                                            <a class="btn-link" href="#" style="cursor:pointer;" onclick="InfoUser(@comment.EmployeeId)">Изтриване</a>
+                                            <a class="url fn" href="#" style="cursor:pointer;" onclick="InfoUser(@comment.EmployeeId)">Редакция</a>
+                                        }*@
+                                </div>
                             </address>
                         </footer>
                         <div class="entry-content" style="padding-left:15px; border-left: 1px solid #eee;">
                             <p>@comment.Text</p>
+                            @if (comment.EmployeeId.ToString() == User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault() || permisionType == SuperAdmin)
+                            {
+                                <div style="display: flex; justify-content: flex-end">
+                                    <button class="btn-outline-danger" href="#" style="cursor:pointer; margin-right:5px;" onclick="DeleteNote(@comment.Id)" id="delete">Изтриване</button>
+                                    <button class="btn-outline-primary" href="#" style="cursor:pointer; margin-right:5px;" onclick="EditNote(@comment.Id)" id="edit">Редакция</button>
+                                </div>
+                            }
                         </div>
                     </article>
                 </li>
@@ -50,28 +67,80 @@
             <textarea name="comment" id="comment" rows="4" tabindex="4" required="required"></textarea>
 
             @*<input name="submit" type="submit" value="Изпрати" />*@
-            <button type="button" class="button save" id="send">Изпрати</button>
+            <button type="button" class="button save" id="send">Публикуване</button>
         </form>
-
     </div>
 </div>
-@*<script type="text/javascript">
-    function InfoUser(userId) {
-        event.preventDefault();
-        var content = document.createElement('div');
-        $.getJSON('..\\Users\\GetUserInfo\?userId=' + userId, { get_param: 'value' }, function (data) {
+<script type="text/javascript">
+    const loc = window.location.href;
+    const path = loc.substr(0, loc.lastIndexOf('/') + 1);
+    let placeholderElement = $('#modal-placeholder');
 
-            content.innerHTML = '<div style = \'text-align:left;\'><div class="row"><div class="col-md-3">N:</div><div class="col-md-4"><label><strong>' + data.data.id + '</strong></label></div></div><div class="row"><div class="col-md-3">Име:</div><div class="col-md-9"><label><strong>' + data.data.fullName + '</strong></label></div></div><div class="row"><div class="col-md-3">Длъжност:</div><div class="col-md-9"><label><strong>' + data.data.jobTitleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Email:</div><div class="col-md-9"><label><strong>' + (data.data.email ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Роля:</div><div class="col-md-9"><label><strong>' + data.data.roleName + '</strong></label></div></div><div class="row"><div class="col-md-3">Телефон:</div><div class="col-md-9"><label><strong>' + (data.data.telephoneNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Мобилен:</div><div class="col-md-9"><label><strong>' + (data.data.mobileNumber ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Дирекция:</div><div class="col-md-9"><label><strong>' + (data.data.directorateName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Отдел:</div><div class="col-md-9"><label><strong>' + (data.data.departmentName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Сектор:</div><div class="col-md-9"><label><strong>' + (data.data.sectorName ?? '<span style=\'color:red;\'>Няма информация</span>') + '</strong></label></div></div><div class="row"><div class="col-md-3">Статус:</div><div class="col-md-9"><label><strong>' + (data.data.status == "Деактивиран акаунт" ? '<span style=\'color:red;\'>Деактивиран акаунт</span>' : (data.data.status == "Активен акаунт" ? '<span style=\'color:green;\'>Активен акаунт</span>' : '<span style=\'color:lightgreen;\'>Чакащ одобрение</span>')) + '</strong></label></div></div></div>';
-
+    function EditNote(noteId) {
+        let url = path + 'EditNote?noteId=' + noteId;
+        $.get(url).done(function (data) {
+            placeholderElement.html(data);
+            placeholderElement.find('.modal').modal('show');
         });
-        swal({
-            content: content,
-            icon: "info",
-            buttons: [false, "Ok"]
-        })
+
     }
-</script>*@
+
+    function ModalAction() {
+        placeholderElement.on('click', '[data-save="modal"]', function (event) {
+            event.preventDefault();
+            let form = $(this).parents('.modal').find('form');
+            let actionUrl = form.attr('action');
+            let dataToSend = form.serialize();
+
+            $.post(actionUrl, dataToSend).done(function (data) {
+                let newBody = $('.modal-body', data);
+                placeholderElement.find('.modal-body').replaceWith(newBody);
+                let isValid = newBody.find('[name="IsValid"]').val() === 'True';
+
+                if (isValid) {
+                    placeholderElement.find('.modal').modal('hide');
+                    location.reload();
+                }
+
+            });
+        });
+    }
+
+    function DeleteNote(noteId) {
+        swal({
+            title: "Потвърждение",
+            text: "Сигурни ли сте, че искате да изтриете коментара?",
+            icon: "warning",
+            closeOnEsc: false,
+            buttons: ["Отказ", "Изтриване!"],
+            dangerMode: true
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    type: "Get",
+                    url: '../Notes/DeleteNote',
+                    data: {
+                        noteId: noteId
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            $(document).ajaxStop(function () { location.reload(true); });
+                        }
+                        else {
+                            toastr.error(data.message);
+                        }
+                    }
+                });
+            }
+        });
+    }
+</script>
 @section Scripts{
     <script src="~/js/notes.js" charset="utf-8"></script>
+    <script>
+        $(document).ready(function () {
+            ModalAction();
+        });
+    </script>
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }
