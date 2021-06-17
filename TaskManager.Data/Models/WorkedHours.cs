@@ -19,7 +19,7 @@ namespace TaskManager.Data.Models
 
         public int HoursSpend { get; set; }
 
-        [MaxLength(250)]
+        [MaxLength(500)]
         public string Text { get; set; }
 
         public bool isDeleted { get; set; } = false;

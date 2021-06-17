@@ -20,5 +20,7 @@ namespace TaskManager.Services.Models.ReportModels
 
         public int? TaskWorkedHours { get; set; }
 
+        public string UserNotesForPeriod { get; set; }
+
     }
 }

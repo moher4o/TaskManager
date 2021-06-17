@@ -33,7 +33,7 @@ namespace TaskManager.Services.Implementations
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(int userId, DateTime dateToProcess)
         {
             var tasks = await this.db.EmployeesTasks
-                    .Where(et => et.EmployeeId == userId && et.isDeleted == false)
+                    .Where(et => et.EmployeeId == userId)
                     .Select(t => t.Task)
                     .Where(t => t.isDeleted == false && t.StartDate.Date <= dateToProcess.Date)
                     .Distinct()
@@ -41,6 +41,14 @@ namespace TaskManager.Services.Implementations
                     .ThenByDescending(t => t.EndDatePrognose)
                     .ProjectTo<TaskFewInfoServiceModel>(new { currentEmployeeId = userId, workDate = dateToProcess.Date })
                     .ToListAsync();
+
+            foreach (var item in tasks)
+            {
+                if (await this.db.EmployeesTasks.Where(et => et.EmployeeId == userId && et.TaskId == item.Id).Select(et => et.isDeleted).FirstOrDefaultAsync() == true && item.TaskStatusName != TaskStatusClosed)
+                {
+                    item.TaskStatusName = "Изтрит";
+                }
+            }
 
             return tasks;
         }

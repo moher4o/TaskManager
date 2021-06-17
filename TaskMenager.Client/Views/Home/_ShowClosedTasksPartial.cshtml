@@ -8,7 +8,7 @@
             <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
         </div>
         <div class="col-md-1">
-            <label style="color:#e62121;">@item.TaskStatusName</label>
+            <label style="color:#e62121; padding-left:10px;">@item.TaskStatusName</label>
         </div>
         @*<div class="col-md-1">
             <label style="padding-left:10px;">@item.TaskPriorityName</label>
@@ -32,8 +32,24 @@
                         <span class="notificationsTodayCountValue" @(item.FilesCount > 0 ? "" : "hidden")>@item.FilesCount</span>
                     </a>
                 </div>
-                <div style="min-width:60px;"></div>
-                <label style="cursor:pointer; font-size:large;"><strong>@(item.EmployeeHours > 0 ? item.EmployeeHours.ToString() : "")</strong></label>
+                <div style="min-width:60px; max-height:35px;">
+                    <div class="center">
+
+                        <div class="input-group">
+                            <input style="font-size:large; text-align:center; max-height:33px; font-weight:600; color:@(item.EmployeeHoursToday > 0 ? "red;" : "dodgerblue")" type="text" name="@item.Id" class="form-control input-number" value="@item.EmployeeHoursToday" min="0" max="16" readonly>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Modal placeholder -->
+                @*<div id="modal-placeholder"></div>*@
+                <!-- Button trigger modal -->
+                <a title="Бележка по задачата за текущата дата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:15px;"
+                    data-balloon-length="xlarge" aria-label="@item.TaskNoteForToday" data-balloon-pos="left">
+                    <img class="chatnotifications2" src="~/png/orange-speech-balloon2.png" />
+                    <span class="notificationsTodayCountValue" @(item.TaskNoteForToday != null ? "" : "hidden")>1</span>
+                </a>
+
             </div>
             </div>
     </div>

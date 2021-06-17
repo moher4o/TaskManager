@@ -48,5 +48,8 @@ namespace TaskManager.Services
         IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId);
 
         Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate);
+
+        Task<AddNoteToTaskServiceModel> GetTaskEmpNoteForDateAsync(int taskId, int empId, DateTime workDate);
+        Task<bool> SetTaskEmpNoteForDateAsync(AddNoteToTaskServiceModel model);
     }
 }

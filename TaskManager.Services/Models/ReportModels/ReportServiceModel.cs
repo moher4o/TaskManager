@@ -54,7 +54,9 @@ namespace TaskManager.Services.Models.ReportModels
                                                                DepartmentId = e.Employee.DepartmentId,
                                                                SectorId = e.Employee.SectorId,
                                                                TaskWorkedHours = e.Employee.WorkedHoursByTask
-                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date).Sum(wh => wh.HoursSpend)
+                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date).Sum(wh => wh.HoursSpend),
+                                                               UserNotesForPeriod = string.Join(" | ", e.Employee.WorkedHoursByTask
+                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date && !string.IsNullOrEmpty(t.Text)).Select(wh => wh.Text).ToArray())
                                                            })
                                                            .ToList()));
         }

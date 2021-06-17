@@ -63,10 +63,16 @@
 }
 
 .chatnotifications3 {
-    width: 35px;
+    width: 30px;
     height: 25px;
     background-color: transparent;
 }
+
+.chatnotifications4 {
+    width: 25px;
+    height: 20px;
+}
+
 
 .notificationsMenu {
     position: relative;

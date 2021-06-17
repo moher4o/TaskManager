@@ -662,6 +662,10 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
                             worksheet.Cells[2, column].Value = "Брой служители на задача";
+                            column += 1;
+                            worksheet.Cells[2, column].Style.WrapText = true;
+                            worksheet.Cells[2, column].Value = "Коментари по задачата";
+
 
                             worksheet.Cells[1, 1, 1, column].Merge = true;
                             worksheet.Row(1).Height = 25;
@@ -712,12 +716,17 @@ namespace TaskMenager.Client.Controllers
                                 worksheet.Cells[row, 5].Value = task.Description;
 
                                 taskExpertsColumn = 6;
+                                var allExpertsNotes = string.Empty;
                                 foreach (var eId in expertsInDepWithNoSectorIds)
                                 {
                                     var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
                                     if (curentColegue != null)
                                     {
                                         worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
+                                        if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
+                                        {
+                                            allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
+                                        }
                                     }
                                     taskExpertsColumn += 1;
                                 }
@@ -731,6 +740,10 @@ namespace TaskMenager.Client.Controllers
                                 worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
+
+                                worksheet.Column(taskExpertsColumn + 2).Width = 80;
+                                worksheet.Cells[row, taskExpertsColumn + 2].Style.WrapText = true;
+                                worksheet.Cells[row, taskExpertsColumn + 2].Value = allExpertsNotes;    //коментарите по задачата
 
                                 if (task.TaskTypeName == TaskTypeSpecificWork)
                                 {
@@ -1004,6 +1017,9 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
                             worksheet.Cells[2, column].Value = "Брой служители на задача";
+                            column += 1;
+                            worksheet.Cells[2, column].Style.WrapText = true;
+                            worksheet.Cells[2, column].Value = "Коментари по задачата";
 
                             worksheet.Cells[1, 1, 1, column].Merge = true;
                             worksheet.Row(1).Height = 25;
@@ -1054,12 +1070,17 @@ namespace TaskMenager.Client.Controllers
                                 worksheet.Cells[row, 5].Value = task.Description;
 
                                 taskExpertsColumn = 6;
+                                var allExpertsNotes = string.Empty;
                                 foreach (var eId in expertsInSector)
                                 {
                                     var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
                                     if (curentColegue != null)
                                     {
                                         worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
+                                        if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
+                                        {
+                                            allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
+                                        }
                                     }
                                     taskExpertsColumn += 1;
                                 }
@@ -1074,6 +1095,10 @@ namespace TaskMenager.Client.Controllers
 
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
+
+                                worksheet.Column(taskExpertsColumn + 2).Width = 80;
+                                worksheet.Cells[row, taskExpertsColumn + 2].Style.WrapText = true;
+                                worksheet.Cells[row, taskExpertsColumn + 2].Value = allExpertsNotes;    //коментарите по задачата
 
                                 if (task.TaskTypeName == TaskTypeSpecificWork)
                                 {

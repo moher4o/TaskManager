@@ -56,34 +56,43 @@ namespace TaskMenager.Client.Controllers
                 if (currentTask != null)
                 {
                     string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value, "/TaskManager");
-                    
+                    //string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value);
+                    var userSetingsLink = "/Users/EditUser?userId=" + currentUser.Id.ToString();
+                    userSetingsLink = string.Concat("<a href=\"",host, userSetingsLink, "\">", "Отписване", "</a>");
+                    string logo = host + "/gif/logo.gif";
+                    var taskLink = host + "/Tasks/TaskDetails?taskId=" + taskId.ToString();
                     var emailForm = string.Empty;
                     if (_emailType == EmailType.Note)
                     {
+                        
                         var notesLink = host + "/Notes/TaskNotesList?taskId=" + taskId.ToString();
                         emailForm = string.Format(
                                                    NotificationTemplate,
-                                                   //string.Concat("г-н/г-жо/г-це ", currentTask.AssignerName.Substring(currentTask.AssignerName.LastIndexOf(' ')+1)),
                                                    string.Concat("<a href=\"", notesLink, "\">", currentTask.TaskName, "</a>"),
-                                                   host
+                                                   host,
+                                                   logo,
+                                                   userSetingsLink
                                                    );
                     }
                     else if (_emailType == EmailType.Create)
                     {
-                        var taskLink = host + "/Tasks/TaskDetails?taskId=" + taskId.ToString();
+                        
                         emailForm = string.Format(
                                                    CreateTemplate,
                                                    string.Concat("<a href=\"", taskLink, "\">", currentTask.TaskName, "</a>"),
-                                                   host
+                                                   host,
+                                                   logo,
+                                                   userSetingsLink
                                                    );
                     }
                     else if (_emailType == EmailType.Close)
                     {
-                        var taskLink = host + "/Tasks/TaskDetails?taskId=" + taskId.ToString();
                         emailForm = string.Format(
                                                    CloseTemplate,
                                                    string.Concat("<a href=\"", taskLink, "\">", currentTask.TaskName, "</a>"),
-                                                   host
+                                                   host,
+                                                   logo,
+                                                   userSetingsLink
                                                    );
                     }
 
@@ -146,13 +155,19 @@ namespace TaskMenager.Client.Controllers
                 if (currentTask != null)
                 {
                     string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value, "/TaskManager");
+                    //string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value);
+                    var userSetingsLink = "/Users/EditUser?userId=" + currentUser.Id.ToString();
+                    userSetingsLink = string.Concat("<a href=\"", host, userSetingsLink, "\">", "Отписване", "</a>");
+                    string logo = host + "/gif/logo.gif";
 
                     var emailForm = string.Empty;
                         var taskLink = host + "/Tasks/TaskDetails?taskId=" + taskId.ToString();
                         emailForm = string.Format(
                                                    AddColeaguesTemplate,
                                                    string.Concat("<a href=\"", taskLink, "\">", currentTask.TaskName, "</a>"),
-                                                   host
+                                                   host,
+                                                   logo,
+                                                   userSetingsLink
                                                    );
                     var emailAddressesToSent = currentTask.Colleagues
                             .Where(e => e.isDeleted == false && !string.IsNullOrWhiteSpace(e.Email) && e.Notify)

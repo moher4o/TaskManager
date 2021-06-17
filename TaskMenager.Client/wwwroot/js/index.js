@@ -17,16 +17,24 @@
     AddDatePicker();
     GetDominions();
 
+    $(function () { //jQuery shortcut for .ready (ensures DOM ready)
+        GetUserTaskForDate();
+        $('#divbtnZapis').show();
+        //onclick евент за бутон Запис
+        $('#btnZapis').on('click', UpdateHours);
+
+    });
+
     function CheckMaxHours() {
         var totalMaxHours = document.getElementById("maxHours") == null ? 16 : parseInt(document.getElementById("maxHours").value);
         //var currentTotal = document.getElementById("totalLabel") == null ? 16 : parseInt(document.getElementById("totalLabel").textContent);
         var sum = parseInt(0);
         $('.PrimeBox3').each(function () {
             let currenttaskId = $(this).attr('id');
-            if (currenttaskId != 'closedTask') {
+            //if (currenttaskId != 'closedTask') {
                 let todayhours = parseInt($(this).find('input').first().val());
                 sum = sum + todayhours;
-            }
+            //}
         });
         if (sum > totalMaxHours) {
             return false;
@@ -147,7 +155,8 @@
                 });
                 //функцията добавя елемента за отчитане на часовете
                 AddHoursCounter();
-
+                //функцията добавя балончето за бележки
+                attachEvents();
             }
         });
     }
@@ -203,13 +212,45 @@
         }, 1200);
     }
 
-    $(function () { //jQuery shortcut for .ready (ensures DOM ready)
-        GetUserTaskForDate();
-        $('#divbtnZapis').show();
-        //onclick евент за бутон Запис
-        $('#btnZapis').on('click', UpdateHours);
-    });
+    function attachEvents() {
 
+        let placeholderElement = $('#modal-placeholder');
+        $('a[data-toggle="ajax-modal"]').click(function (event) {
+            var currentUrl = path + '\\Tasks\\AddDateNote';
+            let newDate = $('#dateSelector2').datepicker("getDate");
+            let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+            let url = currentUrl + '?taskId=' + $(this).data('taskid') + '&userId=' + bossUserId + '&taskName=' + $(this).data('taskname') + '&workDate=' + newDate.toUTCString();
+            $.get(url).done(function (data) {
+                placeholderElement.html(data);
+                placeholderElement.find('.modal').modal('show');
+            });
+        });
+
+        placeholderElement.on('click', '[data-save="modal"]', function (event) {
+            event.preventDefault();
+            let form = $(this).parents('.modal').find('form');
+            let actionUrl = form.attr('action');
+            let dataToSend = form.serialize();
+
+            $.post(actionUrl, dataToSend).done(function (data) {
+                let newBody = $('.modal-body', data);
+                placeholderElement.find('.modal-body').replaceWith(newBody);
+                let isValid = newBody.find('[name="IsValid"]').val() === 'True';
+
+                if (isValid) {
+                    
+                    placeholderElement.find('.modal').modal('hide');
+                    //setTimeout(function () {
+                    //GetUserTaskForDate();
+                    //}, 1500);
+                    //location.reload();
+                    
+                }
+
+            });
+        });
+
+    }
 
     function AddHoursCounter() {
         /////////////////////

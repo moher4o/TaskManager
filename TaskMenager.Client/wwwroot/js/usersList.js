@@ -97,6 +97,7 @@ function loadDataTable(deleted, notActivated) {
                 }, "width": "13%"
             }
         ],
+        "iDisplayLength": 25,
         "language": {
             "emptyTable": "Няма потребители отговарящи на условието"
         },

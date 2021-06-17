@@ -511,6 +511,42 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+        public async Task<IActionResult> AddDateNote(int taskId, int userId, string taskName, DateTime workDate)
+        {
+            var currentNote = await this.tasks.GetTaskEmpNoteForDateAsync(taskId, userId, workDate);
+            if (currentNote == null)
+            {
+                var model = new AddNoteToTaskServiceModel()
+                {
+                    TaskId = taskId,
+                    EmployeeId = userId,
+                    TaskName = taskName,
+                    WorkDate = workDate.Date
+                };
+                return PartialView("_AddNoteModalPartial", model);
+            }
+            return PartialView("_AddNoteModalPartial", currentNote);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddDateNote(AddNoteToTaskServiceModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return PartialView("_AddNoteModalPartial", model);
+            }
+            bool result = await this.tasks.SetTaskEmpNoteForDateAsync(model);
+
+            if (!result)
+            {
+                TempData["Error"] = "[AddDateNote] Сървиз грешка! Уведомете администратора.";
+            }
+            return PartialView("_AddNoteModalPartial", model);
+        }
+
+
+
         public IActionResult CloseTask(int taskId, string taskName)
         {
             var model = new CloseTaskViewModel();

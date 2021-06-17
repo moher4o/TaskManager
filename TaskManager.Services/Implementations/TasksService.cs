@@ -109,7 +109,7 @@ namespace TaskManager.Services.Implementations
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
-                
+
             }
         }
         private IQueryable<Data.Models.Task> GetSectorAdminTasks(bool withClosed, bool withDeleted, int dirId, int depId, int secId)
@@ -534,6 +534,49 @@ namespace TaskManager.Services.Implementations
         public int TasksTypesCount()
         {
             return this.db.TasksTypes.Count();
+        }
+
+        public async Task<AddNoteToTaskServiceModel> GetTaskEmpNoteForDateAsync(int taskId, int empId, DateTime workDate)
+        {
+            var note = await this.db.WorkedHours
+                .Where(wh => wh.TaskId == taskId && wh.EmployeeId == empId && wh.WorkDate.Date == workDate.Date)
+                .ProjectTo<AddNoteToTaskServiceModel>()
+                .FirstOrDefaultAsync();
+            return note;
+        }
+
+        public async Task<bool> SetTaskEmpNoteForDateAsync(AddNoteToTaskServiceModel model)
+        {
+            try
+             {
+                var employeeDateWork = await this.db.WorkedHours
+                    .Where(wh => wh.TaskId == model.TaskId && wh.EmployeeId == model.EmployeeId && wh.WorkDate.Date == model.WorkDate.Date)
+                    .FirstOrDefaultAsync();
+
+                if (employeeDateWork == null)
+                {
+                    var newEmployeeDateWork = new WorkedHours()
+                    {
+                        EmployeeId = model.EmployeeId,
+                        TaskId = model.TaskId,
+                        HoursSpend = 0,
+                        isDeleted = false,
+                        Text = model.Text,
+                        WorkDate = model.WorkDate.Date
+                    };
+                    await this.db.WorkedHours.AddAsync(newEmployeeDateWork);
+                }
+                else
+                {
+                    employeeDateWork.Text = model.Text;
+                }
+                await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<string> SetWorkedHoursAsyncOld(TaskWorkedHoursServiceModel workedHours)

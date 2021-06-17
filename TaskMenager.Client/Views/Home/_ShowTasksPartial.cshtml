@@ -23,7 +23,7 @@
         <partial name="_IndexHead" />
         <div style="min-height:600px; max-height:601px !important; overflow:auto;" id="taskList">
             @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@
-            @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed))
+            @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskStatusName != "Изтрит"))
             {
                 <div class="row PrimeBox3" style="margin-top:5px; font-size:small;" id=@(item.Id)>
                     @{var name = item.TaskName.Length > 90 ? (item.TaskName).Substring(0, 90) + "..." : item.TaskName;}
@@ -42,7 +42,7 @@
                     <div class="col-md-4" style="color: #5f9fec;">
                         <div class="row" style="padding-left:15%;">
                             <div style="min-width:60px;">
-                                <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
+                                <a title="Форум на задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
                                     <img class="chatnotifications" src="~/png/note.png" />
                                     <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
                                 </a>
@@ -56,15 +56,6 @@
                                 </a>
                             </div>
                             <div style="min-width:60px; max-height:35px;">
-                                @*<a asp-controller="Tasks" asp-action="AddWorkHours"
-                                       asp-route-taskName="@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)"     style="display: flex; justify-content: center; align-items: center;"
-                                       asp-route-taskId="@item.Id"
-                                       asp-route-employeeId="@Model.userId">
-                                        <img class="chatnotifications" src="~/png/3DClock.png" />
-                                        <span title="Отчетени часове за текущия ден" class="notificationsTodayCountValue" @(item.EmployeeHoursToday > 0 ? "" : "hidden")>@item.EmployeeHoursToday</span>
-                                        <span title="Отчетени часове" class="notificationsCountValue" @(item.EmployeeHoursToday > 0 ? "hidden" : "")>@item.EmployeeHours</span>
-                                    </a>*@
-                                @*<label style="cursor:pointer; font-size:large;"><strong>@(item.EmployeeHoursToday > 0 ? item.EmployeeHoursToday.ToString() : "")</strong></label>*@
                                 <div class="center">
 
                                     <div class="input-group">
@@ -80,9 +71,22 @@
                                             </button>
                                         </span>
                                     </div>
-
                                 </div>
+
                             </div>
+                            @*<div style="padding-left:15px; cursor:pointer;" title="Бележка по задачата за текущата дата">
+                                    <img class="chatnotifications4" src="~/png/orange-speech-balloon2.png" />
+                                    <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
+                                </div>*@
+                            <!-- Modal placeholder -->
+                            <div id="modal-placeholder"></div>
+                            <!-- Button trigger modal -->
+                            <a title="Бележка по задачата за текущата дата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:15px;"
+                               data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("AddDateNote")" data-taskid="@item.Id" data-taskname="@item.TaskName" data-balloon-length="xlarge" aria-label="@item.TaskNoteForToday" data-balloon-pos="down-right">
+                                <img class="chatnotifications2" src="~/png/orange-speech-balloon2.png"/>
+                                <span class="notificationsTodayCountValue" @(item.TaskNoteForToday != null ? "" : "hidden")>1</span>
+                            </a>
+
 
                         </div>
                     </div>
@@ -90,7 +94,7 @@
                 </div>
             }
             <div class="displayno" id="showclosedTasks">
-                <partial name="_ShowClosedTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName == TaskStatusClosed)" />
+                <partial name="_ShowClosedTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName == TaskStatusClosed || t.TaskStatusName == "Изтрит")" />
             </div>
         </div>
     </div>

@@ -34,6 +34,8 @@ namespace TaskManager.Services.Models.TaskModels
 
         public int FilesCount { get; set; }
 
+        public string TaskNoteForToday { get; set; }
+
         IEnumerable<SelectServiceModel> Colleagues { get; set; } = new List<SelectServiceModel>();
 
         
@@ -60,7 +62,11 @@ namespace TaskManager.Services.Models.TaskModels
                                                                                 .Sum(hr => hr.HoursSpend)))
                    .ForMember(u => u.EmployeeHours, cfg => cfg.MapFrom(s => s.WorkedHours
                                                                                 .Where(hr => hr.EmployeeId == currentEmployeeId)
-                                                                                .Sum(hr => hr.HoursSpend)));
+                                                                                .Sum(hr => hr.HoursSpend)))
+                   .ForMember(u => u.TaskNoteForToday, cfg => cfg.MapFrom(s => s.WorkedHours
+                                                                                .Where(d => d.WorkDate.Date == workDate.Date && d.EmployeeId == currentEmployeeId)
+                                                                                .Select(hr => hr.Text)
+                                                                                .FirstOrDefault()));
         }
     }
 }

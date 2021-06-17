@@ -1,0 +1,28 @@
+﻿@model AddNoteToTaskServiceModel
+<!-- Modal -->
+<div class="modal fade" id="add-contact" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div style="background-color:whitesmoke;" class="modal-header">
+                <label style="font-size:small; color:black;" class="modal-title" id="addContactLabel">Бележка по избраната задача <strong>@(Model.TaskName == null ? "" : Model.TaskName)</strong> за дата <strong>@Model.WorkDate.Date.ToString("dd/MM/yyyy")</strong></label>
+            </div>
+            <div class="modal-body">
+                <form asp-action="AddDateNote">
+                    @Html.HiddenFor(model => model.EmployeeId)
+                    @Html.HiddenFor(model => model.TaskId)
+                    @Html.HiddenFor(model => model.WorkDate)
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <div class="form-group">
+                        <label style="color: black;" asp-for="Text">Текст до 500 символа</label>
+                        @Html.TextAreaFor(model => model.Text, new { @class = "form-control", rows = "7" })
+                        <span asp-validation-for="Text" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button back-small" data-dismiss="modal">Отказ</button>
+                <button type="button" class="button save-small" data-save="modal">Запис</button>
+            </div>
+        </div>
+    </div>
+</div>

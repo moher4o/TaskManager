@@ -49,22 +49,26 @@ namespace TaskManager.Common
 
 
         //Email настройки        
-        public const string FromEmailString = "";
+        public const string FromEmailString = "noreplay-taskmanager@e-gov.bg";
 
         public const string NotificationTemplate = @"
                             <div class=""col-md-offset-1"">
                             <p>Здравейте,  </p>
                             <p>Добавен е коментар по задача: <p> {0}</p></p>
+                            <p>За вход в системата, ползвайте домейнския си акаунт и парола</p>
                             </div>
 
                             <div>
                             <table>
                                 <tbody>
                                     <tr>
+                                        <td><img src=""{2}"" alt=""Useful alt text"" width=""70"" height=""100"" border=""0"" style=""border:0; outline:none; text-decoration:none; display:block;"">
+                                        </td>
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
                                                 <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -77,16 +81,19 @@ namespace TaskManager.Common
                             <div class=""col-md-offset-1"">
                             <p>Здравейте,  </p>
                             <p>Създадена е задача: <p> {0}</p> в която сте участник</p>
+                            <p>За вход в системата, ползвайте домейнския си акаунт и парола</p>
                             </div>
-
                             <div>
                             <table>
                                 <tbody>
                                     <tr>
+                                        <td><img src=""{2}"" alt=""Useful alt text"" width=""70"" height=""100"" border=""0"" style=""border:0; outline:none; text-decoration:none; display:block;"">
+                                        </td>
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
                                                 <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -99,16 +106,20 @@ namespace TaskManager.Common
                             <div class=""col-md-offset-1"">
                             <p>Здравейте,  </p>
                             <p>Включен/а сте в задача: <p> {0}</p></p>
+                            <p>За вход в системата, ползвайте домейнския си акаунт и парола</p>
                             </div>
 
                             <div>
                             <table>
                                 <tbody>
                                     <tr>
+                                        <td><img src=""{2}"" alt=""Useful alt text"" width=""70"" height=""100"" border=""0"" style=""border:0; outline:none; text-decoration:none; display:block;"">
+                                        </td>
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
                                                 <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -122,16 +133,20 @@ namespace TaskManager.Common
                             <div class=""col-md-offset-1"">
                             <p>Здравейте,  </p>
                             <p>Задача: <p> {0}</p> в която сте участник е приключена</p>
+                            <p>За вход в системата, ползвайте домейнския си акаунт и парола</p>
                             </div>
 
                             <div>
                             <table>
                                 <tbody>
                                     <tr>
+                                        <td><img src=""{2}"" alt=""Useful alt text"" width=""70"" height=""100"" border=""0"" style=""border:0; outline:none; text-decoration:none; display:block;"">
+                                        </td>
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
                                                 <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>
                                     </tr>

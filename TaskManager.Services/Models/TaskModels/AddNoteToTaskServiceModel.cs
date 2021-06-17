@@ -8,7 +8,7 @@ using TaskManager.Data.Models;
 
 namespace TaskManager.Services.Models.TaskModels
 {
-    public class TaskWorkedHoursServiceModel : IMapFrom<WorkedHours>, IHaveCustomMapping
+    public class AddNoteToTaskServiceModel : IMapFrom<WorkedHours>, IHaveCustomMapping
     {
         public int TaskId { get; set; }
 
@@ -20,18 +20,16 @@ namespace TaskManager.Services.Models.TaskModels
 
         public DateTime WorkDate { get; set; }
 
-        public int HoursSpend { get; set; }
-
         [MaxLength(500)]
+        [Required(ErrorMessage = "Полето е задължително")]
         public string Text { get; set; }
-
-        public bool isDeleted { get; set; } = false;
 
         public void ConfigureMapping(Profile profile)
         {
-            profile.CreateMap<WorkedHours, TaskWorkedHoursServiceModel>()
+            profile.CreateMap<WorkedHours, AddNoteToTaskServiceModel>()
                               .ForMember(u => u.TaskName, cfg => cfg.MapFrom(s => s.Task.TaskName))
                               .ForMember(u => u.EmployeeName, cfg => cfg.MapFrom(s => s.Employee.FullName));
         }
+                
     }
 }

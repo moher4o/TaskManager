@@ -182,6 +182,8 @@ function loadDataTable(getClosed, withDeleted) {
                  "visible": false
              },
          ],
+         "order": [[10, 'asc']],
+         "iDisplayLength": 25,
         "language": {
             "emptyTable": "Няма такива задачи"
         },
