@@ -140,19 +140,19 @@ namespace TaskMenager.Client.Controllers
                 }
                 else if (currentUser.RoleName == SectorAdmin)
                 {
-                    employeesIds = this.employees.GetEmployeesNamesBySectorWithDeletedAsync(currentUser.SectorId).Result
+                    employeesIds = this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId).Result
                                                         .Select(e => e.Id)
                                                         .ToList();
                 }
                 else if (currentUser.RoleName == DepartmentAdmin)
                 {
-                    employeesIds = this.employees.GetEmployeesNamesByDepartmentWithDeletedAsync(currentUser.DepartmentId).Result
+                    employeesIds = this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId).Result
                                                         .Select(e => e.Id)
                                                         .ToList();
                 }
                 else if (currentUser.RoleName == DirectorateAdmin)
                 {
-                    employeesIds = this.employees.GetEmployeesNamesByDirectorateWithDeletedAsync(currentUser.DirectorateId).Result
+                    employeesIds = this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId).Result
                                                         .Select(e => e.Id)
                                                         .ToList();
                 }
@@ -575,6 +575,7 @@ namespace TaskMenager.Client.Controllers
                 };
                 if (directorate.Id == 0)
                 {
+                    directorate.Id = 1;
                     // TODO справката е за експерти назначени в дирекции, вкл директора, не се вкл председател, секретар, заместник председатели, затова не е необходима тази проверка
                 }
                 directorate.TextValue = this.directorates.GetDirectoratesNames(directorate.Id).FirstOrDefault().TextValue;   //дирекцията за която ще е отчета

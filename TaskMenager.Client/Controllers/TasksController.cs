@@ -620,7 +620,7 @@ namespace TaskMenager.Client.Controllers
                 newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
 
                 ////////
-                var data = this.employees.GetEmployeesNamesBySector(currentUser.SectorId);
+                var data = await this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId);
                 var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                 var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
@@ -644,7 +644,7 @@ namespace TaskMenager.Client.Controllers
                 //    Value = "0",
                 //    Selected = true
                 //});
-                newTask.Employees = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                newTask.Employees = this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId).Result
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -688,7 +688,7 @@ namespace TaskMenager.Client.Controllers
                 });
 
                 ////////
-                var data = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId);
+                var data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
                 var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                 var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
@@ -714,7 +714,7 @@ namespace TaskMenager.Client.Controllers
                 //    Value = "0",
                 //    Selected = true
                 //});
-                newTask.Employees = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId)
+                newTask.Employees = this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId).Result
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -754,7 +754,7 @@ namespace TaskMenager.Client.Controllers
                 });
 
                 ////////
-                var data = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId);
+                var data = await this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId);
                 var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                 var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
@@ -780,7 +780,7 @@ namespace TaskMenager.Client.Controllers
                 //    Value = "0",
                 //    Selected = true
                 //});
-                newTask.Employees = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId)
+                newTask.Employees = this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId).Result
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -930,7 +930,7 @@ namespace TaskMenager.Client.Controllers
                     newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
 
                     ////////
-                    var data = this.employees.GetEmployeesNamesBySector(currentUser.SectorId);
+                    var data = await this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId);
                     var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                     var dropdownList = new SelectList(data.Select(item => new SelectListItem
                     {
@@ -962,7 +962,7 @@ namespace TaskMenager.Client.Controllers
                 else
                 {
                     ////////
-                    var data = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId);
+                    var data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
                     var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                     var dropdownList = new SelectList(data.Select(item => new SelectListItem
                     {
@@ -1023,7 +1023,7 @@ namespace TaskMenager.Client.Controllers
                                                    .ToList();
                 newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
                 ////////
-                var data = this.employees.GetEmployeesNamesBySector(currentUser.SectorId);
+                var data = await this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId);
                 var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                 var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
@@ -1044,7 +1044,7 @@ namespace TaskMenager.Client.Controllers
                 //                                   })
                 //                                   .ToList();
 
-                newTask.Employees = this.employees.GetEmployeesNamesBySector(currentUser.SectorId)
+                newTask.Employees = this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId).Result
                                                    .Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
@@ -1097,7 +1097,7 @@ namespace TaskMenager.Client.Controllers
                     newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
                 }
                 ////////
-                var data = this.employees.GetEmployeesNamesByDepartment(currentUser.DepartmentId);
+                var data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
                 var sectors = data.GroupBy(x => x.SectorName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                 var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {
@@ -1191,7 +1191,7 @@ namespace TaskMenager.Client.Controllers
 
                 }
                 ////////
-                var data = this.employees.GetEmployeesNamesByDirectorate(currentUser.DirectorateId);
+                var data = await this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId);
                 var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                 var dropdownList = new SelectList(data.Select(item => new SelectListItem
                 {

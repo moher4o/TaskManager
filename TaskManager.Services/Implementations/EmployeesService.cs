@@ -212,13 +212,13 @@ namespace TaskManager.Services.Implementations
         }
 
 
-        public IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId)
+        public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDepartmentAsync(int? departmentId)
         {
             if (departmentId == null)
             {
                 return null;
             }
-            var names = this.db.Employees
+            var names = await this.db.Employees
                 .Where(c => c.isDeleted == false && c.DepartmentId == departmentId && c.isActive == true)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
@@ -230,7 +230,7 @@ namespace TaskManager.Services.Implementations
                     SectorName = d.Sector.SectorName
 
                 })
-                .ToList();
+                .ToListAsync();
             return names;
         }
         public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDepartmentWithDeletedAsync(int? departmentId)
@@ -255,13 +255,13 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
-        public IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId)
+        public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDirectorateAsync(int? directorateId)
         {
             if (directorateId == null)
             {
                 return null;
             }
-            var names = this.db.Employees
+            var names = await this.db.Employees
                 .Where(c => c.isDeleted == false && c.DirectorateId == directorateId && c.isActive == true)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
@@ -273,7 +273,7 @@ namespace TaskManager.Services.Implementations
                     SectorName = d.Sector.SectorName
 
                 })
-                .ToList();
+                .ToListAsync();
             return names;
         }
 
@@ -299,13 +299,13 @@ namespace TaskManager.Services.Implementations
             return names;
         }
 
-        public IEnumerable<SelectServiceModel> GetEmployeesNamesBySector(int? sectorId)
+        public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesBySectorAsync(int? sectorId)
         {
             if (sectorId == null)
             {
                 return null;
             }
-            var names = this.db.Employees
+            var names = await this.db.Employees
                 .Where(c => c.isDeleted == false && c.SectorId == sectorId && c.isActive == true)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
@@ -317,7 +317,7 @@ namespace TaskManager.Services.Implementations
                     SectorName = d.Sector.SectorName
 
                 })
-                .ToList();
+                .ToListAsync();
             return names;
         }
         public async Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesBySectorWithDeletedAsync(int? sectorId)
