@@ -27,7 +27,8 @@ namespace TaskManager.Common
         public const string TaskTypeMeetings = "Работни групи и Комисии";
         public const string TaskTypeOther = "Други дейности";
         public const string TaskTypeGlobal = "Глобална";
-        public const int TasksTypesCount = 7; // броя на типовете по-горе  !!!
+        public const string TaskTypeSystem = "Системен тип";
+        public const int TasksTypesCount = 8; // броя на типовете по-горе  !!!
 
         public const string TaskPriorityLow = "Нисък";
         public const string TaskPriorityNormal = "Нормален";
@@ -42,7 +43,7 @@ namespace TaskManager.Common
         public const string DeveloperEmail = "avukov@e-gov.bg";
         public const string DeveloperFirstName = "Ангел";
         public const string DeveloperLastName = "Вуков";
-        public const string DeveloperJobTitle = "Employee"; //for first use
+        //public const string DeveloperJobTitle = "Employee"; //for first use
 
         public const string FirmName = "ДАЕУ";
         public const string ClassFilesSubDirectory = "TasksFiles";

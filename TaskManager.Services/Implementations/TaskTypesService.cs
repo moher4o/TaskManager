@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TaskManager.Common;
 using TaskManager.Data;
 using TaskManager.Services.Models;
 
@@ -18,7 +19,7 @@ namespace TaskManager.Services.Implementations
         public IEnumerable<SelectServiceModel> GetTaskTypesNames()
         {
             var names = this.db.TasksTypes
-                .Where(c => c.isDeleted == false)
+                .Where(c => c.isDeleted == false && c.TypeName != DataConstants.TaskTypeSystem)
                 .Select(d => new SelectServiceModel
                 {
                     TextValue = d.TypeName,

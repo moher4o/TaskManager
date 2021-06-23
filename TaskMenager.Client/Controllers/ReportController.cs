@@ -1365,7 +1365,7 @@ namespace TaskMenager.Client.Controllers
 
                 if (model.PersonalDateList.WorkedHoursByTaskByPeriod.Count < 1)
                 {
-                    TempData["Error"] = $"Няма задачи по които да е работил {model.PersonalDateList.FullName} за избрания период";
+                    TempData["Error"] = $"Няма задачи по които да е работил/а {model.PersonalDateList.FullName} за избрания период";
                     return RedirectToAction("UsersList", "Users");
                 }
                 return View(model);

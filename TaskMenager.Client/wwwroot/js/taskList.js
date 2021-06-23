@@ -87,7 +87,7 @@ function loadDataTable(getClosed, withDeleted) {
         "columns": [
             { "data": "id", "width": "5%" },
             //{ "data": "taskName", "width": "41%" },
-            { "data": "taskName", "width": "41%" },
+            { "data": "taskName", "width": "40%" },
             { "data": "taskAssigner", "width": "14%" },
             { "data": "directorateName", "width": "10%" },
             { "data": "departmentName", "width": "12%" },
@@ -98,7 +98,7 @@ function loadDataTable(getClosed, withDeleted) {
             { "data": "sectorId", "width": "3%" },
             { "data": "assignedExpertsCount", "width": "3%" },
             //{ "data": "status", "width": "12%" },
-            { "data": "status", "width": "6%" },
+            { "data": "status", "width": "7%" },
             //{ "data": "typeName", "width": "14%" },
             { "data": "typeName", "width": "7%" },
             {
@@ -107,17 +107,17 @@ function loadDataTable(getClosed, withDeleted) {
                     if (withDeleted || permisionType != 'SuperAdmin') {
                         return `<div>
                         
-                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer;' title='Информация'>
+                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове'>
+                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications3" src="../png/files.png" />
                         </a>
-                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer;' ${((row.assignedExpertsCount == 0) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
+                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer;' ${((row.typeId == 8) || (row.assignedExpertsCount == 0) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"}>
+                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId == 8) ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/child.png" />
                         </a>
                         </div>`;
@@ -125,22 +125,22 @@ function loadDataTable(getClosed, withDeleted) {
                     else {
                         return `<div>
                         
-                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer;' title='Информация'>
+                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
                         
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=Delete('${path}Delete?taskId=${row.id}') title='Изтриване'>
+                            onclick=Delete('${path}Delete?taskId=${row.id}') title='Изтриване' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
-                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове'>
+                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications3" src="../png/files.png" />
                         </a>
-                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer;' ${row.assignedExpertsCount == 0 ? "hidden" : ""} title='Отчет по задача'>
+                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer;' ${(row.assignedExpertsCount == 0 || row.typeId == 8 )? "hidden" : ""} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px;'
-                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${row.parentTaskId == -1 ? "" : "hidden"}>
+                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId == 8) ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/child.png" />
                         </a>
 

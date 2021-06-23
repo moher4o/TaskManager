@@ -192,7 +192,7 @@
                             </div>
                         </form>
                     }
-                    @if (!isClosed && !isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
+                    @if (!isClosed && !isDeleted && (permisionType == SuperAdmin || permisionType == DirectorateAdmin && Model.DirectorateId == User.Claims.Where(u => u.Type == "directorateId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == DepartmentAdmin && Model.DepartmentId == User.Claims.Where(u => u.Type == "departmentId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == SectorAdmin && Model.SectorId == User.Claims.Where(u => u.Type == "sectorId").Select(u => int.Parse(u.Value)).FirstOrDefault() || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
 || Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         <a style="background-color: #cb7f7d;" class="btn btn-secondary" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@Model.Id">

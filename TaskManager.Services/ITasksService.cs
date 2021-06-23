@@ -27,6 +27,8 @@ namespace TaskManager.Services
         int TasksTypesCount();
 
         int TasksPrioritysCount();
+
+        Task<string> SystemTasksAsync();
         Task<string> SetWorkedHoursAsyncOld(TaskWorkedHoursServiceModel workedHours);
 
         Task<string> SetWorkedHoursAsync(TaskWorkedHoursServiceModel workedHours);

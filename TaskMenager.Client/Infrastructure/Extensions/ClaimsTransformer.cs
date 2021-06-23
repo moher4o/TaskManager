@@ -155,6 +155,16 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     }
 
                 }
+                    resultLocal = await this.tasks.SystemTasksAsync();
+                    if (!resultLocal.Equals("success"))
+                    {
+                        result = result + "<  >" + "Грешка след опит за инициализиране на системните(отпуски/болничен) задачи : " + resultLocal;
+                    }
+                    else
+                    {
+                        result = result + "<  >" + "Заредени отпуска и болничен задачи";
+                    }
+
                 return result;
 
             }

@@ -511,9 +511,12 @@ namespace TaskManager.Services.Implementations
                     TypeName = DataConstants.TaskTypeGlobal
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
-
+                newTypeDb = new TasksType()
+                {
+                    TypeName = DataConstants.TaskTypeSystem
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
                 await this.db.SaveChangesAsync();
-
             }
             catch (Exception)
             {
@@ -523,6 +526,69 @@ namespace TaskManager.Services.Implementations
             this.db.Database.CommitTransaction();
             return "success";
         }
+
+        public async Task<string> SystemTasksAsync()
+        {
+            await this.db.Database.BeginTransactionAsync();
+            try
+            {
+                var admin = await this.db.Employees.FirstOrDefaultAsync();
+
+                var vacationTask = new TaskManager.Data.Models.Task()
+                {
+                    TaskName = "Отпуски",
+                    OwnerId = admin.Id,
+                    //OwnerId = await this.db.Employees.Select(e => e.Id).FirstOrDefaultAsync(),
+                    AssignerId = admin.Id,
+                    HoursLimit = 1000000,
+                    StartDate = DateTime.Now.Date.AddDays(-30),
+                    RegCreated = DateTime.Now.Date,
+                    EndDatePrognose = DateTime.Now.Date.AddDays(8000),
+                    Description = "Системна задача за отчитане на отпуските",
+                    StatusId = await this.db.TasksStatuses.Where(s => s.StatusName == DataConstants.TaskStatusInProgres).Select(s => s.Id).FirstOrDefaultAsync(),
+                    PriorityId = await this.db.Priorities.Where(p => p.PriorityName == DataConstants.TaskPriorityNormal).Select(s => s.Id).FirstOrDefaultAsync(),
+                    TypeId = await this.db.TasksTypes.Where(p => p.TypeName == DataConstants.TaskTypeSystem).Select(s => s.Id).FirstOrDefaultAsync(),
+                    isDeleted = false
+                };
+                var illTask = new TaskManager.Data.Models.Task()
+                {
+                    TaskName = "Болнични",
+                    OwnerId = admin.Id,
+                    AssignerId = admin.Id,
+                    HoursLimit = 1000000,
+                    StartDate = DateTime.Now.Date.AddDays(-30),
+                    RegCreated = DateTime.Now.Date,
+                    EndDatePrognose = DateTime.Now.Date.AddDays(8000),
+                    Description = "Системна задача за отчитане на болничните",
+                    StatusId = await this.db.TasksStatuses.Where(s => s.StatusName == DataConstants.TaskStatusInProgres).Select(s => s.Id).FirstOrDefaultAsync(),
+                    PriorityId = await this.db.Priorities.Where(p => p.PriorityName == DataConstants.TaskPriorityNormal).Select(s => s.Id).FirstOrDefaultAsync(),
+                    TypeId = await this.db.TasksTypes.Where(p => p.TypeName == DataConstants.TaskTypeSystem).Select(s => s.Id).FirstOrDefaultAsync(),
+                    isDeleted = false
+                };
+
+                await this.db.Tasks.AddAsync(illTask);
+                await this.db.Tasks.AddAsync(vacationTask);
+                await this.db.SaveChangesAsync();
+                vacationTask.AssignedExperts.Add(new EmployeesTasks { 
+                EmployeeId = admin.Id,
+                TaskId = vacationTask.Id
+                });
+                illTask.AssignedExperts.Add(new EmployeesTasks
+                {
+                    EmployeeId = admin.Id,
+                    TaskId = illTask.Id
+                });
+                await this.db.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                this.db.Database.RollbackTransaction();
+                return $"Грешка!!! Възникна проблем при създаването на системните задачи.";
+            }
+            this.db.Database.CommitTransaction();
+            return "success";
+        }
+
         public int TasksStatusCount()
         {
             return this.db.TasksStatuses.Count();

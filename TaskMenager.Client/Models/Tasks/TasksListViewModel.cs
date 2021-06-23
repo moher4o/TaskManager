@@ -30,6 +30,8 @@ namespace TaskMenager.Client.Models.Tasks
 
         public string TypeName { get; set; }
 
+        public string TypeId { get; set; }
+
         public string TaskAssigner { get; set; }
 
         public int AssignedExpertsCount { get; set; } = 0;
