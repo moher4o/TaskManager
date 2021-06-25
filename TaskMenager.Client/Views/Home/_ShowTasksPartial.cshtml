@@ -23,7 +23,7 @@
         <partial name="_IndexHead" />
         <div style="min-height:600px; max-height:601px !important; overflow:auto;" id="taskList">
             @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@
-            @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskStatusName != "Изтрит"))
+            @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskStatusName != "Изтрит").OrderByDescending(t => t.EmployeeHoursToday))
             {
                 <div class="row PrimeBox3" style="margin-top:5px; font-size:small;" id=@(item.Id)>
                     @{var name = item.TaskName.Length > 90 ? (item.TaskName).Substring(0, 90) + "..." : item.TaskName;}

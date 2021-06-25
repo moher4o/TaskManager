@@ -35,7 +35,7 @@
                             dateList.Add(item.WorkDate.Date);
                         }
                     }
-                    <th style="width:7%;">Общо</th>
+                    <th style="width:5%;">Общо</th>
                 </tr>
             </thead>
             <tbody style="display: block;">
@@ -51,7 +51,7 @@
                             sum = sum + hours;
                             <td>@(hours > 0 ? hours.ToString() : "")</td>
                         }
-                        <td style="background-color:ivory; font-size:medium; width:7%;"><strong>@sum</strong></td>
+                        <td style="background-color:ivory; font-size:medium; width:5%;"><strong>@sum</strong></td>
                     </tr>
                 }
                 <tr style="background-color:ivory; font-size:medium; display: table; width: 100%; table-layout: fixed;">
@@ -63,7 +63,7 @@
                         <td class="hours"><strong>@hours</strong></td>
                         sum += hours;
                     }
-                    <td style="width:7%;"><strong>@sum</strong></td>
+                    <td style="width:5%;"><strong>@sum</strong></td>
                 </tr>
             </tbody>
         </table>

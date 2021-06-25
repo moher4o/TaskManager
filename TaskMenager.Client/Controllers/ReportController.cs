@@ -163,7 +163,7 @@ namespace TaskMenager.Client.Controllers
                         TempData["Error"] = "Не е избрана дирекция";
                         return RedirectToAction(nameof(PeriodReport));
                     }
-                    employeesIds = this.employees.GetEmployeesNamesByDirectorateWithDeletedAsync(int.Parse(model.DirectoratesId)).Result
+                    employeesIds = this.employees.GetEmployeesNamesByDirectorateAsync(int.Parse(model.DirectoratesId)).Result
                                         .Select(e => e.Id)
                                         .ToList();
                 }

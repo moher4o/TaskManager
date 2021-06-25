@@ -35,7 +35,7 @@ namespace TaskManager.Services.Implementations
             var tasks = await this.db.EmployeesTasks
                     .Where(et => et.EmployeeId == userId)
                     .Select(t => t.Task)
-                    .Where(t => t.isDeleted == false && t.StartDate.Date <= dateToProcess.Date)
+                    .Where(t => t.isDeleted == false && t.StartDate.Date <= dateToProcess.Date && t.TaskType.TypeName != TaskTypeSystem)
                     .Distinct()
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
@@ -470,6 +470,16 @@ namespace TaskManager.Services.Implementations
                 }
                 userToActivate.isDeleted = false;
                 userToActivate.isActive = true;
+                await this.db.SaveChangesAsync();
+                var systemTasks = await this.db.Tasks.Where(t => t.TaskType.TypeName == DataConstants.TaskTypeSystem).ToListAsync();
+                foreach (var daeuTask in systemTasks)
+                {
+                    daeuTask.AssignedExperts.Add(new EmployeesTasks
+                    {
+                        EmployeeId = userToActivate.Id,
+                        TaskId = daeuTask.Id
+                    });
+                }
                 await this.db.SaveChangesAsync();
                 return true;
 
