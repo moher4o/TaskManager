@@ -14,10 +14,12 @@ $(document).ready(function () {
 
 function NotActiveUsersShowOrHile() {
     if ($("#showNotActive").prop('checked') == false) {
+        $("#showDeleted").prop('checked', false);
         dataTable.destroy();
         loadDataTable(false, false);
     }
     else {
+        $("#showDeleted").prop('checked', false);
         dataTable.destroy();
         loadDataTable(false, true);
     }
@@ -25,10 +27,12 @@ function NotActiveUsersShowOrHile() {
 
 function DeletedUsersShowOrHile() {
     if ($("#showDeleted").prop('checked') == false) {
+        $("#showNotActive").prop('checked', false);
         dataTable.destroy();
         loadDataTable(false, false);
     }
     else {
+        $("#showNotActive").prop('checked', false);
         dataTable.destroy();
         loadDataTable(true, false);
     }

@@ -19,11 +19,24 @@
 
     $(function () { //jQuery shortcut for .ready (ensures DOM ready)
         GetUserTaskForDate();
-        $('#divbtnZapis').show();
+        //$('#divbtnZapis').show();
         //onclick евент за бутон Запис
         $('#btnZapis').on('click', UpdateHours);
-
+        $('#holiday').on('change', ShowHolidayWaterMark);
+        //$('#illness').on('change', ShowIllWaterMark());
     });
+
+    function ShowHolidayWaterMark() {
+        if ($("#holiday").prop('checked') == false) {
+            $("#illness").prop('checked', false);
+            $('#watermark').hide();
+
+        }
+        else {
+            $("#illness").prop('checked', false);
+            $('#watermark').show();
+        }
+    }
 
     function CheckMaxHours() {
         var totalMaxHours = document.getElementById("maxHours") == null ? 16 : parseInt(document.getElementById("maxHours").value);
@@ -249,7 +262,6 @@
 
             });
         });
-
     }
 
     function AddHoursCounter() {

@@ -13,20 +13,26 @@
     @if (permision == "Admin")
     {
         <div class="col-md-3" style="padding-top:6px;">
-            <input style="margin-left:15px;" type="checkbox" name="showNotActive" id="showNotActive">
-            <span class="chatnotifications" for="showNotActive"> Чакащи одобрение</span>
+            <label>
+                <input style="margin-left:15px;" type="checkbox" name="showNotActive" id="showNotActive">
+                <span aria-label="showNotActive">Чакащи одобрение</span>
+            </label>
+            @*<input style="margin-left:15px;" type="checkbox" name="showNotActive" id="showNotActive">*@
+            <span class="chatnotifications" for="showNotActive"></span>
             <span title="Чакащи одобрение" class="notificationsMenuSmall" id="notActiveCountinner" hidden></span>
         </div>
         <div class="col-md-3" style="padding-top:6px;">
-            <input style="margin-left:15px;" type="checkbox" name="showDeleted" id="showDeleted">
-            <label for="showDeleted"> Изтрити потребители</label>
+            <label>
+                <input type="checkbox" name="showDeleted" id="showDeleted">
+                <span aria-label="showDeleted">Изтрити потребители</span>
+            </label>
         </div>
 
         @*<div class="col-md-2">
-            <a asp-action="CreateNewUser" asp-controller="Users" class="btn btn-info form-control text-white">
-                Създай потрбител
-            </a>
-        </div>*@
+                <a asp-action="CreateNewUser" asp-controller="Users" class="btn btn-info form-control text-white">
+                    Създай потрбител
+                </a>
+            </div>*@
     }
     <div class="col-12 border p-3">
         <table id="DT_load" class="table table-striped table-bordered compact" style="width:100%">

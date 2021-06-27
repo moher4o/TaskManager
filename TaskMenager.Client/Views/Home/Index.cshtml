@@ -1,18 +1,44 @@
 ﻿@{
     ViewData["Title"] = "Моите задачи";
 }
-<input id="currentUserId" value="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())" hidden />
-<div id="apiNotWorking" style="padding-top:40px; padding-left:50px;  max-width:500px;">
-    <p style="background-color: whitesmoke;">
-        Здравейте,
-        <span style="color:red; font-weight:500;">Приложението не работи с браузър Internet explorer(IE).</span>
-        Ако виждате това съобщение и не ползвате IE -> трябва да изчистите кеша на браузъра си.
-        Пробвайте с поредица от клавиши F12, F5, F12 или се обърнете към администратор.
-    </p>
-</div>
-<div class="fade" id="AREA_PARTIAL_VIEW">
+
+<div class="row">
+    <div class="col-md-11">
+        <input id="currentUserId" value="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())" hidden />
+        <div id="apiNotWorking" style="padding-top:40px; padding-left:50px;  max-width:500px;">
+            <p style="background-color: whitesmoke;">
+                Здравейте,
+                <span style="color:red; font-weight:500;">Приложението не работи с браузър Internet explorer(IE).</span>
+                Ако виждате това съобщение и не ползвате IE -> трябва да изчистите кеша на браузъра си.
+                Пробвайте с поредица от клавиши F12, F5, F12 или се обърнете към администратор.
+            </p>
+        </div>
+        <div class="fade" id="AREA_PARTIAL_VIEW">
+
+        </div>
+    </div>
+    <div class="col-md-1"  style="padding-top:45px;">
+        <div class="ll-skin-latoja" id="dateSelector2">
+        </div>
+        <div style="padding-top:45px;">
+            <label>
+                <input type="checkbox" id="holiday">
+                <span aria-label="vacation">Отпуска</span>
+            </label>
+            <label style="padding-top:10px;">
+                <input type="checkbox" id="illness">
+                <span aria-label="holiday">Болничен</span>
+            </label>
+
+        </div>
+
+        <div class="wrap" style="padding-top:50px; padding-left:20px;" id="divbtnZapis">
+            <button class="buttonZap" id="btnZapis">Запис</button>
+        </div>
+    </div>
 
 </div>
+
 
 @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf

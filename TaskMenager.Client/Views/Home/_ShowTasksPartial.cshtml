@@ -4,6 +4,11 @@
 @Html.HiddenFor(model => model.totalHoursPerDayMax, new { id = "maxHours" })
 @if (Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed).Count() > 0)
 {
+    <!-- WATERMARK -->
+    <div id="watermark">
+        <h1 style="font-size:56pt; font-weight:700;">О &nbsp;Т&nbsp; П&nbsp; У&nbsp; С&nbsp; К&nbsp; А</h1>
+        @*<p style="font-size:200%; font-weight:500;">Часовете за тази дата ще бъдат анулирани!</p>*@
+    </div>
     <div style="min-height:640px; max-height:641px;">
         <div class="row" style="position: relative;">
             <div class="col-md-4">
@@ -16,8 +21,13 @@
                 </div>*@
 
             <div class="col-md-4" style="padding-top:6px;">
-                <input style="margin-left:15px;" type="checkbox" name="showInactive" id="showInactive">
-                <label for="showInactive"> Показване на приключените задачи</label>
+                <label>
+                    <input type="checkbox" name="showInactive" id="showInactive">
+                    <span aria-label="closedTask">Показване на приключените задачи</span>
+                </label>
+
+                @*<input style="margin-left:15px;" type="checkbox" name="showInactive" id="showInactive">
+                    <label for="showInactive"> Показване на приключените задачи</label>*@
             </div>
         </div>
         <partial name="_IndexHead" />
@@ -31,8 +41,8 @@
                         <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
                     </div>
                     @*<div class="col-md-1">
-                        <label>@item.TaskStatusName</label>
-                    </div>*@
+                            <label>@item.TaskStatusName</label>
+                        </div>*@
                     <div class="col-md-1">
                         <label style="padding-left:10px;">@item.TaskPriorityName</label>
                     </div>
@@ -83,7 +93,7 @@
                             <!-- Button trigger modal -->
                             <a title="Бележка по задачата за текущата дата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:15px;"
                                data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("AddDateNote")" data-taskid="@item.Id" data-taskname="@item.TaskName" data-balloon-length="xlarge" aria-label="@item.TaskNoteForToday" data-balloon-pos="down-right">
-                                <img class="chatnotifications2" src="~/png/orange-speech-balloon2.png"/>
+                                <img class="chatnotifications2" src="~/png/orange-speech-balloon2.png" />
                                 <span class="notificationsTodayCountValue" @(item.TaskNoteForToday != null ? "" : "hidden")>1</span>
                             </a>
 

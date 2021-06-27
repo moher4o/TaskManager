@@ -19,6 +19,9 @@
     @*<link rel="stylesheet" href="~/css/notfound.css">*@
     <link rel="stylesheet" href="~/css/comments.css">
 
+    <!-- checkbox styles -->
+    <link rel="stylesheet" href="~/css/CheckBox.css">
+
     <!-- балонни съобщения -->
     <link rel="stylesheet" href="~/css/balloon.css">
     @*<link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">*@
@@ -251,8 +254,8 @@
                 </div>
             </nav>
 
-            <div class="row">
-                <div class="container widthmobile col-md-11">
+            @*<div class="row">*@
+                <div class="container widthmobile"  style="max-width:100%;">
 
                     <main role="main" class="pb-3">
                         @RenderBody()
@@ -281,18 +284,28 @@
                         }
                     </main>
                 </div>
-                <div class="widthmobile col-md-1" style="padding-top:45px;">
+                <!--<div class="widthmobile col-md-1" style="padding-top:45px;">-->
                     @*<a href="#" id="scinChange" style="color:dodgerblue;">Дизаин</a>*@
-                    <div class="ll-skin-latoja" id="dateSelector2">
+                    <!--<div class="ll-skin-latoja" id="dateSelector2">
+                    </div>
+                    <div  style="padding-top:45px;">
+                        <label>
+                            <input type="checkbox">
+                            <span aria-label="vacation">Отпуска</span>
+                        </label>                        
+                        <label style="padding-top:10px;">
+                            <input type="checkbox">
+                            <span aria-label="holiday">Болничен</span>
+                        </label>
+
                     </div>
 
                     <div class="wrap" style="padding-top:50px; padding-left:20px; display:none;" id="divbtnZapis">
                         <button class="buttonZap" id="btnZapis">Запис</button>
                     </div>
 
-
-                </div>
-            </div>
+                </div>-->
+            @*</div>*@
         </div>
         <footer class="border-top footer text-muted hideonmobile">
             <div class="container">
