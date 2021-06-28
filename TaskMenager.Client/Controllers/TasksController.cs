@@ -1354,6 +1354,78 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SetDateSystemTasks(int userId, DateTime workDate, bool isholiday = false, bool isill = false)
+        {
+            try
+            {
+                if (userId != currentUser.Id)
+                {
+                    var dominions = await this.employees.GetUserDominions(currentUser.Id);
+                    if (!dominions.Any(d => d.Id == userId))
+                    {
+                        var targetEmployee = await this.employees.GetEmployeeByIdAsync(userId);
+                        return Json(new { success = false, message = $"[SetDateTasksHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} " });
+                    }
+                }
+                var result = string.Empty;
+                var message = string.Empty;
+                if (isholiday || isill)
+                {
+                    var dateTaskList = await this.employees.GetUserActiveTaskAsync(userId, workDate.Date);
+                    foreach (var itemTask in dateTaskList)
+                    {
+                        var workedHours = new TaskWorkedHoursServiceModel()
+                        {
+                            EmployeeId = userId,
+                            TaskId = itemTask.Id,
+                            HoursSpend = 0,
+                            WorkDate = workDate.Date
+                        };
+
+                        await this.tasks.SetWorkedHoursAsync(workedHours);
+                    }
+                    if (isholiday)
+                    {
+                        var workedHours = new TaskWorkedHoursServiceModel()
+                        {
+                            EmployeeId = userId,
+                            TaskId = await this.tasks.GetSystemTaskIdByNameAsync("Отпуски"),
+                            HoursSpend = 8,
+                            WorkDate = workDate.Date
+                        };
+                      result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                        message = "Отпуската е записана";
+                    }
+                    else if (isill)
+                    {
+                        var workedHours = new TaskWorkedHoursServiceModel()
+                        {
+                            EmployeeId = userId,
+                            TaskId = await this.tasks.GetSystemTaskIdByNameAsync("Болнични"),
+                            HoursSpend = 8,
+                            WorkDate = workDate.Date
+                        };
+                      result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                        message = "Болничния е записан";
+                    }
+
+                }
+                if (result == "success")
+                {
+                    return Json(new { success = true, message = (message + Environment.NewLine) });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "Основна грешка. Моля проверете логиката на входните данни." });
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetAll(bool withClosed = false, bool withDeleted = false)

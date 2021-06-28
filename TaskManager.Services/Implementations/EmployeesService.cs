@@ -35,7 +35,7 @@ namespace TaskManager.Services.Implementations
             var tasks = await this.db.EmployeesTasks
                     .Where(et => et.EmployeeId == userId)
                     .Select(t => t.Task)
-                    .Where(t => t.isDeleted == false && t.StartDate.Date <= dateToProcess.Date && t.TaskType.TypeName != TaskTypeSystem)
+                    .Where(t => t.isDeleted == false && t.StartDate.Date <= dateToProcess.Date)
                     .Distinct()
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)

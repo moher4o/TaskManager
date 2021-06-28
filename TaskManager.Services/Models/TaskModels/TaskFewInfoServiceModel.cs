@@ -24,6 +24,8 @@ namespace TaskManager.Services.Models.TaskModels
 
         public string TaskPriorityName { get; set; }
 
+        public string TaskTypeName { get; set; }
+
         public int HoursLimit { get; set; }
 
         public int NotesCount { get; set; }
@@ -46,6 +48,7 @@ namespace TaskManager.Services.Models.TaskModels
             DateTime workDate = DateTime.Now.Date;
             profile.CreateMap<Task, TaskFewInfoServiceModel>()
                    .ForMember(u => u.TaskStatusName, cfg => cfg.MapFrom(s => s.TaskStatus.StatusName))
+                   .ForMember(u => u.TaskTypeName, cfg => cfg.MapFrom(s => s.TaskType.TypeName))
                    .ForMember(u => u.TaskPriorityName, cfg => cfg.MapFrom(s => s.TaskPriority.PriorityName))
                    .ForMember(u => u.Colleagues, cfg => cfg.MapFrom(s => s.AssignedExperts
                                                            .OrderBy(e => e.Employee.FullName)

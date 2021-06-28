@@ -12,6 +12,7 @@
     var currentUserId = document.getElementById("currentUserId").value;
     var userId = document.getElementById("employeeId") == null ? currentUserId : document.getElementById("employeeId").value;
     var slideSource = document.getElementById('AREA_PARTIAL_VIEW');
+    var element = document.getElementById("btnZapis");
 
     document.getElementById("apiNotWorking").hidden = true;
     AddDatePicker();
@@ -29,12 +30,18 @@
     function ShowHolidayWaterMark() {
         if ($("#holiday").prop('checked') == false) {
             $("#illness").prop('checked', false);
-            $('#watermark').hide();
+            $('#watermarkholiday').hide('fast');
 
         }
         else {
             $("#illness").prop('checked', false);
-            $('#watermark').show();
+            toastr.error('Отчетените часове за тази дата ще бъдат нулирани при запис!');
+            $('#watermarkholiday').show('fast');
+            //var element = document.getElementById("btnZapis");
+            if (!element.classList.contains("special")) {
+                element.classList.add("special");
+            }
+
         }
     }
 
@@ -45,8 +52,8 @@
         $('.PrimeBox3').each(function () {
             let currenttaskId = $(this).attr('id');
             //if (currenttaskId != 'closedTask') {
-                let todayhours = parseInt($(this).find('input').first().val());
-                sum = sum + todayhours;
+            let todayhours = parseInt($(this).find('input').first().val());
+            sum = sum + todayhours;
             //}
         });
         if (sum > totalMaxHours) {
@@ -58,7 +65,7 @@
             }
             document.getElementById('totalLabel').innerHTML = sum;
             return true;
-            }
+        }
     }
 
     function CheckSelectedDominion() {
@@ -137,7 +144,7 @@
         let newDate = $('#dateSelector2').datepicker("getDate");
         let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
         // stop animation of button Zapis
-        var element = document.getElementById("btnZapis");
+        //var element = document.getElementById("btnZapis");
         if (element.classList.contains("special")) {
             element.classList.remove("special");
         }
@@ -162,6 +169,9 @@
                         item.style["background-color"] = "#fff";
                     })
                 })
+                if ($('#watermarkholiday').css('display') != 'none') {
+                    $("#holiday").prop('checked', true);
+                }
                 //onclick евент за показване на приключените задачи 
                 $('#showInactive').click(function () {
                     document.getElementById('showclosedTasks').classList.toggle('displayno');
@@ -175,47 +185,77 @@
     }
 
     function UpdateHours() {
+        var isholiday = $("#holiday").prop('checked');
+        var isill = $("#illness").prop('checked');
         var currentUrl = path + '\/Tasks\/SetDateTasksHours';
         let newDate = $('#dateSelector2').datepicker("getDate");
         let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
         let totallSuccess = true;
         var messageInfo = 'Часовете са записани успешно';
-        $('.PrimeBox3').each(function () {
-            let currenttaskId = $(this).attr('id');
-            if (currenttaskId != 'closedTask') {
-                let todayhours = $(this).find('input').first().val();
-                // заявка за запис на часовете
-                $.ajax({
-                    type: 'GET',
-                    url: currentUrl,   // '..\\Tasks\\SetDateTasksHours'
-                    data: {
-                        userId: bossUserId,
-                        workDate: newDate.toUTCString(),
-                        taskId: currenttaskId,
-                        hours: todayhours
-                    },
-                    success: function (data) {
-                        if (data.success) {
-                        }
-                        else {
+        if (!isholiday && !isill) {                                    //ако не е чекнато отпуска или болничен
+            $('.PrimeBox3').each(function () {
+                let currenttaskId = $(this).attr('id');
+                if (currenttaskId != 'closedTask') {
+                    let todayhours = $(this).find('input').first().val();
+                    // заявка за запис на часовете
+                    $.ajax({
+                        type: 'GET',
+                        url: currentUrl,   // '..\\Tasks\\SetDateTasksHours'
+                        data: {
+                            userId: bossUserId,
+                            workDate: newDate.toUTCString(),
+                            taskId: currenttaskId,
+                            hours: todayhours
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                            }
+                            else {
+                                totallSuccess = false;
+                                messageInfo = data.message;
+                            }
+                        },
+                        error: function (data) {
                             totallSuccess = false;
                             messageInfo = data.message;
                         }
-                    },
-                    error: function (data) {
-                        totallSuccess = false;
+                    });
+                }
+            });
+        }
+        else {    //ако е чекнато отпуска или болничен
+            currentUrl = path + '\/Tasks\/SetDateSystemTasks';
+
+            $.ajax({
+                type: 'GET',
+                url: currentUrl,   // '..\\Tasks\\SetDateSystemTasks'
+                data: {
+                    userId: bossUserId,
+                    workDate: newDate.toUTCString(),
+                    isholiday: isholiday,
+                    isill: isill
+                },
+                success: function (data) {
+                    totallSuccess == true;
                         messageInfo = data.message;
-                    }
-                });
-            }
-        });
+                },
+                error: function (data) {
+                    totallSuccess == false;
+                    messageInfo = data.message;
+                }
+            });
+            slideSource.classList.toggle('fade');
+            setTimeout(function () {
+                GetUserTaskForDate();
+            }, delayInMilliseconds);
+        }
         setTimeout(function () {
             if (totallSuccess == false) {
                 toastr.error(messageInfo);
                 $('#btnZapis').blur();
             }
             else {
-                var element = document.getElementById("btnZapis");
+                //var element = document.getElementById("btnZapis");
                 if (element.classList.contains("special")) {
                     element.classList.remove("special");
                 }
@@ -251,13 +291,13 @@
                 let isValid = newBody.find('[name="IsValid"]').val() === 'True';
 
                 if (isValid) {
-                    
+
                     placeholderElement.find('.modal').modal('hide');
                     //setTimeout(function () {
                     //GetUserTaskForDate();
                     //}, 1500);
                     //location.reload();
-                    
+
                 }
 
             });
@@ -309,7 +349,7 @@
 
         $('.input-number').change(function (lastval) {
             // start animation of button Zapis
-            var element = document.getElementById("btnZapis");
+            //var element = document.getElementById("btnZapis");
             if (!element.classList.contains("special")) {
                 element.classList.add("special");
             }

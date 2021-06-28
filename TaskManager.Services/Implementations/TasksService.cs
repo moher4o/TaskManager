@@ -965,5 +965,13 @@ namespace TaskManager.Services.Implementations
                 })
                 .ToList();
         }
+
+        public async Task<int> GetSystemTaskIdByNameAsync(string name)
+        {
+            return await this.db.Tasks
+                    .Where(et => et.TaskName == name && et.TaskType.TypeName == TaskTypeSystem)
+                    .Select(et => et.Id)
+                    .FirstOrDefaultAsync();
+        }
     }
 }

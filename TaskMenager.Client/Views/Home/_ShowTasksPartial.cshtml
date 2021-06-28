@@ -2,10 +2,11 @@
 @Html.HiddenFor(model => model.userId, new { id = "employeeId" })
 @Html.HiddenFor(model => model.workDate, new { id = "workDate" })
 @Html.HiddenFor(model => model.totalHoursPerDayMax, new { id = "maxHours" })
-@if (Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed).Count() > 0)
+@{var isholiday = Model.ActiveTasks.Where(t => t.TaskTypeName == TaskTypeSystem && t.TaskName == "Отпуски").Select(t => t.EmployeeHoursToday).FirstOrDefault() == 8;}
+@if (Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskTypeName != DataConstants.TaskTypeSystem).Count() > 0)
 {
     <!-- WATERMARK -->
-    <div id="watermark">
+    <div id="watermarkholiday" style="@(isholiday ? "" : "display:none")">
         <h1 style="font-size:56pt; font-weight:700;">О &nbsp;Т&nbsp; П&nbsp; У&nbsp; С&nbsp; К&nbsp; А</h1>
         @*<p style="font-size:200%; font-weight:500;">Часовете за тази дата ще бъдат анулирани!</p>*@
     </div>
@@ -33,7 +34,7 @@
         <partial name="_IndexHead" />
         <div style="min-height:600px; max-height:601px !important; overflow:auto;" id="taskList">
             @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@
-            @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskStatusName != "Изтрит").OrderByDescending(t => t.EmployeeHoursToday))
+            @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskStatusName != "Изтрит" && t.TaskTypeName != TaskTypeSystem).OrderByDescending(t => t.EmployeeHoursToday))
             {
                 <div class="row PrimeBox3" style="margin-top:5px; font-size:small;" id=@(item.Id)>
                     @{var name = item.TaskName.Length > 90 ? (item.TaskName).Substring(0, 90) + "..." : item.TaskName;}

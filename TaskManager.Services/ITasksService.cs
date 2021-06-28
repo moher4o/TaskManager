@@ -53,5 +53,7 @@ namespace TaskManager.Services
 
         Task<AddNoteToTaskServiceModel> GetTaskEmpNoteForDateAsync(int taskId, int empId, DateTime workDate);
         Task<bool> SetTaskEmpNoteForDateAsync(AddNoteToTaskServiceModel model);
+
+        Task<int> GetSystemTaskIdByNameAsync(string name);
     }
 }
