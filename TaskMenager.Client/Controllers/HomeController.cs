@@ -162,12 +162,12 @@ namespace TaskMenager.Client.Controllers
                 ActiveTasks =await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
                 //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
-            foreach (var task in currentEmployee.ActiveTasks)
+            foreach (var task in currentEmployee.ActiveTasks.Where(at => at.TaskTypeName != TaskTypeSystem).ToList())
             {
                 task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
             }
 
-            currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
+            currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Where(at => at.TaskTypeName != TaskTypeSystem).Sum(at => at.EmployeeHoursToday);
 
             return PartialView("~/Views/Home/_ShowTasksPartial.cshtml", currentEmployee);
         }

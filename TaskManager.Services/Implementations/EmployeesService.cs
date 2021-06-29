@@ -459,6 +459,38 @@ namespace TaskManager.Services.Implementations
             }
 
         }
+
+        public async Task<bool> AddAllToSystemTasksAsync()
+        {
+            try
+            {
+                var usersNotAddedToSystemTasks = await this.db.Employees.ToListAsync();
+                var systemTasks = await this.db.Tasks.Where(t => t.TaskType.TypeName == DataConstants.TaskTypeSystem).ToListAsync();
+                foreach (var daeuTask in systemTasks)
+                {
+                    foreach (var user in usersNotAddedToSystemTasks)
+                    {
+                        if (await this.db.EmployeesTasks.Where(et => et.isDeleted == false && et.TaskId == daeuTask.Id && et.EmployeeId == user.Id).FirstOrDefaultAsync() == null)
+                        {
+                            daeuTask.AssignedExperts.Add(new EmployeesTasks
+                            {
+                                EmployeeId = user.Id,
+                                TaskId = daeuTask.Id
+                            });
+                        }
+
+                    }
+                    await this.db.SaveChangesAsync();
+                }
+                
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
         public async Task<bool> АctivateUserAsync(int userId)
         {
             try

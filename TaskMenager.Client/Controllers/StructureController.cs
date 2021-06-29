@@ -374,6 +374,22 @@ namespace TaskMenager.Client.Controllers
         {
             return View();
         }
+        
+        public async Task<IActionResult> AddUsersToSystemTasks()
+        {
+            var result = await this.employees.AddAllToSystemTasksAsync();
+            if (!result)
+            {
+                TempData["Error"] = $"[employee service error] AddAllToSystemTasksAsync";
+            }
+            else
+            {
+                TempData["Success"] = "Потребителите са добавени към системните задачи";
+            }
+
+            return RedirectToAction("UsersList", "Users");
+        }
+
 
         public async Task<IActionResult> RemoveEmptyEmails()
         {

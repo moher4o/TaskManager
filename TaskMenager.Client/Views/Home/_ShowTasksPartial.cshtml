@@ -3,13 +3,31 @@
 @Html.HiddenFor(model => model.workDate, new { id = "workDate" })
 @Html.HiddenFor(model => model.totalHoursPerDayMax, new { id = "maxHours" })
 @{var isholiday = Model.ActiveTasks.Where(t => t.TaskTypeName == TaskTypeSystem && t.TaskName == "Отпуски").Select(t => t.EmployeeHoursToday).FirstOrDefault() == 8;}
+@{var isill = Model.ActiveTasks.Where(t => t.TaskTypeName == TaskTypeSystem && t.TaskName == "Болнични").Select(t => t.EmployeeHoursToday).FirstOrDefault() == 8;}
+@if (isholiday)
+{
+    <input id="systemtask" value="holiday" hidden />
+}
+else if (isill)
+{
+    <input id="systemtask" value="ill" hidden />
+}
+else
+{
+    <input id="systemtask" value="none" hidden />
+}
+<!-- WATERMARK -->
+<div id="watermarkholiday" style="display:none;">
+    <h1 style="font-size:56pt; font-weight:700;">О &nbsp;Т&nbsp; П&nbsp; У&nbsp; С&nbsp; К</h1>
+    @*<p style="font-size:200%; font-weight:500;">Часовете за тази дата ще бъдат анулирани!</p>*@
+</div>
+<div id="watermarkill" style="display:none;">
+    <h1 style="font-size:56pt; font-weight:700;">Б &nbsp;О&nbsp; Л&nbsp; Н&nbsp; И&nbsp; Ч&nbsp; Е&nbsp; Н</h1>
+    @*<p style="font-size:200%; font-weight:500;">Часовете за тази дата ще бъдат анулирани!</p>*@
+</div>
+
 @if (Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskTypeName != DataConstants.TaskTypeSystem).Count() > 0)
 {
-    <!-- WATERMARK -->
-    <div id="watermarkholiday" style="@(isholiday ? "" : "display:none")">
-        <h1 style="font-size:56pt; font-weight:700;">О &nbsp;Т&nbsp; П&nbsp; У&nbsp; С&nbsp; К&nbsp; А</h1>
-        @*<p style="font-size:200%; font-weight:500;">Часовете за тази дата ще бъдат анулирани!</p>*@
-    </div>
     <div style="min-height:640px; max-height:641px;">
         <div class="row" style="position: relative;">
             <div class="col-md-4">

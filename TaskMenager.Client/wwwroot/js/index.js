@@ -14,6 +14,7 @@
     var slideSource = document.getElementById('AREA_PARTIAL_VIEW');
     var element = document.getElementById("btnZapis");
 
+
     document.getElementById("apiNotWorking").hidden = true;
     AddDatePicker();
     GetDominions();
@@ -24,23 +25,50 @@
         //onclick евент за бутон Запис
         $('#btnZapis').on('click', UpdateHours);
         $('#holiday').on('change', ShowHolidayWaterMark);
-        //$('#illness').on('change', ShowIllWaterMark());
+        $('#illness').on('change', ShowIllWaterMark);
     });
 
     function ShowHolidayWaterMark() {
         if ($("#holiday").prop('checked') == false) {
             $("#illness").prop('checked', false);
             $('#watermarkholiday').hide('fast');
+            $('.input-number').prop('readonly', false);
+            $(".btn-number").removeAttr("disabled");
 
         }
         else {
             $("#illness").prop('checked', false);
+            $('#watermarkill').hide('fast');
             toastr.error('Отчетените часове за тази дата ще бъдат нулирани при запис!');
             $('#watermarkholiday').show('fast');
             //var element = document.getElementById("btnZapis");
             if (!element.classList.contains("special")) {
                 element.classList.add("special");
             }
+            $('.input-number').prop('readonly', true);
+            $(".btn-number").attr("disabled", true);
+
+        }
+    }
+
+    function ShowIllWaterMark() {
+        if ($("#illness").prop('checked') == false) {
+            $("#holiday").prop('checked', false);
+            $('#watermarkill').hide('fast');
+            $('.input-number').prop('readonly', false);
+            $(".btn-number").removeAttr("disabled");
+        }
+        else {
+            $("#holiday").prop('checked', false);
+            $('#watermarkholiday').hide('fast');
+            toastr.error('Отчетените часове за тази дата ще бъдат нулирани при запис!');
+            $('#watermarkill').show('fast');
+            //var element = document.getElementById("btnZapis");
+            if (!element.classList.contains("special")) {
+                element.classList.add("special");
+            }
+            $('.input-number').prop('readonly', true);
+            $(".btn-number").attr("disabled", true);
 
         }
     }
@@ -169,9 +197,6 @@
                         item.style["background-color"] = "#fff";
                     })
                 })
-                if ($('#watermarkholiday').css('display') != 'none') {
-                    $("#holiday").prop('checked', true);
-                }
                 //onclick евент за показване на приключените задачи 
                 $('#showInactive').click(function () {
                     document.getElementById('showclosedTasks').classList.toggle('displayno');
@@ -180,6 +205,29 @@
                 AddHoursCounter();
                 //функцията добавя балончето за бележки
                 attachEvents();
+                //управление на отпуска и болничен
+                var systemtask = document.getElementById("systemtask");    //отпуска, болничен или не
+                if (systemtask.value == 'holiday') {
+                    $('.input-number').prop('readonly', true);
+                    $(".btn-number").attr("disabled", true);
+                    $("#holiday").prop('checked', true);
+                    $("#illness").prop('checked', false);
+                    $('#watermarkholiday').show('fast');
+                }
+                else if (systemtask.value == 'ill') {
+                    $('.input-number').prop('readonly', true);
+                    $(".btn-number").attr("disabled", true);
+                    $("#illness").prop('checked', true);
+                    $("#holiday").prop('checked', false);
+                    $('#watermarkill').show('fast');
+                }
+                else {
+                    $('.input-number').prop('readonly', false);
+                    $(".btn-number").removeAttr("disabled");
+                    $("#holiday").prop('checked', false);
+                    $("#illness").prop('checked', false);
+                }
+
             }
         });
     }
@@ -193,35 +241,57 @@
         let totallSuccess = true;
         var messageInfo = 'Часовете са записани успешно';
         if (!isholiday && !isill) {                                    //ако не е чекнато отпуска или болничен
-            $('.PrimeBox3').each(function () {
-                let currenttaskId = $(this).attr('id');
-                if (currenttaskId != 'closedTask') {
-                    let todayhours = $(this).find('input').first().val();
-                    // заявка за запис на часовете
-                    $.ajax({
-                        type: 'GET',
-                        url: currentUrl,   // '..\\Tasks\\SetDateTasksHours'
-                        data: {
-                            userId: bossUserId,
-                            workDate: newDate.toUTCString(),
-                            taskId: currenttaskId,
-                            hours: todayhours
-                        },
-                        success: function (data) {
-                            if (data.success) {
-                            }
-                            else {
+            var removeSystemTAsktUrl = path + '\/Tasks\/RemoveSystemTasks';
+            $.ajax({
+                type: 'GET',
+                url: removeSystemTAsktUrl,   // '..\\Tasks\\RemoveSystemTasks'
+                data: {
+                    userId: bossUserId,
+                    workDate: newDate.toUTCString()
+                },
+                success: function (data) {
+                    totallSuccess == true;
+                    messageInfo = data.message;
+                },
+                error: function (data) {
+                    totallSuccess == false;
+                    messageInfo = data.message;
+                }
+            });
+            if (totallSuccess) {                                    //ако успешно са изтрити болнични или отпуски --> почва отбелязването на работните часове
+                $('.PrimeBox3').each(function () {
+                    let currenttaskId = $(this).attr('id');
+                    if (currenttaskId != 'closedTask') {
+                        let todayhours = $(this).find('input').first().val();
+                        // заявка за запис на часовете
+                        $.ajax({
+                            type: 'GET',
+                            url: currentUrl,   // '..\\Tasks\\SetDateTasksHours'
+                            data: {
+                                userId: bossUserId,
+                                workDate: newDate.toUTCString(),
+                                taskId: currenttaskId,
+                                hours: todayhours
+                            },
+                            success: function (data) {
+                                if (data.success) {
+                                    if (todayhours != '0') {
+                                        messageInfo = 'Часовете са записани успешно';
+                                    }
+                                }
+                                else {
+                                    totallSuccess = false;
+                                    messageInfo = data.message;
+                                }
+                            },
+                            error: function (data) {
                                 totallSuccess = false;
                                 messageInfo = data.message;
                             }
-                        },
-                        error: function (data) {
-                            totallSuccess = false;
-                            messageInfo = data.message;
-                        }
-                    });
-                }
-            });
+                        });
+                    }
+                });
+            }
         }
         else {    //ако е чекнато отпуска или болничен
             currentUrl = path + '\/Tasks\/SetDateSystemTasks';
@@ -237,18 +307,19 @@
                 },
                 success: function (data) {
                     totallSuccess == true;
-                        messageInfo = data.message;
+                    messageInfo = data.message;
                 },
                 error: function (data) {
                     totallSuccess == false;
                     messageInfo = data.message;
                 }
             });
-            slideSource.classList.toggle('fade');
-            setTimeout(function () {
-                GetUserTaskForDate();
-            }, delayInMilliseconds);
         }
+        slideSource.classList.toggle('fade');
+        setTimeout(function () {
+            GetUserTaskForDate();
+        }, delayInMilliseconds);
+
         setTimeout(function () {
             if (totallSuccess == false) {
                 toastr.error(messageInfo);

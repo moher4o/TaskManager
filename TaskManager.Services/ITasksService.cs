@@ -55,5 +55,7 @@ namespace TaskManager.Services
         Task<bool> SetTaskEmpNoteForDateAsync(AddNoteToTaskServiceModel model);
 
         Task<int> GetSystemTaskIdByNameAsync(string name);
+
+        Task<bool> RemoveSystemTaskForDate(int userId, DateTime currentDate);
     }
 }

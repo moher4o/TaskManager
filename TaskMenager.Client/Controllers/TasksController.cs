@@ -1355,6 +1355,36 @@ namespace TaskMenager.Client.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> RemoveSystemTasks(int userId, DateTime workDate)
+        {
+            try
+            {
+                if (userId != currentUser.Id)
+                {
+                    var dominions = await this.employees.GetUserDominions(currentUser.Id);
+                    if (!dominions.Any(d => d.Id == userId))
+                    {
+                        var targetEmployee = await this.employees.GetEmployeeByIdAsync(userId);
+                        return Json(new { success = false, message = $"[SetDateTasksHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} " });
+                    }
+                }
+                bool result = await this.tasks.RemoveSystemTaskForDate(userId, workDate);
+                if (result)
+                {
+                    return Json(new { success = true, message = ("Премахната е системна задача болничен/отпуск" + Environment.NewLine) });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "[RemoveSystemTasks / RemoveSystemTaskForDate] грешка." });
+                }
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "[RemoveSystemTasks / RemoveSystemTaskForDate] грешка. Основна грешка при премахване на системен тип задачи" + Environment.NewLine });
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> SetDateSystemTasks(int userId, DateTime workDate, bool isholiday = false, bool isill = false)
         {
             try
@@ -1395,7 +1425,7 @@ namespace TaskMenager.Client.Controllers
                             WorkDate = workDate.Date
                         };
                       result = await this.tasks.SetWorkedHoursAsync(workedHours);
-                        message = "Отпуската е записана";
+                        message = "Отпускът е отразен в системата";
                     }
                     else if (isill)
                     {
@@ -1407,7 +1437,7 @@ namespace TaskMenager.Client.Controllers
                             WorkDate = workDate.Date
                         };
                       result = await this.tasks.SetWorkedHoursAsync(workedHours);
-                        message = "Болничния е записан";
+                        message = "Болничния е отразен в системата";
                     }
 
                 }

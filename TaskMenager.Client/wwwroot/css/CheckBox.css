@@ -75,3 +75,19 @@
     -sand-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
+#watermarkill {
+    position: absolute;
+    top: 45%;
+    right: 40%;
+    opacity: 0.5;
+    text-align: center;
+    color:salmon;
+    /*z-index: 10;*/
+    -ms-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -sand-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+

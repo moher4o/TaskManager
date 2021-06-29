@@ -748,17 +748,19 @@ namespace TaskManager.Services.Implementations
                 var currentTaskHours = await this.db.WorkedHours
                     .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId && d.TaskId == workedHours.TaskId)
                     .FirstOrDefaultAsync();
-
                 if (currentTaskHours == null)   // ако по конкретната задача не е работено за тази дата
                 {
-                    var workedHoursDB = new WorkedHours()
+                    if (workedHours.HoursSpend > 0)
                     {
-                        EmployeeId = workedHours.EmployeeId,
-                        TaskId = workedHours.TaskId,
-                        HoursSpend = workedHours.HoursSpend,
-                        WorkDate = workedHours.WorkDate
-                    };
-                    await this.db.WorkedHours.AddAsync(workedHoursDB);
+                        var workedHoursDB = new WorkedHours()
+                        {
+                            EmployeeId = workedHours.EmployeeId,
+                            TaskId = workedHours.TaskId,
+                            HoursSpend = workedHours.HoursSpend,
+                            WorkDate = workedHours.WorkDate
+                        };
+                        await this.db.WorkedHours.AddAsync(workedHoursDB);
+                    }
                 }
                 else
                 {
@@ -972,6 +974,26 @@ namespace TaskManager.Services.Implementations
                     .Where(et => et.TaskName == name && et.TaskType.TypeName == TaskTypeSystem)
                     .Select(et => et.Id)
                     .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> RemoveSystemTaskForDate(int userId, DateTime currentDate)
+        {
+            var systemTasksIds = await this.db.Tasks
+                    .Where(et => et.TaskType.TypeName == TaskTypeSystem)
+                    .Select(et => et.Id)
+                    .ToListAsync();
+            foreach (var taskid in systemTasksIds)
+            {
+                var systemEmployeeTask = await this.db.WorkedHours
+                    .Where(et => et.TaskId == taskid && et.EmployeeId == userId && et.WorkDate.Date == currentDate.Date)
+                    .FirstOrDefaultAsync();
+                if (systemEmployeeTask != null)
+                {
+                    this.db.WorkedHours.Remove(systemEmployeeTask);
+                }
+            }
+            await this.db.SaveChangesAsync();
+            return true;
         }
     }
 }
