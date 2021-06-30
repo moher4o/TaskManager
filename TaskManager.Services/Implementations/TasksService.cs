@@ -776,6 +776,26 @@ namespace TaskManager.Services.Implementations
             }
         }
 
+        public async Task<string> SetWorkedHoursWithDeletedAsync(TaskWorkedHoursServiceModel workedHours)
+        {
+            try
+            {
+                var currentTaskHours = await this.db.WorkedHours
+                    .Where(d => d.WorkDate == workedHours.WorkDate && d.EmployeeId == workedHours.EmployeeId && d.TaskId == workedHours.TaskId)
+                    .FirstOrDefaultAsync();
+                if (currentTaskHours != null)
+                {
+                    this.db.WorkedHours.Remove(currentTaskHours);
+                    await this.db.SaveChangesAsync();
+                }
+                return "success";
+            }
+            catch (Exception)
+            {
+                return "Service[SetWorkedHoursAsync]. Неуспешен запис.";
+            }
+        }
+
 
         public async Task<bool> CloseTaskAsync(int taskId, string endNote, int closerid)
         {

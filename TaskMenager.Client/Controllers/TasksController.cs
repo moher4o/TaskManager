@@ -1402,7 +1402,7 @@ namespace TaskMenager.Client.Controllers
                 var message = string.Empty;
                 if (isholiday || isill)
                 {
-                    var dateTaskList = await this.employees.GetUserActiveTaskAsync(userId, workDate.Date);
+                    var dateTaskList = await this.employees.GetAllUserTaskAsync(userId, workDate.Date);
                     foreach (var itemTask in dateTaskList)
                     {
                         var workedHours = new TaskWorkedHoursServiceModel()
@@ -1413,7 +1413,7 @@ namespace TaskMenager.Client.Controllers
                             WorkDate = workDate.Date
                         };
 
-                        await this.tasks.SetWorkedHoursAsync(workedHours);
+                        await this.tasks.SetWorkedHoursWithDeletedAsync(workedHours);
                     }
                     if (isholiday)
                     {

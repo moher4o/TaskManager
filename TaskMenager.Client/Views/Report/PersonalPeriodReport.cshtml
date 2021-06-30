@@ -8,6 +8,9 @@
 @{ var dateList = new HashSet<DateTime>();}
 @{ int hours = 1;}
 @{ int sum = 0;}
+@{ string rcolor = string.Empty;}
+@{ string ropacity = "1.00";}
+@{ string systemtaskname = string.Empty; ;}
 
 <div class="PrimeBox2 widthmobile" style="max-width:100%; position:relative; background-color:ghostwhite; margin-top:10px !important">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
@@ -24,7 +27,7 @@
                     <th style="width:7%;">Дата</th>
                     @foreach (var item in Model.PersonalDateList.WorkedHoursByTaskByPeriod)
                     {
-                        if (!TaskList.Contains(item.TaskId))
+                        if (!TaskList.Contains(item.TaskId) && item.TaskName != "Отпуски" && item.TaskName != "Болнични")
                         {
                             TaskList.Add(item.TaskId);
                             <th class="tasks" style="min-width:30px; max-height:200px; writing-mode: vertical-rl; font-size:smaller; text-transform:lowercase !important;">@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)</th>
@@ -42,8 +45,23 @@
 
                 @foreach (var worckedDate in dateList)
                 {
+                    systemtaskname = string.Empty;
+                    ropacity = "1.00";
+                    rcolor = string.Empty;
                     sum = 0;
-                    <tr style=" display: table; width: 100%; table-layout: fixed; /* even columns width , fix width of table too*/ ">
+                    if (Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date && w.TaskName == "Отпуски").FirstOrDefault() != null)
+                    {
+                        ropacity = "0.5";
+                        rcolor = "cornflowerblue";
+                        systemtaskname = "Отпуск";
+                    }
+                    else if (Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date && w.TaskName == "Болнични").FirstOrDefault() != null)
+                    {
+                        ropacity = "0.5";
+                        rcolor = "salmon";
+                        systemtaskname = "Болничен";
+                    }
+                    <tr style=" display: table; width: 100%; table-layout: fixed; background-color:@(rcolor); opacity:@(ropacity.ToString()); /* even columns width , fix width of table too*/ ">
                         <td style="width:7%;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
                         @foreach (var id in TaskList)
                         {
@@ -51,7 +69,14 @@
                             sum = sum + hours;
                             <td>@(hours > 0 ? hours.ToString() : "")</td>
                         }
-                        <td style="background-color:ivory; font-size:medium; width:5%;"><strong>@sum</strong></td>
+                        @if (sum > 0)
+                        {
+                            <td style="background-color:ivory; font-size:medium; width:5%;"><strong>@sum</strong></td>
+                        }
+                        else
+                        {
+                            <td style="background-color:@(rcolor); font-size:smaller; width:5%;">@systemtaskname</td>
+                        }
                     </tr>
                 }
                 <tr style="background-color:ivory; font-size:medium; display: table; width: 100%; table-layout: fixed;">

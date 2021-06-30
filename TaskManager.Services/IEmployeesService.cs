@@ -57,5 +57,7 @@ namespace TaskManager.Services
         Task<string> GenerateEmailWhenEmpty();
 
         Task<bool> AddAllToSystemTasksAsync();
+
+        Task<IEnumerable<TaskFewInfoServiceModel>> GetAllUserTaskAsync(int userId, DateTime dateToProcess);
     }
 }

@@ -57,5 +57,7 @@ namespace TaskManager.Services
         Task<int> GetSystemTaskIdByNameAsync(string name);
 
         Task<bool> RemoveSystemTaskForDate(int userId, DateTime currentDate);
+
+        Task<string> SetWorkedHoursWithDeletedAsync(TaskWorkedHoursServiceModel workedHours);
     }
 }

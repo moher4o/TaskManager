@@ -34,7 +34,9 @@
             $('#watermarkholiday').hide('fast');
             $('.input-number').prop('readonly', false);
             $(".btn-number").removeAttr("disabled");
-
+            if (!element.classList.contains("special")) {
+                element.classList.add("special");
+            }
         }
         else {
             $("#illness").prop('checked', false);
@@ -57,6 +59,9 @@
             $('#watermarkill').hide('fast');
             $('.input-number').prop('readonly', false);
             $(".btn-number").removeAttr("disabled");
+            if (!element.classList.contains("special")) {
+                element.classList.add("special");
+            }
         }
         else {
             $("#holiday").prop('checked', false);

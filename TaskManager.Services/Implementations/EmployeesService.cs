@@ -53,6 +53,22 @@ namespace TaskManager.Services.Implementations
             return tasks;
         }
 
+        public async Task<IEnumerable<TaskFewInfoServiceModel>> GetAllUserTaskAsync(int userId, DateTime dateToProcess)
+        {
+            var tasks = await this.db.EmployeesTasks
+                    .Where(et => et.EmployeeId == userId)
+                    .Select(t => t.Task)
+                    .Where(t => t.StartDate.Date <= dateToProcess.Date)
+                    .Distinct()
+                    .OrderBy(t => t.PriorityId)
+                    .ThenByDescending(t => t.EndDatePrognose)
+                    .ProjectTo<TaskFewInfoServiceModel>(new { currentEmployeeId = userId, workDate = dateToProcess.Date })
+                    .ToListAsync();
+
+            return tasks;
+        }
+
+
         public async Task<List<PersonalDateReportServiceModel>> GetDateReport(int userId, DateTime currentDate)
         {
             var report = await this.db.WorkedHours

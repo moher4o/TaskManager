@@ -75,6 +75,7 @@
     -sand-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
+
 #watermarkill {
     position: absolute;
     top: 45%;
