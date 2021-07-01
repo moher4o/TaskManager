@@ -55,6 +55,11 @@
         border-color: transparent;
     }
 
+    /*Добавка за цветове на датите*/
+    .ll-skin-latoja .ui-state-holiday .ui-state-default, .ll-skin-latoja .ui-datepicker-week-end .ui-state-default {
+        color: red;
+    }
+
     .ll-skin-latoja .ui-state-default {
         background: transparent;
         border: none;

@@ -177,6 +177,13 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction(nameof(TaskDetails), new { taskId });
                 }
 
+                if (taskDetails.TaskName.ToLower() == "отпуски" || taskDetails.TaskName.ToLower() == "болнични")
+                {
+                    TempData["Error"] = "Системните задачи не се редактират!";
+                    return RedirectToAction("Index", "Home");
+                }
+
+
                 var taskToEdit = new AddNewTaskViewModel()
                 {
                      ParentTaskId = taskDetails.ParentTaskId,
@@ -268,13 +275,17 @@ namespace TaskMenager.Client.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-
-                   // model = await TasksModelPrepareForViewWithOldInfo(model);
-
                     TempData["Error"] = "Невалидни данни. Моля прегледайте въведената информация за новата задача.";
 
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
+
+                if (model.TaskName.ToLower() == "отпуски" || model.TaskName.ToLower() == "болнични")
+                {
+                    TempData["Error"] = "Името на задачата е заето за системни нужди!";
+                    return RedirectToAction("Index", "Home");
+                }
+
 
                 if (model.Valid_From > model.Valid_To)
                 {
@@ -428,6 +439,14 @@ namespace TaskMenager.Client.Controllers
 
                     return View(model);
                 }
+
+                if (model.TaskName.ToLower() == "отпуски" || model.TaskName.ToLower() == "болнични")
+                {
+                    model = await TasksModelPrepareForViewWithOldInfo(model);
+                    TempData["Error"] = "Името на задачата е заето за системни нужди!";
+                    return View(model);
+                }
+
 
                 if (model.Valid_From > model.Valid_To)
                 {
@@ -1352,6 +1371,19 @@ namespace TaskMenager.Client.Controllers
             {
                 return Json(new { success = false, message = "Основна грешка. Моля проверете логиката на входните данни." });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHolidayDates(int userId)
+        {
+          var data = await this.tasks.GetHolidayDatesAsync(userId, "Отпуски");
+          return Json(new { data });
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetIlldayDates(int userId)
+        {
+            var data = await this.tasks.GetHolidayDatesAsync(userId, "Болнични");
+            return Json(new { data });
         }
 
         [HttpGet]

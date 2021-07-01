@@ -112,7 +112,7 @@ namespace TaskManager.Services.Implementations
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId)
         {
             var tasks = await this.db.Tasks
-                    .Where(et => et.AssignerId == userId && et.isDeleted == false)
+                    .Where(et => et.AssignerId == userId && et.isDeleted == false && et.TaskType.TypeName != TaskTypeSystem)
                     .OrderBy(t => t.PriorityId)
                     .ThenByDescending(t => t.EndDatePrognose)
                     .ProjectTo<TaskFewInfoServiceModel>()

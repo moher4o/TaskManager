@@ -996,6 +996,15 @@ namespace TaskManager.Services.Implementations
                     .FirstOrDefaultAsync();
         }
 
+        public async Task<List<string>> GetHolidayDatesAsync(int userid, string taskName)
+        {
+            var result = await this.db.WorkedHours
+                .Where(wh => wh.Task.TaskName.ToLower() == taskName.ToLower() && wh.EmployeeId == userid)
+                .Select(wh => wh.WorkDate.Date.ToString())
+                .ToListAsync();
+            return result;
+        }
+
         public async Task<bool> RemoveSystemTaskForDate(int userId, DateTime currentDate)
         {
             var systemTasksIds = await this.db.Tasks

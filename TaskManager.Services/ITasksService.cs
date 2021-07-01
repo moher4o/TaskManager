@@ -14,6 +14,8 @@ namespace TaskManager.Services
         Task<bool> CheckIfTaskIsClosed(int taskId);
         IQueryable<TaskInfoServiceModel> GetTaskDetails(int taskId);
 
+        Task<List<string>> GetHolidayDatesAsync(int userid, string taskName);
+
         Task<int> AddNewTaskAsync(AddNewTaskServiceModel newTask);
 
         Task<string> CreateTasksStatusesAsync();

@@ -1,4 +1,5 @@
-﻿$(() => {
+﻿//$(() => {
+{
     const delayInMilliseconds = 200;
     const lochref = window.location.href;
     const locOrigin = window.location.origin;
@@ -14,13 +15,18 @@
     var slideSource = document.getElementById('AREA_PARTIAL_VIEW');
     var element = document.getElementById("btnZapis");
 
-
     document.getElementById("apiNotWorking").hidden = true;
-    AddDatePicker();
     GetDominions();
+    setTimeout(function () {
+        AddDatePicker();
+    }, 100);
+    //AddDatePicker();
 
     $(function () { //jQuery shortcut for .ready (ensures DOM ready)
-        GetUserTaskForDate();
+        setTimeout(function () {
+            GetUserTaskForDate();
+        }, 200);
+        //GetUserTaskForDate();
         //$('#divbtnZapis').show();
         //onclick евент за бутон Запис
         $('#btnZapis').on('click', UpdateHours);
@@ -147,15 +153,62 @@
         });
     }
 
+    function GetIllDays(bossUserId) {
+        currentUrl = path + '\/Tasks\/GetHolidayDates';
+        $.ajax({
+            type: 'GET',
+            url: currentUrl,   // '..\\Tasks\\GetHolidayDates'
+            data: {
+                userId: bossUserId
+            },
+            success: function (data) {
+                return data
+            }
+        })
+    }
+
+    function GetHolidays(bossUserId) {
+        //let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+        console.log(bossUserId);
+        currentUrl = path + '\/Tasks\/GetHolidayDates';
+        $.ajax({
+            type: 'GET',
+            url: currentUrl,   // '..\\Tasks\\GetHolidayDates'
+            data: {
+                userId: bossUserId
+            },
+            success: function (data) {
+                
+                console.log(data);
+                return data.data;
+            }
+        })
+    }
+
     function AddDatePicker() {
-        //var selectedText = document.getElementById("workDate").value
+        var holidays = ["2021/07/01", "2021/07/05", "2021/06/22", "2021/06/30", "2021/06/27", "2021/07/15"];
+
         var selectedText = document.getElementById("workDate") == null ? new Date().toDateString() : document.getElementById("workDate").value;
         //console.log(selectedText);
-        $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+1d", inline: true });
+
+        $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+1m", inline: true, beforeShowDay: highLight });
+        //$("#dateSelector2").datepicker({ beforeShowDay: highLight });
+
         $('#dateSelector2').datepicker('setDate', new Date(selectedText));
-        //$('#dateSelector2').datepicker("refresh");
-        //let date2 = $('#dateSelector2').datepicker("getDate");
-        //console.log(date2);
+                //$('#dateSelector2').datepicker("refresh");
+                //let date2 = $('#dateSelector2').datepicker("getDate");
+                //console.log(date2);
+
+        function highLight(date) {
+            for (var i = 0; i < holidays.length; i++) {
+                if (new Date(holidays[i]).toString() == date.toString()) {
+                    return [true, 'ui-state-holiday'];
+                }
+            }
+            return [true];
+        }
+
+
         $('#dateSelector2').datepicker({
             onSelect: function (d, i) {
                 if (d !== i.lastVal) {
@@ -211,27 +264,30 @@
                 //функцията добавя балончето за бележки
                 attachEvents();
                 //управление на отпуска и болничен
-                var systemtask = document.getElementById("systemtask");    //отпуска, болничен или не
-                if (systemtask.value == 'holiday') {
-                    $('.input-number').prop('readonly', true);
-                    $(".btn-number").attr("disabled", true);
-                    $("#holiday").prop('checked', true);
-                    $("#illness").prop('checked', false);
-                    $('#watermarkholiday').show('fast');
-                }
-                else if (systemtask.value == 'ill') {
-                    $('.input-number').prop('readonly', true);
-                    $(".btn-number").attr("disabled", true);
-                    $("#illness").prop('checked', true);
-                    $("#holiday").prop('checked', false);
-                    $('#watermarkill').show('fast');
-                }
-                else {
-                    $('.input-number').prop('readonly', false);
-                    $(".btn-number").removeAttr("disabled");
-                    $("#holiday").prop('checked', false);
-                    $("#illness").prop('checked', false);
-                }
+                setTimeout(function () {
+                    var systemtask = document.getElementById("systemtask");    //отпуска, болничен или не
+                    if (systemtask.value == 'holiday') {
+                        $('.input-number').prop('readonly', true);
+                        $(".btn-number").attr("disabled", true);
+                        $("#holiday").prop('checked', true);
+                        $("#illness").prop('checked', false);
+                        $('#watermarkholiday').show('fast');
+                    }
+                    else if (systemtask.value == 'ill') {
+                        $('.input-number').prop('readonly', true);
+                        $(".btn-number").attr("disabled", true);
+                        $("#illness").prop('checked', true);
+                        $("#holiday").prop('checked', false);
+                        $('#watermarkill').show('fast');
+                    }
+                    else {
+                        $('.input-number').prop('readonly', false);
+                        $(".btn-number").removeAttr("disabled");
+                        $("#holiday").prop('checked', false);
+                        $("#illness").prop('checked', false);
+                    }
+                }, delayInMilliseconds);
+
 
             }
         });
@@ -480,4 +536,5 @@
         ///////////////////
     }
 
-});
+//});
+}
