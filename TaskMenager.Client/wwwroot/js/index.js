@@ -17,17 +17,17 @@
 
     document.getElementById("apiNotWorking").hidden = true;
     GetDominions();
-    setTimeout(function () {
-        AddDatePicker();
-    }, 100);
+    //setTimeout(function () {
+    //}, 100);
     //AddDatePicker();
+    //GetHolidays();
 
     $(function () { //jQuery shortcut for .ready (ensures DOM ready)
-        setTimeout(function () {
-            GetUserTaskForDate();
-        }, 200);
+        //    setTimeout(function () {
         //GetUserTaskForDate();
-        //$('#divbtnZapis').show();
+        //}, 2000);
+
+       
         //onclick евент за бутон Запис
         $('#btnZapis').on('click', UpdateHours);
         $('#holiday').on('change', ShowHolidayWaterMark);
@@ -138,7 +138,7 @@
                 $('#bosses').change(function () {
                     slideSource.classList.toggle('fade');
                     setTimeout(function () {
-                        GetUserTaskForDate();
+                        GetHolidays();                    //При смяна на акаунта се презареждат задачите
                     }, delayInMilliseconds);
                 });
             }
@@ -150,48 +150,45 @@
                     $("#bosses").append(new Option(item.textValue, item.id));
                 }
             });
+        }).done(function () { //use this
+            GetHolidays();
         });
     }
 
-    function GetIllDays(bossUserId) {
+    function GetHolidays() {
+        let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+        //console.log(bossUserId);
         currentUrl = path + '\/Tasks\/GetHolidayDates';
         $.ajax({
             type: 'GET',
             url: currentUrl,   // '..\\Tasks\\GetHolidayDates'
             data: {
                 userId: bossUserId
-            },
-            success: function (data) {
-                return data
             }
-        })
+        }).done(function (data) { //use this
+            currentUrl = path + '\/Tasks\/GetIlldayDates';
+            $.ajax({
+                type: 'GET',
+                url: currentUrl,   // '..\\Tasks\\GetIlldayDates'
+                data: {
+                    userId: bossUserId
+                }
+            }).done(function (illdates) { //use this
+                AddDatePicker(data.data, illdates.data);
+            });
+        });
     }
 
-    function GetHolidays(bossUserId) {
-        //let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
-        console.log(bossUserId);
-        currentUrl = path + '\/Tasks\/GetHolidayDates';
-        $.ajax({
-            type: 'GET',
-            url: currentUrl,   // '..\\Tasks\\GetHolidayDates'
-            data: {
-                userId: bossUserId
-            },
-            success: function (data) {
-                
-                console.log(data);
-                return data.data;
-            }
-        })
-    }
-
-    function AddDatePicker() {
-        var holidays = ["2021/07/01", "2021/07/05", "2021/06/22", "2021/06/30", "2021/06/27", "2021/07/15"];
-
+    function AddDatePicker(holidays, illdays) {
+        //holidays = ["2021/07/01", "2021/07/05", "2021/06/22", "2021/06/30", "2021/06/27", "2021/07/15"];
+        //console.log(holidays);
+        //console.log(illdays);
+        jQuery('#dateSelector2').datepicker('destroy');
         var selectedText = document.getElementById("workDate") == null ? new Date().toDateString() : document.getElementById("workDate").value;
         //console.log(selectedText);
 
         $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+1m", inline: true, beforeShowDay: highLight });
+        
         //$("#dateSelector2").datepicker({ beforeShowDay: highLight });
 
         $('#dateSelector2').datepicker('setDate', new Date(selectedText));
@@ -200,11 +197,29 @@
                 //console.log(date2);
 
         function highLight(date) {
-            for (var i = 0; i < holidays.length; i++) {
-                if (new Date(holidays[i]).toString() == date.toString()) {
-                    return [true, 'ui-state-holiday'];
+            //for (var i = 0; i < holidays.length; i++) {
+            //    if (new Date(holidays[i]).toString() == date.toString()) {
+            //        return [true, 'ui-state-holiday'];
+            //    }
+            let delitel = '/';;
+            if (holidays.length > 0) {
+                if (holidays[0].includes('.')) {
+                    delitel = '.';
+                }
+                else if (holidays[0].includes('-')) {
+                    delitel = '-';
                 }
             }
+            var search = date.getFullYear("yyyy") + delitel + (("0" + (date.getMonth() + 1)).slice(-2)) + delitel + ("0" + date.getDate()).slice(-2);
+            if (holidays.includes(search)) {
+                //console.log('inhy');
+                return [true, 'ui-state-holiday'];
+            }
+            if (illdays.includes(search)) {
+                //console.log('inill');
+                return [true, 'ui-state-ill'];
+            }
+            //}
             return [true];
         }
 
@@ -223,6 +238,7 @@
             }, delayInMilliseconds);
 
         });
+        GetUserTaskForDate();
     }
 
     function GetUserTaskForDate() {
@@ -378,8 +394,9 @@
         }
         slideSource.classList.toggle('fade');
         setTimeout(function () {
-            GetUserTaskForDate();
-        }, delayInMilliseconds);
+            //GetUserTaskForDate();
+            GetHolidays();
+        }, 300);
 
         setTimeout(function () {
             if (totallSuccess == false) {
@@ -394,7 +411,7 @@
                 $('#btnZapis').blur();
                 toastr.success(messageInfo);
             }
-        }, 1200);
+        }, 800);
     }
 
     function attachEvents() {

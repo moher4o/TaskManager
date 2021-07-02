@@ -21,7 +21,6 @@ namespace TaskManager.Services.Models.TaskModels
         public DateTime WorkDate { get; set; }
 
         [MaxLength(500)]
-        [Required(ErrorMessage = "Полето е задължително")]
         public string Text { get; set; }
 
         public void ConfigureMapping(Profile profile)

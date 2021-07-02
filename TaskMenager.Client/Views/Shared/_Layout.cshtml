@@ -241,9 +241,6 @@
                         </div>*@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
-                            @*<li class="nav-item" id="dominions">
-                                </li>*@
-
                             <li class="nav-item">
                                 <a class="nav-link" style="color:black; font-size:larger;" asp-controller="Users" asp-action="EditUser" asp-route-userId="@(User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault())">
                                     <i class=" fas fa-user-cog fa-lg"></i>
@@ -266,7 +263,7 @@
                             <script type="text/javascript">
                                 $(document).ready(function () {
                                     var data = $('#successMessage').text();
-                                    toastr.success(data, { timeOut: 6000 });
+                                    toastr.success(data, { timeOut: 4000 });
                                     //notify.showSuccess(data);
                                 });
                             </script>
@@ -277,7 +274,7 @@
                             <script type="text/javascript">
                                 $(document).ready(function () {
                                     var data = $('#errorMessage').text();
-                                    toastr.error(data, { timeOut: 10000 });
+                                    toastr.error(data, { timeOut: 6000 });
                                     //notify.showError(data);
                                 });
                             </script>

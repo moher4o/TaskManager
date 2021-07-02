@@ -999,8 +999,8 @@ namespace TaskManager.Services.Implementations
         public async Task<List<string>> GetHolidayDatesAsync(int userid, string taskName)
         {
             var result = await this.db.WorkedHours
-                .Where(wh => wh.Task.TaskName.ToLower() == taskName.ToLower() && wh.EmployeeId == userid)
-                .Select(wh => wh.WorkDate.Date.ToString())
+                .Where(wh => wh.Task.TaskName.ToLower() == taskName.ToLower() && wh.EmployeeId == userid && wh.WorkDate.Date >= DateTime.Now.Date.AddMonths(-12) )
+                .Select(wh => wh.WorkDate.Date.ToString("yyyy/MM/dd"))
                 .ToListAsync();
             return result;
         }
