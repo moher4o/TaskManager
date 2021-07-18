@@ -986,17 +986,18 @@ namespace TaskMenager.Client.Controllers
                                         worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
 
                                     }
-                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski+2, 2, row, 3];
-                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                    if (rowBeforeOtpuski+2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                                    {
+                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                        row = rowBeforeOtpuski;
+                                    }
 
-                                    row = rowBeforeOtpuski;
-
-
-                                        //Графики начало
-                                        ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
+                                    //Графики начало
+                                    ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
 
                                     pieChart.Title.Text = "N: Задача / Часове";
                                     //select the ranges for the pie. First the values, then the header range
@@ -1066,13 +1067,15 @@ namespace TaskMenager.Client.Controllers
                                         worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
 
                                     }
-                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-
-                                    row = rowBeforeOtpuski;
+                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                                    {
+                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                        row = rowBeforeOtpuski;
+                                    }
                                 }
                             }
                             else
@@ -1123,12 +1126,15 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
 
                                 }
-                                var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-
+                                if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                                {
+                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                    row = rowBeforeOtpuski;
+                                }
                             }
                         }
                     }
@@ -1479,13 +1485,15 @@ namespace TaskMenager.Client.Controllers
                                         worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
 
                                     }
-                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-
-                                    row = rowBeforeOtpuski;
+                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                                    {
+                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                        row = rowBeforeOtpuski;
+                                    }
 
                                     //Графики начало
                                     ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
@@ -1557,13 +1565,15 @@ namespace TaskMenager.Client.Controllers
                                         worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
 
                                     }
-                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-
-                                    row = rowBeforeOtpuski;
+                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                                    {
+                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                        row = rowBeforeOtpuski;
+                                    }
                                 }
                             }
                             else
@@ -1614,11 +1624,15 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
 
                                 }
-                                var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                                {
+                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                                    row = rowBeforeOtpuski;
+                                }
 
                             }
                         }
