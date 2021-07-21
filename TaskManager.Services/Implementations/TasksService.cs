@@ -89,7 +89,7 @@ namespace TaskManager.Services.Implementations
             if (withClosed)
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id))
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id) && t.TaskType.TypeName != TaskTypeSystem)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -97,7 +97,7 @@ namespace TaskManager.Services.Implementations
             else if (withDeleted)
             {
                 return this.db.Tasks
-                        .Where(t => t.isDeleted == true && empTaskIds.Contains(t.Id))
+                        .Where(t => t.isDeleted == true && empTaskIds.Contains(t.Id) && t.TaskType.TypeName != TaskTypeSystem)
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -105,7 +105,7 @@ namespace TaskManager.Services.Implementations
             else
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id))
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id) && t.TaskType.TypeName != TaskTypeSystem)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -117,7 +117,7 @@ namespace TaskManager.Services.Implementations
             if (withClosed)
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -125,7 +125,7 @@ namespace TaskManager.Services.Implementations
             else if (withDeleted)
             {
                 return this.db.Tasks
-                        .Where(t => t.isDeleted == true && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                        .Where(t => t.isDeleted == true && t.TaskType.TypeName != TaskTypeSystem && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -133,7 +133,7 @@ namespace TaskManager.Services.Implementations
             else
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal)))
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -145,7 +145,7 @@ namespace TaskManager.Services.Implementations
             if (withClosed)
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -153,7 +153,7 @@ namespace TaskManager.Services.Implementations
             else if (withDeleted)
             {
                 return this.db.Tasks
-                        .Where(t => t.isDeleted == true && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                        .Where(t => t.isDeleted == true && t.TaskType.TypeName != TaskTypeSystem && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -161,7 +161,7 @@ namespace TaskManager.Services.Implementations
             else
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal)))
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -173,7 +173,7 @@ namespace TaskManager.Services.Implementations
             if (withClosed)
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null))
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null) && t.TaskType.TypeName != TaskTypeSystem)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -181,7 +181,7 @@ namespace TaskManager.Services.Implementations
             else if (withDeleted)
             {
                 return this.db.Tasks
-                        .Where(t => t.isDeleted == true && (t.DirectorateId == dirId || t.DirectorateId == null))
+                        .Where(t => t.isDeleted == true && (t.DirectorateId == dirId || t.DirectorateId == null) && t.TaskType.TypeName != TaskTypeSystem)
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -189,7 +189,7 @@ namespace TaskManager.Services.Implementations
             else
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null))
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null) && t.TaskType.TypeName != TaskTypeSystem)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -201,7 +201,7 @@ namespace TaskManager.Services.Implementations
             if (withClosed)
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false)
+                         .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && t.TaskType.TypeName != TaskTypeSystem)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -209,7 +209,7 @@ namespace TaskManager.Services.Implementations
             else if (withDeleted)
             {
                 return this.db.Tasks
-                        .Where(t => t.isDeleted == true)
+                        .Where(t => t.isDeleted == true && t.TaskType.TypeName != TaskTypeSystem)
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -217,7 +217,7 @@ namespace TaskManager.Services.Implementations
             else
             {
                 return this.db.Tasks
-                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false)
+                         .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && t.TaskType.TypeName != TaskTypeSystem)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();

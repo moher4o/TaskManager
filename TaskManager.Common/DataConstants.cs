@@ -45,7 +45,7 @@ namespace TaskManager.Common
         public const string DeveloperLastName = "Вуков";
         //public const string DeveloperJobTitle = "Employee"; //for first use
 
-        public const string FirmName = "ДАЕУ";
+        public const string FirmName = "Мениджър задачи";
         public const string ClassFilesSubDirectory = "TasksFiles";
 
 
