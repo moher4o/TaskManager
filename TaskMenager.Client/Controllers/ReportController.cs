@@ -722,8 +722,16 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                             worksheet.Cells[1, 1].Style.Indent = 10;
                             worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            worksheet.Cells[1, 1].Value = "Дирекция: \"" + directorate.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
-                                "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                            if (allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() == 1)
+                            {
+                                worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.DepartmentId == department.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                    "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                            }
+                            else
+                            {
+                                worksheet.Cells[1, 1].Value = "Отдел: \"" + department.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                    "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                            }
                             worksheet.Cells[1, 1].Style.Font.Size = 14;
                             worksheet.Cells[1, 1].Style.Font.Bold = true;
                             //worksheet.View.FreezePanes(100, 6);
@@ -1219,8 +1227,16 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                             worksheet.Cells[1, 1].Style.Indent = 10;
                             worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            worksheet.Cells[1, 1].Value = "Дирекция: \"" + directorate.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
-                                "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                            if (allExperts.Where(s => s.SectorId == sector.Id).ToList().Count() == 1)
+                            {
+                                worksheet.Cells[1, 1].Value ="Отчет на: "+ allExperts.Where(s => s.SectorId == sector.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                    "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                            }
+                            else
+                            {
+                                worksheet.Cells[1, 1].Value = "Сектор: \"" + sector.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                    "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                            }
                             worksheet.Cells[1, 1].Style.Font.Size = 14;
                             worksheet.Cells[1, 1].Style.Font.Bold = true;
                             //worksheet.View.FreezePanes(100, 6);
