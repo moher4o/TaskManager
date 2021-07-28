@@ -54,73 +54,73 @@ else
             @*<partial name="_ShowTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed)" />*@
             @foreach (var item in Model.ActiveTasks.Where(t => t.TaskStatusName != TaskStatusClosed && t.TaskStatusName != "Изтрит" && t.TaskTypeName != TaskTypeSystem).OrderByDescending(t => t.EmployeeHoursToday))
             {
-                <div class="row PrimeBox3" style="margin-top:5px; font-size:small;" id=@(item.Id)>
-                    @{var name = item.TaskName.Length > 90 ? (item.TaskName).Substring(0, 90) + "..." : item.TaskName;}
-                    <div class="col-md-6">
-                        <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
-                    </div>
-                    @*<div class="col-md-1">
-                            <label>@item.TaskStatusName</label>
-                        </div>*@
-                    <div class="col-md-1">
-                        <label style="padding-left:10px;">@item.TaskPriorityName</label>
-                    </div>
-                    <div class="col-md-1">
-                        <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
-                    </div>
-                    <div class="col-md-4" style="color: #5f9fec;">
-                        <div class="row" style="padding-left:15%;">
-                            <div style="min-width:60px;">
-                                <a title="Форум на задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
-                                    <img class="chatnotifications" src="~/png/note.png" />
-                                    <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
-                                </a>
-                            </div>
-                            <div style="min-width:60px;">
-                                <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
-                                   asp-route-taskName="@item.TaskName"
-                                   asp-route-taskId="@item.Id">
-                                    <img class="chatnotifications3" src="~/png/files.png" />
-                                    <span class="notificationsTodayCountValue" @(item.FilesCount > 0 ? "" : "hidden")>@item.FilesCount</span>
-                                </a>
-                            </div>
-                            <div style="min-width:60px; max-height:35px;">
-                                <div class="center">
-
-                                    <div class="input-group">
-                                        <span class="input-group-btn">
-                                            <button type="button" class="btn btn-number" style="background-color:#fcdede; border-radius:80px;" data-type="minus" data-field="@item.Id">
-                                                <i class="fas fa-minus fa-sm"></i>
-                                            </button>
-                                        </span>
-                                        <input style="font-size:large; text-align:center; max-height:33px; font-weight:600; color:@(item.EmployeeHoursToday > 0 ? "red;" : "dodgerblue")" type="text" name="@item.Id" class="form-control input-number" value="@item.EmployeeHoursToday" min="0" max="16">
-                                        <span class="input-group-btn">
-                                            <button type="button" class="btn btn-number" style="background-color:#dfffde; border-radius:80px;" data-type="plus" data-field="@item.Id">
-                                                <i class=" fas fa-plus fa-sm"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                </div>
-
-                            </div>
-                            @*<div style="padding-left:15px; cursor:pointer;" title="Бележка по задачата за текущата дата">
-                                    <img class="chatnotifications4" src="~/png/orange-speech-balloon2.png" />
-                                    <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
-                                </div>*@
-                            <!-- Modal placeholder -->
-                            <div id="modal-placeholder"></div>
-                            <!-- Button trigger modal -->
-                            <a title="Бележка по задачата за текущата дата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:15px;"
-                               data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("AddDateNote")" data-taskid="@item.Id" data-taskname="@item.TaskName" data-balloon-length="xlarge" aria-label="@item.TaskNoteForToday" data-balloon-pos="down-right">
-                                <img class="chatnotifications2" src="~/png/orange-speech-balloon2.png" />
-                                <span class="notificationsTodayCountValue" @(item.TaskNoteForToday != null ? "" : "hidden")>1</span>
+            <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");" id=@(item.Id)>
+                @{var name = item.TaskName.Length > 90 ? (item.TaskName).Substring(0, 90) + "..." : item.TaskName;}
+                <div class="col-md-6">
+                    <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
+                </div>
+                @*<div class="col-md-1">
+            <label>@item.TaskStatusName</label>
+        </div>*@
+                <div class="col-md-1">
+                    <label style="padding-left:10px;">@item.TaskPriorityName</label>
+                </div>
+                <div class="col-md-1">
+                    <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
+                </div>
+                <div class="col-md-4" style="color: #5f9fec;">
+                    <div class="row" style="padding-left:15%;">
+                        <div style="min-width:60px;">
+                            <a title="Форум на задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
+                                <img class="chatnotifications" src="~/png/note.png" />
+                                <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
                             </a>
+                        </div>
+                        <div style="min-width:60px;">
+                            <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
+                               asp-route-taskName="@item.TaskName"
+                               asp-route-taskId="@item.Id">
+                                <img class="chatnotifications3" src="~/png/files.png" />
+                                <span class="notificationsTodayCountValue" @(item.FilesCount > 0 ? "" : "hidden")>@item.FilesCount</span>
+                            </a>
+                        </div>
+                        <div style="min-width:60px; max-height:35px;">
+                            <div class="center">
 
+                                <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-number" style="background-color:#fcdede; border-radius:80px;" data-type="minus" data-field="@item.Id">
+                                            <i class="fas fa-minus fa-sm"></i>
+                                        </button>
+                                    </span>
+                                    <input style="font-size:large; text-align:center; max-height:33px; font-weight:600; color:@(item.EmployeeHoursToday > 0 ? "red;" : "dodgerblue")" type="text" name="@item.Id" class="form-control input-number" value="@item.EmployeeHoursToday" min="0" max="16">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-number" style="background-color:#dfffde; border-radius:80px;" data-type="plus" data-field="@item.Id">
+                                            <i class=" fas fa-plus fa-sm"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
 
                         </div>
-                    </div>
+                        @*<div style="padding-left:15px; cursor:pointer;" title="Бележка по задачата за текущата дата">
+                    <img class="chatnotifications4" src="~/png/orange-speech-balloon2.png" />
+                    <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
+                </div>*@
+                        <!-- Modal placeholder -->
+                        <div id="modal-placeholder"></div>
+                        <!-- Button trigger modal -->
+                        <a title="Бележка по задачата за текущата дата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:15px;"
+                           data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("AddDateNote")" data-taskid="@item.Id" data-taskname="@item.TaskName" data-balloon-length="xlarge" aria-label="@item.TaskNoteForToday" data-balloon-pos="down-right">
+                            <img class="chatnotifications2" src="~/png/orange-speech-balloon2.png" />
+                            <span class="notificationsTodayCountValue" @(item.TaskNoteForToday != null ? "" : "hidden")>1</span>
+                        </a>
 
+
+                    </div>
                 </div>
+
+            </div>
             }
             <div class="displayno" id="showclosedTasks">
                 <partial name="_ShowClosedTasksPartial" model="@Model.ActiveTasks.Where(t => t.TaskStatusName == TaskStatusClosed || t.TaskStatusName == "Изтрит")" />

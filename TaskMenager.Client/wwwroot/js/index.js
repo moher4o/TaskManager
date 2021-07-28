@@ -264,11 +264,12 @@
                 slideSource.classList.toggle('fade');
                 //добавяне на eventListener
                 document.querySelectorAll('.PrimeBox3').forEach(item => {
+                    let backcolor = item.style["background-color"];
                     item.addEventListener('mouseover', event => {
                         item.style["background-color"] = "#e7f6fb";
                     })
                     item.addEventListener('mouseout', event => {
-                        item.style["background-color"] = "#fff";
+                        item.style["background-color"] = backcolor;
                     })
                 })
                 //onclick евент за показване на приключените задачи 

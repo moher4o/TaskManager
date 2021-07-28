@@ -31,7 +31,8 @@ namespace TaskMenager.Client.Controllers
         protected readonly IEmailService email;
         protected readonly IWebHostEnvironment env;
         protected readonly UserServiceModel currentUser;
-        public BaseController(IHttpContextAccessor httpContextAccessor, IEmployeesService employees, ITasksService tasks, IEmailService email, IWebHostEnvironment env)
+        private readonly IEmailConfiguration emailConfiguration;
+        public BaseController(IHttpContextAccessor httpContextAccessor, IEmployeesService employees, ITasksService tasks, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration)
         {
             this.env = env;
             this.tasks = tasks;
@@ -39,6 +40,7 @@ namespace TaskMenager.Client.Controllers
             this.email = email;
             this._httpContextAccessor = httpContextAccessor;
             currentUser = this.employees.GetUserDataForCooky(_httpContextAccessor?.HttpContext?.User?.Identities.FirstOrDefault().Name.ToLower());
+            this.emailConfiguration = _emailConfiguration;
         }
 
         public IActionResult NotAuthorized()
@@ -55,8 +57,8 @@ namespace TaskMenager.Client.Controllers
                     .FirstOrDefaultAsync();
                 if (currentTask != null)
                 {
-                    string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value, "/TaskManager");
-                    //string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value);
+                    string host = string.Concat(emailConfiguration.HostName, "/TaskManager");
+                    //string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value, "/TaskManager");
                     var userSetingsLink = "/Users/EditUser?userId=" + currentUser.Id.ToString();
                     userSetingsLink = string.Concat("<a href=\"",host, userSetingsLink, "\">", "Отписване", "</a>");
                     string logo = host + "/gif/logo.gif";
@@ -154,7 +156,7 @@ namespace TaskMenager.Client.Controllers
                     .FirstOrDefaultAsync();
                 if (currentTask != null)
                 {
-                    string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value, "/TaskManager");
+                    string host = string.Concat(emailConfiguration.HostName, "/TaskManager");
                     //string host = string.Concat("https://", _httpContextAccessor.HttpContext.Request.Host.Value);
                     var userSetingsLink = "/Users/EditUser?userId=" + currentUser.Id.ToString();
                     userSetingsLink = string.Concat("<a href=\"", host, userSetingsLink, "\">", "Отписване", "</a>");

@@ -28,7 +28,7 @@ namespace TaskMenager.Client.Controllers
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
         
-        public InsertDataFromFileController(IRolesService roles, ITitleService titles, IEmployeesService employees, ITasksService tasks, IDepartmentsService departments, ISectorsService sectors, IDirectorateService directorates, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
+        public InsertDataFromFileController(IRolesService roles, ITitleService titles, IEmployeesService employees, ITasksService tasks, IDepartmentsService departments, ISectorsService sectors, IDirectorateService directorates, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             //this.roles = roles;
             this.titles = titles;

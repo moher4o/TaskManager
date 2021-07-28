@@ -21,7 +21,7 @@ namespace TaskMenager.Client.Controllers
     {
         private readonly IManageFilesService files;
 
-        public TasksFilesController(IManageFilesService files, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env) : base(httpContextAccessor, employees, tasks, email, env)
+        public TasksFilesController(IManageFilesService files, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.files = files;
         }

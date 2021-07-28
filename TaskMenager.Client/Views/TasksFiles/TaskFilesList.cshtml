@@ -89,7 +89,6 @@
     function DeleteFile(fileName) {
         var result = confirm("Потвърдете изтриването на " + fileName);
         if(result){
-            console.log(result);
             $.getJSON('\DeleteFile\?taskId=' + $("#taskIdFiles").val() + '&fileName=' + fileName, { get_param: 'value' }, function (data) {
                 if (data) {
                     FileList();
@@ -113,11 +112,13 @@
         fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
         if (validExts.indexOf(fileExt) < 0) {
             toastr.error("Избран е невалиден тип файл, валидните типове са " +
-                validExts.toString() + " .")
+                validExts.toString() + " .");
+            $("#myfile").val(null);
             return false;
         }
-        else if (sizeMb.toPrecision(5) > 10.5) {
-            toastr.error("Размера " + sizeMb.toPrecision(5).toString() + "MB на файла е по-голям от допустимия(10MB)");
+        else if (sizeMb.toPrecision(5) > 50.5) {
+            toastr.error("Размера " + sizeMb.toPrecision(5).toString() + "MB на файла е по-голям от допустимия(50MB)");
+            $("#myfile").val(null);
             return false;
         }
         else {

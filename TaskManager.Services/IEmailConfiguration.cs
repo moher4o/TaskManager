@@ -16,5 +16,7 @@
         bool StoreFiles { get; set; }
 
         long TaskDirectorySize { get; }
+
+        string HostName { get; set; }
     }
 }
