@@ -38,6 +38,8 @@ namespace TaskMenager.Client.Models.Tasks
 
         public string ParentTaskId { get; set; }
 
+        public int FilesCount { get; set; }
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Task, TasksListViewModel>()

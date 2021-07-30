@@ -1495,6 +1495,10 @@ namespace TaskMenager.Client.Controllers
             var data = this.tasks.GetAllTasks(currentUser.Id, withClosed, withDeleted)
                 .ProjectTo<TasksListViewModel>()
                 .ToList();
+            foreach (var task in data)
+            {
+                task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
+            }
 
             return Json(new { data });
         }
