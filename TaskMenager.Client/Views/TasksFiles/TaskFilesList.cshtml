@@ -106,7 +106,7 @@
     function checkfile(sender) {
 
         let sizeMb = sender.files[0].size / 1048576;
-        var validExts = new Array(".xlsx", ".xls", ".doc", ".docx", ".rar", ".zip", ".pdf", ".txt", ".jpg", ".7z", ".csv");
+        var validExts = new Array(".xlsx", ".xls", ".doc", ".docx", ".rar", ".zip", ".pdf", ".txt", ".jpg", ".7z", ".csv", ".pptx", ".sql", ".json", ".xml", ".config");
         var fileExt = sender.value;
         var fullName = fileExt.substring(fileExt.lastIndexOf('\\') + 1);
         fileExt = fileExt.substring(fileExt.lastIndexOf('.'));

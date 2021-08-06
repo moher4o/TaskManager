@@ -67,6 +67,32 @@
     @*<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>*@
     <!--<script src="~/js/animated.js"></script>-->
 
+    @*cookieconsent*@
+    <link rel="stylesheet" type="text/css" href="~/build/cookieconsent.min.css" />
+    <script src="~/build/cookieconsent.min.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            window.cookieconsent.initialise({
+                "palette": {
+                    "popup": {
+                        "background": "#eee"
+                    },
+                    "button": {
+                        "background": "#2a67ac"
+                    }
+                },
+                "theme": "edgeless",
+                "position": "bottom-left",
+                "content": {
+                    "message": "Този сайт използва бисквитки, за да ви предостави най-добрата услуга.",
+                    "dismiss": "Приемам!",
+                    "link": "Научете повече",
+                    "href": "https://bg.wikipedia.org/wiki/HTTP-%D0%B1%D0%B8%D1%81%D0%BA%D0%B2%D0%B8%D1%82%D0%BA%D0%B0"
+                }
+            })
+        });
+    </script>
+    @*cookieconsent*@
 </head>
 <body>
     <header>
