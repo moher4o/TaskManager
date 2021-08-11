@@ -77,8 +77,20 @@ namespace TaskMenager.Client.Controllers
                     TempData["Error"] = "[TaskReportResult] Невалиден номер на задача";
                     return RedirectToAction("TasksList", "Tasks");
                 }
-
-                model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                var currentTask = this.tasks.GetTaskDetails(model.taskId).FirstOrDefault();
+                model.TaskName = currentTask.TaskName;
+                if (currentTask.TaskTypeName == DataConstants.TaskTypeGlobal)    //ако е глобална
+                {
+                    foreach (var itemId in await this.tasks.GetTaskChildsIdsAsync(currentTask.Id))
+                    {
+                        model.DateList.AddRange(await this.tasks.GetTaskReport(itemId, model.StartDate.Date, model.EndDate.Date));
+                    }
+                }
+                else
+                {
+                    model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                }
+               
                 if (model.DateList.Count < 1)
                 {
                     TempData["Error"] = "[TaskReportResult] Няма отчет по задачата за този период.";
@@ -198,8 +210,20 @@ namespace TaskMenager.Client.Controllers
                     TempData["Error"] = "[ExportSpravkaForTask] Невалиден номер на задача";
                     return RedirectToAction("TasksList", "Tasks");
                 }
-
-                var taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                var taskReportForPeriod = new List<TaskWorkedHoursServiceModel>();
+                var currentTask = this.tasks.GetTaskDetails(model.taskId).FirstOrDefault();
+                if (currentTask.TaskTypeName == DataConstants.TaskTypeGlobal)    //ако е глобална
+                {
+                    foreach (var itemId in await this.tasks.GetTaskChildsIdsAsync(currentTask.Id))
+                    {
+                        taskReportForPeriod.AddRange(await this.tasks.GetTaskReport(itemId, model.StartDate.Date, model.EndDate.Date));
+                    }
+                }
+                else
+                {
+                    taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                }
+                //var taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
 
                 foreach (var item in taskReportForPeriod)
                 {
@@ -228,7 +252,7 @@ namespace TaskMenager.Client.Controllers
                     }
                     catch (Exception)
                     {
-                        TempData["Error"] = "Грешка при създаването на tab за отчета: " + taskReportForPeriod.Select(wh => wh.TaskName).FirstOrDefault().Substring(0, 50) + "...";
+                        TempData["Error"] = "Грешка при създаването на tab за отчета: " + currentTask.TaskName.Substring(0, 50) + "...";
                         return RedirectToAction("TasksList", "Tasks");
                     }
 
@@ -261,14 +285,14 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Column(column).Width = 10;
                     worksheet.Cells[2, column].Value = "Общо за дата :";
 
-                    worksheet.Cells[1, 1, 1, column > 14 ? column : 14].Merge = true;
+                    worksheet.Cells[1, 1, 1, column > 20 ? column : 20].Merge = true;
                     worksheet.Row(1).Height = 25;
                     worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
                     worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                     worksheet.Cells[1, 1].Style.Indent = 10;
                     worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                    worksheet.Cells[1, 1].Value = taskReportForPeriod.Select(wh => wh.TaskName).FirstOrDefault() + "  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                    worksheet.Cells[1, 1].Value = currentTask.TaskName + "  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                     worksheet.Cells[1, 1].Style.Font.Size = 14;
                     worksheet.Cells[1, 1].Style.Font.Bold = true;
                     //worksheet.View.FreezePanes(400, 2);
@@ -284,7 +308,7 @@ namespace TaskMenager.Client.Controllers
 
                         foreach (var empid in employeesList)
                         {
-                            var hours = taskReportForPeriod.Where(wh => wh.EmployeeId == empid && wh.WorkDate.Date == date.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
+                            var hours = taskReportForPeriod.Where(wh => wh.EmployeeId == empid && wh.WorkDate.Date == date.Date).Sum(wh => wh.HoursSpend);
                             if (hours > 0)
                             {
                                 worksheet.Cells[row, tableEmpColumn[empid]].Value = hours;

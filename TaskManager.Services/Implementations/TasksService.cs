@@ -891,7 +891,7 @@ namespace TaskManager.Services.Implementations
 
                 }
 
-                if (taskToEdit.ParentTaskId.Value == 0 || taskToEdit.ParentTaskId == null)
+                if (taskToEdit.ParentTaskId == null)
                 {
                     currentTask.TypeId = await this.db.TasksTypes.Where(tt => tt.TypeName == TaskTypeGlobal).Select(tt => tt.Id).FirstOrDefaultAsync();
                     currentTask.ParentTaskId = null;
@@ -1023,6 +1023,11 @@ namespace TaskManager.Services.Implementations
             }
             await this.db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<int>> GetTaskChildsIdsAsync(int taskId)
+        {
+            return await this.db.Tasks.Where(t => t.ParentTaskId == taskId).Select(t => t.Id).ToListAsync();
         }
     }
 }
