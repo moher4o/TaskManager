@@ -196,7 +196,6 @@ namespace TaskMenager.Client.Controllers
                      Valid_From = taskDetails.StartDate.Date,
                      Valid_To = taskDetails.EndDatePrognose.Value.Date
                 };
-
                 var assignedEmployees = new List<SelectServiceModel>();
                 assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
 
@@ -256,6 +255,16 @@ namespace TaskMenager.Client.Controllers
                 taskToEdit.Description = taskDetails.Description;
                 taskToEdit.HoursLimit = taskDetails.HoursLimit;
                 taskToEdit.ParentTaskId = taskDetails.ParentTaskId;
+                if (taskDetails.TypeId == await this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal))
+                {
+                    var childrens = await this.tasks.GetTaskChildsIdsAsync(taskToEdit.Id);
+                    taskToEdit.ChildrenTasksCount = childrens.Count();
+                }
+                else
+                {
+                    taskToEdit.ChildrenTasksCount = 0;
+                }
+
 
                 return View(taskToEdit);
             }

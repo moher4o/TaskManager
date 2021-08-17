@@ -27,6 +27,8 @@ namespace TaskMenager.Client.Models.Tasks
 
         public int? ParentTaskId { get; set; }
 
+        public int? ChildrenTasksCount { get; set; }
+
         public int OwnerId { get; set; }
 
         [Display(Name = "Дирекция")]

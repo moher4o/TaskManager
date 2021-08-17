@@ -1,6 +1,6 @@
 ﻿$(() => {
     attachEvents();
-
+    var childrensCount = document.getElementById("childrensCount").value;
     function attachEvents() {
         $('#assignerId').on('change', function () { $("#select2-assignerId-container").css('background-color', '#ffffff'); });
         $('#taskTypesId').on('change', CheckSelectedParent);
@@ -13,19 +13,28 @@
     }
 
     function CheckSelectedTaskType() {
-        if ($('#parentsId :selected').text() != 'Моля изберете...' && document.getElementById('taskTypesId').selectedIndex === 6) {
-            document.getElementById('taskTypesId').selectedIndex = 4;    //Индекса на "Специфични задачи"  !!!!! (индексите почват от 0)    --> $('#taskTypesId :selected').text() === 'Глобална'
+        
+        if (childrensCount === '0') {   //ако не е родител
 
+            if ($('#parentsId :selected').text() != 'Моля изберете...' && document.getElementById('taskTypesId').selectedIndex === 6) {
+                document.getElementById('taskTypesId').selectedIndex = 4;    //Индекса на "Специфични задачи"  !!!!! (индексите почват от 0)    --> $('#taskTypesId :selected').text() === 'Глобална'
+
+            }
+            else if ($('#parentsId :selected').text() === 'Моля изберете...' && document.getElementById('taskTypesId').selectedIndex != 6) {
+                document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
+            }
+            if ($('#parentsId :selected').text() != 'Моля изберете...') {
+                $('#Subjects_dropdown').multiselect('enable');
+            }
+            else {
+                $('#Subjects_dropdown').multiselect('disable');
+                DeselectEmployees();
+            }
         }
-        else if ($('#parentsId :selected').text() === 'Моля изберете...' && document.getElementById('taskTypesId').selectedIndex != 6) {
+        else {     //ако е родител
+            swal("Информация", "Задачата е родител на <" + childrensCount + "> други задачи. Пренасочете ги към други Глобални задачи, преди да смените типа на тази!", "info");
             document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
-        }
-        if ($('#parentsId :selected').text() != 'Моля изберете...') {
-            $('#Subjects_dropdown').multiselect('enable');
-        }
-        else {
-            $('#Subjects_dropdown').multiselect('disable');
-            DeselectEmployees();
+            $("#parentsId").val('0');    //Индекса на "Моля изберете..."  !!!!! (индексите почват от 0)
         }
     }
 
@@ -36,29 +45,39 @@
     }
 
     function CheckSelectedParent() {
-        if (document.getElementById('taskTypesId').selectedIndex != 6 && $('#parentsId :selected').text() === 'Моля изберете...') {    // $('#taskTypesId :selected').text() != 'Глобална'
-            swal("Информация", "Изберете глобална задача(родител), преди да смените типа.", "info");
-            document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
-        }
-        else if (document.getElementById('taskTypesId').selectedIndex === 6 && $('#parentsId :selected').text() != 'Моля изберете...') {
+        
+        if (childrensCount === '0') {  //ако не е родител
+
+            if (document.getElementById('taskTypesId').selectedIndex != 6 && $('#parentsId :selected').text() === 'Моля изберете...') {    // $('#taskTypesId :selected').text() != 'Глобална'
+                swal("Информация", "Изберете глобална задача(родител), преди да смените типа.", "info");
+                document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
+            }
+            else if (document.getElementById('taskTypesId').selectedIndex === 6 && $('#parentsId :selected').text() != 'Моля изберете...') {
                 swal("Информация", "Задачите от тип \"Глобална\", не трябва да имат задача родител. Изборът на родител ще бъде нулиран и назначените експерти(ако има такива) ще бъдат премахнати", "info");
+                $("#parentsId").val('0');    //Индекса на "Моля изберете..."  !!!!! (индексите почват от 0)
+                $("#parentsId").select2().trigger('change');
+            }
+            if (document.getElementById('taskTypesId').selectedIndex != 6) {
+                $('#Subjects_dropdown').multiselect('enable');
+            }
+            else {
+                $('#Subjects_dropdown').multiselect('disable');
+                DeselectEmployees();
+            }
+        }
+        else {  //ако е родител
+            swal("Информация", "Задачата е родител на <" + childrensCount + "> други задачи. Пренасочете ги към други Глобални задачи, преди да смените типа на тази!", "info");
+            document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
             $("#parentsId").val('0');    //Индекса на "Моля изберете..."  !!!!! (индексите почват от 0)
             $("#parentsId").select2().trigger('change');
-        }
-        if (document.getElementById('taskTypesId').selectedIndex != 6) {
-            $('#Subjects_dropdown').multiselect('enable');
-        }
-        else {
-            $('#Subjects_dropdown').multiselect('disable');
-            DeselectEmployees();
-        }
 
+        }
     }
 
     function CheckFieldsChoose() {
         let result = true;
         let errormessage = "";
-        
+
         if ($('#select2-assignerId-container').text() === 'Моля изберете...') {
             $("#select2-assignerId-container").css('background-color', 'rgb(250, 204, 204)');
             $(':focus').blur()
@@ -76,18 +95,18 @@
             $("#taskName").css('background-color', 'rgb(250, 204, 204)');
             result = false;
         }
-        
+
         if (result) {
             if ($('#parentsId :selected').text() === 'Моля изберете...') {
-               
+
                 ParentCheck();
                 $(':focus').blur();
             }
             else {
-                
+
                 $("#realsend").click();
             }
-            
+
         }
         else {
             toastr.error('Моля попълнете всички задължителни полета', { timeOut: 10000 });

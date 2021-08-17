@@ -110,13 +110,6 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' ${((row.typeId == 8) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
-                            <img class="chatnotifications" src="../png/report.png" />
-                        </a>
-                        <a style='cursor:pointer; padding-left:5px; min-width:25%;'
-                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId == 8) ? "hidden" : ""}>
-                            <img class="chatnotifications" src="../png/child.png" />
-                        </a>
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/files3.png" />
                             <span class="notificationsTodayCountValue" ${row.filesCount > 0 ? "" : "hidden"}>${row.filesCount}</span>
@@ -225,10 +218,13 @@ function Delete(url) {
 }
 
 function CustomSearch(parentId) {
-        dataTable
-            .columns(6)
-            .search(parentId)
-            .draw();
+    //$('input[type=search]').val('').change();
+    dataTable.destroy();
+    loadDataTable(false, false);
+    dataTable
+        .columns(6)
+        .search(parentId)
+        .draw();
 }
 
 //"data": "id",
@@ -265,3 +261,14 @@ function CustomSearch(parentId) {
 
 //    }, "width": "11%"
 //            }
+
+
+
+//<a style='cursor:pointer; padding-left:5px; min-width:25%;'
+//    onclick=CustomSearch('${row.id}') title = 'Подзадачи' ${ (row.parentTaskId > 0 || row.typeId == 8) ? "hidden" : "" }>
+//        <img class="chatnotifications" src="../png/child.png" />
+//                        </a >
+
+//<a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' ${((row.typeId == 8) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
+//    <img class="chatnotifications" src="../png/report.png" />
+//</a>

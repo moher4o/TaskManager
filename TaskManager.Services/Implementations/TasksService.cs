@@ -891,7 +891,7 @@ namespace TaskManager.Services.Implementations
 
                 }
 
-                if (taskToEdit.ParentTaskId == null)
+                if (taskToEdit.ParentTaskId == null || taskToEdit.ParentTaskId == 0)
                 {
                     currentTask.TypeId = await this.db.TasksTypes.Where(tt => tt.TypeName == TaskTypeGlobal).Select(tt => tt.Id).FirstOrDefaultAsync();
                     currentTask.ParentTaskId = null;
@@ -978,7 +978,7 @@ namespace TaskManager.Services.Implementations
 
         public IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId)
         {
-            return this.db.Tasks.Where(t => t.ParentTaskId == null && (t.DirectorateId == directorateId || t.DirectorateId == null) && t.isDeleted == false)
+            return this.db.Tasks.Where(t => t.TaskType.TypeName == TaskTypeGlobal && (t.DirectorateId == directorateId || t.DirectorateId == null) && t.isDeleted == false)
                 .Select(t => new SelectServiceModel
                 {
                     Id = t.Id,

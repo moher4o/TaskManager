@@ -4,6 +4,7 @@
     ViewData["Title"] = "Създаване на задача";
 }
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
+<input id="childrensCount" value="0" hidden />
 <form method="post" asp-controller="Tasks" asp-action="CreateNewTask">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
