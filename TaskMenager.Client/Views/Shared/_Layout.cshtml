@@ -141,7 +141,7 @@
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                            {*@
+                {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -150,8 +150,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                                <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                            </li>*@
+                    <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -171,11 +171,11 @@
                             <a asp-controller="Report" asp-action="SetPersonalPeriodDate">Лична справка</a>
                         </li>
                         @*<li>
-                                <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
-                            </li>*@
+                    <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
+                </li>*@
                     </ul>
                 </li>
-                <li>
+                @*<li>
                     <a href="#expertsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-user"></i>
                         <span class="chatnotifications">Експерти</span>
@@ -186,7 +186,15 @@
                             <a asp-controller="Users" asp-action="UsersList">Списък</a>
                         </li>
                     </ul>
+                </li>*@
+                <li>
+                    <a asp-controller="Users" asp-action="UsersList">
+                        <i class="fas fa-user"></i>
+                        <span class="chatnotifications">Експерти</span>
+                        <span title="Чакащи одобрение" class="notificationsMenu" id="notActiveCount" hidden></span>
+                    </a>
                 </li>
+
                 <li @(User.Claims.Any(u => u.Value == DataConstants.SuperAdmin) ? "" : "hidden")>
                     <a href="#optionsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-cog"></i>
@@ -230,17 +238,17 @@
 
 
                 @*<li>
-                        <a asp-controller="Home" asp-action="NotImplemented">
-                            <i class="fas fa-question"></i>
-                            Информация
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Home" asp-action="NotImplemented">
-                            <i class="fas fa-paper-plane"></i>
-                            Контакти
-                        </a>
-                    </li>*@
+            <a asp-controller="Home" asp-action="NotImplemented">
+                <i class="fas fa-question"></i>
+                Информация
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Home" asp-action="NotImplemented">
+                <i class="fas fa-paper-plane"></i>
+                Контакти
+            </a>
+        </li>*@
             </ul>
         </nav>
 

@@ -23,10 +23,10 @@
 
         var num = document.getElementById("telNumberId").value;
         if (num != null) {
-            if (!(/^\d+$/.test(num))) {
-                $("#telNumberId").css('background-color', 'rgb(250, 204, 204)');
-                result = false;
-            }
+            //if (!(/^\d+$/.test(num))) {
+            //    $("#telNumberId").css('background-color', 'rgb(250, 204, 204)');
+            //    result = false;
+            //}
         }
         else {
             $("#telNumberId").css('background-color', 'rgb(250, 204, 204)');

@@ -1786,7 +1786,7 @@ namespace TaskMenager.Client.Controllers
                     int col = 1;
                     worksheet.Column(1).Width = 40;
                     worksheet.Column(2).Width = 50;
-                    worksheet.Column(3).Width = 10;
+                    worksheet.Column(3).Width = 16;
                     worksheet.Column(4).Width = 16;
                     var directorates = users.Select(u => u.DirectorateId).ToHashSet();
                     foreach (var dirId in directorates)

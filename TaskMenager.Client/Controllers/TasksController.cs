@@ -469,7 +469,7 @@ namespace TaskMenager.Client.Controllers
                 newTask.TaskName = model.TaskName;
                 newTask.Description = model.Description;
                 newTask.StartDate = model.Valid_From;
-                newTask.EndDatePrognose = model.Valid_To;
+                newTask.EndDatePrognose = model.Valid_To.HasValue ? model.Valid_To.Value.Date : DateTime.Now.AddDays(10);
                 newTask.OwnerId = currentUser.Id;
                 newTask.ParentTaskId = model.ParentTaskId;
                 newTask.TypeId = int.Parse(model.TaskTypesId);

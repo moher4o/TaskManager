@@ -5,6 +5,8 @@
         $('#assignerId').on('change', function () { $("#select2-assignerId-container").css('background-color', '#ffffff'); });
         $('#taskTypesId').on('change', CheckSelectedParent);
         $('#parentsId').on('change', CheckSelectedTaskType);
+        $('#validFrom').on('change', function () { $("#validFrom").css('background-color', '#ffffff'); });
+        $('#validTo').on('change', function () { $("#validTo").css('background-color', '#ffffff'); });
         $('#hourslimit').on('change', function () { $("#hourslimit").css('background-color', '#ffffff'); });
         $('#hourslimit').on('click', function () { $("#hourslimit").css('background-color', '#ffffff'); });
         $('#taskName').on('change', function () { $("#taskName").css('background-color', '#ffffff'); });
@@ -87,6 +89,16 @@
         var num = document.getElementById("hourslimit").value;
         if (!(/^\d+$/.test(num))) {
             $("#hourslimit").css('background-color', 'rgb(250, 204, 204)');
+            result = false;
+        }
+
+        if ($('#validFrom').val().length === 0) {
+            $("#validFrom").css('background-color', 'rgb(250, 204, 204)');
+            result = false;
+        }
+
+        if ($('#validTo').val().length === 0) {
+            $("#validTo").css('background-color', 'rgb(250, 204, 204)');
             result = false;
         }
 

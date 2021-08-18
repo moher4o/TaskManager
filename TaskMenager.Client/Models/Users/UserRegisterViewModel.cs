@@ -55,8 +55,8 @@ namespace TaskMenager.Client.Models.Users
         public SelectList RepresentativeList { get; set; }
 
         [Display(Name = "Телефонен номер(02 949)*:")]
-        [Required(ErrorMessage = "Телефонния номер е задължителен")]
-        [RegularExpression(@"^\(?([0-9]{4})\)?$", ErrorMessage = "Въведения телефонен номер не е валиден.")]
+        [Required(ErrorMessage = "Телефонния номер е задължителен, ако имате 2 тел. номера ги въведете във формат xxxx;xxxx")]
+        //[RegularExpression(@"^\(?([0-9]{4})\)?$", ErrorMessage = "Въведения телефонен номер не е валиден.")]
         public string TelephoneNumber { get; set; }
 
         [Display(Name = "Мобилен номер:")]
