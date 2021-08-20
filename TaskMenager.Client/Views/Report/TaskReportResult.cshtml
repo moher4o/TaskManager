@@ -8,6 +8,7 @@
 @{ var dateList = new HashSet<DateTime>();}
 @{ int hours = 1;}
 @{ int sum = 0;}
+@{ string tasksNames = string.Empty;}
 @{ int employeeCount = 0;}
 @{ DateTime currentDate = DateTime.Now.AddDays(100);}
 <div class="PrimeBox2 widthmobile" style="max-width:100%; position:relative; background-color:ghostwhite; margin-top:10px !important">
@@ -21,7 +22,7 @@
     <div>
         <table class="table table-striped table-bordered compact" style="width:100%">
             <thead style="display:table; width:100%; table-layout:fixed;">
-                <tr >
+                <tr>
                     <th style="width:7%;">Дата</th>
                     @foreach (var item in Model.DateList)
                     {
@@ -51,10 +52,12 @@
                         {
                             //hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
                             hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Sum(wh => wh.HoursSpend);
+                            tasksNames = string.Empty;
+                            Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.TaskName).ToList().ForEach(tn => tasksNames += tn.Replace(" ", "_") + Environment.NewLine);
                             sum = sum + hours;
                             if (hours > 0)
                             {
-                                <td style="text-align:center;">@(hours > 0 ? hours.ToString() : "")</td>
+                                <td style="text-align:center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@tasksNames data-balloon-pos="up">@(hours > 0 ? hours.ToString() : "")</td>
                             }
                             else
                             {
