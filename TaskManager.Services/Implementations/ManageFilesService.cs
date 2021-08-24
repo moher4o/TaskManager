@@ -10,20 +10,20 @@ namespace TaskManager.Services.Implementations
 {
     public class ManageFilesService : IManageFilesService
     {
-        private readonly IEmailConfiguration fileConfiguration;
+        private readonly IFileStoreConfiguration fileConfiguration;
 
-        public ManageFilesService(IEmailConfiguration emailConfiguration)
+        public ManageFilesService(IFileStoreConfiguration _fileConfiguration)
         {
-            fileConfiguration = emailConfiguration;
+            fileConfiguration = _fileConfiguration;
         }
 
 
         public bool DeleteTaskFile(int taskId, string fileName)
         {
             string directoryName = taskId.ToString();
-            string globalPath = Environment.CurrentDirectory;
+            string globalPath = fileConfiguration.Location;
 
-            var path = Path.Combine(globalPath, DataConstants.ClassFilesSubDirectory, directoryName,fileName);
+            var path = Path.Combine(globalPath, directoryName,fileName);
 
             FileInfo file = new FileInfo(path);
             if (file.Exists)
@@ -37,9 +37,9 @@ namespace TaskManager.Services.Implementations
         public bool DeleteTaskDirectory(int taskId)
         {
             string directoryName = taskId.ToString();
-            string globalPath = Environment.CurrentDirectory;
+            string globalPath = fileConfiguration.Location;
 
-            var path = Path.Combine(globalPath, DataConstants.ClassFilesSubDirectory,directoryName);
+            var path = Path.Combine(globalPath,directoryName);
 
             if (Directory.Exists(path))
             {
@@ -53,10 +53,10 @@ namespace TaskManager.Services.Implementations
             if (fileConfiguration.StoreFiles)
             {
                 string directoryName = taskId.ToString();
-                string globalPath = Environment.CurrentDirectory;
+                string globalPath = fileConfiguration.Location;
 
                 var classDirectory = Path.Combine(
-                            globalPath, DataConstants.ClassFilesSubDirectory, directoryName);
+                            globalPath, directoryName);
 
                 if (!Directory.Exists(classDirectory))
                 {
@@ -101,10 +101,10 @@ namespace TaskManager.Services.Implementations
             try
             {
                 string directoryName = taskId.ToString();
-                string globalPath = Environment.CurrentDirectory;
+                string globalPath = fileConfiguration.Location;
 
                 var classDirectory = Path.Combine(
-                            globalPath, DataConstants.ClassFilesSubDirectory, directoryName);
+                            globalPath, directoryName);
 
                 if (!Directory.Exists(classDirectory))
                 {
@@ -133,10 +133,10 @@ namespace TaskManager.Services.Implementations
             try
             {
                 string directoryName = taskId.ToString();
-                string globalPath = Environment.CurrentDirectory;
+                string globalPath = fileConfiguration.Location;
 
                 var classDirectory = Path.Combine(
-                            globalPath, DataConstants.ClassFilesSubDirectory, directoryName);
+                            globalPath, directoryName);
 
                 if (!Directory.Exists(classDirectory))
                 {
@@ -161,10 +161,10 @@ namespace TaskManager.Services.Implementations
             try
             {
                 string directoryName = taskId.ToString();
-                string globalPath = Environment.CurrentDirectory;
+                string globalPath = fileConfiguration.Location;
 
                 var classDirectory = Path.Combine(
-                            globalPath, DataConstants.ClassFilesSubDirectory, directoryName);
+                            globalPath, directoryName);
 
                 if (!Directory.Exists(classDirectory))
                 {

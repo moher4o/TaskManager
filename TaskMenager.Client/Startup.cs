@@ -86,6 +86,7 @@ namespace TaskMenager.Client
 
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
 
+            services.AddSingleton<IFileStoreConfiguration>(Configuration.GetSection("FileStoreConfiguration").Get<FileStoreConfiguration>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

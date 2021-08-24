@@ -46,11 +46,11 @@ namespace TaskManager.Common
         //public const string DeveloperJobTitle = "Employee"; //for first use
 
         public const string FirmName = "Мениджър задачи";
-        public const string ClassFilesSubDirectory = "TasksFiles";
+        //public const string ClassFilesSubDirectory = "TasksFiles";
 
 
         //Email настройки        
-        public const string FromEmailString = "noreplay-taskmanager@e-gov.bg";
+        //public const string FromEmailString = "noreplay-taskmanager@e-gov.bg";
 
         public const string NotificationTemplate = @"
                             <div class=""col-md-offset-1"">

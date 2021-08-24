@@ -13,9 +13,8 @@
         public string PopPassword { get; set; }
 
         public bool SendMails { get; set; } = false;
-        public bool StoreFiles { get; set; } = false;
-        public long TaskDirectorySize { get; set; }
 
+        public string FromEmailString { get; set; }
         public string HostName { get; set; }
     }
 }

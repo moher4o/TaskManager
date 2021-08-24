@@ -13,10 +13,7 @@
         string PopPassword { get; }
         bool SendMails { get; set; }
 
-        bool StoreFiles { get; set; }
-
-        long TaskDirectorySize { get; }
-
+        string FromEmailString { get; set; }
         string HostName { get; set; }
     }
 }

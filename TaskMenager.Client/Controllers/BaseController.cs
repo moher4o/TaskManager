@@ -131,7 +131,7 @@ namespace TaskMenager.Client.Controllers
                     {
                         var message = new EmailMessage();
                         message.Content = emailForm;
-                        message.FromAddresses.Add(new EmailAddress { Name = FirmName, Address = FromEmailString });
+                        message.FromAddresses.Add(new EmailAddress { Name = FirmName, Address = emailConfiguration.FromEmailString });
                         message.ToAddresses.AddRange(emailAddressesToSent);
                         message.Subject = "Информация за активност по задача";
                         await this.email.Send(message);
@@ -208,7 +208,7 @@ namespace TaskMenager.Client.Controllers
                     {
                         var message = new EmailMessage();
                         message.Content = emailForm;
-                        message.FromAddresses.Add(new EmailAddress { Name = FirmName, Address = FromEmailString });
+                        message.FromAddresses.Add(new EmailAddress { Name = FirmName, Address = emailConfiguration.FromEmailString });
                         message.ToAddresses.AddRange(emailAddressesToSent);
                         message.Subject = "Информация за активност по задача";
                         await this.email.Send(message);

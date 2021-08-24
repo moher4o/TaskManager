@@ -651,7 +651,25 @@ namespace TaskMenager.Client.Controllers
                 }
                 directorate.TextValue = this.directorates.GetDirectoratesNames(directorate.Id).FirstOrDefault().TextValue;   //дирекцията за която ще е отчета
 
-                var departmentsList = this.departments.GetDepartmentsNamesByDirectorate(directorate.Id);  //отделите в дирекцията
+                var departmentsList = this.departments.GetDepartmentsNamesByDirectorate(directorate.Id).ToList();  //отделите в дирекцията
+
+                //създавам виртуален отдел Директори и всички директори ги назначавам в него(само за справката)
+                var otdelDirectori = new SelectServiceModel()
+                {
+                    DirectorateName = directorate.DirectorateName,
+                    DepartmentName = "Директор",
+                    Id = 999,
+                    isDeleted = false,
+                    TextValue = "Директор"
+                };
+                departmentsList.Insert(0, otdelDirectori);
+                foreach (var director in allExperts.Where(s => s.DepartmentId == null && s.SectorId == null).ToList())
+                {
+                    director.DepartmentId = 999;
+                }
+                //създавам виртуален отдел Директори и всички директори ги назначавам в него(само за справката)
+
+
 
                 var sectorsList = await this.sectors.GetSectorsNamesByDirectorate(directorate.Id);
 
