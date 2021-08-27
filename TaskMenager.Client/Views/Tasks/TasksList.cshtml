@@ -8,8 +8,11 @@
 <input type='hidden' id='dirid' value=@directorateId>
 @{var departmentId = User.Claims.Where(u => u.Type == "departmentId").Select(u => u.Value).FirstOrDefault();}
 <input type='hidden' id='depid' value=@departmentId>
+@{var userId = User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault();}
+<input type='hidden' id='userid' value=@userId>
 @{var sectorId = User.Claims.Where(u => u.Type == "sectorId").Select(u => u.Value).FirstOrDefault();}
 <input type='hidden' id='secid' value=@sectorId>
+
 <br />
 <div class="row p-0 m-0">
     <div class="col-md-3">

@@ -65,6 +65,7 @@ function loadDataTable(deleted) {
                 }, "width": "10%"
             }
         ],
+        "iDisplayLength": 25,
         "language": {
             "emptyTable": "Няма отдели отговарящи на условието"
         },

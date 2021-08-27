@@ -4,6 +4,7 @@ var empdirectorateId;
 var empdepartmentId;
 var empsectorId;
 var userFullName;
+var userId;
 const loc = window.location.href;
 const path = loc.substr(0, loc.lastIndexOf('/') + 1); 
 
@@ -17,6 +18,8 @@ $(document).ready(function () {
     empdepartmentId = $('#depid').val();
     empsectorId = $('#secid').val();
     userFullName = $('#userFN').text();
+    userId = $('#userid').val();
+    console.log(userId);
 });
 
 function LoadTasksTest() {
@@ -110,6 +113,11 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
+                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:20%;' ${((permisionType == "DirectorateAdmin" && (row.directorateId == empdirectorateId || row.assignerId == userId)) || (permisionType == "DepartmentAdmin" && (row.departmentId == empdepartmentId || row.assignerId == userId)) || (permisionType == "SectorAdmin" && (row.sectorId == empsectorId || row.assignerId == userId)) || (permisionType == "Employee" && row.assignerId == userId)) ? "" : "hidden"} title='Отчет по задача'>
+                            <img class="chatnotifications" src="../png/report.png" />
+                        </a>
+
+
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/files3.png" />
                             <span class="notificationsTodayCountValue" ${row.filesCount > 0 ? "" : "hidden"}>${row.filesCount}</span>
@@ -270,5 +278,11 @@ function CustomSearch(parentId) {
 //                        </a >
 
 //<a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' ${((row.typeId == 8) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
+//    <img class="chatnotifications" src="../png/report.png" />
+//</a>
+
+
+
+//<a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:20%;' ${(row.typeId == 8 || (permisionType == "DirectorateAdmin" && row.directorateId != empdirectorateId) || (permisionType == "DepartmentAdmin" && row.departmentId != empdepartmentId) || (permisionType == "SectorAdmin" && row.sectorId != empsectorId) || (permisionType == "Employee" && row.assignerId != userId)) ? "hidden" : ""} title='Отчет по задача'>
 //    <img class="chatnotifications" src="../png/report.png" />
 //</a>

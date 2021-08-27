@@ -34,6 +34,8 @@ namespace TaskMenager.Client.Models.Tasks
 
         public string TaskAssigner { get; set; }
 
+        public int AssignerId { get; set; }
+
         public int AssignedExpertsCount { get; set; } = 0;
 
         public string ParentTaskId { get; set; }

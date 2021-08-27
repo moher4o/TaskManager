@@ -14,9 +14,6 @@
 <div class="PrimeBox2 widthmobile" style="max-width:100%; position:relative; background-color:ghostwhite; margin-top:10px !important">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
         <h5 style="color:white; margin-left:15px;">Периодичен отчет на задача "@(Model.TaskName)"</h5>
-        @*<button asp-controller="Tasks" asp-action="TasksList" id="x">
-                X
-            </button>*@
     </div>
     <div id="chartdiv"></div>
     <div>
@@ -26,7 +23,7 @@
                     <th style="width:7%;">Дата</th>
                     @foreach (var item in Model.DateList)
                     {
-                        if (!employeesList.Contains(item.EmployeeId) && employeeCount < 21)
+                        if (!employeesList.Contains(item.EmployeeId))      //&& employeeCount < 41
                         {
                             employeesList.Add(item.EmployeeId);
                             <th class="employee" style="min-width:30px; max-height:200px; writing-mode: vertical-rl; font-size:smaller; text-align:center;">@item.EmployeeName</th>
@@ -80,9 +77,9 @@
                 </tr>
             </tbody>
         </table>
-        @if (employeeCount > 20)
+        @if (employeeCount > 40)
         {
-            <p style="color:red;">Внимание! Назначените по задачата експерти са повече от 20 и не могат да бъдат показани всички. За точна справка  -  изтеглете екселския файл !</p>
+            <p style="color:red;">Внимание! Работилите по задачата експерти са повече от 40 и е възможно да има проблем с изобразяването на данните. За точна справка  -  изтеглете екселския файл !</p>
         }
         <form method="get" asp-action="ExportSpravkaForTask" asp-controller="Report">
             <input asp-for="taskId" class="form-control" nopicker="true" hidden />

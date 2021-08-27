@@ -89,7 +89,7 @@ function loadDataTable(deleted, notActivated) {
                          <a href="${path}EditUser?userId=${row.id}" style='cursor:pointer; padding-left:5px;' ${row.status == "editable" ? "" : "hidden"} title='Редакция'>
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
-                        <a href='mailto:${row.email}' target="_top" style='cursor:pointer; padding-left:5px;' ${row.email == null ? "hidden" : ""} title='Изпращане на email'>
+                        <a href='mailto:${row.email}' target="_top" style='cursor:pointer; padding-left:5px;' ${row.email == null ? "hidden" : ""} title='Изпращане на email' data-balloon-length="xlarge" aria-label="За да изпозвате пълните възможности на тази функция, в Default apps за Email изберете Ootlook" data-balloon-pos="up">
                             <img class="chatnotifications" src="../png/email.png" />
                         </a>
                         <a href="..\\Report\\SetPersonalPeriodDate?userId=${row.id}" style='cursor:pointer;' ${row.status == "editable" ? "" : "hidden"} title='Отчет за период на ${row.fullName}'>
