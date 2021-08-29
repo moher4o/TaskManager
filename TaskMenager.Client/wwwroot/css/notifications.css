@@ -72,7 +72,11 @@
     width: 25px;
     height: 20px;
 }
-
+.chatnotifications5 {
+    width: 20px;
+    height: 25px;
+    background-color: transparent;
+}
 
 .notificationsMenu {
     position: relative;

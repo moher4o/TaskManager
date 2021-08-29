@@ -42,6 +42,8 @@ namespace TaskMenager.Client.Models.Tasks
 
         public int FilesCount { get; set; }
 
+        public int ChildrenCount { get; set; }
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Task, TasksListViewModel>()
@@ -52,6 +54,7 @@ namespace TaskMenager.Client.Models.Tasks
                   .ForMember(u => u.DepartmentName, cfg => cfg.MapFrom(s => s.Department.DepartmentName))
                   .ForMember(u => u.SectorName, cfg => cfg.MapFrom(s => s.Sector.SectorName))
                   .ForMember(u => u.ParentTaskId, cfg => cfg.MapFrom(s => s.ParentTaskId.HasValue ? s.ParentTaskId.ToString() : "-1"))
+                  .ForMember(u => u.ChildrenCount, cfg => cfg.MapFrom(s => s.TaskChildrens.Where(tc => tc.isDeleted == false).Count()))
                   .ForMember(u => u.AssignedExpertsCount, cfg => cfg.MapFrom(s => s.AssignedExperts.Where(ae => ae.isDeleted == false).Count()));
         }
     }

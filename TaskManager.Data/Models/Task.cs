@@ -69,6 +69,8 @@ namespace TaskManager.Data.Models
 
         public int HoursLimit { get; set; }
 
+        public virtual ICollection<Task> TaskChildrens { get; set; } = new List<Task>();
+
         public virtual ICollection<EmployeesTasks> AssignedExperts { get; set; } = new List<EmployeesTasks>();
 
         public virtual ICollection<WorkedHours> WorkedHours { get; set; } = new List<WorkedHours>();

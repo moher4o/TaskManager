@@ -101,6 +101,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id) && t.TaskType.TypeName != TaskTypeSystem)
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -109,6 +110,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                         .Where(t => t.isDeleted == true && empTaskIds.Contains(t.Id) && t.TaskType.TypeName != TaskTypeSystem)
+                        .Include(te => te.TaskChildrens)
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -117,6 +119,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && empTaskIds.Contains(t.Id) && t.TaskType.TypeName != TaskTypeSystem)
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -132,6 +135,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal) || empTaskIds.Contains(t.Id)))
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -140,6 +144,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                         .Where(t => t.isDeleted == true && t.TaskType.TypeName != TaskTypeSystem && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal) || empTaskIds.Contains(t.Id)))
+                        .Include(te => te.TaskChildrens)
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -148,6 +153,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.SectorId == secId || ((t.DirectorateId == null || t.DirectorateId == dirId || t.DepartmentId == depId) && t.TaskType.TypeName == TaskTypeGlobal) || empTaskIds.Contains(t.Id)))
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -161,6 +167,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal) || empTaskIds.Contains(t.Id)))
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -169,6 +176,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                         .Where(t => t.isDeleted == true && t.TaskType.TypeName != TaskTypeSystem && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal) || empTaskIds.Contains(t.Id)))
+                        .Include(te => te.TaskChildrens)
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -177,6 +185,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.TaskType.TypeName != TaskTypeSystem && t.isDeleted == false && (t.DepartmentId == depId || ((t.DirectorateId == null || t.DirectorateId == dirId) && t.TaskType.TypeName == TaskTypeGlobal) || empTaskIds.Contains(t.Id)))
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -190,6 +199,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null || empTaskIds.Contains(t.Id)) && t.TaskType.TypeName != TaskTypeSystem)
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -199,6 +209,7 @@ namespace TaskManager.Services.Implementations
                 return this.db.Tasks
                         .Where(t => t.isDeleted == true && (t.DirectorateId == dirId || t.DirectorateId == null || empTaskIds.Contains(t.Id)) && t.TaskType.TypeName != TaskTypeSystem)
                         .Include(te => te.AssignedExperts)
+                        .Include(te => te.TaskChildrens)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
             }
@@ -206,6 +217,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && (t.DirectorateId == dirId || t.DirectorateId == null || empTaskIds.Contains(t.Id)) && t.TaskType.TypeName != TaskTypeSystem)
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();
@@ -218,6 +230,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName == TaskStatusClosed && t.isDeleted == false && t.TaskType.TypeName != TaskTypeSystem)
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.StatusId)
                          .AsQueryable();
@@ -226,6 +239,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                         .Where(t => t.isDeleted == true && t.TaskType.TypeName != TaskTypeSystem)
+                        .Include(te => te.TaskChildrens)
                         .Include(te => te.AssignedExperts)
                         .OrderBy(t => t.StatusId)
                         .AsQueryable();
@@ -234,6 +248,7 @@ namespace TaskManager.Services.Implementations
             {
                 return this.db.Tasks
                          .Where(t => t.TaskStatus.StatusName != TaskStatusClosed && t.isDeleted == false && t.TaskType.TypeName != TaskTypeSystem)
+                         .Include(te => te.TaskChildrens)
                          .Include(te => te.AssignedExperts)
                          .OrderBy(t => t.Id)
                          .AsQueryable();

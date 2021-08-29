@@ -189,6 +189,12 @@ namespace TaskManager.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Task>()
+                .HasMany(u => u.TaskChildrens)
+                .WithOne(u => u.ParentTask)
+                .HasForeignKey(t => t.ParentTaskId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Task>()
                 .HasMany(tt => tt.Notes)
                 .WithOne(t => t.Task)
                 .HasForeignKey(t => t.TaskId)
