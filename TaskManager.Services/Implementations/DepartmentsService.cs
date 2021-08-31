@@ -284,5 +284,18 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public bool CheckDepartmentInDirectorate(int dirId, int depId)
+        {
+            var departmentsInDir = this.db.Departments.Where(d => d.DirectorateId == dirId).Select(d => d.Id).ToArray();
+            if (departmentsInDir.Contains(depId))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

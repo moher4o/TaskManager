@@ -1009,7 +1009,7 @@ namespace TaskManager.Services.Implementations
 
         public IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId)
         {
-            return this.db.Tasks.Where(t => t.TaskType.TypeName == TaskTypeGlobal && (t.DirectorateId == directorateId || t.DirectorateId == null) && t.isDeleted == false)
+            var result = this.db.Tasks.Where(t => t.TaskType.TypeName == TaskTypeGlobal && (t.DirectorateId == directorateId || t.DirectorateId == null) && t.isDeleted == false)
                 .Select(t => new SelectServiceModel
                 {
                     Id = t.Id,
@@ -1017,6 +1017,8 @@ namespace TaskManager.Services.Implementations
                     isDeleted = t.isDeleted
                 })
                 .ToList();
+
+            return result;
         }
 
         public async Task<int> GetSystemTaskIdByNameAsync(string name)

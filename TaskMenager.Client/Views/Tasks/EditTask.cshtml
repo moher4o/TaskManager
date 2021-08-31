@@ -83,7 +83,7 @@
             @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"),
-                  permisionType != SuperAdmin ? new { @class = "form-control", @disabled = "disabled" } as object :
+                  (permisionType != SuperAdmin && Model.DirectoratesId != "0") ? new { @class = "form-control", @disabled = "disabled" } as object :
                   new
                   {
                       @class = "form-control",
@@ -104,7 +104,7 @@
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"),
                (Model.Departments.Count() == 0) ? new { @hidden = "hidden" } as object :
-               (permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) ? new { @class = "form-control", @disabled = "disabled" } as object :
+               ((permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) && Model.DepartmentsId != "0") ? new { @class = "form-control", @disabled = "disabled" } as object :
                new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
             </div>
             @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label" })

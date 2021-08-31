@@ -289,7 +289,13 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
 
-                if (model.TaskName.ToLower() == "отпуски" || model.TaskName.ToLower() == "болнични")
+                if ((model.ParentTaskId == 0 || model.ParentTaskId == null) && model.TaskTypesId != this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal).ToString())
+                {
+                    TempData["Error"] = "Невалидни данни. Или изберете задача родител (полето \"Подзадача на:\"), или сменете типа на задачата на \"Глобална\".";
+                    return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
+                }
+
+                if (model.TaskName.ToLower() == "отпуски" || model.TaskName.ToLower() == "отпуска" || model.TaskName.ToLower() == "болнични" || model.TaskName.ToLower() == "болничен")
                 {
                     TempData["Error"] = "Името на задачата е заето за системни нужди!";
                     return RedirectToAction("Index", "Home");
@@ -449,7 +455,7 @@ namespace TaskMenager.Client.Controllers
                     return View(model);
                 }
 
-                if (model.TaskName.ToLower() == "отпуски" || model.TaskName.ToLower() == "болнични")
+                if (model.TaskName.ToLower() == "отпуски" || model.TaskName.ToLower() == "отпуска" || model.TaskName.ToLower() == "болнични" || model.TaskName.ToLower() == "болничен")
                 {
                     model = await TasksModelPrepareForViewWithOldInfo(model);
                     TempData["Error"] = "Името на задачата е заето за системни нужди!";
@@ -875,35 +881,88 @@ namespace TaskMenager.Client.Controllers
 
             if (currentUser.RoleName == TaskManager.Common.DataConstants.Employee)
             {
-                newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
-                                                   .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = true
-                                                   })
-                                                   .ToList();
+                if (currentUser.DirectorateId != null)
+                {
+                    newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
+                                                       .Select(a => new SelectListItem
+                                                       {
+                                                           Text = a.TextValue,
+                                                           Value = a.Id.ToString(),
+                                                           Selected = true
+                                                       })
+                                                       .ToList();
+                    newTask.DirectoratesId = currentUser.DirectorateId.ToString();
+                }
+                else
+                {
+                    newTask.DirectoratesId = null;
+                }
+
+                //if (!string.IsNullOrWhiteSpace(oldTask.DirectoratesId) && newTask.Directorates.Where(d => d.Value == oldTask.DirectoratesId).FirstOrDefault() == null) //ако има дирекция, но не е от списъка. Пример: Ако задачата е от друга дирекция и др.
+                //{
+                //    var directorateIdInt = int.Parse(oldTask.DirectoratesId);
+                //    newTask.Directorates.Add(new SelectListItem
+                //    {
+                //        Text = this.directorates.GetDirectoratesNames(directorateIdInt).Select(d => d.TextValue).FirstOrDefault(),
+                //        Value = oldTask.DirectoratesId,
+                //        Selected = true
+                //    });
+                //}
+
                 newTask.DirectoratesId = newTask.Directorates.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
-                newTask.Departments = this.departments.GetDepartmentsNames(currentUser.DepartmentId)
-                                                   .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = true
-                                                   })
-                                                   .ToList();
-                newTask.DepartmentsId = newTask.Departments.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
+
+                if (currentUser.DepartmentId != null)   //currentUser има departmentId
+                {
+                    newTask.Departments = this.departments.GetDepartmentsNames(currentUser.DepartmentId)
+                               .Select(a => new SelectListItem
+                               {
+                                   Text = a.TextValue,
+                                   Value = a.Id.ToString(),
+                                   Selected = true
+                               })
+                               .ToList();
+                    newTask.DepartmentsId = currentUser.DepartmentId.ToString();
+
+
+                }
+                else   //currentUser няма departmentId
+                {
+                    //newTask.Departments = this.departments.GetDepartmentsNamesByDirectorate(currentUser.DirectorateId)
+                    //                                   .Select(a => new SelectListItem
+                    //                                   {
+                    //                                       Text = a.TextValue,
+                    //                                       Value = a.Id.ToString(),
+                    //                                       Selected = oldTask.DepartmentsId == a.Id.ToString() ? true : false
+                    //                                   })
+                    //                                    .ToList();
+                    newTask.DepartmentsId = null;
+                }
+
+                //if (!string.IsNullOrWhiteSpace(oldTask.DepartmentsId) && newTask.Departments.Where(d => d.Value == oldTask.DepartmentsId).FirstOrDefault() == null) //ако има отдел, но не е от списъка с отдели от горните два селекта. Пример: Ако задачата е от друга дирекция и др.
+                //{
+                //    var departmentIdInt = int.Parse(oldTask.DepartmentsId);
+                //        newTask.Departments.Add(new SelectListItem
+                //        {
+                //            Text = this.departments.GetDepartmentsNames(departmentIdInt).Select(d => d.TextValue).FirstOrDefault(),
+                //            Value = oldTask.DepartmentsId,
+                //            Selected = true
+                //        });
+
+                //}
+
+                //newTask.DepartmentsId = newTask.Departments.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
+
                 if (currentUser.SectorId != null)
                 {
-                    newTask.Sectors = this.sectors.GetSectorsNames(currentUser.SectorId)
-                                                   .Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = true
-                                                   })
-                                                   .ToList();
-                    newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
+                        newTask.Sectors = this.sectors.GetSectorsNames(currentUser.SectorId)
+                                                                           .Select(a => new SelectListItem
+                                                                           {
+                                                                               Text = a.TextValue,
+                                                                               Value = a.Id.ToString(),
+                                                                               Selected = true
+                                                                           })
+                                                                           .ToList();
+                        newTask.SectorsId = currentUser.SectorId.ToString();
 
                     ////////
                     var data = await this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId);
@@ -929,7 +988,20 @@ namespace TaskMenager.Client.Controllers
                 else
                 {
                     ////////
-                    var data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
+                    IEnumerable<SelectServiceModel> data = new List<SelectServiceModel>();
+                    if (currentUser.DepartmentId != null)
+                    {
+                        data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
+                    }
+                    else if(currentUser.DirectorateId != null)
+                    {
+                        data = await this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId);
+                    }
+                    else
+                    {
+                        data = this.employees.GetActiveEmployeesNames();
+                    }
+                    
                     var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                     var dropdownList = new SelectList(data.Select(item => new SelectListItem
                     {
@@ -1077,7 +1149,7 @@ namespace TaskMenager.Client.Controllers
                                                        Selected = true
                                                    })
                                                    .ToList();
-                newTask.DirectoratesId = newTask.Directorates.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
+                newTask.DirectoratesId = currentUser.DirectorateId.ToString();
                 newTask.Departments = this.departments.GetDepartmentsNamesByDirectorate(currentUser.DirectorateId)
                                                    .Select(a => new SelectListItem
                                                    {
@@ -1086,7 +1158,7 @@ namespace TaskMenager.Client.Controllers
                                                        Selected = oldTask.DepartmentsId == a.Id.ToString() ? true : false
                                                    })
                                                     .ToList();
-                if (oldTask.DepartmentsId == "0" || string.IsNullOrWhiteSpace(oldTask.DepartmentsId))   //ако не е избран отдел
+                if (oldTask.DepartmentsId == "0" || string.IsNullOrWhiteSpace(oldTask.DepartmentsId) || !this.departments.CheckDepartmentInDirectorate(currentUser.DirectorateId.Value,int.Parse(oldTask.DepartmentsId)))   //ако не е избран отдел или е избран отдел от друга дирекция
                 {
                     newTask.Departments.Insert(0, new SelectListItem
                     {
@@ -1103,9 +1175,10 @@ namespace TaskMenager.Client.Controllers
                     });
                     newTask.SectorsId = "0";
                 }
-                else    //ако е избран отдел
+                else    //ако е избран отдел от дирекцията
                 {
                     newTask.DepartmentsId = oldTask.DepartmentsId;
+
                     newTask.Sectors = this.sectors.GetSectorsNamesByDepartment(int.Parse(newTask.DepartmentsId))
                                                        .Result
                                                        .Select(a => new SelectListItem
@@ -1115,7 +1188,7 @@ namespace TaskMenager.Client.Controllers
                                                            Selected = oldTask.SectorsId == a.Id.ToString() ? true : false
                                                        })
                                                        .ToList();
-                    if (oldTask.SectorsId == "0" || string.IsNullOrWhiteSpace(oldTask.SectorsId)) //избран отдел , но не е избран сектор
+                    if (oldTask.SectorsId == "0" || string.IsNullOrWhiteSpace(oldTask.SectorsId) ) //избран отдел , но не е избран сектор
                     {
                         newTask.Sectors.Insert(0, new SelectListItem
                         {
@@ -1123,13 +1196,8 @@ namespace TaskMenager.Client.Controllers
                             Value = "0",
                             Selected = true
                         });
-                        newTask.SectorsId = "0";
                     }
-                    else
-                    {
-                        newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
-                    }
-
+                    newTask.SectorsId = newTask.Sectors.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
                 }
                 ////////
                 var data = await this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId);

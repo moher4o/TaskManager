@@ -657,10 +657,10 @@ namespace TaskMenager.Client.Controllers
                 var otdelDirectori = new SelectServiceModel()
                 {
                     DirectorateName = directorate.DirectorateName,
-                    DepartmentName = "Директор",
+                    DepartmentName = directorate.TextValue,
                     Id = 999,
                     isDeleted = false,
-                    TextValue = "Директор"
+                    TextValue = directorate.TextValue
                 };
                 departmentsList.Insert(0, otdelDirectori);
                 foreach (var director in allExperts.Where(s => s.DepartmentId == null && s.SectorId == null).ToList())
@@ -764,15 +764,14 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                             worksheet.Cells[1, 1].Style.Indent = 10;
                             worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            if (allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() == 1)
+                            if ((allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() == 1) && (department.TextValue != directorate.TextValue))
                             {
                                 worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.DepartmentId == department.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
                                     "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             }
                             else
                             {
-                                worksheet.Cells[1, 1].Value = "Отдел: \"" + department.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
-                                    "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                                worksheet.Cells[1, 1].Value = ((department.TextValue == directorate.TextValue) ? "Дирекция: \"" : "Отдел: \"") + department.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             }
                             worksheet.Cells[1, 1].Style.Font.Size = 14;
                             worksheet.Cells[1, 1].Style.Font.Bold = true;
