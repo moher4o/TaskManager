@@ -19,7 +19,7 @@ $(document).ready(function () {
     empsectorId = $('#secid').val();
     userFullName = $('#userFN').text();
     userId = $('#userid').val();
-    
+    console.log(userFullName);
 });
 
 function LoadTasksTest() {
@@ -99,7 +99,7 @@ function loadDataTable(getClosed, withDeleted) {
             { "data": "directorateId", "width": "3%" },
             { "data": "departmentId", "width": "3%" },
             { "data": "sectorId", "width": "3%" },
-            { "data": "assignedExpertsCount", "width": "3%" },
+            { "data": "assignedExpertsCount", "width": "2%" },
             //{ "data": "status", "width": "12%" },
             { "data": "status", "width": "7%" },
             //{ "data": "typeName", "width": "14%" },
@@ -139,15 +139,18 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:15%;' ${(row.typeId == 8 )? "hidden" : ""} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
-                        
-                        
+                       
                         <a style='cursor:pointer; min-width:15%;'
                             onclick=Delete('${path}Delete?taskId=${row.id}') title='Изтриване' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
+                        <a style='cursor:pointer; min-width:15%;'
+                            onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName != "Ангел Иванов Вуков") ? "hidden" : ""}>
+                            <img class="chatnotifications" src="../png/delete_total.png" />
+                        </a>
                         
                         
-                        <a style='cursor:pointer; padding-left:5px; min-width:22%;'
+                        <a style='cursor:pointer; padding-left:3px; min-width:20%;'
                             onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/child.png" />
                             <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
@@ -155,7 +158,7 @@ function loadDataTable(getClosed, withDeleted) {
                         
 
                         
-                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:22%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
+                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:3px; min-width:20%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/files3.png" />
                             <span class="notificationsTodayCountValue" ${row.filesCount > 0 ? "" : "hidden"}>${row.filesCount}</span>
                         </a>
@@ -163,7 +166,7 @@ function loadDataTable(getClosed, withDeleted) {
                         </div>`;
                     }
 
-                }, "width": "14%"
+                }, "width": "15%"
             }
          ],
          "columnDefs": [
@@ -205,6 +208,38 @@ function loadDataTable(getClosed, withDeleted) {
         },
         "width": "100%"
      });
+}
+
+function TotalDelete(url) {
+    swal({
+        title: "Внимание",
+        text: "Сигурни ли сте, че искате да изтриете задачата тотално???",
+        icon: "warning",
+        closeOnEsc: false,
+        //showCancelButton: true,
+        //buttons: true,
+        //cancelButtonText: "Отказ",
+        //confirmButtonColor: "#DD6B55",
+        //confirmButtonText: "Изтриване",
+        buttons: ["Отказ", "Тотално Изтриване!"],
+        dangerMode: true
+    }).then((willDelete) => {
+        if (willDelete) {
+            $.ajax({
+                type: "Get",
+                url: url,
+                success: function (data) {
+                    if (data.success) {
+                        toastr.success(data.message);
+                        dataTable.ajax.reload();
+                    }
+                    else {
+                        toastr.error(data.message);
+                    }
+                }
+            });
+        }
+    });
 }
 
 function Delete(url) {

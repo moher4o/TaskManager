@@ -1598,6 +1598,44 @@ namespace TaskMenager.Client.Controllers
             return Json(new { success = result, message = "Задачата е изтрита" });
         }
 
+        [Authorize(Policy = SuperAdmin)]
+        [HttpGet]
+        public async Task<IActionResult> TotalDelete(int taskId)
+        {
+
+            var taskFromDb = await this.tasks.CheckTaskByIdAsync(taskId);
+            if (!taskFromDb)
+            {
+                return Json(new { success = false, message = $"Грешка при изтриване! Няма задача с номер: {taskId}" });
+            }
+
+            try
+            {
+                var dirDelResult = this.files.DeleteTaskDirectory(taskId);
+                if (dirDelResult)
+                {
+                    taskFromDb = await this.tasks.TotalTaskDeletedAsync(taskId);
+                    if (taskFromDb)
+                    {
+                        return Json(new { success = true, message = "Задачата е тотално изтрита" });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = $"Грешка при изтриване на задачата {taskId} от DB" });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, message = $"Грешка при изтриване на файловете по задача {taskId}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"[Грешка при изтриване] {ex.Message}" });
+            }
+
+        }
+
         public async Task<IActionResult> GetDateWorkedHours(DateTime searchedDate, int userId)
         {
             var data = await this.employees.GetDateReport(userId, searchedDate);

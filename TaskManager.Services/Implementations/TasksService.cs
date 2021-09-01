@@ -306,10 +306,36 @@ namespace TaskManager.Services.Implementations
             {
                 return ex.Message;
             }
-
-
         }
-        public async Task<bool> CheckTaskByIdAsync(int taskId)
+
+        public async Task<bool> TotalTaskDeletedAsync(int taskId)
+        {
+            try
+            {
+                var taskToDelete = await this.db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
+                if (taskToDelete == null)
+                {
+                    return false;
+                }
+                var workHoursForTask = await this.db.WorkedHours.Where(wh => wh.TaskId == taskId).ToListAsync();
+                this.db.WorkedHours.RemoveRange(workHoursForTask);
+                await this.db.SaveChangesAsync();
+                var employeesOnTask = await this.db.EmployeesTasks.Where(wh => wh.TaskId == taskId).ToListAsync();
+                this.db.EmployeesTasks.RemoveRange(employeesOnTask);
+                await this.db.SaveChangesAsync();
+                var notesOnTask = await this.db.Notes.Where(wh => wh.TaskId == taskId).ToListAsync();
+                this.db.Notes.RemoveRange(notesOnTask);
+                await this.db.SaveChangesAsync();
+                this.db.Tasks.Remove(taskToDelete);
+                await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+            public async Task<bool> CheckTaskByIdAsync(int taskId)
         {
             var taskFromDb = await this.db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
             if (taskFromDb == null)
