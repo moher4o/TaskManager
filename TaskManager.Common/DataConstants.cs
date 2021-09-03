@@ -21,14 +21,15 @@ namespace TaskManager.Common
         public const int TasksStatusCount = 3; // броя на статусите по-горе  !!!
 
         public const string TaskTypeSpecificWork = "Специфична дейност";
-        public const string TaskTypeProcurement = "Обществени поръчки";
+        public const string TaskTypeProcurement = "Обществени поръчки и проекти";
         public const string TaskTypeLearning = "Обучения и Презентации";
         public const string TaskTypeAdminActivity = "Административна дейност";
         public const string TaskTypeMeetings = "Работни групи и Комисии";
         public const string TaskTypeOther = "Други дейности";
         public const string TaskTypeGlobal = "Глобална";
         public const string TaskTypeSystem = "Системен тип";
-        public const int TasksTypesCount = 8; // броя на типовете по-горе  !!!
+        public const string TaskTypeSpecialTeam = "Специализиран екип по проект";
+        public const int TasksTypesCount = 9; // броя на типовете по-горе  !!!
 
         public const string TaskPriorityLow = "Нисък";
         public const string TaskPriorityNormal = "Нормален";

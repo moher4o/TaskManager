@@ -51,7 +51,7 @@ namespace TaskManager.Services
 
         Task<string> MarkTaskActiveAsync(int taskId, int userId);
  
-        IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId);
+        IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId, bool allGlobal);
 
         Task<List<int>> GetTaskChildsIdsAsync(int taskId);
 

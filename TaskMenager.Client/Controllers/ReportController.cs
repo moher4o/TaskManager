@@ -786,6 +786,7 @@ namespace TaskMenager.Client.Controllers
                             var workingHoursAdminSum = 0;
                             var workingHoursMeetingsSum = 0;
                             var workingHoursOtherSum = 0;
+                            var workingHoursSProjectSum = 0;
                             var taskExpertsColumn = 6;
                             foreach (var task in tasksList.Where(t => expertsInDepWithNoSectorIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName != TaskTypeSystem).OrderBy(t => t.ParentTaskId).ThenByDescending(t => t.TaskTypeName))
                             {
@@ -849,7 +850,7 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
                                 }
 
-                                if (task.TaskTypeName == TaskTypeSpecificWork)
+                                else if (task.TaskTypeName == TaskTypeSpecificWork)
                                 {
                                     workingHoursSpecificSum += workedHoursByDepartment;
                                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
@@ -879,6 +880,12 @@ namespace TaskMenager.Client.Controllers
                                     workingHoursOtherSum += workedHoursByDepartment;
                                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
                                 }
+                                else if (task.TaskTypeName == TaskTypeSpecialTeam)
+                                {
+                                    workingHoursSProjectSum += workedHoursByDepartment;
+                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
+                                }
+
 
                                 row += 1;
                             }
@@ -957,7 +964,7 @@ namespace TaskMenager.Client.Controllers
 
                                 if (totalHoursWorckedByType > 0)
                                 {
-                                    var modelTablePercentage = worksheet.Cells[row, 2, row + 6, 3];
+                                    var modelTablePercentage = worksheet.Cells[row, 2, row + 7, 3];
                                     modelTablePercentage.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                                     modelTablePercentage.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около процентите
                                     modelTablePercentage.Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -988,6 +995,11 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, 2].Value = TaskTypeMeetings;
                                     worksheet.Cells[row, 3].Value = workingHoursMeetingsSum;
                                     worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
+
+                                    row += 1;
+                                    worksheet.Cells[row, 2].Value = TaskTypeSpecialTeam;
+                                    worksheet.Cells[row, 3].Value = workingHoursSProjectSum;
+                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
 
                                     row += 1;
                                     worksheet.Cells[row, 2].Value = TaskTypeOther;
@@ -1073,7 +1085,7 @@ namespace TaskMenager.Client.Controllers
                                     //Set position to row 1 column 7 and 16 pixels offset
                                     doughtnutChart.SetPosition(row - 7, 0, 4, 10);
                                     doughtnutChart.SetSize(500, 500);
-                                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row - 6, 3, row - 1, 3), ExcelRange.GetAddress(row - 6, 2, row - 1, 2));
+                                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row - 7, 3, row - 1, 3), ExcelRange.GetAddress(row - 7, 2, row - 1, 2));
                                     doughtnutChart.Title.Text = "ТИП ЗАДАЧА / ЧАСОВЕ";
                                     doughtnutChart.DataLabel.ShowPercent = true;
                                     //doughtnutChart.DataLabel.ShowLeaderLines = true;
@@ -1291,6 +1303,7 @@ namespace TaskMenager.Client.Controllers
                             var workingHoursAdminSum = 0;
                             var workingHoursMeetingsSum = 0;
                             var workingHoursOtherSum = 0;
+                            var workingHoursSProjectSum = 0;
                             var taskExpertsColumn = 6;
                             foreach (var task in tasksList.Where(t => expertsInSector.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName != TaskTypeSystem).OrderBy(t => t.ParentTaskId).ThenByDescending(t => t.TaskTypeName))
                             {
@@ -1354,7 +1367,7 @@ namespace TaskMenager.Client.Controllers
                                     workingDaysSystemSum += workedHoursByDepartment / 8;
                                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
                                 }
-                                if (task.TaskTypeName == TaskTypeSpecificWork)
+                                else if (task.TaskTypeName == TaskTypeSpecificWork)
                                 {
                                     workingHoursSpecificSum += workedHoursByDepartment;
                                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
@@ -1383,6 +1396,11 @@ namespace TaskMenager.Client.Controllers
                                 {
                                     workingHoursOtherSum += workedHoursByDepartment;
                                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                                }
+                                else if (task.TaskTypeName == TaskTypeSpecialTeam)
+                                {
+                                    workingHoursSProjectSum += workedHoursByDepartment;
+                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
                                 }
 
                                 row += 1;
@@ -1464,7 +1482,7 @@ namespace TaskMenager.Client.Controllers
 
                                 if (totalHoursWorckedByType > 0)
                                 {
-                                    var modelTablePercentage = worksheet.Cells[row, 2, row + 6, 3];
+                                    var modelTablePercentage = worksheet.Cells[row, 2, row + 7, 3];
                                     modelTablePercentage.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                                     modelTablePercentage.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около процентите
                                     modelTablePercentage.Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -1495,6 +1513,11 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, 2].Value = TaskTypeMeetings;
                                     worksheet.Cells[row, 3].Value = workingHoursMeetingsSum;
                                     worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
+
+                                    row += 1;
+                                    worksheet.Cells[row, 2].Value = TaskTypeSpecialTeam;
+                                    worksheet.Cells[row, 3].Value = workingHoursSProjectSum;
+                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
 
                                     row += 1;
                                     worksheet.Cells[row, 2].Value = TaskTypeOther;
@@ -1580,7 +1603,7 @@ namespace TaskMenager.Client.Controllers
                                     //Set position to row 1 column 7 and 16 pixels offset
                                     doughtnutChart.SetPosition(row - 7, 0, 4, 10);
                                     doughtnutChart.SetSize(500, 500);
-                                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row - 6, 3, row - 1, 3), ExcelRange.GetAddress(row - 6, 2, row - 1, 2));
+                                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row - 7, 3, row - 1, 3), ExcelRange.GetAddress(row - 7, 2, row - 1, 2));
                                     doughtnutChart.Title.Text = "ТИП ЗАДАЧА / ЧАСОВЕ";
                                     doughtnutChart.DataLabel.ShowPercent = true;
                                     //doughtnutChart.DataLabel.ShowLeaderLines = true;
@@ -1800,7 +1823,7 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Cells[1, 1].Style.Font.Size = 14;
                     worksheet.Cells[1, 1].Style.Font.Bold = true;
                     int row = 2;
-                    int col = 1;
+                    //int col = 1;
                     worksheet.Column(1).Width = 40;
                     worksheet.Column(2).Width = 50;
                     worksheet.Column(3).Width = 16;
@@ -1819,7 +1842,22 @@ namespace TaskMenager.Client.Controllers
                         worksheet.Cells[row, 1].Style.Font.Size = 14;
                         worksheet.Cells[row, 1].Style.Font.Bold = true;
                         row += 1;
-                        var directors = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == null && u.SectorId == null).ToList();
+                        var directors = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == null && u.SectorId == null).OrderByDescending(d => d.JobTitleName).ToList();
+                        var direktorBoss = directors.Where(u => u.JobTitleName == "Директор" || u.JobTitleName == "Ръководител Инспекторат" || u.JobTitleName == "Председател" || u.JobTitleName == "Министър" || u.JobTitleName == "Министър председател" || u.JobTitleName == "Секретар").FirstOrDefault();
+                        if (direktorBoss != null)
+                        {
+                            worksheet.Row(row).Style.Indent = 1;
+                            worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                            worksheet.Row(row).Style.Font.Size = 13;
+                            worksheet.Cells[row, 1].Style.Font.Bold = true;
+                            worksheet.Cells[row, 1].Value = direktorBoss.JobTitleName;
+                            worksheet.Cells[row, 2].Style.Font.Bold = true;
+                            worksheet.Cells[row, 2].Value = direktorBoss.FullName;
+                            worksheet.Cells[row, 3].Value = direktorBoss.TelephoneNumber;
+                            worksheet.Cells[row, 4].Value = direktorBoss.MobileNumber;
+                            row += 1;
+                            directors.Remove(direktorBoss);
+                        }
                         foreach (var user in directors)
                         {
                             worksheet.Row(row).Style.Indent = 1;
@@ -1845,7 +1883,22 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[row, 1].Style.Font.Size = 13;
                             worksheet.Cells[row, 1].Style.Font.Bold = true;
                             row += 1;
-                            var expertsInDepartment = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == null).ToList();
+                            var expertsInDepartment = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == null).OrderBy(d => d.JobTitleName).ToList();
+                            var departmentBoss = expertsInDepartment.Where(u => u.JobTitleName == "Началник отдел").FirstOrDefault();
+                            if (departmentBoss != null )
+                            {
+                                worksheet.Row(row).Style.Indent = 1;
+                                worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                                worksheet.Row(row).Style.Font.Size = 13;
+                                worksheet.Cells[row, 1].Style.Font.Bold = true;
+                                worksheet.Cells[row, 1].Value = departmentBoss.JobTitleName;
+                                worksheet.Cells[row, 2].Style.Font.Bold = true;
+                                worksheet.Cells[row, 2].Value = departmentBoss.FullName;
+                                worksheet.Cells[row, 3].Value = departmentBoss.TelephoneNumber;
+                                worksheet.Cells[row, 4].Value = departmentBoss.MobileNumber;
+                                row += 1;
+                                expertsInDepartment.Remove(departmentBoss);
+                            }
                             foreach (var userInDepartment in expertsInDepartment)
                             {
                                 worksheet.Row(row).Style.Indent = 1;
@@ -1871,7 +1924,22 @@ namespace TaskMenager.Client.Controllers
                                 worksheet.Cells[row, 1].Style.Font.Size = 13;
                                 worksheet.Cells[row, 1].Style.Font.Bold = true;
                                 row += 1;
-                                var expertsInSector = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == sectorId).ToList();
+                                var expertsInSector = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == sectorId).OrderBy(d => d.JobTitleName).ToList();
+                                var sectorBoss = expertsInSector.Where(u => u.JobTitleName == "Началник сектор").FirstOrDefault();
+                                if (sectorBoss != null)
+                                {
+                                    worksheet.Row(row).Style.Indent = 1;
+                                    worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                                    worksheet.Row(row).Style.Font.Size = 13;
+                                    worksheet.Cells[row, 1].Style.Font.Bold = true;
+                                    worksheet.Cells[row, 1].Value = sectorBoss.JobTitleName;
+                                    worksheet.Cells[row, 2].Style.Font.Bold = true;
+                                    worksheet.Cells[row, 2].Value = sectorBoss.FullName;
+                                    worksheet.Cells[row, 3].Value = sectorBoss.TelephoneNumber;
+                                    worksheet.Cells[row, 4].Value = sectorBoss.MobileNumber;
+                                    row += 1;
+                                    expertsInSector.Remove(sectorBoss);
+                                }
                                 foreach (var userInSector in expertsInSector)
                                 {
                                     worksheet.Row(row).Style.Indent = 1;

@@ -141,8 +141,6 @@
                         Задачи
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
-                        @*@if (User.Claims.Any(u => u.Value == "Admin"))
-                {*@
                         <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                             <a asp-controller="Tasks" asp-action="CreateNewTask">Създаване на задача</a>
                         </li>
@@ -151,8 +149,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                    <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                </li>*@
+                            <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                       </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -171,23 +169,8 @@
                         <li>
                             <a asp-controller="Report" asp-action="SetPersonalPeriodDate">Лична справка</a>
                         </li>
-                        @*<li>
-                    <a asp-controller="Report" asp-action="PhonesAndEmails">Тел. указател</a>
-                </li>*@
                     </ul>
                 </li>
-                @*<li>
-                    <a href="#expertsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-user"></i>
-                        <span class="chatnotifications">Експерти</span>
-                        <span title="Чакащи одобрение" class="notificationsMenu" id="notActiveCount" hidden></span>
-                    </a>
-                    <ul class="collapse list-unstyled" id="expertsSubmenu">
-                        <li>
-                            <a asp-controller="Users" asp-action="UsersList">Списък</a>
-                        </li>
-                    </ul>
-                </li>*@
                 <li>
                     <a asp-controller="Users" asp-action="UsersList">
                         <i class="fas fa-user"></i>
@@ -228,9 +211,6 @@
                     </a>
                     <ul class="collapse list-unstyled" id="developerSubmenu">
                         <li>
-                            <a asp-controller="Structure" asp-action="TotalDeleteTask">Тотално изтриване на задача</a>
-                        </li>
-                        <li>
                             <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Добавяне на email автоматично</a>
                         </li>
                         <li>
@@ -239,20 +219,6 @@
                     </ul>
                 </li>
 
-
-
-                @*<li>
-            <a asp-controller="Home" asp-action="NotImplemented">
-                <i class="fas fa-question"></i>
-                Информация
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Home" asp-action="NotImplemented">
-                <i class="fas fa-paper-plane"></i>
-                Контакти
-            </a>
-        </li>*@
             </ul>
         </nav>
 
@@ -267,16 +233,6 @@
                     <div class="tooltip-big-text" id="dominions" style="position: relative; left: 25%;" data-balloon-length="xlarge" aria-label="Смяната на сесия дава възможност да бъдат отчитани часове за друг(виртуален) потребител. Текушия/логнат потребител не наследява правата на виртуалния такъв! Всяко действие различно от отчитане на часове, връща сесията към текущия/логнат потребител." data-balloon-pos="up">
                     </div>
 
-                    @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <i class="fas fa-align-justify"></i>
-                        </button>*@
-
-                    @*<div id="notifications" style="position: relative; left: 20%;">
-                            <div id="loadingBox" class="notification"><span>Зареждане …</span></div>
-                            <div id="infoBox" class="notification"><span>Информация</span></div>
-                            <div id="errorBox" class="notification"><span>Грешка</span></div>
-                            <div id="successBox" class="notification"><span>Успех</span></div>
-                        </div>*@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
@@ -321,28 +277,6 @@
                         }
                     </main>
                 </div>
-                <!--<div class="widthmobile col-md-1" style="padding-top:45px;">-->
-                    @*<a href="#" id="scinChange" style="color:dodgerblue;">Дизаин</a>*@
-                    <!--<div class="ll-skin-latoja" id="dateSelector2">
-                    </div>
-                    <div  style="padding-top:45px;">
-                        <label>
-                            <input type="checkbox">
-                            <span aria-label="vacation">Отпуска</span>
-                        </label>                        
-                        <label style="padding-top:10px;">
-                            <input type="checkbox">
-                            <span aria-label="holiday">Болничен</span>
-                        </label>
-
-                    </div>
-
-                    <div class="wrap" style="padding-top:50px; padding-left:20px; display:none;" id="divbtnZapis">
-                        <button class="buttonZap" id="btnZapis">Запис</button>
-                    </div>
-
-                </div>-->
-            @*</div>*@
         </div>
         <footer class="border-top footer text-muted hideonmobile">
             <div class="container">
@@ -351,14 +285,10 @@
         </footer>
 
     </div>
-    @*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
-    <!-- Popper.JS -->
-    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>*@
     <script src="~/js/popper.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/jquery.dataTables.min.js"></script>
-    @*<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>*@
     <script src="~/js/toastr.min.js"></script>
     <script src="~/js/sweetalert.min.js"></script>
 

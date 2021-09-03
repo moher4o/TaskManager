@@ -289,7 +289,8 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
 
-                if ((model.ParentTaskId == 0 || model.ParentTaskId == null) && model.TaskTypesId != this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal).ToString())
+                var globalTaskId = await this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal);
+                if ((model.ParentTaskId == 0 || model.ParentTaskId == null) && model.TaskTypesId != globalTaskId.ToString())
                 {
                     TempData["Error"] = "Невалидни данни. Или изберете задача родител (полето \"Подзадача на:\"), или сменете типа на задачата на \"Глобална\".";
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
@@ -836,14 +837,31 @@ namespace TaskMenager.Client.Controllers
                                                    })
                                                    .ToList();
             }
-            
-            newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId)
+
+            if (currentUser.RoleName == SuperAdmin)
+            {
+                newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId, true)
                    .Select(a => new SelectListItem
                    {
                        Text = a.TextValue,
-                       Value = a.Id.ToString()
+                       Value = a.Id.ToString(),
+                       Selected = false
                    })
                    .ToList();
+            }
+            else
+            {
+                newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId, false)
+                   .Select(a => new SelectListItem
+                   {
+                       Text = a.TextValue,
+                       Value = a.Id.ToString(),
+                       Selected = false
+                   })
+                   .ToList();
+
+            }
+
             newTask.TaskParetns.Insert(0, new SelectListItem
             {
                 Text = ChooseValue,
@@ -1328,7 +1346,7 @@ namespace TaskMenager.Client.Controllers
                                                    .ToList();
             }
             newTask.AssignerIdInt = oldTask.AssignerIdInt;
-            newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId)
+            newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId, true)
                    .Select(a => new SelectListItem
                    {
                        Text = a.TextValue,
@@ -1336,7 +1354,7 @@ namespace TaskMenager.Client.Controllers
                        Selected = a.Id == oldTask.ParentTaskId ? true : false
                    })
                    .ToList();
-            newTask.TaskParetns.Insert(0, new SelectListItem
+             newTask.TaskParetns.Insert(0, new SelectListItem
             {
                 Text = ChooseValue,
                 Value = "0",

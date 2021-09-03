@@ -19,7 +19,6 @@ $(document).ready(function () {
     empsectorId = $('#secid').val();
     userFullName = $('#userFN').text();
     userId = $('#userid').val();
-    console.log(userFullName);
 });
 
 function LoadTasksTest() {
@@ -27,27 +26,6 @@ function LoadTasksTest() {
         console.log(data);
     });
 }
-
-//function DeletedTasksShowOrHideOld() {
-//    if ($("#showClosed").prop('checked') == true && $("#showDeleted").prop('checked') == true) {
-//        dataTable.destroy();
-//        loadDataTable(true, true);
-//    }
-//    else if ($("#showClosed").prop('checked') == true && $("#showDeleted").prop('checked') == false){
-//        dataTable.destroy();
-//        loadDataTable(true, false);
-//    }
-//    else if ($("#showClosed").prop('checked') == false && $("#showDeleted").prop('checked') ==true) {
-//        dataTable.destroy();
-//        loadDataTable(false, true);
-//    }
-//    else if ($("#showClosed").prop('checked') == false && $("#showDeleted").prop('checked') == false) {
-//        dataTable.destroy();
-//        loadDataTable(false, false);
-//    }
-
-
-//}
 
 function ClosedTasksShowOrHide() {
     if ($("#showClosed").prop('checked') == true) {
@@ -89,7 +67,6 @@ function loadDataTable(getClosed, withDeleted) {
         },
         "columns": [
             { "data": "id", "width": "5%" },
-            //{ "data": "taskName", "width": "41%" },
             { "data": "taskName", "width": "40%" },
             { "data": "taskAssigner", "width": "14%" },
             { "data": "directorateName", "width": "10%" },
@@ -100,9 +77,7 @@ function loadDataTable(getClosed, withDeleted) {
             { "data": "departmentId", "width": "3%" },
             { "data": "sectorId", "width": "3%" },
             { "data": "assignedExpertsCount", "width": "2%" },
-            //{ "data": "status", "width": "12%" },
             { "data": "status", "width": "7%" },
-            //{ "data": "typeName", "width": "14%" },
             { "data": "typeName", "width": "5%" },
             {
                 "data": null,
@@ -113,8 +88,12 @@ function loadDataTable(getClosed, withDeleted) {
                         <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:15px; min-width:20%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/info2.png" />
                         </a>
-                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:20%;' ${((permisionType == "DirectorateAdmin" && (row.directorateId == empdirectorateId || row.assignerId == userId)) || (permisionType == "DepartmentAdmin" && (row.departmentId == empdepartmentId || row.assignerId == userId)) || (permisionType == "SectorAdmin" && (row.sectorId == empsectorId || row.assignerId == userId)) || (permisionType == "Employee" && row.assignerId == userId)) ? "" : "hidden"} title='Отчет по задача'>
+                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:20%;' ${((permisionType == "DirectorateAdmin" && (row.directorateId == empdirectorateId || row.assignerId == userId)) || (permisionType == "DepartmentAdmin" && (row.departmentId == empdepartmentId || row.assignerId == userId)) || (permisionType == "SectorAdmin" && (row.sectorId == empsectorId || row.assignerId == userId)) || (permisionType == "Employee" && row.assignerId == userId) || permisionType == 'SuperAdmin') ? "" : "hidden"} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
+                        </a>
+                        <a style='cursor:pointer; min-width:15%;'
+                            onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName == "Ангел Иванов Вуков" && permisionType == 'SuperAdmin') ? "" : "hidden"}>
+                            <img class="chatnotifications" src="../png/delete_total.png" />
                         </a>
                         <a style='cursor:pointer; padding-left:5px; min-width:22%;'
                             onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
@@ -145,19 +124,14 @@ function loadDataTable(getClosed, withDeleted) {
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
                         <a style='cursor:pointer; min-width:15%;'
-                            onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName != "Ангел Иванов Вуков") ? "hidden" : ""}>
+                            onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName == "Ангел Иванов Вуков" && permisionType == 'SuperAdmin') ? "" : "hidden"}>
                             <img class="chatnotifications" src="../png/delete_total.png" />
                         </a>
-                        
-                        
                         <a style='cursor:pointer; padding-left:3px; min-width:20%;'
                             onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/child.png" />
                             <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
                         </a>
-                        
-
-                        
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:3px; min-width:20%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/files3.png" />
                             <span class="notificationsTodayCountValue" ${row.filesCount > 0 ? "" : "hidden"}>${row.filesCount}</span>
@@ -248,11 +222,6 @@ function Delete(url) {
         text: "Сигурни ли сте, че искате да изтриете задачата?",
         icon: "warning",
         closeOnEsc: false,
-        //showCancelButton: true,
-        //buttons: true,
-        //cancelButtonText: "Отказ",
-        //confirmButtonColor: "#DD6B55",
-        //confirmButtonText: "Изтриване",
         buttons: ["Отказ", "Изтриване!"],
         dangerMode: true
     }).then((willDelete) => {
@@ -284,54 +253,3 @@ function CustomSearch(parentId) {
         .draw();
 }
 
-//"data": "id",
-//    "render": function (data) {
-//        if (withDeleted || permisionType != 'SuperAdmin') {
-//            return `<div>
-                        
-//                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
-//                            <img class="chatnotifications" src="../png/info2.png" />
-//                        </a>
-//                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
-//                            <img class="chatnotifications3" src="../png/files.png" />
-//                        </a>
-
-//                        </div>`;
-//        }
-//        else {
-//            return `<div>
-                        
-//                        <a href="${path}TaskDetails?taskId=${data}" style='cursor:pointer;' title='Информация'>
-//                            <img class="chatnotifications" src="../png/info2.png" />
-//                        </a>
-                        
-//                        <a style='cursor:pointer; padding-left:5px;'
-//                            onclick=Delete('${path}Delete?taskId=${data}') title='Изтриване'>
-//                            <img class="chatnotifications" src="../png/delete2.png" />
-//                        </a>
-//                        <a href="..\\TasksFiles\\TaskFilesList?taskId=${data}" style='cursor:pointer;' title='Прикачени файлове'>
-//                            <img class="chatnotifications3" src="../png/files.png" />
-//                        </a>
-
-//                        </div>`;
-//        }
-
-//    }, "width": "11%"
-//            }
-
-
-
-//<a style='cursor:pointer; padding-left:5px; min-width:25%;'
-//    onclick=CustomSearch('${row.id}') title = 'Подзадачи' ${ (row.parentTaskId > 0 || row.typeId == 8) ? "hidden" : "" }>
-//        <img class="chatnotifications" src="../png/child.png" />
-//                        </a >
-
-//<a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:25%;' ${((row.typeId == 8) || ((permisionType == "DirectorateAdmin") && (row.directorateId != empdirectorateId)) || ((permisionType == "DepartmentAdmin") && (row.departmentId != empdepartmentId)) || ((permisionType == "SectorAdmin") && (row.sectorId != empsectorId)) || (permisionType == "Employee")) && (row.taskAssigner != userFullName) ? "hidden" : ""} title='Отчет по задача'>
-//    <img class="chatnotifications" src="../png/report.png" />
-//</a>
-
-
-
-//<a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:20%;' ${(row.typeId == 8 || (permisionType == "DirectorateAdmin" && row.directorateId != empdirectorateId) || (permisionType == "DepartmentAdmin" && row.departmentId != empdepartmentId) || (permisionType == "SectorAdmin" && row.sectorId != empsectorId) || (permisionType == "Employee" && row.assignerId != userId)) ? "hidden" : ""} title='Отчет по задача'>
-//    <img class="chatnotifications" src="../png/report.png" />
-//</a>

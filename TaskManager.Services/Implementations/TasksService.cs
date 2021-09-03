@@ -1033,16 +1033,31 @@ namespace TaskManager.Services.Implementations
             return searchedTask;
         }
 
-        public IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId)
+        public IEnumerable<SelectServiceModel> GetParentTaskNames(int? directorateId, bool allGlobal)
         {
-            var result = this.db.Tasks.Where(t => t.TaskType.TypeName == TaskTypeGlobal && (t.DirectorateId == directorateId || t.DirectorateId == null) && t.isDeleted == false)
-                .Select(t => new SelectServiceModel
-                {
-                    Id = t.Id,
-                    TextValue = t.TaskName,
-                    isDeleted = t.isDeleted
-                })
-                .ToList();
+            var result = new List<SelectServiceModel>();
+            if (allGlobal)
+            {
+                result = this.db.Tasks.Where(t => t.TaskType.TypeName == TaskTypeGlobal && t.isDeleted == false)
+                    .Select(t => new SelectServiceModel
+                    {
+                        Id = t.Id,
+                        TextValue = t.TaskName,
+                        isDeleted = t.isDeleted
+                    })
+                    .ToList();
+            }
+            else
+            {
+                result = this.db.Tasks.Where(t => t.TaskType.TypeName == TaskTypeGlobal && (t.DirectorateId == directorateId || t.DirectorateId == null) && t.isDeleted == false)
+                    .Select(t => new SelectServiceModel
+                    {
+                        Id = t.Id,
+                        TextValue = t.TaskName,
+                        isDeleted = t.isDeleted
+                    })
+                    .ToList();
+            }
 
             return result;
         }

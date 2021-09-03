@@ -34,7 +34,7 @@
         </label>
     </div>
 
-    <div class="col-md-2 offset-md-1">
+    <div class="col-md-2 offset-md-1" @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
         <a asp-action="CreateNewTask" asp-controller="Tasks" class="btn btn-info form-control text-white">
             Създай задача
         </a>
