@@ -1,6 +1,9 @@
 ﻿$(() => {
     attachEvents();
+    const loc = window.location.href;
+    const path = loc.substr(0, loc.lastIndexOf('/') + 1);
     var childrensCount = document.getElementById("childrensCount").value;
+    var taskNomer = document.getElementById("taskId").value;
     function attachEvents() {
         $('#assignerId').on('change', function () { $("#select2-assignerId-container").css('background-color', '#ffffff'); });
         $('#taskTypesId').on('change', CheckSelectedParent);
@@ -50,7 +53,7 @@
         
         if (childrensCount === '0') {  //ако не е родител
 
-            if (document.getElementById('taskTypesId').selectedIndex != 6 && $('#parentsId :selected').text() === 'Моля изберете...') {    // $('#taskTypesId :selected').text() != 'Глобална'
+            if ((document.getElementById('taskTypesId').selectedIndex != 6) && $('#parentsId :selected').text() === 'Моля изберете...') {    // $('#taskTypesId :selected').text() != 'Глобална'
                 swal("Информация", "Изберете глобална задача (полето \"Подзадача на:\"), преди да смените типа.", "info");
                 document.getElementById('taskTypesId').selectedIndex = 6;    //Индекса на "Глобална"  !!!!! (индексите почват от 0)
             }
@@ -60,6 +63,10 @@
                 $("#parentsId").select2().trigger('change');
             }
             if (document.getElementById('taskTypesId').selectedIndex != 6) {
+                
+                if (document.getElementById('taskTypesId').selectedIndex === 7) {     //ако е екипна задача от много дирекции
+                    GetAllEmployees(taskNomer, true);
+                }
                 $('#Subjects_dropdown').multiselect('enable');
             }
             else {
@@ -138,6 +145,46 @@
                 $("#realsend").click();
             }
         });
+    }
+
+    function GetAllEmployees(taskId, isAll) {
+        //swal("Информация", "Избрания тип задача е специален. Дава възможност за сформиране на екип от експерти от различни дирекции.", "info");
+        if (taskId == undefined) {
+            taskId = null;
+        }
+        var url = path + "getEmployees?isAll=" + isAll + "&taskId=" + taskId;
+        $.ajax({
+            type: "Get",
+            url: url,
+            success: function (data) {
+                //console.log(data.taskEmployees);
+                let selectedExp = [];
+                $.each($('#Subjects_dropdown option:selected'), function (i, expert) {
+                    selectedExp.push(expert.value)
+                });
+                //console.log(selectedExp);
+                 $('#Subjects_dropdown').empty();
+
+                let group = null;
+                $.each(data.taskEmployees, function (i, expert) {
+
+                    if (group != (expert.group == null ? null : expert.group.name)) {
+                        $('#Subjects_dropdown').append('<optgroup label=\'' + expert.group.name + '\'>');
+                        group = expert.group.name;
+                    }
+                    if (expert.selected || selectedExp.includes(expert.value)) {
+                        $('#Subjects_dropdown').append('<option value=\'' + expert.value + '\' selected="selected">' + expert.text + '</option>');
+                    }
+                    else {
+                        $('#Subjects_dropdown').append('<option value=\'' + expert.value + '\'>' + expert.text + '</option>');
+                    }
+                    
+                });
+                $('#Subjects_dropdown').multiselect('rebuild');
+
+            }
+        });
+        
     }
 
 });

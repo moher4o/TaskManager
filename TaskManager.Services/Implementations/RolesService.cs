@@ -168,46 +168,5 @@ namespace TaskManager.Services.Implementations
                 .ToList();
             return roles;
         }
-
-        //public IEnumerable<SelectServiceModel> GetDirectorateRoles()
-        //{
-        //    var roles = this.db.Roles
-        //        .Where(c => c.isDeleted == false && c.Name != SuperAdmin)
-        //        .Select(d => new SelectServiceModel
-        //        {
-        //            TextValue = d.Name,
-        //            Id = d.Id
-        //        })
-        //        .ToList();
-        //    return roles;
-        //}
-
-        //public IEnumerable<SelectServiceModel> GetDepartmentRoles()
-        //{
-        //    var roles = this.db.Roles
-        //        .Where(c => c.isDeleted == false && c.Name != SuperAdmin && c.Name != DirectorateAdmin)
-        //        .Select(d => new SelectServiceModel
-        //        {
-        //            TextValue = d.Name,
-        //            Id = d.Id
-        //        })
-        //        .ToList();
-        //    return roles;
-        //}
-
-        //public IEnumerable<SelectServiceModel> GetSectorRoles()
-        //{
-        //    var roles = this.db.Roles
-        //        .Where(c => c.isDeleted == false && c.Name != SuperAdmin && c.Name != DirectorateAdmin && c.Name != DepartmentAdmin)
-        //        .Select(d => new SelectServiceModel
-        //        {
-        //            TextValue = d.Name,
-        //            Id = d.Id
-        //        })
-        //        .ToList();
-        //    return roles;
-        //}
-
-
     }
 }

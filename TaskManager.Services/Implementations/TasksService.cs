@@ -573,6 +573,12 @@ namespace TaskManager.Services.Implementations
                     TypeName = DataConstants.TaskTypeSystem
                 };
                 await this.db.TasksTypes.AddAsync(newTypeDb);
+                newTypeDb = new TasksType()
+                {
+                    TypeName = DataConstants.TaskTypeSpecialTeam
+                };
+                await this.db.TasksTypes.AddAsync(newTypeDb);
+
                 await this.db.SaveChangesAsync();
             }
             catch (Exception)

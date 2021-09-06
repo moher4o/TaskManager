@@ -1040,7 +1040,6 @@ namespace TaskMenager.Client.Controllers
                                                        .ToList();
                 }
             }
-
             if (currentUser.RoleName == SectorAdmin)
             {
                 newTask.Directorates = this.directorates.GetDirectoratesNames(currentUser.DirectorateId)
@@ -1083,8 +1082,7 @@ namespace TaskMenager.Client.Controllers
                 newTask.AssignersList = dropdownList;
                 ///////
 
-                newTask.Employees = this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId).Result
-                                                   .Select(a => new SelectListItem
+                newTask.Employees = data.Select(a => new SelectListItem
                                                    {
                                                        Text = a.TextValue,
                                                        Value = a.Id.ToString(),
@@ -1425,8 +1423,126 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+        private async Task<IEnumerable<SelectServiceModel>> GetEmployeesByUserRoleAsync(bool isAll)
+        {
+            IEnumerable<SelectServiceModel> data = new List<SelectServiceModel>();
+            if (isAll)   //ако са нужни всички служители
+            {
+                data = this.employees.GetActiveEmployeesNames();
+            }
+            else   //ако НЕ са нужни всички служители
+            {
+                if (currentUser.RoleName == DataConstants.SuperAdmin)
+                {
+                    data = this.employees.GetActiveEmployeesNames();
+                }
+                if (currentUser.RoleName == DataConstants.SectorAdmin)
+                {
+                    data = await this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId);
+                }
+                if (currentUser.RoleName == DataConstants.DepartmentAdmin)
+                {
+                    data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
+                }
+                if (currentUser.RoleName == DataConstants.DirectorateAdmin)
+                {
+                    data = await this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId);
+                }
+                else   // ако е Employee
+                {
+                    if (currentUser.SectorId != null)
+                    {
+                        data = await this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId);
+                    }
+                    else if (currentUser.DepartmentId != null)
+                    {
+                        data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
+                    }
+                    else if (currentUser.DirectorateId != null)
+                    {
+                        data = await this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId);
+                    }
+                    else
+                    {
+                        data = this.employees.GetActiveEmployeesNames();
+                    }
+                }
+            }
+            return data;
+        }
 
         #region API Calls
+
+        [Authorize(Policy = DataConstants.Employee)]
+        [HttpGet]
+        public async Task<IActionResult> GetEmployees(bool isAll, int? taskId)
+        {
+            var employeesIds = new List<int>();  // номерата на експерти работещи по задачата  (ако има такива)
+            //var taskEmployees = new List<SelectListItem>();
+            var taskEmployees = new SelectList(new List<SelectListItem>(), "Value", "Text", "-1", "Group.Name");
+            var data = await this.GetEmployeesByUserRoleAsync(isAll);  // колекция от експерти според ролята на потребителя
+            var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+
+            if (taskId.HasValue)
+            {
+                
+                var taskDetails = this.tasks.GetTaskDetails(taskId.Value)
+                                             .ProjectTo<TaskViewModel>()
+                                             .FirstOrDefault();
+                var assignedEmployees = new List<SelectServiceModel>();
+                assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
+                employeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToList(); //за да изключи премахнатите експерти
+                //taskEmployees = data.Select(a => new SelectListItem
+                //{
+                //    Text = a.TextValue,
+                //    Value = a.Id.ToString(),
+                //    Selected = employeesIds.Contains(a.Id) ? true : false
+                //})
+                //.ToList();
+                taskEmployees = new SelectList(data.Select(item => new SelectListItem
+                {
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Selected = employeesIds.Contains(item.Id) ? true : false,
+                    Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                employeesIds = assignedEmployees.Select(a => a.Id).ToList(); //за да включи всички експерти работили по задачата(изтрити и такива дето не са в йерархията на експерта)
+                if (!employeesIds.All(elem => taskEmployees.Select(e => int.Parse(e.Value)).ToArray().Contains(elem))) //добавям членовете на задачата, които не са в йерархиата на отговорника
+                {
+                    foreach (var empId in employeesIds)
+                    {
+                        if (taskEmployees.FirstOrDefault(e => e.Value == empId.ToString()) == null)
+                        {
+                            var curentEmployee = assignedEmployees.Where(e => e.Id == empId).FirstOrDefault();
+                            var employeeFromDB = await this.employees.GetEmployeeByIdAsync(empId);
+                            if (employeeFromDB.isDeleted == false)   //проверка дали колегата, който е вкл. в задачата, междувременно не е маркиран като изтрит акаунт
+                            {
+                                taskEmployees.Append(new SelectListItem
+                                {
+                                    Text = curentEmployee.TextValue,
+                                    Value = empId.ToString(),
+                                    Selected = curentEmployee.isDeleted ? false : true,
+                                    Group = departments.Where(d => d.Name == curentEmployee.DepartmentName).FirstOrDefault()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+               taskEmployees = new SelectList(data.Select(item => new SelectListItem
+                {
+                    Text = item.TextValue,
+                    Value = item.Id.ToString(),
+                    Selected = false,
+                    Group = departments.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+
+            }
+            return Json(new { taskEmployees });
+        }   
+
         [HttpGet]
         public async Task<IActionResult> SetDateTasksHours(int userId, DateTime workDate, int taskId, int hours)
         {

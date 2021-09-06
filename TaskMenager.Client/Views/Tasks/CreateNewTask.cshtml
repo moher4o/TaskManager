@@ -16,7 +16,7 @@
             </button>
         </div>
         <div class="form-group row">
-            @*@Html.HiddenFor(model => model.Id)*@
+            @Html.HiddenFor(model => model.Id, new { id = "taskNomer" })
             @if (permisionType != SuperAdmin)
             {
                 @Html.HiddenFor(model => model.DirectoratesId);
@@ -206,7 +206,9 @@
         $(document).ready(function () {
             //$('#Subjects_dropdown').multiselect();
             $('#Subjects_dropdown').multiselect({
-                maxHeight: 300
+                maxHeight: 400,
+                enableClickableOptGroups: true,
+                includeResetOption: false,
             });
             $('#Subjects_dropdown').multiselect('disable');
             $('#assignerId').select2({
