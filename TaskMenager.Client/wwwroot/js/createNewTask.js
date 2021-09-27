@@ -3,7 +3,9 @@
     const loc = window.location.href;
     const path = loc.substr(0, loc.lastIndexOf('/') + 1);
     var childrensCount = document.getElementById("childrensCount").value;
-    var taskNomer = document.getElementById("taskId").value;
+    var taskNomer = document.getElementById("taskNomer").value;
+    GetAllEmployees(taskNomer, false);
+    //console.log(taskNomer);
     function attachEvents() {
         $('#assignerId').on('change', function () { $("#select2-assignerId-container").css('background-color', '#ffffff'); });
         $('#taskTypesId').on('change', CheckSelectedParent);
@@ -66,6 +68,9 @@
                 
                 if (document.getElementById('taskTypesId').selectedIndex === 7) {     //ако е екипна задача от много дирекции
                     GetAllEmployees(taskNomer, true);
+                }
+                else {
+                    GetAllEmployees(taskNomer, false);
                 }
                 $('#Subjects_dropdown').multiselect('enable');
             }
@@ -149,7 +154,8 @@
 
     function GetAllEmployees(taskId, isAll) {
         //swal("Информация", "Избрания тип задача е специален. Дава възможност за сформиране на екип от експерти от различни дирекции.", "info");
-        if (taskId == undefined) {
+        //console.log(taskId);
+        if (taskId == undefined || taskId ==='0') {
             taskId = null;
         }
         var url = path + "getEmployees?isAll=" + isAll + "&taskId=" + taskId;
@@ -167,7 +173,7 @@
 
                 let group = null;
                 $.each(data.taskEmployees, function (i, expert) {
-
+                    //console.log(expert.group);
                     if (group != (expert.group == null ? null : expert.group.name)) {
                         $('#Subjects_dropdown').append('<optgroup label=\'' + expert.group.name + '\'>');
                         group = expert.group.name;
