@@ -52,7 +52,7 @@
 
         <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
         <div class="form-group row" >
-            @Html.LabelFor(model => model.AssignersList, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.AssignersList, new { @class = "col-md-2 col-form-label blinking" })
             <div class="col-md-5 tooltip-big-text" data-balloon-length="xlarge" aria-label="Ако отговорника на задачата, работи по нея и трябва да отчита часове, трябва да бъде добавен и при изпълнителите" data-balloon-pos="up">
                 @*@Html.DropDownListFor(m => m.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })*@
                 <!-- If needed, change 'null' to "Моля изберете..." -->
@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.Employees, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Employees, new { @class = "col-md-2 col-form-label blinking" })
             <div class="col-md-5">
                 @Html.ListBoxFor(model => model.EmployeesIds, new MultiSelectList(Model.Employees, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown"})
             </div>

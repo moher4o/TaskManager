@@ -76,8 +76,12 @@ namespace TaskMenager.Client.Models.Tasks
 
         //public string AssignerId { get; set; }
 
-        [Display(Name = "Изпълнители")]
+        [Display(Name = "Назначени служители")]
         public IList<SelectListItem> Employees { get; set; } = new List<SelectListItem>();
+
+        [Display(Name = "Назначени служители")]
+        public SelectList EmployeesList { get; set; }
+
 
         [Display(Name = "Subjects")]
         public int[] EmployeesIds { get; set; }

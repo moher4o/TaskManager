@@ -54,7 +54,7 @@
 
         <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
         <div class="form-group row">
-            @Html.LabelFor(model => model.AssignersList, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.AssignersList, new { @class = "col-md-2 col-form-label blinking" })
             <div class="col-md-5">
                 @Html.DropDownListFor(a => a.AssignerIdInt, Model.AssignersList, "Моля изберете...", new { @class = "form-control", id = "assignerId", name = "assignerId" })
             </div>
@@ -70,9 +70,9 @@
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.Employees, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.EmployeesList, new { @class = "col-md-2 col-form-label blinking" })
             <div class="col-md-5">
-                @Html.ListBoxFor(model => model.EmployeesIds, new MultiSelectList(Model.Employees, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown" })
+                @Html.ListBoxFor(model => model.EmployeesIds, new MultiSelectList(Model.EmployeesList, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown" })
             </div>
             @Html.LabelFor(model => model.TaskPrioritys, new { @class = "col-md-2 col-form-label" })
             <div class="col-md-3">

@@ -16,6 +16,8 @@ using TaskManager.Services.Models.TaskModels;
 using TaskMenager.Client.Models.Home;
 using TaskMenager.Client.Models.Tasks;
 using static TaskManager.Common.DataConstants;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace TaskMenager.Client.Controllers
 {
@@ -195,7 +197,7 @@ namespace TaskMenager.Client.Controllers
                      TaskTypesId = taskDetails.TypeId.ToString(),
                      Valid_From = taskDetails.StartDate.Date,
                      Valid_To = taskDetails.EndDatePrognose.Value.Date
-                };
+            };
                 //var assignedEmployees = new List<SelectServiceModel>();
                 //assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
 
@@ -252,8 +254,11 @@ namespace TaskMenager.Client.Controllers
                 //???????????????????
                 //taskToEdit.AssignersList = new SelectList(;
                 taskToEdit = await TasksModelPrepareForViewWithOldInfo(taskToEdit);
-
+                var employeesOnTask = await this.GetEmployeesOnTask(taskDetails.TaskTypeName == TaskTypeSpecialTeam ? true : false, taskDetails.Id);
+                taskToEdit.EmployeesList = employeesOnTask;
                 taskToEdit.EmployeesIds = taskDetails.Colleagues.ToList().Where(e => e.isDeleted == false).Select(a => a.Id).ToArray();  //за да изключи премахнатите експерти
+                taskToEdit.AssignersList = employeesOnTask;
+                taskToEdit.AssignerIdInt = taskDetails.AssignerId;
                 //???????????????????
 
                 taskToEdit.Id = taskDetails.Id;
@@ -262,6 +267,7 @@ namespace TaskMenager.Client.Controllers
                 taskToEdit.Description = taskDetails.Description;
                 taskToEdit.HoursLimit = taskDetails.HoursLimit;
                 taskToEdit.ParentTaskId = taskDetails.ParentTaskId;
+
                 if (taskDetails.TypeId == await this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal))
                 {
                     var childrens = await this.tasks.GetTaskChildsIdsAsync(taskToEdit.Id);
@@ -1003,11 +1009,11 @@ namespace TaskMenager.Client.Controllers
                     ///////
 
                     newTask.Employees = data.Select(a => new SelectListItem
-                                                       {
-                                                           Text = a.TextValue,
-                                                           Value = a.Id.ToString(),
-                                                           Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
-                                                       })
+                    {
+                        Text = a.TextValue,
+                        Value = a.Id.ToString(),
+                        Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                    })
                                                        .ToList();
                 }
                 else
@@ -1018,7 +1024,7 @@ namespace TaskMenager.Client.Controllers
                     {
                         data = await this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId);
                     }
-                    else if(currentUser.DirectorateId != null)
+                    else if (currentUser.DirectorateId != null)
                     {
                         data = await this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId);
                     }
@@ -1026,7 +1032,7 @@ namespace TaskMenager.Client.Controllers
                     {
                         data = this.employees.GetActiveEmployeesNames();
                     }
-                    
+
                     var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
                     var dropdownList = new SelectList(data.Select(item => new SelectListItem
                     {
@@ -1039,11 +1045,11 @@ namespace TaskMenager.Client.Controllers
                     ///////
 
                     newTask.Employees = data.Select(a => new SelectListItem
-                                                       {
-                                                           Text = a.TextValue,
-                                                           Value = a.Id.ToString(),
-                                                           Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
-                                                       })
+                    {
+                        Text = a.TextValue,
+                        Value = a.Id.ToString(),
+                        Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                    })
                                                        .ToList();
                 }
             }
@@ -1090,12 +1096,11 @@ namespace TaskMenager.Client.Controllers
                 ///////
 
                 newTask.Employees = data.Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
-                                                   })
-                                                   .ToList();
+                {
+                    Text = a.TextValue,
+                    Value = a.Id.ToString(),
+                    Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                }).ToList();
             }
             else if (currentUser.RoleName == DepartmentAdmin)
             {
@@ -1149,18 +1154,17 @@ namespace TaskMenager.Client.Controllers
                     Value = item.Id.ToString(),
                     Selected = (oldTask.AssignerIdInt == item.Id) ? true : false,
                     //Group = sectors.Where(d => d.Name == item.SectorName).FirstOrDefault()
-                    Group = new SelectListGroup { Name = currentUser.DepartmentName}
+                    Group = new SelectListGroup { Name = currentUser.DepartmentName }
                 }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
                 newTask.AssignersList = dropdownList;
                 ///////
 
                 newTask.Employees = data.Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
-                                                   })
-                                                   .ToList();
+                {
+                    Text = a.TextValue,
+                    Value = a.Id.ToString(),
+                    Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                }).ToList();
             }
             else if (currentUser.RoleName == DirectorateAdmin)
             {
@@ -1236,11 +1240,11 @@ namespace TaskMenager.Client.Controllers
                 ///////
 
                 newTask.Employees = data.Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
-                                                   })
+                {
+                    Text = a.TextValue,
+                    Value = a.Id.ToString(),
+                    Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                })
                                                    .ToList();
             }
             else if (currentUser.RoleName == SuperAdmin)
@@ -1343,12 +1347,11 @@ namespace TaskMenager.Client.Controllers
                 ///////
 
                 newTask.Employees = data.Select(a => new SelectListItem
-                                                   {
-                                                       Text = a.TextValue,
-                                                       Value = a.Id.ToString(),
-                                                       Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
-                                                   })
-                                                   .ToList();
+                {
+                    Text = a.TextValue,
+                    Value = a.Id.ToString(),
+                    Selected = newTask.EmployeesIds.Contains(a.Id) ? true : false
+                }).ToList();
             }
             newTask.AssignerIdInt = oldTask.AssignerIdInt;
             newTask.TaskParetns = this.tasks.GetParentTaskNames(currentUser.DirectorateId, true)
@@ -1478,44 +1481,30 @@ namespace TaskMenager.Client.Controllers
             return data;
         }
 
-        #region API Calls
-
-        //[Authorize(Policy = DataConstants.Employee)]               
-        [HttpGet]
-        public async Task<IActionResult> GetEmployees(bool isAll, int? taskId)
+        private async Task<SelectList> GetEmployeesOnTask(bool isAll, int? taskId)
         {
             var employeesIds = new List<int>();  // номерата на експерти работещи по задачата  (ако има такива)
-            //var taskEmployees = new List<SelectListItem>();
             var taskEmployees = new SelectList(new List<SelectListItem>(), "Value", "Text", "-1", "Group.Name");
             var data = await this.GetEmployeesByUserRoleAsync(isAll);  // колекция от експерти според ролята на потребителя
-         // var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+                                                                       // var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
             var departmentlist = this.departments.GetDepartmentsNames();
             var depNameGroups = departmentlist.GroupBy(x => x.TextValue).Select(x => new SelectListGroup { Name = x.Key }).ToList();
-            //depNameGroups.Add(new SelectListGroup { Name = "0_Служители без присвоен отдел" });
 
             if (taskId.HasValue)
             {
-                
+
                 var taskDetails = this.tasks.GetTaskDetails(taskId.Value)
                                              .ProjectTo<TaskViewModel>()
                                              .FirstOrDefault();
                 var assignedEmployees = new List<SelectServiceModel>();
                 assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
                 employeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToList(); //за да изключи премахнатите експерти
-                //taskEmployees = data.Select(a => new SelectListItem
-                //{
-                //    Text = a.TextValue,
-                //    Value = a.Id.ToString(),
-                //    Selected = employeesIds.Contains(a.Id) ? true : false
-                //})
-                //.ToList();
                 taskEmployees = new SelectList(data.Select(item => new SelectListItem
                 {
                     Text = item.TextValue,
                     Value = item.Id.ToString(),
                     Selected = employeesIds.Contains(item.Id) ? true : false,
                     Group = new SelectListGroup { Name = (depNameGroups.Where(d => d.Name == item.DepartmentName).Select(d => d.Name).FirstOrDefault() ?? "0_Служители без присвоен отдел") }
-                    // Group = depNameGroups.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
                 }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
                 employeesIds = assignedEmployees.Select(a => a.Id).ToList(); //за да включи всички експерти работили по задачата(изтрити и такива дето не са в йерархията на експерта)
                 if (!employeesIds.All(elem => taskEmployees.Select(e => int.Parse(e.Value)).ToArray().Contains(elem))) //добавям членовете на задачата, които не са в йерархиата на отговорника
@@ -1536,14 +1525,6 @@ namespace TaskMenager.Client.Controllers
                                     Selected = curentEmployee.isDeleted ? false : true,
                                     Group = new SelectListGroup { Name = (depNameGroups.Where(d => d.Name == curentEmployee.DepartmentName).Select(d => d.Name).FirstOrDefault() ?? "0_Служители без присвоен отдел") }
                                 });
-
-                                //taskEmployees.Append(new SelectListItem
-                                //{
-                                //    Text = curentEmployee.TextValue,
-                                //    Value = empId.ToString(),
-                                //    Selected = curentEmployee.isDeleted ? false : true,
-                                //    Group = departments.Where(d => d.Name == curentEmployee.DepartmentName).FirstOrDefault()
-                                //});
                             }
                         }
                     }
@@ -1563,15 +1544,114 @@ namespace TaskMenager.Client.Controllers
             }
             else
             {
-               taskEmployees = new SelectList(data.Select(item => new SelectListItem
+                taskEmployees = new SelectList(data.Select(item => new SelectListItem
                 {
                     Text = item.TextValue,
                     Value = item.Id.ToString(),
                     Selected = false,
                     Group = new SelectListGroup { Name = (depNameGroups.Where(d => d.Name == item.DepartmentName).Select(d => d.Name).FirstOrDefault() ?? "0_Служители без присвоен отдел") }
-               }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+                }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
 
             }
+            return taskEmployees;
+        }
+
+        #region API Calls
+
+        //[Authorize(Policy = DataConstants.Employee)]               
+        [HttpGet]
+        public async Task<IActionResult> GetEmployees(bool isAll, int? taskId)
+        {
+         //   var employeesIds = new List<int>();  // номерата на експерти работещи по задачата  (ако има такива)
+         //   //var taskEmployees = new List<SelectListItem>();
+         //   var taskEmployees = new SelectList(new List<SelectListItem>(), "Value", "Text", "-1", "Group.Name");
+         //   var data = await this.GetEmployeesByUserRoleAsync(isAll);  // колекция от експерти според ролята на потребителя
+         //// var departments = data.GroupBy(x => x.DepartmentName).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+         //   var departmentlist = this.departments.GetDepartmentsNames();
+         //   var depNameGroups = departmentlist.GroupBy(x => x.TextValue).Select(x => new SelectListGroup { Name = x.Key }).ToList();
+         //   //depNameGroups.Add(new SelectListGroup { Name = "0_Служители без присвоен отдел" });
+
+         //   if (taskId.HasValue)
+         //   {
+                
+         //       var taskDetails = this.tasks.GetTaskDetails(taskId.Value)
+         //                                    .ProjectTo<TaskViewModel>()
+         //                                    .FirstOrDefault();
+         //       var assignedEmployees = new List<SelectServiceModel>();
+         //       assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
+         //       employeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToList(); //за да изключи премахнатите експерти
+         //       //taskEmployees = data.Select(a => new SelectListItem
+         //       //{
+         //       //    Text = a.TextValue,
+         //       //    Value = a.Id.ToString(),
+         //       //    Selected = employeesIds.Contains(a.Id) ? true : false
+         //       //})
+         //       //.ToList();
+         //       taskEmployees = new SelectList(data.Select(item => new SelectListItem
+         //       {
+         //           Text = item.TextValue,
+         //           Value = item.Id.ToString(),
+         //           Selected = employeesIds.Contains(item.Id) ? true : false,
+         //           Group = new SelectListGroup { Name = (depNameGroups.Where(d => d.Name == item.DepartmentName).Select(d => d.Name).FirstOrDefault() ?? "0_Служители без присвоен отдел") }
+         //           // Group = depNameGroups.Where(d => d.Name == item.DepartmentName).FirstOrDefault()
+         //       }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+         //       employeesIds = assignedEmployees.Select(a => a.Id).ToList(); //за да включи всички експерти работили по задачата(изтрити и такива дето не са в йерархията на експерта)
+         //       if (!employeesIds.All(elem => taskEmployees.Select(e => int.Parse(e.Value)).ToArray().Contains(elem))) //добавям членовете на задачата, които не са в йерархиата на отговорника
+         //       {
+         //           var tempSelectListItems = new List<SelectListItem>();
+         //           foreach (var empId in employeesIds)
+         //           {
+         //               if (taskEmployees.FirstOrDefault(e => e.Value == empId.ToString()) == null)
+         //               {
+         //                   var curentEmployee = assignedEmployees.Where(e => e.Id == empId).FirstOrDefault();
+         //                   var employeeFromDB = await this.employees.GetEmployeeByIdAsync(empId);
+         //                   if (employeeFromDB.isDeleted == false)   //проверка дали колегата, който е вкл. в задачата, междувременно не е маркиран като изтрит акаунт
+         //                   {
+         //                       tempSelectListItems.Add(new SelectListItem
+         //                       {
+         //                           Text = curentEmployee.TextValue,
+         //                           Value = empId.ToString(),
+         //                           Selected = curentEmployee.isDeleted ? false : true,
+         //                           Group = new SelectListGroup { Name = (depNameGroups.Where(d => d.Name == curentEmployee.DepartmentName).Select(d => d.Name).FirstOrDefault() ?? "0_Служители без присвоен отдел") }
+         //                       });
+
+         //                       //taskEmployees.Append(new SelectListItem
+         //                       //{
+         //                       //    Text = curentEmployee.TextValue,
+         //                       //    Value = empId.ToString(),
+         //                       //    Selected = curentEmployee.isDeleted ? false : true,
+         //                       //    Group = departments.Where(d => d.Name == curentEmployee.DepartmentName).FirstOrDefault()
+         //                       //});
+         //                   }
+         //               }
+         //           }
+         //           if (tempSelectListItems.Count > 0)
+         //           {
+         //               List<SelectListItem> _assignersList = taskEmployees.Select(asl => new SelectListItem
+         //               {
+         //                   Text = asl.Text,
+         //                   Value = asl.Value,
+         //                   Selected = false,
+         //                   Group = new SelectListGroup { Name = asl.Group.Name }
+         //               }).ToList();
+         //               _assignersList = _assignersList.Concat(tempSelectListItems).ToList();
+         //               taskEmployees = new SelectList(_assignersList, "Value", "Text", "-1", "Group.Name");
+         //           }
+         //       }
+         //   }
+         //   else
+         //   {
+         //      taskEmployees = new SelectList(data.Select(item => new SelectListItem
+         //       {
+         //           Text = item.TextValue,
+         //           Value = item.Id.ToString(),
+         //           Selected = false,
+         //           Group = new SelectListGroup { Name = (depNameGroups.Where(d => d.Name == item.DepartmentName).Select(d => d.Name).FirstOrDefault() ?? "0_Служители без присвоен отдел") }
+         //      }).OrderBy(a => a.Group.Name).ToList(), "Value", "Text", "-1", "Group.Name");
+
+         //   }
+
+            var taskEmployees = await this.GetEmployeesOnTask(isAll,taskId);
             return Json(new { taskEmployees });
         }   
 

@@ -4,8 +4,13 @@
     const path = loc.substr(0, loc.lastIndexOf('/') + 1);
     var childrensCount = document.getElementById("childrensCount").value;
     var taskNomer = document.getElementById("taskNomer").value;
-    GetAllEmployees(taskNomer, false);
-    //console.log(taskNomer);
+    if (document.getElementById('taskTypesId').selectedIndex === 7) {     //ако е екипна задача от много дирекции
+        GetAllEmployees(true, taskNomer);
+    }
+    else {
+        GetAllEmployees(false, taskNomer);
+    }
+    
     function attachEvents() {
         $('#assignerId').on('change', function () { $("#select2-assignerId-container").css('background-color', '#ffffff'); });
         $('#taskTypesId').on('change', CheckSelectedParent);
@@ -20,7 +25,7 @@
     }
 
     function CheckSelectedTaskType() {
-        
+
         if (childrensCount === '0') {   //ако не е родител
 
             if ($('#parentsId :selected').text() != 'Моля изберете...' && document.getElementById('taskTypesId').selectedIndex === 6) {
@@ -52,7 +57,7 @@
     }
 
     function CheckSelectedParent() {
-        
+
         if (childrensCount === '0') {  //ако не е родител
 
             if ((document.getElementById('taskTypesId').selectedIndex != 6) && $('#parentsId :selected').text() === 'Моля изберете...') {    // $('#taskTypesId :selected').text() != 'Глобална'
@@ -65,12 +70,12 @@
                 $("#parentsId").select2().trigger('change');
             }
             if (document.getElementById('taskTypesId').selectedIndex != 6) {
-                
+
                 if (document.getElementById('taskTypesId').selectedIndex === 7) {     //ако е екипна задача от много дирекции
-                    GetAllEmployees(taskNomer, true);
+                    GetAllEmployees(true, taskNomer);
                 }
                 else {
-                    GetAllEmployees(taskNomer, false);
+                    GetAllEmployees(false, taskNomer);
                 }
                 $('#Subjects_dropdown').multiselect('enable');
             }
@@ -152,10 +157,10 @@
         });
     }
 
-    function GetAllEmployees(taskId, isAll) {
+    function GetAllEmployees(isAll, taskId) {
         //swal("Информация", "Избрания тип задача е специален. Дава възможност за сформиране на екип от експерти от различни дирекции.", "info");
         //console.log(taskId);
-        if (taskId == undefined || taskId ==='0') {
+        if (taskId == undefined || taskId === '0') {
             taskId = null;
         }
         var url = path + "getEmployees?isAll=" + isAll + "&taskId=" + taskId;
@@ -168,29 +173,70 @@
                 $.each($('#Subjects_dropdown option:selected'), function (i, expert) {
                     selectedExp.push(expert.value)
                 });
-                //console.log(selectedExp);
-                 $('#Subjects_dropdown').empty();
-
+                let selectedAssigner = [];
+                $.each($('#assignerId option:selected'), function (i, expert) {
+                    selectedAssigner.push(expert.value)
+                });
+                $('#Subjects_dropdown').empty();
+                $('#assignerId').empty();
+                ///////////
+                var dataF = {
+                    id: 0,
+                    text: 'Моля изберете...'
+                };
+                if (selectedAssigner.includes(0)) {
+                    var newOption = new Option(dataF.text, dataF.id, true, true);                           //добавям Моля изберете... 
+                }
+                else {
+                    var newOption = new Option(dataF.text, dataF.id, false, false);
+                }
+                $('#assignerId').append(newOption).trigger('change');
+                ///////////
                 let group = null;
                 $.each(data.taskEmployees, function (i, expert) {
                     //console.log(expert.group);
                     if (group != (expert.group == null ? null : expert.group.name)) {
                         $('#Subjects_dropdown').append('<optgroup label=\'' + expert.group.name + '\'>');
+                        $('#assignerId').append('<optgroup label=\'' + expert.group.name + '\'>');
                         group = expert.group.name;
                     }
+                    ///////////   добавян на експертa към списъка с assigners
+                    var data = {
+                        id: expert.value,
+                        text: expert.text
+                    };
+                    if (selectedAssigner.includes(expert.value)) {
+                        var newOption = new Option(data.text, data.id, true, true);
+                    }
+                    else {
+                        var newOption = new Option(data.text, data.id, false, false);
+                    }
+                    $('#assignerId optgroup[label =\'' + expert.group.name + '\']').append(newOption).trigger('change');
+
+                    ///////////  добавян на експертa към списъка с изпълнители
                     if (expert.selected || selectedExp.includes(expert.value)) {
                         $('#Subjects_dropdown').append('<option value=\'' + expert.value + '\' selected="selected">' + expert.text + '</option>');
                     }
                     else {
                         $('#Subjects_dropdown').append('<option value=\'' + expert.value + '\'>' + expert.text + '</option>');
                     }
-                    
+
                 });
                 $('#Subjects_dropdown').multiselect('rebuild');
-
             }
+        }).done(function () { //use this
+            if (document.getElementById('taskTypesId').selectedIndex === 6) {
+                $('#Subjects_dropdown').multiselect('disable');
+                DeselectEmployees();
+            }
+            for (let i = 0; i < 2; i++) {
+                $('.blinking').fadeOut(500);
+                $('.blinking').fadeIn(500);
+            } 
+
         });
-        
+
     }
+
 
 });
