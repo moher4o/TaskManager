@@ -194,8 +194,9 @@
                 ///////////
                 let group = null;
                 $.each(data.taskEmployees, function (i, expert) {
-                    //console.log(expert.group);
+                    
                     if (group != (expert.group == null ? null : expert.group.name)) {
+                        //console.log(expert.group.name);
                         $('#Subjects_dropdown').append('<optgroup label=\'' + expert.group.name + '\'>');
                         $('#assignerId').append('<optgroup label=\'' + expert.group.name + '\'>');
                         group = expert.group.name;
@@ -229,7 +230,7 @@
                 $('#Subjects_dropdown').multiselect('disable');
                 DeselectEmployees();
             }
-            for (let i = 0; i < 2; i++) {
+            for (let i = 0; i < 3; i++) {
                 $('.blinking').fadeOut(500);
                 $('.blinking').fadeIn(500);
             } 

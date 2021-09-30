@@ -7,12 +7,14 @@ namespace TaskMenager.Client.Models.Report
 {
     public class PeriodReportViewModel : PeriodViewModel
     {
-        [Display(Name = "Дирекция")]
+        [Display(Name = "Дирекция:")]
         public IList<SelectListItem> Directorates { get; set; } = new List<SelectListItem>();
 
         public string DirectoratesId { get; set; }
 
         public int[] EmployeesIds { get; set; }
+
+        public bool WithDepTabs { get; set; } = true;
 
     }
 }

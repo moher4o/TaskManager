@@ -90,7 +90,7 @@ namespace TaskMenager.Client.Controllers
                 {
                     model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
                 }
-               
+
                 if (model.DateList.Count < 1)
                 {
                     TempData["Error"] = "[TaskReportResult] Няма отчет по задачата за този период.";
@@ -111,8 +111,6 @@ namespace TaskMenager.Client.Controllers
             try
             {
                 var newPeriod = new PeriodReportViewModel();
-                if (currentUser.RoleName == SuperAdmin)
-                {
                     newPeriod.Directorates = this.directorates.GetDirectoratesNames(null)
                                    .Select(a => new SelectListItem
                                    {
@@ -120,10 +118,24 @@ namespace TaskMenager.Client.Controllers
                                        Value = a.Id.ToString()
                                    })
                                    .ToList();
-                    newPeriod.DirectoratesId = newPeriod.Directorates.FirstOrDefault().Value;
-                    newPeriod.Directorates.FirstOrDefault().Selected = true;
-                }
+                    if (currentUser.DirectorateId.HasValue)
+                    {
+                        newPeriod.DirectoratesId = currentUser.DirectorateId.Value.ToString();
+                        newPeriod.Directorates.Where(d => d.Value == currentUser.DirectorateId.Value.ToString()).FirstOrDefault().Selected = true;
+                    }
+                    else
+                    {
+                    newPeriod.Directorates.Insert(0, new SelectListItem
+                    {
+                        Text = ChooseValue,
+                        Value = "0",
+                        Selected = true
+                    });
+                    newPeriod.DirectoratesId = "0";
 
+                    //newPeriod.DirectoratesId = newPeriod.Directorates.FirstOrDefault().Value;
+                    //    newPeriod.Directorates.FirstOrDefault().Selected = true;
+                    }
                 return View(newPeriod);
             }
             catch (Exception)
@@ -182,7 +194,7 @@ namespace TaskMenager.Client.Controllers
                 newReport.EmployeesIds = employeesIds.ToArray();
                 newReport.StartDate = model.StartDate.Date;
                 newReport.EndDate = model.EndDate.Date;
-
+                newReport.WithDepTabs = model.WithDepTabs;
                 return await ExportReport(newReport);
             }
             catch (Exception)
@@ -531,7 +543,7 @@ namespace TaskMenager.Client.Controllers
 
                                 worksheet.Cells[row, tableTaskColumn[item.TaskId]].Value = item.HoursSpend;
                             }
-                            
+
                             tempDate = item.WorkDate;
 
                         }
@@ -592,7 +604,7 @@ namespace TaskMenager.Client.Controllers
 
                     worksheet.Cells[row + 2, 10].Value = "Отпуск за периода :";
                     worksheet.Cells[row + 2, 12].Value = employeeWork.WorkedHoursByTaskByPeriod.Where(t => t.TaskName == "Отпуски").Count();
-                    var totalholidayrow = worksheet.Cells[row+2, 10, row+2, 12];
+                    var totalholidayrow = worksheet.Cells[row + 2, 10, row + 2, 12];
                     totalholidayrow.Style.Fill.PatternType = ExcelFillStyle.Solid;
                     totalholidayrow.Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
 
@@ -646,10 +658,14 @@ namespace TaskMenager.Client.Controllers
                 };
                 if (directorate.Id == 0)
                 {
-                    directorate.Id = 1;
+                    //directorate.Id = 1;
+                    directorate.TextValue = "Разширен отчет";
                     // TODO справката е за експерти назначени в дирекции, вкл директора, не се вкл председател, секретар, заместник председатели, затова не е необходима тази проверка
                 }
-                directorate.TextValue = this.directorates.GetDirectoratesNames(directorate.Id).FirstOrDefault().TextValue;   //дирекцията за която ще е отчета
+                else
+                {
+                    directorate.TextValue = this.directorates.GetDirectoratesNames(directorate.Id).FirstOrDefault().TextValue;   //дирекцията за която ще е отчета
+                }
 
                 var departmentsList = this.departments.GetDepartmentsNamesByDirectorate(directorate.Id).ToList();  //отделите в дирекцията
 
@@ -764,11 +780,17 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                             worksheet.Cells[1, 1].Style.Indent = 10;
                             worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            if ((allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() == 1) && (department.TextValue != directorate.TextValue))
+                            //if ((allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() == 1) && (department.TextValue != directorate.TextValue))
+                            //{
+                            //    worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.DepartmentId == department.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                            //        "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                            //}
+                            if (allExperts.Count() == 1)
                             {
                                 worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.DepartmentId == department.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
                                     "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             }
+
                             else
                             {
                                 worksheet.Cells[1, 1].Value = ((department.TextValue == directorate.TextValue) ? "Дирекция: \"" : "Отдел: \"") + department.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
@@ -821,7 +843,7 @@ namespace TaskMenager.Client.Controllers
                                     var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
                                     if (curentColegue != null)
                                     {
-                                        worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;    
+                                        worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
                                         if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
                                         {
                                             allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
@@ -846,7 +868,7 @@ namespace TaskMenager.Client.Controllers
 
                                 if (task.TaskTypeName == TaskTypeSystem)
                                 {
-                                    workingDaysSystemSum += workedHoursByDepartment/8;
+                                    workingDaysSystemSum += workedHoursByDepartment / 8;
                                     worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
                                 }
 
@@ -1038,7 +1060,7 @@ namespace TaskMenager.Client.Controllers
                                                     row += 1;
                                                 }
                                             }
-                                            
+
                                         }
                                         worksheet.Cells[row, 2].Value = "Общо дни";
                                         worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
@@ -1047,7 +1069,7 @@ namespace TaskMenager.Client.Controllers
                                         worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
 
                                     }
-                                    if (rowBeforeOtpuski+2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
                                     {
                                         var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
                                         modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -1282,7 +1304,7 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                             if (allExperts.Where(s => s.SectorId == sector.Id).ToList().Count() == 1)
                             {
-                                worksheet.Cells[1, 1].Value ="Отчет на: "+ allExperts.Where(s => s.SectorId == sector.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.SectorId == sector.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
                                     "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             }
                             else
@@ -1885,7 +1907,7 @@ namespace TaskMenager.Client.Controllers
                             row += 1;
                             var expertsInDepartment = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId == null).OrderBy(d => d.JobTitleName).ToList();
                             var departmentBoss = expertsInDepartment.Where(u => u.JobTitleName == "Началник отдел").FirstOrDefault();
-                            if (departmentBoss != null )
+                            if (departmentBoss != null)
                             {
                                 worksheet.Row(row).Style.Indent = 1;
                                 worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
