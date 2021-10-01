@@ -105,106 +105,6 @@ namespace TaskMenager.Client.Controllers
             }
         }  //task 2 step
 
-
-        public IActionResult PeriodReport()
-        {
-            try
-            {
-                var newPeriod = new PeriodReportViewModel();
-                    newPeriod.Directorates = this.directorates.GetDirectoratesNames(null)
-                                   .Select(a => new SelectListItem
-                                   {
-                                       Text = a.TextValue,
-                                       Value = a.Id.ToString()
-                                   })
-                                   .ToList();
-                    if (currentUser.DirectorateId.HasValue)
-                    {
-                        newPeriod.DirectoratesId = currentUser.DirectorateId.Value.ToString();
-                        newPeriod.Directorates.Where(d => d.Value == currentUser.DirectorateId.Value.ToString()).FirstOrDefault().Selected = true;
-                    }
-                    else
-                    {
-                    newPeriod.Directorates.Insert(0, new SelectListItem
-                    {
-                        Text = ChooseValue,
-                        Value = "0",
-                        Selected = true
-                    });
-                    newPeriod.DirectoratesId = "0";
-
-                    //newPeriod.DirectoratesId = newPeriod.Directorates.FirstOrDefault().Value;
-                    //    newPeriod.Directorates.FirstOrDefault().Selected = true;
-                    }
-                return View(newPeriod);
-            }
-            catch (Exception)
-            {
-                TempData["Error"] = "[PeriodReport] Грешка при подготовка на модела за отчет";
-                return RedirectToAction("Index", "Home");
-            }
-        }
-
-
-        public async Task<IActionResult> GetReport(PeriodReportViewModel model)
-        {
-            try
-            {
-                if (model.StartDate > model.EndDate)
-                {
-                    TempData["Error"] = "Невалидни дати";
-                    return RedirectToAction(nameof(PeriodReport));
-                }
-
-                var newReport = new PeriodReportViewModel();
-                var employeesIds = new List<int>();
-                if (currentUser.RoleName == Employee)
-                {
-                    employeesIds.Add(currentUser.Id);
-                }
-                else if (currentUser.RoleName == SectorAdmin)
-                {
-                    employeesIds = this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId).Result
-                                                        .Select(e => e.Id)
-                                                        .ToList();
-                }
-                else if (currentUser.RoleName == DepartmentAdmin)
-                {
-                    employeesIds = this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId).Result
-                                                        .Select(e => e.Id)
-                                                        .ToList();
-                }
-                else if (currentUser.RoleName == DirectorateAdmin)
-                {
-                    employeesIds = this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId).Result
-                                                        .Select(e => e.Id)
-                                                        .ToList();
-                }
-                else if (currentUser.RoleName == SuperAdmin)
-                {
-                    if (model.DirectoratesId == null)
-                    {
-                        TempData["Error"] = "Не е избрана дирекция";
-                        return RedirectToAction(nameof(PeriodReport));
-                    }
-                    employeesIds = this.employees.GetEmployeesNamesByDirectorateAsync(int.Parse(model.DirectoratesId)).Result
-                                        .Select(e => e.Id)
-                                        .ToList();
-                }
-                newReport.EmployeesIds = employeesIds.ToArray();
-                newReport.StartDate = model.StartDate.Date;
-                newReport.EndDate = model.EndDate.Date;
-                newReport.WithDepTabs = model.WithDepTabs;
-                return await ExportReport(newReport);
-            }
-            catch (Exception)
-            {
-                TempData["Error"] = "Грешка при обработката на модела за отчет";
-                return RedirectToAction(nameof(PeriodReport));
-            }
-
-        }
-
         public async Task<IActionResult> ExportSpravkaForTask(PeriodViewModel model)
         {
             try
@@ -629,7 +529,107 @@ namespace TaskMenager.Client.Controllers
             }
         }   //employee 3 step
 
-        public async Task<IActionResult> ExportReport(PeriodReportViewModel model)
+        public IActionResult PeriodReport()
+        {
+            try
+            {
+                var newPeriod = new PeriodReportViewModel();
+                newPeriod.Directorates = this.directorates.GetDirectoratesNames(null)
+                               .Select(a => new SelectListItem
+                               {
+                                   Text = a.TextValue,
+                                   Value = a.Id.ToString()
+                               })
+                               .ToList();
+                if (currentUser.DirectorateId.HasValue)
+                {
+                    newPeriod.DirectoratesId = currentUser.DirectorateId.Value.ToString();
+                    newPeriod.Directorates.Where(d => d.Value == currentUser.DirectorateId.Value.ToString()).FirstOrDefault().Selected = true;
+                }
+                else
+                {
+                    newPeriod.Directorates.Insert(0, new SelectListItem
+                    {
+                        Text = ChooseValue,
+                        Value = "0",
+                        Selected = true
+                    });
+                    newPeriod.DirectoratesId = "0";
+
+                    //newPeriod.DirectoratesId = newPeriod.Directorates.FirstOrDefault().Value;
+                    //    newPeriod.Directorates.FirstOrDefault().Selected = true;
+                }
+                return View(newPeriod);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "[PeriodReport] Грешка при подготовка на модела за отчет";
+                return RedirectToAction("Index", "Home");
+            }
+        }       //  I
+
+
+        public async Task<IActionResult> GetReport(PeriodReportViewModel model)
+        {
+            try
+            {
+                if (model.StartDate > model.EndDate)
+                {
+                    TempData["Error"] = "Невалидни дати";
+                    return RedirectToAction(nameof(PeriodReport));
+                }
+
+                var newReport = new PeriodReportViewModel();
+                var employeesIds = new List<int>();
+                if (currentUser.RoleName == Employee)
+                {
+                    employeesIds.Add(currentUser.Id);
+                }
+                else if (currentUser.RoleName == SectorAdmin)
+                {
+                    employeesIds = this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId).Result
+                                                        .Select(e => e.Id)
+                                                        .ToList();
+                }
+                else if (currentUser.RoleName == DepartmentAdmin)
+                {
+                    employeesIds = this.employees.GetEmployeesNamesByDepartmentAsync(currentUser.DepartmentId).Result
+                                                        .Select(e => e.Id)
+                                                        .ToList();
+                }
+                else if (currentUser.RoleName == DirectorateAdmin)
+                {
+                    employeesIds = this.employees.GetEmployeesNamesByDirectorateAsync(currentUser.DirectorateId).Result
+                                                        .Select(e => e.Id)
+                                                        .ToList();
+                }
+                else if (currentUser.RoleName == SuperAdmin)
+                {
+                    if (model.DirectoratesId == null)
+                    {
+                        TempData["Error"] = "Не е избрана дирекция";
+                        return RedirectToAction(nameof(PeriodReport));
+                    }
+                    employeesIds = this.employees.GetEmployeesNamesByDirectorateAsync(int.Parse(model.DirectoratesId)).Result
+                                        .Select(e => e.Id)
+                                        .ToList();
+                }
+                newReport.EmployeesIds = employeesIds.ToArray();
+                newReport.StartDate = model.StartDate.Date;
+                newReport.EndDate = model.EndDate.Date;
+                newReport.WithDepTabs = model.WithDepTabs;
+                return await ExportReport(newReport);
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Грешка при обработката на модела за отчет";
+                return RedirectToAction(nameof(PeriodReport));
+            }
+
+        }    //  II
+
+
+        public async Task<IActionResult> ExportReport(PeriodReportViewModel model)   //   III
         {
             try
             {
@@ -668,6 +668,7 @@ namespace TaskMenager.Client.Controllers
                 }
 
                 var departmentsList = this.departments.GetDepartmentsNamesByDirectorate(directorate.Id).ToList();  //отделите в дирекцията
+                var sectorsList = await this.sectors.GetSectorsNamesByDirectorate(directorate.Id);    //секторите в дирекцията
 
                 //създавам виртуален отдел Директори и всички директори ги назначавам в него(само за справката)
                 var otdelDirectori = new SelectServiceModel()
@@ -679,1063 +680,142 @@ namespace TaskMenager.Client.Controllers
                     TextValue = directorate.TextValue
                 };
                 departmentsList.Insert(0, otdelDirectori);
+                //създавам виртуален отдел Директори и всички директори ги назначавам в него(само за справката)
                 foreach (var director in allExperts.Where(s => s.DepartmentId == null && s.SectorId == null).ToList())
                 {
                     director.DepartmentId = 999;
                 }
-                //създавам виртуален отдел Директори и всички директори ги назначавам в него(само за справката)
 
-
-
-                var sectorsList = await this.sectors.GetSectorsNamesByDirectorate(directorate.Id);
-
-                var formula = string.Empty;
+                
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var stream = new System.IO.MemoryStream();
                 using (ExcelPackage package = new ExcelPackage(stream))
                 {
-                    foreach (var department in departmentsList)
-                    {     //allExperts.Select(s => s.DepartmentId).ToList().Distinct().Contains(department.Id)
-                        if (allExperts.Where(s => s.DepartmentId == department.Id && s.SectorId == null).ToList().Count() > 0)   //ако има експерти в отдела
+                    if (model.WithDepTabs == false)
+                    {
+                        if (allExperts.Count() > 0)   //ако има експерти
                         {
                             ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
                             worksheet.View.ZoomScale = 70;
                             try
                             {
-                                // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
-                                worksheet.Name = department.TextValue;
+                                 worksheet.Name = "Разширен отчет";
                             }
                             catch (Exception)
                             {
-                                TempData["Error"] = "Грешка при създаването на tab за отдел: " + department.TextValue.Substring(0, 50) + "...";
+                                TempData["Error"] = "Грешка при създаването на tab за справката";
                                 return RedirectToAction(nameof(PeriodReport));
                             }
 
-                            worksheet.Row(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            worksheet.Row(2).Height = 48;
-                            var headerrange = worksheet.Cells[2, 1, 2, 5];
-                            headerrange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            headerrange.Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                            worksheet.Row(2).Style.Font.Size = 12;
-                            worksheet.Cells[2, 1].Value = "№";
-                            worksheet.Column(1).Width = 10;
-                            worksheet.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            //worksheet.Column(1).Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[2, 2].Value = "Наименование и пояснения към задачата";
-                            worksheet.Column(2).Width = 60;
-                            worksheet.Column(2).Style.WrapText = true;
-                            //worksheet.Column(2).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            //worksheet.Cells[2, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
-                            worksheet.Cells[2, 3].Value = "Начална Дата";
-                            worksheet.Column(3).Width = 15;
-                            //worksheet.Column(3).Style.Numberformat.Format = "dd-MM-yyyy";
-                            worksheet.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            worksheet.Cells[2, 4].Value = "Краен срок";
-                            worksheet.Column(4).Width = 15;
-                            //worksheet.Column(4).Style.Numberformat.Format = "dd-MM-yyyy";
-                            worksheet.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            worksheet.Cells[2, 5].Value = "Описание \\ Резултати";
-                            worksheet.Column(5).Width = 60;
-                            //worksheet.Column(5).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            //worksheet.Cells[2, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
-                            worksheet.Column(5).Style.WrapText = true;
-                            int column = 6;
-
-                            var expertsInDepWithNoSectorIds = allExperts
-                                .Where(e => e.DepartmentId == department.Id && e.SectorId == null)
-                                .OrderBy(e => e.Id)
-                                .Select(e => e.Id)
-                                .ToHashSet();
-                            foreach (var expert in allExperts.Where(e => e.DepartmentId == department.Id && e.SectorId == null).OrderBy(e => e.Id))
-                            {
-                                worksheet.Column(column).Width = 11;
-                                worksheet.Cells[2, column].Style.WrapText = true;
-                                worksheet.Cells[2, column].Style.Font.Size = 8;
-                                worksheet.Cells[2, column].Value = expert.FullName;
-                                worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                                column += 1;
-                            }
-                            worksheet.Cells[2, column].Style.WrapText = true;
-                            worksheet.Cells[2, column].Style.Font.Size = 8;
-                            worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                            worksheet.Column(column).Width = 15;
-                            worksheet.Cells[2, column].Value = "Общо колко часа е работено в/у задачата";
-                            column += 1;
-                            worksheet.Cells[2, column].Style.WrapText = true;
-                            worksheet.Cells[2, column].Style.Font.Size = 8;
-                            worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
-                            worksheet.Cells[2, column].Value = "Брой служители на задача";
-                            column += 1;
-                            worksheet.Cells[2, column].Style.WrapText = true;
-                            worksheet.Cells[2, column].Value = "Коментари по задачата";
-
-
-                            worksheet.Cells[1, 1, 1, column].Merge = true;
+                            worksheet.Cells[1, 1, 1, (8 + allExperts.Count())].Merge = true;
                             worksheet.Row(1).Height = 25;
                             worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
                             worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                             worksheet.Cells[1, 1].Style.Indent = 10;
                             worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            //if ((allExperts.Where(s => s.DepartmentId == department.Id).ToList().Count() == 1) && (department.TextValue != directorate.TextValue))
-                            //{
-                            //    worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.DepartmentId == department.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
-                            //        "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
-                            //}
                             if (allExperts.Count() == 1)
                             {
-                                worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.DepartmentId == department.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
                                     "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             }
 
                             else
                             {
-                                worksheet.Cells[1, 1].Value = ((department.TextValue == directorate.TextValue) ? "Дирекция: \"" : "Отдел: \"") + department.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
+                               var adminUnitName = (currentUser.RoleName == SuperAdmin || currentUser.RoleName == DirectorateAdmin) ? directorate.TextValue : currentUser.DepartmentName;
+                                worksheet.Cells[1, 1].Value = ((currentUser.RoleName == SuperAdmin || currentUser.RoleName == DirectorateAdmin) ? "Дирекция: \"" : "Отдел: \"") + adminUnitName + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             }
                             worksheet.Cells[1, 1].Style.Font.Size = 14;
                             worksheet.Cells[1, 1].Style.Font.Bold = true;
-                            //worksheet.View.FreezePanes(100, 6);
-                            //дотук се създават първите два реда за отдела в екселския файл
-                            var parentTaskId = 0;
-                            var row = 3;
-                            var workingDaysSystemSum = 0;
-                            var workingHoursSpecificSum = 0;
-                            var workingHoursProcurementSum = 0;
-                            var workingHoursLearningSum = 0;
-                            var workingHoursAdminSum = 0;
-                            var workingHoursMeetingsSum = 0;
-                            var workingHoursOtherSum = 0;
-                            var workingHoursSProjectSum = 0;
-                            var taskExpertsColumn = 6;
-                            foreach (var task in tasksList.Where(t => expertsInDepWithNoSectorIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName != TaskTypeSystem).OrderBy(t => t.ParentTaskId).ThenByDescending(t => t.TaskTypeName))
+                            //дотук се създава първия ред за отдела в екселския файл
+                            
+                            await DrawExpertsData(tasksList, allExperts.OrderBy(e => e.Id), worksheet);
+                        }
+
+                    }
+                    else
+                    {
+                        foreach (var department in departmentsList)
+                        {     //allExperts.Select(s => s.DepartmentId).ToList().Distinct().Contains(department.Id)
+                            if (allExperts.Where(s => s.DepartmentId == department.Id && s.SectorId == null).ToList().Count() > 0)   //ако има експерти в отдела
                             {
-                                if (task.ParentTaskId != null && task.ParentTaskId != parentTaskId)
+                                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
+                                worksheet.View.ZoomScale = 70;
+                                try
                                 {
-                                    TaskServiceModel parentTask = await this.tasks.GetParentTaskAsync(task.ParentTaskId.Value);
-                                    if (parentTask != null)
-                                    {
-                                        worksheet.Row(row).Style.Font.Size = 12;
-                                        worksheet.Row(row).Style.Font.Bold = true;
-                                        worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                        worksheet.Cells[row, 1].Value = parentTask.Id;
-                                        worksheet.Cells[row, 2].Value = parentTask.TaskName.Length > 100 ? parentTask.TaskName.Substring(0, 100) + "..." : parentTask.TaskName;
-                                        row += 1;
-                                        parentTaskId = parentTask.Id;
-
-                                    }
+                                    // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
+                                    worksheet.Name = department.TextValue;
+                                }
+                                catch (Exception)
+                                {
+                                    TempData["Error"] = "Грешка при създаването на tab за отдел: " + department.TextValue.Substring(0, 50) + "...";
+                                    return RedirectToAction(nameof(PeriodReport));
                                 }
 
-                                worksheet.Cells[row, 1].Value = task.Id;
-                                worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, 2].Value = task.TaskName;
-                                worksheet.Cells[row, 3].Value = task.StartDate.Date.ToString("dd-MM-yyyy") + "г.";
-                                worksheet.Cells[row, 4].Value = task.TaskStatusName == TaskStatusClosed ? task.EndDate.Value.Date.ToString("dd-MM-yyyy") + "г." : task.EndDatePrognose.Value.Date.ToString("dd-MM-yyyy") + "г.";
-                                worksheet.Cells[row, 5].Value = task.Description;
-
-                                taskExpertsColumn = 6;
-                                var allExpertsNotes = string.Empty;
-                                foreach (var eId in expertsInDepWithNoSectorIds)
+                                worksheet.Cells[1, 1, 1, (8 + allExperts
+                                    .Where(e => e.DepartmentId == department.Id && e.SectorId == null).Count())].Merge = true;
+                                worksheet.Row(1).Height = 25;
+                                worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                                worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                                worksheet.Cells[1, 1].Style.Indent = 10;
+                                worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                                if (allExperts.Count() == 1)
                                 {
-                                    var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                    if (curentColegue != null)
-                                    {
-                                        worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
-                                        if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
-                                        {
-                                            allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
-                                        }
-                                    }
-                                    taskExpertsColumn += 1;
-                                }
-                                int workedHoursByDepartment = task.Colleagues.Where(cl => expertsInDepWithNoSectorIds.Contains(cl.Id)).Sum(cl => cl.TaskWorkedHours ?? 0);
-                                formula = "=SUM(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо часове по задачата
-                                worksheet.Cells[row, taskExpertsColumn].Formula = formula;
-
-                                worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                                formula = "=COUNTA(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо eksperti по задачата
-                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
-
-                                worksheet.Column(taskExpertsColumn + 2).Width = 80;
-                                worksheet.Cells[row, taskExpertsColumn + 2].Style.WrapText = true;
-                                worksheet.Cells[row, taskExpertsColumn + 2].Value = allExpertsNotes;    //коментарите по задачата
-
-                                if (task.TaskTypeName == TaskTypeSystem)
-                                {
-                                    workingDaysSystemSum += workedHoursByDepartment / 8;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
+                                    worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.DepartmentId == department.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                        "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                                 }
 
-                                else if (task.TaskTypeName == TaskTypeSpecificWork)
-                                {
-                                    workingHoursSpecificSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                                }
-                                else if (task.TaskTypeName == TaskTypeProcurement)
-                                {
-                                    workingHoursProcurementSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSeaGreen);
-                                }
-                                else if (task.TaskTypeName == TaskTypeLearning)
-                                {
-                                    workingHoursLearningSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGoldenrodYellow);
-                                }
-                                else if (task.TaskTypeName == TaskTypeAdminActivity)
-                                {
-                                    workingHoursAdminSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.Bisque);
-                                }
-                                else if (task.TaskTypeName == TaskTypeMeetings)
-                                {
-                                    workingHoursMeetingsSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
-                                }
-                                else if (task.TaskTypeName == TaskTypeOther)
-                                {
-                                    workingHoursOtherSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-                                }
-                                else if (task.TaskTypeName == TaskTypeSpecialTeam)
-                                {
-                                    workingHoursSProjectSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
-                                }
-
-
-                                row += 1;
-                            }
-                            var modelTable = worksheet.Cells[2, 1, row, column];
-                            modelTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                            modelTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;             //border за клетките около задачите и верикално позициониране
-                            modelTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                            modelTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                            modelTable.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-                            if (row > 3)  // дали има поне една задача по която да е работено в отдела/сектора
-                            {
-
-                                worksheet.Cells[row, 5].Value = "Брой задачи по които е работено";
-                                for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
-                                {
-                                    formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 1).ToString() + ")";
-                                    worksheet.Cells[row, col].Formula = formula;
-                                }
-                                worksheet.Cells[row, taskExpertsColumn].Style.Numberformat.Format = "0.00";
-                                formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";
-                                worksheet.Cells[row, taskExpertsColumn].Formula = formula; //по колко задачи средно е работено
-                                var modelTableBroiZadachi = worksheet.Cells[row, 5, row, taskExpertsColumn];
-                                modelTableBroiZadachi.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiZadachi.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около броя задачи
-                                modelTableBroiZadachi.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiZadachi.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiZadachi.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableBroiZadachi.Style.Fill.BackgroundColor.SetColor(Color.Orange);
-
-                                formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Numberformat.Format = "0.00";
-                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
-
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);  //средно колко човека са работили по задача
-
-                                row += 1;
-                                worksheet.Cells[row, 5].Value = "Общо часове на служителя";
-                                for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
-                                {
-                                    formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 2).ToString() + ")";
-                                    worksheet.Cells[row, col].Formula = formula;
-                                }
-                                var modelTableBroiChasove = worksheet.Cells[row, 5, row, taskExpertsColumn - 1];
-                                modelTableBroiChasove.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiChasove.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около броя часове на служителите
-                                modelTableBroiChasove.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiChasove.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiChasove.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableBroiChasove.Style.Fill.BackgroundColor.SetColor(Color.Bisque);
-
-                                row += 1;
-                                worksheet.Cells[row, 5].Value = "Общо часове на всички служители";
-                                formula = "=SUM(F" + (row - 1).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
-                                worksheet.Cells[row, 6].Formula = formula;
-
-                                var modelTableSumHours = worksheet.Cells[row, 5, row, 6];
-                                modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове
-                                modelTableSumHours.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableSumHours.Style.Fill.BackgroundColor.SetColor(Color.White);
-                                modelTableSumHours.Style.Font.Size = 12;
-                                modelTableSumHours.Style.Font.Bold = true;
-
-                                for (int col = 6; col <= taskExpertsColumn + 1; col++)
-                                {
-                                    worksheet.Column(col).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                                }
-
-                                row += 2;
-                                var totalHoursWorckedByType = workingHoursSpecificSum + workingHoursProcurementSum + workingHoursLearningSum + workingHoursAdminSum +
-                                    workingHoursMeetingsSum + workingHoursOtherSum;
-
-                                if (totalHoursWorckedByType > 0)
-                                {
-                                    var modelTablePercentage = worksheet.Cells[row, 2, row + 7, 3];
-                                    modelTablePercentage.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelTablePercentage.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около процентите
-                                    modelTablePercentage.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelTablePercentage.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                    modelTablePercentage.Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-
-                                    worksheet.Cells[row, 2].Value = TaskTypeSpecificWork;
-                                    worksheet.Cells[row, 3].Value = workingHoursSpecificSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeProcurement;
-                                    worksheet.Cells[row, 3].Value = workingHoursProcurementSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSeaGreen);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeLearning;
-                                    worksheet.Cells[row, 3].Value = workingHoursLearningSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightGoldenrodYellow);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeAdminActivity;
-                                    worksheet.Cells[row, 3].Value = workingHoursAdminSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.Bisque);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeMeetings;
-                                    worksheet.Cells[row, 3].Value = workingHoursMeetingsSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeSpecialTeam;
-                                    worksheet.Cells[row, 3].Value = workingHoursSProjectSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeOther;
-                                    worksheet.Cells[row, 3].Value = workingHoursOtherSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = "Общо часове";
-                                    worksheet.Cells[row, 3].Value = totalHoursWorckedByType;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                    worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                    //Отпуски и болнични начало
-                                    var rowBeforeOtpuski = row;
-                                    var totalSystemDays = 0;
-                                    foreach (var task in tasksList.Where(t => expertsInDepWithNoSectorIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
-                                    {
-                                        row += 2;
-                                        totalSystemDays = 0;
-                                        worksheet.Cells[row, 2].Value = task.TaskName;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 2].Style.Font.Bold = true;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
-                                        row += 1;
-                                        foreach (var eId in expertsInDepWithNoSectorIds)
-                                        {
-                                            var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                            if (curentColegue != null)
-                                            {
-                                                var daysontask = curentColegue.TaskWorkedHours / 8;
-                                                if (daysontask != null)
-                                                {
-                                                    worksheet.Cells[row, 2].Value = curentColegue.FullName;
-                                                    worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
-                                                    totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
-                                                    row += 1;
-                                                }
-                                            }
-
-                                        }
-                                        worksheet.Cells[row, 2].Value = "Общо дни";
-                                        worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                        worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                    }
-                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
-                                    {
-                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                        row = rowBeforeOtpuski;
-                                    }
-
-                                    //Графики начало
-                                    ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
-
-                                    pieChart.Title.Text = "N: Задача / Часове";
-                                    //select the ranges for the pie. First the values, then the header range
-                                    pieChart.Legend.Position = eLegendPosition.Bottom;
-                                    pieChart.DataLabel.ShowPercent = true;
-                                    pieChart.DataLabel.ShowLeaderLines = true;
-                                    pieChart.DataLabel.ShowCategory = true;
-                                    //pieChart.ShowDataLabelsOverMaximum = true;
-                                    pieChart.Legend.Remove();
-                                    var rangeTitles = ExcelRange.GetAddress(3, 1, row - 11, 1);
-                                    if ((row - 13) < 14)  // броя задачи променя дали имената на задачите се вземат или номерата им
-                                    {
-                                        rangeTitles = ExcelRange.GetAddress(3, 2, row - 11, 2);
-                                    }
-                                    pieChart.Series.Add(ExcelRange.GetAddress(3, taskExpertsColumn, row - 11, taskExpertsColumn), rangeTitles);
-                                    pieChart.SetSize(600, 500);
-                                    pieChart.SetPosition(row - 7, 0, 8, 0);
-                                    pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette3);
-                                    pieChart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
-                                    pieChart.DataLabel.Font.Fill.Color = Color.Black;
-                                    pieChart.DataLabel.Font.Size = 12;
-                                    //create a new piechart of type Doughnut
-                                    var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
-                                    //Set position to row 1 column 7 and 16 pixels offset
-                                    doughtnutChart.SetPosition(row - 7, 0, 4, 10);
-                                    doughtnutChart.SetSize(500, 500);
-                                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row - 7, 3, row - 1, 3), ExcelRange.GetAddress(row - 7, 2, row - 1, 2));
-                                    doughtnutChart.Title.Text = "ТИП ЗАДАЧА / ЧАСОВЕ";
-                                    doughtnutChart.DataLabel.ShowPercent = true;
-                                    //doughtnutChart.DataLabel.ShowLeaderLines = true;
-                                    doughtnutChart.Style = eChartStyle.Style26; //3D look
-                                }
                                 else
                                 {
-                                    //Отпуски и болнични начало
-                                    var rowBeforeOtpuski = row;
-                                    var totalSystemDays = 0;
-                                    foreach (var task in tasksList.Where(t => expertsInDepWithNoSectorIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
-                                    {
-                                        row += 2;
-                                        totalSystemDays = 0;
-                                        worksheet.Cells[row, 2].Value = task.TaskName;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 2].Style.Font.Bold = true;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
-                                        row += 1;
-                                        foreach (var eId in expertsInDepWithNoSectorIds)
-                                        {
-                                            var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                            if (curentColegue != null)
-                                            {
-                                                var daysontask = curentColegue.TaskWorkedHours / 8;
-                                                if (daysontask != null)
-                                                {
-                                                    worksheet.Cells[row, 2].Value = curentColegue.FullName;
-                                                    worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
-                                                    totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
-                                                    row += 1;
-                                                }
-                                            }
-
-                                        }
-                                        worksheet.Cells[row, 2].Value = "Общо дни";
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                        worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                    }
-                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
-                                    {
-                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                        row = rowBeforeOtpuski;
-                                    }
+                                    worksheet.Cells[1, 1].Value = ((department.TextValue == directorate.TextValue) ? "Дирекция: \"" : "Отдел: \"") + department.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                                 }
-                            }
-                            else
-                            {
-                                var modelTableSumHours = worksheet.Cells[row + 1, 5, row + 1, 6];
-                                modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове
-                                modelTableSumHours.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableSumHours.Style.Fill.BackgroundColor.SetColor(Color.White);
-                                modelTableSumHours.Style.Font.Size = 13;
-                                modelTableSumHours.Style.Font.Bold = true;
-                                worksheet.Cells[row + 1, 5].Value = "Брой задачи по които е работено";
-                                worksheet.Cells[row + 1, 6].Value = 0;
+                                worksheet.Cells[1, 1].Style.Font.Size = 14;
+                                worksheet.Cells[1, 1].Style.Font.Bold = true;
+                                //дотук се създава първия ред за отдела в екселския файл
 
-                                var rowBeforeOtpuski = row;
-                                var totalSystemDays = 0;
-                                foreach (var task in tasksList.Where(t => expertsInDepWithNoSectorIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
-                                {
-                                    row += 2;
-                                    totalSystemDays = 0;
-                                    worksheet.Cells[row, 2].Value = task.TaskName;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                    worksheet.Cells[row, 2].Style.Font.Bold = true;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
-                                    row += 1;
-                                    foreach (var eId in expertsInDepWithNoSectorIds)
-                                    {
-                                        var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                        if (curentColegue != null)
-                                        {
-                                            var daysontask = curentColegue.TaskWorkedHours / 8;
-                                            if (daysontask != null)
-                                            {
-                                                worksheet.Cells[row, 2].Value = curentColegue.FullName;
-                                                worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
-                                                totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
-                                                row += 1;
-                                            }
-                                        }
-
-                                    }
-                                    worksheet.Cells[row, 2].Value = "Общо дни";
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                    worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                    worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                }
-                                if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
-                                {
-                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                    row = rowBeforeOtpuski;
-                                }
+                                await DrawExpertsData(tasksList, allExperts.Where(e => e.DepartmentId == department.Id && e.SectorId == null).OrderBy(e => e.Id), worksheet);
                             }
                         }
-                    }
-                    foreach (var sector in sectorsList)
-                    {
-                        if (allExperts.Where(s => s.SectorId == sector.Id).ToList().Count() > 0)   //ако има експерти в sectora
+                        foreach (var sector in sectorsList)
                         {
-                            ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
-                            worksheet.View.ZoomScale = 70;
-                            try
+                            if (allExperts.Where(s => s.SectorId == sector.Id).ToList().Count() > 0)   //ако има експерти в sectora
                             {
-                                // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
-                                worksheet.Name = sector.TextValue;
-                            }
-                            catch (Exception)
-                            {
-                                TempData["Error"] = "Грешка при създаването на tab за сектор: " + sector.TextValue.Substring(0, 50) + "...";
-                                return RedirectToAction(nameof(PeriodReport));
-                            }
-
-                            worksheet.Row(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            worksheet.Row(2).Height = 48;
-                            var headerrange = worksheet.Cells[2, 1, 2, 5];
-                            headerrange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            headerrange.Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                            worksheet.Row(2).Style.Font.Size = 12;
-                            worksheet.Cells[2, 1].Value = "№";
-                            worksheet.Column(1).Width = 10;
-                            worksheet.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            //worksheet.Column(1).Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[2, 2].Value = "Наименование и пояснения към задачата";
-                            worksheet.Column(2).Width = 60;
-                            worksheet.Column(2).Style.WrapText = true;
-                            worksheet.Cells[2, 3].Value = "Начална Дата";
-                            worksheet.Column(3).Width = 15;
-                            //worksheet.Column(3).Style.Numberformat.Format = "dd-MM-yyyy";
-                            worksheet.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            worksheet.Cells[2, 4].Value = "Краен срок";
-                            worksheet.Column(4).Width = 15;
-                            //worksheet.Column(4).Style.Numberformat.Format = "dd-MM-yyyy";
-                            worksheet.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            worksheet.Cells[2, 5].Value = "Описание \\ Резултати";
-                            worksheet.Column(5).Width = 60;
-                            worksheet.Column(5).Style.WrapText = true;
-                            int column = 6;
-
-                            var expertsInSector = allExperts
-                                .Where(e => e.SectorId == sector.Id)
-                                .OrderBy(e => e.Id)
-                                .Select(e => e.Id)
-                                .ToHashSet();
-                            foreach (var expert in allExperts.Where(e => e.SectorId == sector.Id).OrderBy(e => e.Id))
-                            {
-                                worksheet.Column(column).Width = 11;
-                                worksheet.Cells[2, column].Style.WrapText = true;
-                                worksheet.Cells[2, column].Style.Font.Size = 8;
-                                worksheet.Cells[2, column].Value = expert.FullName;
-                                worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                                column += 1;
-                            }
-                            worksheet.Cells[2, column].Style.WrapText = true;
-                            worksheet.Cells[2, column].Style.Font.Size = 8;
-                            worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                            worksheet.Column(column).Width = 15;
-                            worksheet.Cells[2, column].Value = "Общо колко часа е работено в/у задачата";
-                            column += 1;
-                            worksheet.Cells[2, column].Style.WrapText = true;
-                            worksheet.Cells[2, column].Style.Font.Size = 8;
-                            worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
-                            worksheet.Cells[2, column].Value = "Брой служители на задача";
-                            column += 1;
-                            worksheet.Cells[2, column].Style.WrapText = true;
-                            worksheet.Cells[2, column].Value = "Коментари по задачата";
-
-                            worksheet.Cells[1, 1, 1, column].Merge = true;
-                            worksheet.Row(1).Height = 25;
-                            worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                            worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                            worksheet.Cells[1, 1].Style.Indent = 10;
-                            worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            if (allExperts.Where(s => s.SectorId == sector.Id).ToList().Count() == 1)
-                            {
-                                worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.SectorId == sector.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
-                                    "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
-                            }
-                            else
-                            {
-                                worksheet.Cells[1, 1].Value = "Сектор: \"" + sector.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
-                                    "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
-                            }
-                            worksheet.Cells[1, 1].Style.Font.Size = 14;
-                            worksheet.Cells[1, 1].Style.Font.Bold = true;
-                            //worksheet.View.FreezePanes(100, 6);
-                            //дотук се създават първите два реда за сектора в екселския файл
-                            var parentTaskId = 0;
-                            var row = 3;
-                            var workingDaysSystemSum = 0;
-                            var workingHoursSpecificSum = 0;
-                            var workingHoursProcurementSum = 0;
-                            var workingHoursLearningSum = 0;
-                            var workingHoursAdminSum = 0;
-                            var workingHoursMeetingsSum = 0;
-                            var workingHoursOtherSum = 0;
-                            var workingHoursSProjectSum = 0;
-                            var taskExpertsColumn = 6;
-                            foreach (var task in tasksList.Where(t => expertsInSector.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName != TaskTypeSystem).OrderBy(t => t.ParentTaskId).ThenByDescending(t => t.TaskTypeName))
-                            {
-                                if (task.ParentTaskId != null && task.ParentTaskId != parentTaskId)
+                                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
+                                worksheet.View.ZoomScale = 70;
+                                try
                                 {
-                                    TaskServiceModel parentTask = await this.tasks.GetParentTaskAsync(task.ParentTaskId.Value);
-                                    if (parentTask != null)
-                                    {
-                                        worksheet.Row(row).Style.Font.Size = 12;
-                                        worksheet.Row(row).Style.Font.Bold = true;
-                                        worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                        worksheet.Cells[row, 1].Value = parentTask.Id;
-                                        worksheet.Cells[row, 2].Value = parentTask.TaskName;
-                                        row += 1;
-                                        parentTaskId = parentTask.Id;
-
-                                    }
+                                    // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
+                                    worksheet.Name = sector.TextValue;
+                                }
+                                catch (Exception)
+                                {
+                                    TempData["Error"] = "Грешка при създаването на tab за сектор: " + sector.TextValue.Substring(0, 50) + "...";
+                                    return RedirectToAction(nameof(PeriodReport));
                                 }
 
-                                worksheet.Cells[row, 1].Value = task.Id;
-                                worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, 2].Value = task.TaskName;
-                                worksheet.Cells[row, 3].Value = task.StartDate.Date.ToString("dd-MM-yyyy") + "г.";
-                                worksheet.Cells[row, 4].Value = task.TaskStatusName == TaskStatusClosed ? task.EndDate.Value.Date.ToString("dd-MM-yyyy") + "г." : task.EndDatePrognose.Value.Date.ToString("dd-MM-yyyy") + "г.";
-                                worksheet.Cells[row, 5].Value = task.Description;
-
-                                taskExpertsColumn = 6;
-                                var allExpertsNotes = string.Empty;
-                                foreach (var eId in expertsInSector)
+                                worksheet.Cells[1, 1, 1, (8 + allExperts.Where(e => e.SectorId == sector.Id).Count())].Merge = true;
+                                worksheet.Row(1).Height = 25;
+                                worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                                worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                                worksheet.Cells[1, 1].Style.Indent = 10;
+                                worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                                if (allExperts.Where(s => s.SectorId == sector.Id).ToList().Count() == 1)
                                 {
-                                    var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                    if (curentColegue != null)
-                                    {
-                                        worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
-                                        if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
-                                        {
-                                            allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
-                                        }
-                                    }
-                                    taskExpertsColumn += 1;
-                                }
-                                int workedHoursByDepartment = task.Colleagues.Where(cl => expertsInSector.Contains(cl.Id)).Sum(cl => cl.TaskWorkedHours ?? 0);
-                                formula = "=SUM(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо часове по задачата
-                                worksheet.Cells[row, taskExpertsColumn].Formula = formula;
-
-                                worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                                formula = "=COUNTA(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо eksperti по задачата
-                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
-
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
-
-                                worksheet.Column(taskExpertsColumn + 2).Width = 80;
-                                worksheet.Cells[row, taskExpertsColumn + 2].Style.WrapText = true;
-                                worksheet.Cells[row, taskExpertsColumn + 2].Value = allExpertsNotes;    //коментарите по задачата
-
-                                if (task.TaskTypeName == TaskTypeSystem)
-                                {
-                                    workingDaysSystemSum += workedHoursByDepartment / 8;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
-                                }
-                                else if (task.TaskTypeName == TaskTypeSpecificWork)
-                                {
-                                    workingHoursSpecificSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-                                }
-                                else if (task.TaskTypeName == TaskTypeProcurement)
-                                {
-                                    workingHoursProcurementSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSeaGreen);
-                                }
-                                else if (task.TaskTypeName == TaskTypeLearning)
-                                {
-                                    workingHoursLearningSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGoldenrodYellow);
-                                }
-                                else if (task.TaskTypeName == TaskTypeAdminActivity)
-                                {
-                                    workingHoursAdminSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.Bisque);
-                                }
-                                else if (task.TaskTypeName == TaskTypeMeetings)
-                                {
-                                    workingHoursMeetingsSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
-                                }
-                                else if (task.TaskTypeName == TaskTypeOther)
-                                {
-                                    workingHoursOtherSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-                                }
-                                else if (task.TaskTypeName == TaskTypeSpecialTeam)
-                                {
-                                    workingHoursSProjectSum += workedHoursByDepartment;
-                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
-                                }
-
-                                row += 1;
-                            }
-                            var modelTable = worksheet.Cells[2, 1, row, column];
-                            modelTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                            modelTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;             //border за клетките около задачите и верикално позициониране
-                            modelTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                            modelTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                            modelTable.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-                            if (row > 3)  // дали има поне една задача по която да е работено в отдела/сектора
-                            {
-
-
-                                worksheet.Cells[row, 5].Value = "Брой задачи по които е работено";
-                                for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
-                                {
-                                    formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 1).ToString() + ")";
-
-                                    worksheet.Cells[row, col].Formula = formula;
-                                }
-                                formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";
-                                worksheet.Cells[row, taskExpertsColumn].Formula = formula; //по колко задачи средно е работено
-
-                                worksheet.Cells[row, taskExpertsColumn].Style.Numberformat.Format = "0.00";
-                                var modelTableBroiZadachi = worksheet.Cells[row, 5, row, taskExpertsColumn];
-                                modelTableBroiZadachi.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiZadachi.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около броя задачи
-                                modelTableBroiZadachi.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiZadachi.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiZadachi.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableBroiZadachi.Style.Fill.BackgroundColor.SetColor(Color.Orange);
-                                formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
-                                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Numberformat.Format = "0.00";
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);  //средно колко човека са работили по задача
-
-                                row += 1;
-                                worksheet.Cells[row, 5].Value = "Общо часове на служителя";
-                                for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
-                                {
-                                    formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 2).ToString() + ")";
-
-                                    worksheet.Cells[row, col].Formula = formula;
-                                }
-                                var modelTableBroiChasove = worksheet.Cells[row, 5, row, taskExpertsColumn - 1];
-                                modelTableBroiChasove.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiChasove.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около броя часове на служителите
-                                modelTableBroiChasove.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiChasove.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableBroiChasove.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableBroiChasove.Style.Fill.BackgroundColor.SetColor(Color.Bisque);
-
-                                row += 1;
-                                worksheet.Cells[row, 5].Value = "Общо часове на всички служители";
-                                formula = "=SUM(F" + (row - 1).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
-                                worksheet.Cells[row, 6].Formula = formula;
-
-                                var modelTableSumHours = worksheet.Cells[row, 5, row, 6];
-                                modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове
-                                modelTableSumHours.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableSumHours.Style.Fill.BackgroundColor.SetColor(Color.White);
-                                modelTableSumHours.Style.Font.Size = 12;
-                                modelTableSumHours.Style.Font.Bold = true;
-
-                                for (int col = 6; col <= taskExpertsColumn + 1; col++)
-                                {
-                                    worksheet.Column(col).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                                }
-
-                                row += 2;
-                                var totalHoursWorckedByType = workingHoursSpecificSum + workingHoursProcurementSum + workingHoursLearningSum + workingHoursAdminSum +
-                                    workingHoursMeetingsSum + workingHoursOtherSum;
-
-                                if (totalHoursWorckedByType > 0)
-                                {
-                                    var modelTablePercentage = worksheet.Cells[row, 2, row + 7, 3];
-                                    modelTablePercentage.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelTablePercentage.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около процентите
-                                    modelTablePercentage.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelTablePercentage.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                    modelTablePercentage.Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-
-                                    worksheet.Cells[row, 2].Value = TaskTypeSpecificWork;
-                                    worksheet.Cells[row, 3].Value = workingHoursSpecificSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeProcurement;
-                                    worksheet.Cells[row, 3].Value = workingHoursProcurementSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSeaGreen);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeLearning;
-                                    worksheet.Cells[row, 3].Value = workingHoursLearningSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightGoldenrodYellow);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeAdminActivity;
-                                    worksheet.Cells[row, 3].Value = workingHoursAdminSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.Bisque);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeMeetings;
-                                    worksheet.Cells[row, 3].Value = workingHoursMeetingsSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeSpecialTeam;
-                                    worksheet.Cells[row, 3].Value = workingHoursSProjectSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = TaskTypeOther;
-                                    worksheet.Cells[row, 3].Value = workingHoursOtherSum;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-
-                                    row += 1;
-                                    worksheet.Cells[row, 2].Value = "Общо часове";
-                                    worksheet.Cells[row, 3].Value = totalHoursWorckedByType;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                    worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                    //Отпуски начало
-                                    var rowBeforeOtpuski = row;
-                                    var totalSystemDays = 0;
-                                    foreach (var task in tasksList.Where(t => expertsInSector.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
-                                    {
-                                        row += 2;
-                                        totalSystemDays = 0;
-                                        worksheet.Cells[row, 2].Value = task.TaskName;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 2].Style.Font.Bold = true;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
-                                        row += 1;
-                                        foreach (var eId in expertsInSector)
-                                        {
-                                            var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                            if (curentColegue != null)
-                                            {
-                                                var daysontask = curentColegue.TaskWorkedHours / 8;
-                                                if (daysontask != null)
-                                                {
-                                                    worksheet.Cells[row, 2].Value = curentColegue.FullName;
-                                                    worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
-                                                    totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
-                                                    row += 1;
-                                                }
-                                            }
-
-                                        }
-                                        worksheet.Cells[row, 2].Value = "Общо дни";
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                        worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                    }
-                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
-                                    {
-                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                        row = rowBeforeOtpuski;
-                                    }
-
-                                    //Графики начало
-                                    ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
-                                    pieChart.Title.Text = "N: Задача / Часове";
-                                    //select the ranges for the pie. First the values, then the header range
-                                    pieChart.Legend.Position = eLegendPosition.Bottom;
-                                    pieChart.DataLabel.ShowPercent = true;
-                                    pieChart.DataLabel.ShowLeaderLines = true;
-                                    pieChart.DataLabel.ShowCategory = true;
-                                    pieChart.Legend.Remove();
-                                    var rangeTitles = ExcelRange.GetAddress(3, 1, row - 11, 1);
-                                    if ((row - 13) < 14)  // броя задачи променя дали имената на задачите се вземат или номерата им
-                                    {
-                                        rangeTitles = ExcelRange.GetAddress(3, 2, row - 11, 2);
-                                    }
-                                    pieChart.Series.Add(ExcelRange.GetAddress(3, taskExpertsColumn, row - 11, taskExpertsColumn), rangeTitles);
-                                    pieChart.SetSize(600, 500);
-                                    pieChart.SetPosition(row - 7, 0, 8, 0);
-                                    pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette3);
-                                    pieChart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
-                                    pieChart.DataLabel.Font.Fill.Color = Color.Black;
-                                    pieChart.DataLabel.Font.Size = 12;
-                                    //pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle7);
-
-                                    //create a new piechart of type Doughnut
-                                    var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
-                                    //Set position to row 1 column 7 and 16 pixels offset
-                                    doughtnutChart.SetPosition(row - 7, 0, 4, 10);
-                                    doughtnutChart.SetSize(500, 500);
-                                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row - 7, 3, row - 1, 3), ExcelRange.GetAddress(row - 7, 2, row - 1, 2));
-                                    doughtnutChart.Title.Text = "ТИП ЗАДАЧА / ЧАСОВЕ";
-                                    doughtnutChart.DataLabel.ShowPercent = true;
-                                    //doughtnutChart.DataLabel.ShowLeaderLines = true;
-                                    doughtnutChart.Style = eChartStyle.Style26; //3D look
+                                    worksheet.Cells[1, 1].Value = "Отчет на: " + allExperts.Where(s => s.SectorId == sector.Id).Select(e => e.FullName).FirstOrDefault() + " (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                        "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                                 }
                                 else
                                 {
-                                    var rowBeforeOtpuski = row;
-                                    var totalSystemDays = 0;
-                                    foreach (var task in tasksList.Where(t => expertsInSector.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
-                                    {
-                                        row += 2;
-                                        totalSystemDays = 0;
-                                        worksheet.Cells[row, 2].Value = task.TaskName;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 2].Style.Font.Bold = true;
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
-                                        row += 1;
-                                        foreach (var eId in expertsInSector)
-                                        {
-                                            var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                            if (curentColegue != null)
-                                            {
-                                                var daysontask = curentColegue.TaskWorkedHours / 8;
-                                                if (daysontask != null)
-                                                {
-                                                    worksheet.Cells[row, 2].Value = curentColegue.FullName;
-                                                    worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
-                                                    totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
-                                                    row += 1;
-                                                }
-                                            }
-
-                                        }
-                                        worksheet.Cells[row, 2].Value = "Общо дни";
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
-                                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                        worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                    }
-                                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
-                                    {
-                                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                        row = rowBeforeOtpuski;
-                                    }
+                                    worksheet.Cells[1, 1].Value = "Сектор: \"" + sector.TextValue + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") +
+                                        "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                                 }
-                            }
-                            else
-                            {
-                                var modelTableSumHours = worksheet.Cells[row + 1, 5, row + 1, 6];
-                                modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове
-                                modelTableSumHours.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                modelTableSumHours.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                modelTableSumHours.Style.Fill.BackgroundColor.SetColor(Color.White);
-                                modelTableSumHours.Style.Font.Size = 13;
-                                modelTableSumHours.Style.Font.Bold = true;
-                                worksheet.Cells[row + 1, 5].Value = "Брой задачи по които е работено";
-                                worksheet.Cells[row + 1, 6].Value = 0;
+                                worksheet.Cells[1, 1].Style.Font.Size = 14;
+                                worksheet.Cells[1, 1].Style.Font.Bold = true;
+                                // първи ред
 
-                                var rowBeforeOtpuski = row;
-                                var totalSystemDays = 0;
-                                foreach (var task in tasksList.Where(t => expertsInSector.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
-                                {
-                                    row += 2;
-                                    totalSystemDays = 0;
-                                    worksheet.Cells[row, 2].Value = task.TaskName;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                    worksheet.Cells[row, 2].Style.Font.Bold = true;
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
-                                    row += 1;
-                                    foreach (var eId in expertsInSector)
-                                    {
-                                        var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
-                                        if (curentColegue != null)
-                                        {
-                                            var daysontask = curentColegue.TaskWorkedHours / 8;
-                                            if (daysontask != null)
-                                            {
-                                                worksheet.Cells[row, 2].Value = curentColegue.FullName;
-                                                worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
-                                                totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
-                                                row += 1;
-                                            }
-                                        }
-
-                                    }
-                                    worksheet.Cells[row, 2].Value = "Общо дни";
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                    worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
-                                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                    worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
-
-                                }
-                                if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
-                                {
-                                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
-                                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
-                                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                    row = rowBeforeOtpuski;
-                                }
-
+                                await DrawExpertsData(tasksList, allExperts.Where(s => s.SectorId == sector.Id).OrderBy(e => e.Id), worksheet);
                             }
                         }
                     }
@@ -1754,6 +834,486 @@ namespace TaskMenager.Client.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+        }
+
+        private async Task DrawExpertsData(List<ReportServiceModel> tasksList, IEnumerable<ReportUserServiceModel> allExperts, ExcelWorksheet worksheet)
+        {
+            var expertsIds = allExperts
+                .OrderBy(e => e.Id)
+                .Select(e => e.Id)
+                .ToHashSet();
+
+            var formula = string.Empty;
+            worksheet.Row(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Row(2).Height = 48;
+            var headerrange = worksheet.Cells[2, 1, 2, 5];
+            headerrange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            headerrange.Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+            worksheet.Row(2).Style.Font.Size = 12;
+            worksheet.Cells[2, 1].Value = "№";
+            worksheet.Column(1).Width = 10;
+            worksheet.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[2, 2].Value = "Наименование и пояснения към задачата";
+            worksheet.Column(2).Width = 60;
+            worksheet.Column(2).Style.WrapText = true;
+            worksheet.Cells[2, 3].Value = "Начална Дата";
+            worksheet.Column(3).Width = 15;
+            worksheet.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[2, 4].Value = "Краен срок";
+            worksheet.Column(4).Width = 15;
+            worksheet.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[2, 5].Value = "Описание \\ Резултати";
+            worksheet.Column(5).Width = 60;
+            worksheet.Column(5).Style.WrapText = true;
+            int column = 6;
+
+            foreach (var expert in allExperts)
+            {
+                worksheet.Column(column).Width = 11;
+                worksheet.Cells[2, column].Style.WrapText = true;
+                worksheet.Cells[2, column].Style.Font.Size = 8;
+                worksheet.Cells[2, column].Value = expert.FullName;
+                worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+                column += 1;
+            }
+            worksheet.Cells[2, column].Style.WrapText = true;
+            worksheet.Cells[2, column].Style.Font.Size = 8;
+            worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+            worksheet.Column(column).Width = 15;
+            worksheet.Cells[2, column].Value = "Общо колко часа е работено в/у задачата";
+            column += 1;
+            worksheet.Cells[2, column].Style.WrapText = true;
+            worksheet.Cells[2, column].Style.Font.Size = 8;
+            worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
+            worksheet.Cells[2, column].Value = "Брой служители на задача";
+            column += 1;
+            worksheet.Cells[2, column].Style.WrapText = true;
+            worksheet.Cells[2, column].Value = "Коментари по задачата";
+            //worksheet.View.FreezePanes(100, 6);
+            //дотук се създава втория ред за отдела в екселския файл
+            var parentTaskId = 0;
+            var row = 3;
+            var workingDaysSystemSum = 0;
+            var workingHoursSpecificSum = 0;
+            var workingHoursProcurementSum = 0;
+            var workingHoursLearningSum = 0;
+            var workingHoursAdminSum = 0;
+            var workingHoursMeetingsSum = 0;
+            var workingHoursOtherSum = 0;
+            var workingHoursSProjectSum = 0;
+            var taskExpertsColumn = 6;
+            foreach (var task in tasksList.Where(t => expertsIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName != TaskTypeSystem).OrderBy(t => t.ParentTaskId).ThenByDescending(t => t.TaskTypeName))
+            {
+                if (task.ParentTaskId != null && task.ParentTaskId != parentTaskId)
+                {
+                    TaskServiceModel parentTask = await this.tasks.GetParentTaskAsync(task.ParentTaskId.Value);
+                    if (parentTask != null)
+                    {
+                        worksheet.Row(row).Style.Font.Size = 12;
+                        worksheet.Row(row).Style.Font.Bold = true;
+                        worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
+                        worksheet.Cells[row, 1].Value = parentTask.Id;
+                        worksheet.Cells[row, 2].Value = parentTask.TaskName.Length > 100 ? parentTask.TaskName.Substring(0, 100) + "..." : parentTask.TaskName;
+                        row += 1;
+                        parentTaskId = parentTask.Id;
+
+                    }
+                }
+
+                worksheet.Cells[row, 1].Value = task.Id;
+                worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, 2].Value = task.TaskName;
+                worksheet.Cells[row, 3].Value = task.StartDate.Date.ToString("dd-MM-yyyy") + "г.";
+                worksheet.Cells[row, 4].Value = task.TaskStatusName == TaskStatusClosed ? task.EndDate.Value.Date.ToString("dd-MM-yyyy") + "г." : task.EndDatePrognose.Value.Date.ToString("dd-MM-yyyy") + "г.";
+                worksheet.Cells[row, 5].Value = task.Description;
+
+                taskExpertsColumn = 6;
+                var allExpertsNotes = string.Empty;
+                foreach (var eId in expertsIds)
+                {
+                    var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
+                    if (curentColegue != null)
+                    {
+                        worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
+                        if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
+                        {
+                            allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
+                        }
+                    }
+                    taskExpertsColumn += 1;
+                }
+                int workedHoursByDepartment = task.Colleagues.Where(cl => expertsIds.Contains(cl.Id)).Sum(cl => cl.TaskWorkedHours ?? 0);
+                formula = "=SUM(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо часове по задачата
+                worksheet.Cells[row, taskExpertsColumn].Formula = formula;
+
+                worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                formula = "=COUNTA(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо eksperti по задачата
+                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
+                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
+
+                worksheet.Column(taskExpertsColumn + 2).Width = 80;
+                worksheet.Cells[row, taskExpertsColumn + 2].Style.WrapText = true;
+                worksheet.Cells[row, taskExpertsColumn + 2].Value = allExpertsNotes;    //коментарите по задачата
+
+                if (task.TaskTypeName == TaskTypeSystem)
+                {
+                    workingDaysSystemSum += workedHoursByDepartment / 8;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
+                }
+
+                else if (task.TaskTypeName == TaskTypeSpecificWork)
+                {
+                    workingHoursSpecificSum += workedHoursByDepartment;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+                }
+                else if (task.TaskTypeName == TaskTypeProcurement)
+                {
+                    workingHoursProcurementSum += workedHoursByDepartment;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSeaGreen);
+                }
+                else if (task.TaskTypeName == TaskTypeLearning)
+                {
+                    workingHoursLearningSum += workedHoursByDepartment;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGoldenrodYellow);
+                }
+                else if (task.TaskTypeName == TaskTypeAdminActivity)
+                {
+                    workingHoursAdminSum += workedHoursByDepartment;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.Bisque);
+                }
+                else if (task.TaskTypeName == TaskTypeMeetings)
+                {
+                    workingHoursMeetingsSum += workedHoursByDepartment;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
+                }
+                else if (task.TaskTypeName == TaskTypeOther)
+                {
+                    workingHoursOtherSum += workedHoursByDepartment;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                }
+                else if (task.TaskTypeName == TaskTypeSpecialTeam)
+                {
+                    workingHoursSProjectSum += workedHoursByDepartment;
+                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
+                }
+
+
+                row += 1;
+            }
+            var modelTable = worksheet.Cells[2, 1, row, column];
+            modelTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            modelTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;             //border за клетките около задачите и верикално позициониране
+            modelTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            modelTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            modelTable.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            if (row > 3)  // дали има поне една задача по която да е работено в отдела/сектора
+            {
+
+                worksheet.Cells[row, 5].Value = "Брой задачи по които е работено";
+                for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
+                {
+                    formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 1).ToString() + ")";
+                    worksheet.Cells[row, col].Formula = formula;
+                }
+                worksheet.Cells[row, taskExpertsColumn].Style.Numberformat.Format = "0.00";
+                formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";
+                worksheet.Cells[row, taskExpertsColumn].Formula = formula; //по колко задачи средно е работено
+                var modelTableBroiZadachi = worksheet.Cells[row, 5, row, taskExpertsColumn];
+                modelTableBroiZadachi.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                modelTableBroiZadachi.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около броя задачи
+                modelTableBroiZadachi.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                modelTableBroiZadachi.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                modelTableBroiZadachi.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                modelTableBroiZadachi.Style.Fill.BackgroundColor.SetColor(Color.Orange);
+
+                formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
+                worksheet.Cells[row, taskExpertsColumn + 1].Style.Numberformat.Format = "0.00";
+                worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
+
+                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);  //средно колко човека са работили по задача
+
+                row += 1;
+                worksheet.Cells[row, 5].Value = "Общо часове на служителя";
+                for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
+                {
+                    formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 2).ToString() + ")";
+                    worksheet.Cells[row, col].Formula = formula;
+                }
+                var modelTableBroiChasove = worksheet.Cells[row, 5, row, taskExpertsColumn - 1];
+                modelTableBroiChasove.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                modelTableBroiChasove.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около броя часове на служителите
+                modelTableBroiChasove.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                modelTableBroiChasove.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                modelTableBroiChasove.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                modelTableBroiChasove.Style.Fill.BackgroundColor.SetColor(Color.Bisque);
+
+                row += 1;
+                worksheet.Cells[row, 5].Value = "Общо часове на всички служители";
+                formula = "=SUM(F" + (row - 1).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+                worksheet.Cells[row, 6].Formula = formula;
+
+                var modelTableSumHours = worksheet.Cells[row, 5, row, 6];
+                modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове
+                modelTableSumHours.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                modelTableSumHours.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                modelTableSumHours.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                modelTableSumHours.Style.Fill.BackgroundColor.SetColor(Color.White);
+                modelTableSumHours.Style.Font.Size = 12;
+                modelTableSumHours.Style.Font.Bold = true;
+
+                for (int col = 6; col <= taskExpertsColumn + 1; col++)
+                {
+                    worksheet.Column(col).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+
+                row += 2;
+                var totalHoursWorckedByType = workingHoursSpecificSum + workingHoursProcurementSum + workingHoursLearningSum + workingHoursAdminSum +
+                    workingHoursMeetingsSum + workingHoursOtherSum;
+
+                if (totalHoursWorckedByType > 0)
+                {
+                    var modelTablePercentage = worksheet.Cells[row, 2, row + 7, 3];
+                    modelTablePercentage.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    modelTablePercentage.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около процентите
+                    modelTablePercentage.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    modelTablePercentage.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    modelTablePercentage.Style.Fill.PatternType = ExcelFillStyle.Solid;
+
+
+                    worksheet.Cells[row, 2].Value = TaskTypeSpecificWork;
+                    worksheet.Cells[row, 3].Value = workingHoursSpecificSum;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+
+                    row += 1;
+                    worksheet.Cells[row, 2].Value = TaskTypeProcurement;
+                    worksheet.Cells[row, 3].Value = workingHoursProcurementSum;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSeaGreen);
+
+                    row += 1;
+                    worksheet.Cells[row, 2].Value = TaskTypeLearning;
+                    worksheet.Cells[row, 3].Value = workingHoursLearningSum;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightGoldenrodYellow);
+
+                    row += 1;
+                    worksheet.Cells[row, 2].Value = TaskTypeAdminActivity;
+                    worksheet.Cells[row, 3].Value = workingHoursAdminSum;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.Bisque);
+
+                    row += 1;
+                    worksheet.Cells[row, 2].Value = TaskTypeMeetings;
+                    worksheet.Cells[row, 3].Value = workingHoursMeetingsSum;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightSalmon);
+
+                    row += 1;
+                    worksheet.Cells[row, 2].Value = TaskTypeSpecialTeam;
+                    worksheet.Cells[row, 3].Value = workingHoursSProjectSum;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.MistyRose);
+
+                    row += 1;
+                    worksheet.Cells[row, 2].Value = TaskTypeOther;
+                    worksheet.Cells[row, 3].Value = workingHoursOtherSum;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+
+                    row += 1;
+                    worksheet.Cells[row, 2].Value = "Общо часове";
+                    worksheet.Cells[row, 3].Value = totalHoursWorckedByType;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
+                    worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
+
+                    //Отпуски и болнични начало
+                    var rowBeforeOtpuski = row;
+                    var totalSystemDays = 0;
+                    foreach (var task in tasksList.Where(t => expertsIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
+                    {
+                        row += 2;
+                        totalSystemDays = 0;
+                        worksheet.Cells[row, 2].Value = task.TaskName;
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 2].Style.Font.Bold = true;
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
+                        row += 1;
+                        foreach (var eId in expertsIds)
+                        {
+                            var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
+                            if (curentColegue != null)
+                            {
+                                var daysontask = curentColegue.TaskWorkedHours / 8;
+                                if (daysontask != null)
+                                {
+                                    worksheet.Cells[row, 2].Value = curentColegue.FullName;
+                                    worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
+                                    totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
+                                    row += 1;
+                                }
+                            }
+
+                        }
+                        worksheet.Cells[row, 2].Value = "Общо дни";
+                        worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
+                        worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
+
+                    }
+                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                    {
+                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                        row = rowBeforeOtpuski;
+                    }
+
+                    //Графики начало
+                    ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
+
+                    pieChart.Title.Text = "N: Задача / Часове";
+                    //select the ranges for the pie. First the values, then the header range
+                    pieChart.Legend.Position = eLegendPosition.Bottom;
+                    pieChart.DataLabel.ShowPercent = true;
+                    pieChart.DataLabel.ShowLeaderLines = true;
+                    pieChart.DataLabel.ShowCategory = true;
+                    //pieChart.ShowDataLabelsOverMaximum = true;
+                    pieChart.Legend.Remove();
+                    var rangeTitles = ExcelRange.GetAddress(3, 1, row - 11, 1);
+                    if ((row - 13) < 14)  // броя задачи променя дали имената на задачите се вземат или номерата им
+                    {
+                        rangeTitles = ExcelRange.GetAddress(3, 2, row - 11, 2);
+                    }
+                    pieChart.Series.Add(ExcelRange.GetAddress(3, taskExpertsColumn, row - 11, taskExpertsColumn), rangeTitles);
+                    pieChart.SetSize(600, 500);
+                    pieChart.SetPosition(row - 7, 0, 8, 0);
+                    pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette3);
+                    pieChart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
+                    pieChart.DataLabel.Font.Fill.Color = Color.Black;
+                    pieChart.DataLabel.Font.Size = 12;
+                    //create a new piechart of type Doughnut
+                    var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
+                    //Set position to row 1 column 7 and 16 pixels offset
+                    doughtnutChart.SetPosition(row - 7, 0, 4, 10);
+                    doughtnutChart.SetSize(500, 500);
+                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row - 7, 3, row - 1, 3), ExcelRange.GetAddress(row - 7, 2, row - 1, 2));
+                    doughtnutChart.Title.Text = "ТИП ЗАДАЧА / ЧАСОВЕ";
+                    doughtnutChart.DataLabel.ShowPercent = true;
+                    //doughtnutChart.DataLabel.ShowLeaderLines = true;
+                    doughtnutChart.Style = eChartStyle.Style26; //3D look
+                }
+                else
+                {
+                    //Отпуски и болнични начало
+                    var rowBeforeOtpuski = row;
+                    var totalSystemDays = 0;
+                    foreach (var task in tasksList.Where(t => expertsIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
+                    {
+                        row += 2;
+                        totalSystemDays = 0;
+                        worksheet.Cells[row, 2].Value = task.TaskName;
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 2].Style.Font.Bold = true;
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
+                        row += 1;
+                        foreach (var eId in expertsIds)
+                        {
+                            var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
+                            if (curentColegue != null)
+                            {
+                                var daysontask = curentColegue.TaskWorkedHours / 8;
+                                if (daysontask != null)
+                                {
+                                    worksheet.Cells[row, 2].Value = curentColegue.FullName;
+                                    worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
+                                    totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
+                                    row += 1;
+                                }
+                            }
+
+                        }
+                        worksheet.Cells[row, 2].Value = "Общо дни";
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
+                        worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
+                        worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
+
+                    }
+                    if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                    {
+                        var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                        modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                        modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                        row = rowBeforeOtpuski;
+                    }
+                }
+            }
+            else
+            {
+                var modelTableSumHours = worksheet.Cells[row + 1, 5, row + 1, 6];
+                modelTableSumHours.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                modelTableSumHours.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките Общо часове
+                modelTableSumHours.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                modelTableSumHours.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                modelTableSumHours.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                modelTableSumHours.Style.Fill.BackgroundColor.SetColor(Color.White);
+                modelTableSumHours.Style.Font.Size = 13;
+                modelTableSumHours.Style.Font.Bold = true;
+                worksheet.Cells[row + 1, 5].Value = "Брой задачи по които е работено";
+                worksheet.Cells[row + 1, 6].Value = 0;
+
+                var rowBeforeOtpuski = row;
+                var totalSystemDays = 0;
+                foreach (var task in tasksList.Where(t => expertsIds.Overlaps(t.Colleagues.Select(e => e.Id).ToList()) && t.TaskTypeName == TaskTypeSystem).OrderBy(t => t.Id))
+                {
+                    row += 2;
+                    totalSystemDays = 0;
+                    worksheet.Cells[row, 2].Value = task.TaskName;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 2].Style.Font.Bold = true;
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(task.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
+                    row += 1;
+                    foreach (var eId in expertsIds)
+                    {
+                        var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
+                        if (curentColegue != null)
+                        {
+                            var daysontask = curentColegue.TaskWorkedHours / 8;
+                            if (daysontask != null)
+                            {
+                                worksheet.Cells[row, 2].Value = curentColegue.FullName;
+                                worksheet.Cells[row, 3].Value = (daysontask > 1 ? daysontask.ToString() + " дни" : daysontask.ToString() + " ден");
+                                totalSystemDays += daysontask.HasValue ? daysontask.Value : 0;
+                                row += 1;
+                            }
+                        }
+
+                    }
+                    worksheet.Cells[row, 2].Value = "Общо дни";
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 3].Value = (totalSystemDays == 1 ? totalSystemDays + " ден" : totalSystemDays.ToString() + " дни");
+                    worksheet.Cells[row, 2, row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
+                    worksheet.Cells[row, 2, row, 3].Style.Font.Bold = true;
+
+                }
+                if (rowBeforeOtpuski + 2 <= row)    //ако няма отпуски и болнични да не слага бордер
+                {
+                    var modelOtpuski = worksheet.Cells[rowBeforeOtpuski + 2, 2, row, 3];
+                    modelOtpuski.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    modelOtpuski.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border за клетките около болнични и отпуски
+                    modelOtpuski.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    row = rowBeforeOtpuski;
+                }
+            }
         }
 
         public IActionResult SetPersonalPeriodDate(int userId = 0)    //employee 1 step
