@@ -647,7 +647,6 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction(nameof(PeriodReport));
                 }
 
-                //var selectedExperts = tasksList.FirstOrDefault().Colleagues.ToList();
                 var allExpertsOnTasks = new HashSet<ReportUserServiceModel>();
                 var allExperts = this.employees.GetEmployeesByList(model.EmployeesIds);
 
@@ -658,7 +657,6 @@ namespace TaskMenager.Client.Controllers
                 };
                 if (directorate.Id == 0)
                 {
-                    //directorate.Id = 1;
                     directorate.TextValue = "Разширен отчет";
                     // TODO справката е за експерти назначени в дирекции, вкл директора, не се вкл председател, секретар, заместник председатели, затова не е необходима тази проверка
                 }
@@ -736,14 +734,13 @@ namespace TaskMenager.Client.Controllers
                     else
                     {
                         foreach (var department in departmentsList)
-                        {     //allExperts.Select(s => s.DepartmentId).ToList().Distinct().Contains(department.Id)
+                        {     
                             if (allExperts.Where(s => s.DepartmentId == department.Id && s.SectorId == null).ToList().Count() > 0)   //ако има експерти в отдела
                             {
                                 ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
                                 worksheet.View.ZoomScale = 70;
                                 try
                                 {
-                                    // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
                                     worksheet.Name = department.TextValue;
                                 }
                                 catch (Exception)
@@ -785,7 +782,6 @@ namespace TaskMenager.Client.Controllers
                                 worksheet.View.ZoomScale = 70;
                                 try
                                 {
-                                    // worksheet = package.Workbook.Worksheets.Add(department.TextValue);
                                     worksheet.Name = sector.TextValue;
                                 }
                                 catch (Exception)
@@ -946,13 +942,15 @@ namespace TaskMenager.Client.Controllers
                     }
                     taskExpertsColumn += 1;
                 }
-                int workedHoursByDepartment = task.Colleagues.Where(cl => expertsIds.Contains(cl.Id)).Sum(cl => cl.TaskWorkedHours ?? 0);
-                formula = "=SUM(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо часове по задачата
+                string sufix = GetSufixByEmpCount(taskExpertsColumn);
+                var reminder = ((taskExpertsColumn - 2) % 26);
+                
+                formula = "=SUM(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : (sufix + ((char)('A' + reminder)).ToString())) + (row).ToString() + ")";  //общо часове по задачата
                 worksheet.Cells[row, taskExpertsColumn].Formula = formula;
 
                 worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                formula = "=COUNTA(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";  //общо eksperti по задачата
+                formula = "=COUNTA(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : (sufix + ((char)('A' + reminder)).ToString())) + (row).ToString() + ")";  //общо eksperti по задачата
                 worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
@@ -961,6 +959,7 @@ namespace TaskMenager.Client.Controllers
                 worksheet.Cells[row, taskExpertsColumn + 2].Style.WrapText = true;
                 worksheet.Cells[row, taskExpertsColumn + 2].Value = allExpertsNotes;    //коментарите по задачата
 
+                int workedHoursByDepartment = task.Colleagues.Where(cl => expertsIds.Contains(cl.Id)).Sum(cl => cl.TaskWorkedHours ?? 0);
                 if (task.TaskTypeName == TaskTypeSystem)
                 {
                     workingDaysSystemSum += workedHoursByDepartment / 8;
@@ -1019,11 +1018,22 @@ namespace TaskMenager.Client.Controllers
                 worksheet.Cells[row, 5].Value = "Брой задачи по които е работено";
                 for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                 {
-                    formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 1).ToString() + ")";
+                    var sufixCounta = GetSufixByEmpCount(col+1);
+                    var reminderCounta = ((col-1) % 26);
+
+
+                    formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixCounta + ((char)('A' + reminderCounta)).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixCounta + ((char)('A' + reminderCounta)).ToString())) + (row - 1).ToString() + ")";
+                    //formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufix + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 1).ToString() + ")";
+
                     worksheet.Cells[row, col].Formula = formula;
                 }
                 worksheet.Cells[row, taskExpertsColumn].Style.Numberformat.Format = "0.00";
-                formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";
+
+                var sufixAverage = GetSufixByEmpCount(taskExpertsColumn);
+                var reminderAverage = ((taskExpertsColumn-2) % 26);
+                formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : (sufixAverage + ((char)('A' + reminderAverage)).ToString())) + (row).ToString() + ")";
+                //formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";
+
                 worksheet.Cells[row, taskExpertsColumn].Formula = formula; //по колко задачи средно е работено
                 var modelTableBroiZadachi = worksheet.Cells[row, 5, row, taskExpertsColumn];
                 modelTableBroiZadachi.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -1033,7 +1043,9 @@ namespace TaskMenager.Client.Controllers
                 modelTableBroiZadachi.Style.Fill.PatternType = ExcelFillStyle.Solid;
                 modelTableBroiZadachi.Style.Fill.BackgroundColor.SetColor(Color.Orange);
 
-                formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 26))).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
+                sufixAverage = GetSufixByEmpCount(taskExpertsColumn+2);
+                reminderAverage = (taskExpertsColumn % 26);
+                formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : (sufixAverage + ((char)('A' + reminderAverage)).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : (sufixAverage + ((char)('A' + reminderAverage)).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Numberformat.Format = "0.00";
                 worksheet.Cells[row, taskExpertsColumn + 1].Formula = formula;
 
@@ -1044,7 +1056,10 @@ namespace TaskMenager.Client.Controllers
                 worksheet.Cells[row, 5].Value = "Общо часове на служителя";
                 for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                 {
-                    formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : ("A" + ((char)('A' + (col - 27))).ToString())) + (row - 2).ToString() + ")";
+                    var sufixSum = GetSufixByEmpCount(col+1);
+                    var reminderSum = ((col - 1) % 26);
+
+                    formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixSum + ((char)('A' + reminderSum)).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixSum + ((char)('A' + reminderSum)).ToString())) + (row - 2).ToString() + ")";
                     worksheet.Cells[row, col].Formula = formula;
                 }
                 var modelTableBroiChasove = worksheet.Cells[row, 5, row, taskExpertsColumn - 1];
@@ -1057,7 +1072,12 @@ namespace TaskMenager.Client.Controllers
 
                 row += 1;
                 worksheet.Cells[row, 5].Value = "Общо часове на всички служители";
-                formula = "=SUM(F" + (row - 1).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+
+                sufixAverage = GetSufixByEmpCount(taskExpertsColumn);
+                reminderAverage = ((taskExpertsColumn - 2) % 26);
+
+                formula = "=SUM(F" + (row - 1).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : (sufixAverage + ((char)('A' + reminderAverage)).ToString())) + (row - 1).ToString() + ")";  //ОБЩО ЧАСОВЕ
+
                 worksheet.Cells[row, 6].Formula = formula;
 
                 var modelTableSumHours = worksheet.Cells[row, 5, row, 6];
@@ -1314,6 +1334,51 @@ namespace TaskMenager.Client.Controllers
                     row = rowBeforeOtpuski;
                 }
             }
+        }
+
+        private string GetSufix(int column)
+        {
+            var reminder = column % 26;
+            return ((char)('A' + reminder)).ToString();
+
+        }
+
+        private string GetSufixByEmpCount(int columns)
+        {
+            string result = columns switch
+            {
+                _ when columns <= 27 => string.Empty,
+                _ when columns <= 53 => "A",
+                _ when columns <= 79 => "B",
+                _ when columns <= 105 => "C",
+                _ when columns <= 131 => "D",
+                _ when columns <= 157 => "E",
+                _ when columns <= 183 => "F",
+                _ when columns <= 209 => "G",
+                _ when columns <= 235 => "H",
+                _ when columns <= 261 => "I",
+                _ when columns <= 287 => "J",
+                _ when columns <= 313 => "K",
+                _ when columns <= 339 => "L",
+                _ when columns <= 365 => "M",
+                _ when columns <= 391 => "N",
+                _ when columns <= 417 => "O",
+                _ when columns <= 443 => "P",
+                _ when columns <= 469 => "Q",
+                _ when columns <= 495 => "R",
+                _ when columns <= 521 => "S",
+                _ when columns <= 547 => "T",
+                _ when columns <= 573 => "U",
+                _ when columns <= 599 => "V",
+                _ when columns <= 625 => "W",
+                _ when columns <= 651 => "X",
+                _ when columns <= 677 => "Y",
+                _ when columns <= 703 => "Z",
+                _ when columns <= 729 => "AA",
+                _ => "AB"
+            };
+
+            return result;
         }
 
         public IActionResult SetPersonalPeriodDate(int userId = 0)    //employee 1 step
