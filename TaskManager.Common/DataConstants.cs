@@ -22,12 +22,12 @@ namespace TaskManager.Common
 
         public const string TaskTypeSpecificWork = "Специфична дейност";
         public const string TaskTypeProcurement = "Обществени поръчки и проекти";
-        public const string TaskTypeLearning = "Обучения и Презентации";
+        public const string TaskTypeLearning =    "Обучения и Презентации";
         public const string TaskTypeAdminActivity = "Административна дейност";
-        public const string TaskTypeMeetings = "Работни групи и Комисии";
-        public const string TaskTypeOther = "Други дейности";
-        public const string TaskTypeGlobal = "Глобална";
-        public const string TaskTypeSystem = "Системен тип";
+        public const string TaskTypeMeetings =    "Работни групи и Комисии";
+        public const string TaskTypeOther =       "Други дейности";
+        public const string TaskTypeGlobal =      "Глобална";
+        public const string TaskTypeSystem =      "Системен тип";
         public const string TaskTypeSpecialTeam = "Специализиран екип по проект";
         public const int TasksTypesCount = 9; // броя на типовете по-горе  !!!
 

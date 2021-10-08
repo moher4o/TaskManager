@@ -32,21 +32,21 @@
             {
                 @Html.HiddenFor(model => model.SectorsId)
             }
-            @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-10">
                 @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control", placeholder = "Въведете име на задачата", id = "taskName", name = "taskName" })
                 <span asp-validation-for="TaskName" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.Description, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Description, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-10">
                 @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Въведете описание", rows = "3" })
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group row" style="margin-bottom:8px;">
-            @Html.LabelFor(model => model.TaskParetns, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.TaskParetns, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-10">
                 @Html.DropDownListFor(m => m.ParentTaskId, new SelectList(Model.TaskParetns, "Value", "Text"), new { @class = "form-control", id = "parentsId", name = "parentsId" })
             </div>
@@ -54,7 +54,7 @@
 
         <hr style="height:2px; margin-top:4px; margin-bottom:8px; margin-bottom:8px;" />
         <div class="form-group row">
-            @Html.LabelFor(model => model.AssignersList, new { @class = "col-md-2 col-form-label blinking" })
+            @Html.LabelFor(model => model.AssignersList, new { @class = "col-md-2 col-form-label blinking strong" })
             <div class="col-md-5">
                 @Html.DropDownListFor(a => a.AssignerIdInt, Model.AssignersList, "Моля изберете...", new { @class = "form-control", id = "assignerId", name = "assignerId" })
             </div>
@@ -63,24 +63,24 @@
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.AssignerId, new SelectList(Model.Assigners, "Value", "Text"), new { @class = "form-control", id = "assignerId", name = "assignerId" })
             </div>*@
-            @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.HoursLimit, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-3">
                 @Html.TextBoxFor(model => model.HoursLimit, new { @class = "form-control", id = "hourslimit", name = "hourslimit" })
                 <span asp-validation-for="HoursLimit" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.EmployeesList, new { @class = "col-md-2 col-form-label blinking" })
+            @Html.LabelFor(model => model.EmployeesList, new { @class = "col-md-2 col-form-label blinking strong" })
             <div class="col-md-5">
                 @Html.ListBoxFor(model => model.EmployeesIds, new MultiSelectList(Model.EmployeesList, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "Subjects_dropdown" })
             </div>
-            @Html.LabelFor(model => model.TaskPrioritys, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.TaskPrioritys, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-3">
                 @Html.DropDownListFor(m => m.TaskPriorityId, new SelectList(Model.TaskPrioritys, "Value", "Text"), new { @class = "form-control", name = "taskPriorityId", id = "taskPriorityId" })
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Directorates, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.DirectoratesId, new SelectList(Model.Directorates, "Value", "Text"),
                   (permisionType != SuperAdmin && Model.DirectoratesId != "0") ? new { @class = "form-control", @disabled = "disabled" } as object :
@@ -93,21 +93,21 @@
 
                   } as object)
             </div>
-            @Html.LabelFor(model => model.TaskTypes, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.TaskTypes, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-3">
                 @Html.DropDownListFor(m => m.TaskTypesId, new SelectList(Model.TaskTypes, "Value", "Text"), new { @class = "form-control", name = "taskTypesId", id = "taskTypesId" })
             </div>
 
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.Departments, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Departments, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Departments, "Value", "Text"),
                (Model.Departments.Count() == 0) ? new { @hidden = "hidden" } as object :
                ((permisionType == SectorAdmin || permisionType == Employee || permisionType == DepartmentAdmin) && Model.DepartmentsId != "0") ? new { @class = "form-control", @disabled = "disabled" } as object :
                new { @class = "form-control", id = "departmentsId", name = "departmentsId", onchange = "LoadSectors(event)" })
             </div>
-            @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Valid_From, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-3">
                 <div class="form-group">
                     <input asp-for="Valid_From" class="form-control" id="validFrom" />
@@ -116,14 +116,14 @@
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.Sectors, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Sectors, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-5">
                 @Html.DropDownListFor(m => m.SectorsId, new SelectList(Model.Sectors, "Value", "Text"),
                 (Model.Sectors.Count() == 0) ? new { @hidden = "hidden" } as object :
                 (permisionType == SectorAdmin || permisionType == Employee) ? new { @class = "form-control", @disabled = "disabled" } as object :
                new { @class = "form-control", name = "sectorsId", id = "sectorsId" })
             </div>
-            @Html.LabelFor(model => model.Valid_To, new { @class = "col-md-2 col-form-label" })
+            @Html.LabelFor(model => model.Valid_To, new { @class = "col-md-2 col-form-label strong" })
             <div class="col-md-3">
                 <div class="form-group">
                     <input asp-for="Valid_To" class="form-control" id="validTo" />
