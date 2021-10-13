@@ -14,70 +14,75 @@
             </label>
 
             @*<input style="margin-left:15px;" type="checkbox" name="showInactive" id="showInactive">
-            <label for="showInactive"> Показване на приключените задачи</label>*@
+                <label for="showInactive"> Показване на приключените задачи</label>*@
         </div>
     </div>
     @*<label style="font-size:large;"><b>Задачи по които потребителя е отговорник</b></label>*@
     <partial name="../Home/_IndexHeadAssigners" />
     @*<h4>Задачи по които потребителя е отговорник</h4>*@
     <div style="min-height:600px; max-height:601px !important; overflow:auto;">
-        @foreach (var item in Model.AssignerTasks.Where(t => t.TaskStatusName != TaskStatusClosed).OrderByDescending(t => t.TaskTypeName.Length))
+        @foreach (var item in Model.AssignerTasks.Where(t => t.TaskStatusName != TaskStatusClosed).OrderBy(t => t.TaskTypeName.Length).ThenBy(t => t.ChildrenCount))
         {
 
-        <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
-            @{var name = item.TaskName.Length > 50 ? (item.TaskName).Substring(0, 50) + "..." : item.TaskName; var modalId = "modal" + item.Id;}
-            @*var typeName = item.TaskTypeName.Length > 13 ? (item.TaskTypeName).Substring(0, 10) + "..." : item.TaskTypeName;*@
-            <div class="col-md-6">
-                <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
-            </div>
-            @*<div class="col-md-2">
-            <label style="padding-left:10px;">@item.TaskStatusName</label>
-           </div>*@
-            <div class="col-md-1">
-                <label style="padding-left:10px;">@item.TaskPriorityName</label>
-            </div>
-            <div class="col-md-1">
-                <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
-            </div>
-            <div class="col-md-2">
-                <a>
-                    @*<i class="fas fa-user"></i>*@
-                    <span class="chatnotifications">@item.TaskTypeName</span>
-                    <span title='Брой на подзадачите' class="notificationsTodayCountValue" id=@(item.Id.ToString() + "ChildrenCount") @(item.ChildrenCount > 0 ? "" : "hidden")>@item.ChildrenCount</span>
-                </a>
-            </div>
-            <div class="col-md-2" style="color: #5f9fec;">
-                <div class="row" style="display: flex; justify-content: left; align-items:flex-start;">
-                    <div style="min-width:50px;">
-                        <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
-                            <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+            <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">
+                @{var name = item.TaskName.Length > 100 ? (item.TaskName).Substring(0, 100) + "..." : item.TaskName; var modalId = "modal" + item.Id;}
+                @*var typeName = item.TaskTypeName.Length > 13 ? (item.TaskTypeName).Substring(0, 10) + "..." : item.TaskTypeName;*@
+                
+                    <div class="col-md-6">
+                        <a style="color: #0366d6;" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">@name</a>
+                    </div>
+                    @*<div class="col-md-2">
+         <label style="padding-left:10px;">@item.TaskStatusName</label>
+        </div>*@
+                    <div class="col-md-1">
+                        <label style="padding-left:10px;">@item.TaskPriorityName</label>
+                    </div>
+                    <div class="col-md-1">
+                        <label style="padding-left:10px;">@(item.EndDatePrognose.HasValue ? item.EndDatePrognose.Value.Date.ToString("dd/MM/yyyy") : "")</label>
+                    </div>
+                    <div class="col-md-2">
+                        <a>
+                            @*<i class="fas fa-user"></i>*@
+                            <span class="chatnotifications">@item.TaskTypeName</span>
+                            <span title='Брой на подзадачите' class="notificationsTodayCountValue" id=@(item.Id.ToString() + "ChildrenCount") @(item.ChildrenCount > 0 ? "" : "hidden")>@item.ChildrenCount</span>
+                            <span title='Списък на подзадачите' class="downarrow" style="cursor: pointer; color: #5f9fec; font-weight:700; font-size:larger;" data-url="@Url.Action("GetTaskChildrens")" data-taskid="@item.Id" @(item.ChildrenCount > 0 ? "" : "hidden")>&#x25BC;</span>
+                            <span title='Списък на подзадачите' class="uparrow" style="cursor: pointer; color: #5f9fec; font-weight: 700; font-size: larger; display: none;">&#x25B2;</span>
                         </a>
                     </div>
-                    <div style="min-width:50px;">
-                        <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
-                            <img class="chatnotifications" src="~/png/note.png" />
-                            <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
-                        </a>
+                    <div class="col-md-2" style="color: #5f9fec;">
+                        <div class="row" style="display: flex; justify-content: left; align-items:flex-start;">
+                            <div style="min-width:50px;">
+                                <a title="Промяна на задачата" style="background-color:transparent; border:none; cursor:pointer;" asp-action="EditTask" asp-controller="Tasks" asp-route-taskId="@item.Id">
+                                    <img style="cursor: pointer;" class="chatnotifications" src="~/png/edit-icon.png" />
+                                </a>
+                            </div>
+                            <div style="min-width:50px;">
+                                <a title="Коментари по задачата" asp-controller="Notes" asp-action="TaskNotesList" asp-route-taskId="@item.Id">
+                                    <img class="chatnotifications" src="~/png/note.png" />
+                                    <span class="notificationsTodayCountValue" @(item.NotesCount > 0 ? "" : "hidden")>@item.NotesCount</span>
+                                </a>
+                            </div>
+                            <div style="min-width:50px;">
+                                <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
+                                   asp-route-taskName="@item.TaskName"
+                                   asp-route-taskId="@item.Id">
+                                    <img class="chatnotifications2" src="~/png/files3.png" />
+                                    <span class="notificationsTodayCountValue" @(item.FilesCount > 0 ? "" : "hidden")>@item.FilesCount</span>
+                                </a>
+                            </div>
+                            <!-- Modal placeholder -->
+                            <div id="modal-placeholder"></div>
+                            <!-- Button trigger modal -->
+                            <a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:10px;"
+                               data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("CloseTask")" data-taskid="@item.Id" data-taskname="@item.TaskName" @(item.ChildrenCount > 0 ? "hidden" : "")>
+                                <img class="chatnotifications2" src="~/png/Cansel2.png" />
+                            </a>
+                        </div>
                     </div>
-                    <div style="min-width:50px;">
-                        <a title="Файлове по задачата" asp-controller="TasksFiles" asp-action="TaskFilesList"
-                           asp-route-taskName="@item.TaskName"
-                           asp-route-taskId="@item.Id">
-                            <img class="chatnotifications2" src="~/png/files3.png" />
-                            <span class="notificationsTodayCountValue" @(item.FilesCount > 0 ? "" : "hidden")>@item.FilesCount</span>
-                        </a>
-                    </div>
-                    <!-- Modal placeholder -->
-                    <div id="modal-placeholder"></div>
-                    <!-- Button trigger modal -->
-                    <a title="Приключване на задачата" style="background-color:transparent; border:none; cursor:pointer; min-width:50px; padding-left:10px;"
-                       data-toggle="ajax-modal" data-target="#add-contact" data-url="@Url.Action("CloseTask")" data-taskid="@item.Id" data-taskname="@item.TaskName" @(item.ChildrenCount > 0 ? "hidden" : "")>
-                        <img class="chatnotifications2" src="~/png/Cansel2.png" />
-                    </a>
-                </div>
+                
+                <div class="taskSubList" style="display:none; padding-left:50px;">test</div>
             </div>
 
-        </div>
         }
         <div class="displayno">
             <partial name="../Home/_ShowClosedTasksPartial" model="@Model.AssignerTasks.Where(t => t.TaskStatusName == TaskStatusClosed)" />

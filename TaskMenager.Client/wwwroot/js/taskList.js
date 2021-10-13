@@ -6,7 +6,8 @@ var empsectorId;
 var userFullName;
 var userId;
 const loc = window.location.href;
-const path = loc.substr(0, loc.lastIndexOf('/') + 1); 
+const path = loc.substr(0, loc.lastIndexOf('/') + 1);
+let placeholderElement = $('#modal-placeholder');
 
 
 $(document).ready(function () {
@@ -19,6 +20,9 @@ $(document).ready(function () {
     empsectorId = $('#secid').val();
     userFullName = $('#userFN').text();
     userId = $('#userid').val();
+    ModalAction();
+    CloseModalOutside();
+
 });
 
 function LoadTasksTest() {
@@ -95,12 +99,10 @@ function loadDataTable(getClosed, withDeleted) {
                             onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName == "Ангел Иванов Вуков" && permisionType == 'SuperAdmin') ? "" : "hidden"}>
                             <img class="chatnotifications" src="../png/delete_total.png" />
                         </a>
-                        <a style='cursor:pointer; padding-left:5px; min-width:22%;'
-                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
+                        <a style='cursor:pointer; padding-left:5px; min-width:22%;' data-toggle='ajax-modal' onclick=GetChildren('${path}ShowModalChildren?taskId=${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/child.png" />
                             <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
                         </a>
-
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:22%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/files3.png" />
                             <span class="notificationsTodayCountValue" ${row.filesCount > 0 ? "" : "hidden"}>${row.filesCount}</span>
@@ -127,11 +129,11 @@ function loadDataTable(getClosed, withDeleted) {
                             onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName == "Ангел Иванов Вуков" && permisionType == 'SuperAdmin') ? "" : "hidden"}>
                             <img class="chatnotifications" src="../png/delete_total.png" />
                         </a>
-                        <a style='cursor:pointer; padding-left:3px; min-width:20%;'
-                            onclick=CustomSearch('${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
-                            <img class="chatnotifications2" src="../png/child.png" />
+                        <a style='cursor:pointer; padding-left:3px; min-width:20%;' data-toggle='ajax-modal' onclick=GetChildren('${path}ShowModalChildren?taskId=${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
+                            <img class="chatnotifications" src="../png/child.png" />
                             <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
                         </a>
+
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:3px; min-width:20%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/files3.png" />
                             <span class="notificationsTodayCountValue" ${row.filesCount > 0 ? "" : "hidden"}>${row.filesCount}</span>
@@ -244,7 +246,6 @@ function Delete(url) {
 }
 
 function CustomSearch(parentId) {
-    //$('input[type=search]').val('').change();
     dataTable.destroy();
     loadDataTable(false, false);
     dataTable
@@ -253,3 +254,50 @@ function CustomSearch(parentId) {
         .draw();
 }
 
+function GetChildren(url) {
+    $.get(url).done(function (data) {
+        placeholderElement.html(data);
+        placeholderElement.find('.modal').modal('show');
+    });
+
+}
+
+function ModalAction() {
+    placeholderElement.on('click', '[data-save="modal"]', function (event) {
+        event.preventDefault();
+        placeholderElement.empty();
+
+        $('#childrens').modal('hide');
+        $('.modal-open').css({ "padding-right": "" });
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+
+        //$('.modal-backdrop.fade.show').removeClass('modal-backdrop fade show');
+        //$('.modal-open').css({ "padding-right": "" });
+        //$('.modal-open').removeClass('modal-open');
+    });
+}
+
+function CloseModalOutside() {
+    document.addEventListener("click", e => {
+        if (e.target == document.querySelector(".modalbig-dialog") || e.target == document.querySelector(".modal.fade.show")) {
+            placeholderElement.empty();
+            $('#childrens').modal('hide');
+            $('.modal-open').css({ "padding-right": "" });
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }
+    });
+}
+
+//<a style='cursor:pointer; padding-left:3px; min-width:20%;'
+//    onclick=CustomSearch('${row.id}') title = 'Подзадачи' ${ (row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : "" }>
+//                            <img class="chatnotifications2" src="../png/child.png" />
+//                            <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
+//</a >
+
+//<a style='cursor:pointer; padding-left:5px; min-width:22%;'
+//    onclick=CustomSearch('${row.id}') title = 'Подзадачи' ${ (row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : "" }>
+//                            <img class="chatnotifications" src="../png/child.png" />
+//                            <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
+//                        </a >

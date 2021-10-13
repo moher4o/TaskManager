@@ -55,6 +55,10 @@ namespace TaskManager.Services
 
         Task<List<int>> GetTaskChildsIdsAsync(int taskId);
 
+        Task<List<TaskChildrensServiceModel>> GetTaskChildrensAsync(int taskId);
+
+        Task<string> GetTaskNameAsync(int taskId);
+
         Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate);
 
         Task<AddNoteToTaskServiceModel> GetTaskEmpNoteForDateAsync(int taskId, int empId, DateTime workDate);

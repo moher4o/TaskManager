@@ -1,0 +1,63 @@
+﻿@model TaskChildrenViewModel
+<!-- Modal -->
+@*<div class="modal fade" id="add-contact" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true" data-backdrop="static">*@
+<div class="modal fade" id="childrens" role="dialog" data-backdrop="static">
+    <div class="modalbig-dialog" role="document">
+        <div class="modal-content">
+            <div style="background-color:whitesmoke;" class="modal-header">
+                <label style="padding-left:10px; font-size:small;" class="modal-title" id="addContactLabel"><strong>Подзадачи на: </strong></label>
+                <p2 style="margin-left:10px; color:black;"><span style="font-weight:700">@(Model.TaskName.Length > 200 ? Model.TaskName.Substring(0,197)+"..." : Model.TaskName)</span></p2>
+                <button type="button" class="close" data-save="modal">
+                        <span aria-hidden="true" class="glyphicon glyphicon-remove">X</span>
+                    </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 border p-3">
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <table id="DT_load" class="table table-striped table-bordered compact" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>N:</th>
+                                <th>Име на задача</th>
+                                <th>Изтрита?</th>
+                                <th>Статус</th>
+                                <th>Тип</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ChildrenTasks)
+                            {
+                                var name = (item.TaskName.Length > 140 ? item.TaskName.Substring(0, 137) + "..." : item.TaskName);
+                                <tr>
+                                    <th>
+                                        @item.Id
+                                    </th>
+                                    <th>
+                                        <a style="@(item.isDeleted == true ? " color:red" : "color:#5f9fec;")" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">
+                                            @name
+                                        </a>
+                                    </th>
+                                    <th style="width:80px; @(item.isDeleted == true ? " color:red" : "color:black;")">
+                                        @(item.isDeleted ? "Да" : "Не")
+                                    </th>
+                                    <th style="width:120px;">
+                                        @item.TaskStatusName
+                                    </th>
+                                    <th style="width:250px;">
+                                        @item.TaskTypeName
+                                    </th>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                @*<button type="button" class="button back-small" data-save="modal">Затвори</button>*@
+                <button type="button" class="close" data-save="modal">Затвори</button>
+            </div>
+        </div>
+    </div>
+</div>

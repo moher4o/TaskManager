@@ -595,8 +595,6 @@ namespace TaskMenager.Client.Controllers
             return PartialView("_AddNoteModalPartial", model);
         }
 
-
-
         public IActionResult CloseTask(int taskId, string taskName)
         {
             var model = new CloseTaskViewModel();
@@ -1560,6 +1558,18 @@ namespace TaskMenager.Client.Controllers
             return taskEmployees;
         }
 
+        public async Task<IActionResult> ShowModalChildren(int taskId)
+        {
+            var model = new TaskChildrenViewModel();
+
+            model.TaskName = await this.tasks.GetTaskNameAsync(taskId);
+
+            model.ChildrenTasks = await this.tasks.GetTaskChildrensAsync(taskId);
+
+            return PartialView("_TaskChildrenModalPartial", model);
+        }
+
+
         #region API Calls
 
         //[Authorize(Policy = DataConstants.Employee)]               
@@ -1803,6 +1813,11 @@ namespace TaskMenager.Client.Controllers
             return Json(new { data });
         }
 
+        public async Task<IActionResult> GetTaskChildrens(int taskId)
+        {
+            var data = await this.tasks.GetTaskChildrensAsync(taskId);
+            return Json(new { data });
+        }
 
         #endregion
     }

@@ -1109,5 +1109,25 @@ namespace TaskManager.Services.Implementations
         {
             return await this.db.Tasks.Where(t => t.ParentTaskId == taskId).Select(t => t.Id).ToListAsync();
         }
+
+        public async Task<List<TaskChildrensServiceModel>> GetTaskChildrensAsync(int taskId)
+        {
+            var searchedTask = await this.db.Tasks
+                    .Where(t => t.ParentTaskId == taskId)
+                    .OrderBy(t => t.Id)
+                    .ProjectTo<TaskChildrensServiceModel>()
+                    .ToListAsync();
+
+            return searchedTask;
+        }
+
+        public async Task<string> GetTaskNameAsync(int taskId)
+        {
+            var taskName = await this.db.Tasks
+                    .Where(t => t.Id == taskId)
+                    .Select(t => t.TaskName)
+                    .FirstOrDefaultAsync();
+            return taskName;
+        }
     }
 }
