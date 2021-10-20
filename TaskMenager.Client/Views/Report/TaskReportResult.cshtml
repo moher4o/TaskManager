@@ -17,7 +17,7 @@
     </div>
     <div id="chartdiv"></div>
     <div>
-        <table class="table table-striped table-bordered compact" style="width:100%">
+        <table class="table table-bordered compact" style="width:100%">
             <thead style="display:table; width:100%; table-layout:fixed;">
                 <tr>
                     <th style="width:7%;">Дата</th>
@@ -48,13 +48,23 @@
                         @foreach (var id in employeesList)
                         {
                             //hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
-                            hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Sum(wh => wh.HoursSpend);
+                            hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Sum(wh => wh.HoursSpend);   //при глобалната може да е повече от една задача, затова сумирам
+                            var inTimeList = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(t => new
+                            {
+                                inTimeRecord = t.InTimeRecord,
+                                RegistrationDate = t.RegistrationDate
+                            }).ToList();
+                            var hasLateRecord = inTimeList.Any(laterecord => laterecord.inTimeRecord == false);
                             tasksNames = string.Empty;
                             Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.TaskName).ToList().ForEach(tn => tasksNames += tn.Replace(" ", "_") + Environment.NewLine);
+                            if (hasLateRecord)
+                            {
+                                tasksNames += "Част_или_всички_часове_са_въведени_след_отчетния_период!";
+                            }
                             sum = sum + hours;
                             if (hours > 0)
                             {
-                                <td style="text-align:center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@tasksNames data-balloon-pos="up">@(hours > 0 ? hours.ToString() : "")</td>
+                    <td style="text-align:center; @(hasLateRecord == true ? "background-color:#fee9e9; color:red;" : "")" class="tooltip-big-text @(hasLateRecord ? "tooltip-red" : "")" data-balloon-length="xxlarge" aria-label=@tasksNames data-balloon-pos="up">@(hours > 0 ? hours.ToString() : "")</td>
                             }
                             else
                             {

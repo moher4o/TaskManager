@@ -24,6 +24,7 @@ namespace TaskMenager.Client.Controllers
     [Authorize(Policy = DataConstants.Employee)]
     public class TasksController : BaseController
     {
+        private readonly IDateManagementConfiguration dateConfiguration;
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
@@ -31,7 +32,7 @@ namespace TaskMenager.Client.Controllers
         private readonly ITaskPrioritysService taskprioritys;
         private readonly IStatusService statuses;
         private readonly IManageFilesService files;
-        public TasksController(IManageFilesService files, IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public TasksController(IDateManagementConfiguration _dateConfiguration, IManageFilesService files, IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.statuses = statuses;
             this.directorates = directorates;
@@ -40,6 +41,7 @@ namespace TaskMenager.Client.Controllers
             this.tasktypes = tasktypes;
             this.taskprioritys = taskprioritys;
             this.files = files;
+            this.dateConfiguration = _dateConfiguration;
         }
 
         public IActionResult TasksList()
@@ -103,7 +105,7 @@ namespace TaskMenager.Client.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-        }
+        }    //old
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -158,15 +160,15 @@ namespace TaskMenager.Client.Controllers
                 return View(model);
             }
 
-        }
+        }       //old
 
         public async Task<IActionResult> EditTask(int taskId)
         {
             try
             {
-               var taskDetails = this.tasks.GetTaskDetails(taskId)
-                        .ProjectTo<TaskViewModel>()
-                        .FirstOrDefault();
+                var taskDetails = this.tasks.GetTaskDetails(taskId)
+                         .ProjectTo<TaskViewModel>()
+                         .FirstOrDefault();
                 if (currentUser.RoleName != SuperAdmin && currentUser.Id != taskDetails.OwnerId && currentUser.Id != taskDetails.AssignerId && (currentUser.RoleName == DepartmentAdmin && currentUser.DepartmentId != taskDetails.DepartmentId) && (currentUser.RoleName == DirectorateAdmin && currentUser.DirectorateId != taskDetails.DirectorateId) && (currentUser.RoleName == SectorAdmin && currentUser.SectorId != taskDetails.SectorId))
                 {
                     TempData["Error"] = "Суперадмин, създател и отговорник имат право да променят задача!";
@@ -188,16 +190,16 @@ namespace TaskMenager.Client.Controllers
 
                 var taskToEdit = new AddNewTaskViewModel()
                 {
-                     ParentTaskId = taskDetails.ParentTaskId,
-                     DirectoratesId = taskDetails.DirectorateId.ToString(),
-                     DepartmentsId = taskDetails.DepartmentId.ToString(),
-                     SectorsId = taskDetails.SectorId.ToString(),
-                     AssignerIdInt = taskDetails.AssignerId,
-                     TaskPriorityId = taskDetails.PriorityId.ToString(),
-                     TaskTypesId = taskDetails.TypeId.ToString(),
-                     Valid_From = taskDetails.StartDate.Date,
-                     Valid_To = taskDetails.EndDatePrognose.Value.Date
-            };
+                    ParentTaskId = taskDetails.ParentTaskId,
+                    DirectoratesId = taskDetails.DirectorateId.ToString(),
+                    DepartmentsId = taskDetails.DepartmentId.ToString(),
+                    SectorsId = taskDetails.SectorId.ToString(),
+                    AssignerIdInt = taskDetails.AssignerId,
+                    TaskPriorityId = taskDetails.PriorityId.ToString(),
+                    TaskTypesId = taskDetails.TypeId.ToString(),
+                    Valid_From = taskDetails.StartDate.Date,
+                    Valid_To = taskDetails.EndDatePrognose.Value.Date
+                };
                 //var assignedEmployees = new List<SelectServiceModel>();
                 //assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
 
@@ -330,7 +332,7 @@ namespace TaskMenager.Client.Controllers
                 assignedEmployees.AddRange(taskDetails.Colleagues.ToList());
 
                 var oldActiveEmployeesIds = assignedEmployees.Where(e => e.isDeleted == false).Select(a => a.Id).ToList(); //за да изключи премахнатите експерти
-                oldActiveEmployeesIds.Insert(0,taskDetails.AssignerId);
+                oldActiveEmployeesIds.Insert(0, taskDetails.AssignerId);
                 // номерата на старите колеги преди ъпдейта  край
 
                 AddNewTaskServiceModel taskToEdit = new AddNewTaskServiceModel();
@@ -406,7 +408,7 @@ namespace TaskMenager.Client.Controllers
                     TempData["Success"] = TempData["Success"] + "Промените са записани успешно";
                     return RedirectToAction(nameof(TaskDetails), new { taskId = model.Id });
                 }
-                else if(result == "halfsuccess")
+                else if (result == "halfsuccess")
                 {
                     try
                     {
@@ -983,15 +985,15 @@ namespace TaskMenager.Client.Controllers
 
                 if (currentUser.SectorId != null)
                 {
-                        newTask.Sectors = this.sectors.GetSectorsNames(currentUser.SectorId)
-                                                                           .Select(a => new SelectListItem
-                                                                           {
-                                                                               Text = a.TextValue,
-                                                                               Value = a.Id.ToString(),
-                                                                               Selected = true
-                                                                           })
-                                                                           .ToList();
-                        newTask.SectorsId = currentUser.SectorId.ToString();
+                    newTask.Sectors = this.sectors.GetSectorsNames(currentUser.SectorId)
+                                                                       .Select(a => new SelectListItem
+                                                                       {
+                                                                           Text = a.TextValue,
+                                                                           Value = a.Id.ToString(),
+                                                                           Selected = true
+                                                                       })
+                                                                       .ToList();
+                    newTask.SectorsId = currentUser.SectorId.ToString();
 
                     ////////
                     var data = await this.employees.GetEmployeesNamesBySectorAsync(currentUser.SectorId);
@@ -1183,7 +1185,7 @@ namespace TaskMenager.Client.Controllers
                                                        Selected = oldTask.DepartmentsId == a.Id.ToString() ? true : false
                                                    })
                                                     .ToList();
-                if (oldTask.DepartmentsId == "0" || string.IsNullOrWhiteSpace(oldTask.DepartmentsId) || !this.departments.CheckDepartmentInDirectorate(currentUser.DirectorateId.Value,int.Parse(oldTask.DepartmentsId)))   //ако не е избран отдел или е избран отдел от друга дирекция
+                if (oldTask.DepartmentsId == "0" || string.IsNullOrWhiteSpace(oldTask.DepartmentsId) || !this.departments.CheckDepartmentInDirectorate(currentUser.DirectorateId.Value, int.Parse(oldTask.DepartmentsId)))   //ако не е избран отдел или е избран отдел от друга дирекция
                 {
                     newTask.Departments.Insert(0, new SelectListItem
                     {
@@ -1213,7 +1215,7 @@ namespace TaskMenager.Client.Controllers
                                                            Selected = oldTask.SectorsId == a.Id.ToString() ? true : false
                                                        })
                                                        .ToList();
-                    if (oldTask.SectorsId == "0" || string.IsNullOrWhiteSpace(oldTask.SectorsId) ) //избран отдел , но не е избран сектор
+                    if (oldTask.SectorsId == "0" || string.IsNullOrWhiteSpace(oldTask.SectorsId)) //избран отдел , но не е избран сектор
                     {
                         newTask.Sectors.Insert(0, new SelectListItem
                         {
@@ -1360,7 +1362,7 @@ namespace TaskMenager.Client.Controllers
                        Selected = a.Id == oldTask.ParentTaskId ? true : false
                    })
                    .ToList();
-             newTask.TaskParetns.Insert(0, new SelectListItem
+            newTask.TaskParetns.Insert(0, new SelectListItem
             {
                 Text = ChooseValue,
                 Value = "0",
@@ -1576,9 +1578,9 @@ namespace TaskMenager.Client.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEmployees(bool isAll, int? taskId)
         {
-            var taskEmployees = await this.GetEmployeesOnTask(isAll,taskId);
+            var taskEmployees = await this.GetEmployeesOnTask(isAll, taskId);
             return Json(new { taskEmployees });
-        }   
+        }
 
         [HttpGet]
         public async Task<IActionResult> SetDateTasksHours(int userId, DateTime workDate, int taskId, int hours)
@@ -1591,23 +1593,25 @@ namespace TaskMenager.Client.Controllers
                     if (!dominions.Any(d => d.Id == userId))
                     {
                         var targetEmployee = await this.employees.GetEmployeeByIdAsync(userId);
-                        return Json(new { success = false, message = $"[SetDateTasksHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} "});
+                        return Json(new { success = false, message = $"[SetDateTasksHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} " });
                     }
                 }
 
-
+                var inTime = this.CheckDate(workDate.Date);
                 var workedHours = new TaskWorkedHoursServiceModel()
                 {
                     EmployeeId = userId,
                     TaskId = taskId,
                     HoursSpend = hours,
-                    WorkDate = workDate.Date
+                    WorkDate = workDate.Date,
+                    RegistrationDate = DateTime.Now.Date,
+                    InTimeRecord = inTime
                 };
 
                 string result = await this.tasks.SetWorkedHoursAsync(workedHours);
                 if (result == "success")
                 {
-                    return Json(new { success = true, message = ("Часовете са отразени успешно" + Environment.NewLine) });
+                    return Json(new { success = true, message = ("Часовете са отразени успешно" + inTime.ToString() + Environment.NewLine) });
                 }
                 else
                 {
@@ -1621,11 +1625,59 @@ namespace TaskMenager.Client.Controllers
             }
         }
 
+        private bool CheckDate(DateTime workDate)   //проверява дали датата за която ще се прави отчет е в текущия отчетен период
+        {
+                var daysAfterOtchet = new List<int>();
+                var ot4etday = this.dateConfiguration.ReportDate;
+                var todayDate = DateTime.Now.Date;
+                var todayDayOfWeek = ((int)todayDate.DayOfWeek);
+                var diference = todayDate.Date - workDate.Date;
+                if (diference.TotalDays < 0)
+                {
+                    return true;
+                }
+                if (diference.TotalDays <= 7)
+                {
+                    for (int i = ot4etday + 1; i <= ((todayDayOfWeek < (ot4etday + 1)) ? (todayDayOfWeek + 7) : todayDayOfWeek); i++)
+                    {
+                        daysAfterOtchet.Add(i > 6 ? i - 7 : i);
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                if (daysAfterOtchet.Contains(((int)workDate.DayOfWeek)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+        }
+
+        [HttpGet]
+        public IActionResult FrontEndDateCheck(DateTime workDate)
+        {
+            if (this.dateConfiguration.CheckRegistrationDate)
+            {
+                return Json(new { success = this.CheckDate(workDate) });
+            }
+            else
+            {
+                return Json(new { success = true });
+            }
+            
+        }
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetHolidayDates(int userId)
         {
-          var data = await this.tasks.GetHolidayDatesAsync(userId, "Отпуски");
-          return Json(new { data });
+            var data = await this.tasks.GetHolidayDatesAsync(userId, "Отпуски");
+            return Json(new { data });
         }
         [HttpGet]
         public async Task<IActionResult> GetIlldayDates(int userId)
@@ -1683,6 +1735,7 @@ namespace TaskMenager.Client.Controllers
                 if (isholiday || isill)
                 {
                     var dateTaskList = await this.employees.GetAllUserTaskAsync(userId, workDate.Date);
+                    var inTime = CheckDate(workDate.Date);
                     foreach (var itemTask in dateTaskList)
                     {
                         var workedHours = new TaskWorkedHoursServiceModel()
@@ -1690,7 +1743,7 @@ namespace TaskMenager.Client.Controllers
                             EmployeeId = userId,
                             TaskId = itemTask.Id,
                             HoursSpend = 0,
-                            WorkDate = workDate.Date
+                            WorkDate = workDate.Date,
                         };
 
                         await this.tasks.SetWorkedHoursWithDeletedAsync(workedHours);
@@ -1702,9 +1755,11 @@ namespace TaskMenager.Client.Controllers
                             EmployeeId = userId,
                             TaskId = await this.tasks.GetSystemTaskIdByNameAsync("Отпуски"),
                             HoursSpend = 8,
-                            WorkDate = workDate.Date
+                            WorkDate = workDate.Date,
+                            RegistrationDate = DateTime.Now.Date,
+                            InTimeRecord = inTime
                         };
-                      result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                        result = await this.tasks.SetWorkedHoursAsync(workedHours);
                         message = "Отпускът е отразен в системата";
                     }
                     else if (isill)
@@ -1714,9 +1769,12 @@ namespace TaskMenager.Client.Controllers
                             EmployeeId = userId,
                             TaskId = await this.tasks.GetSystemTaskIdByNameAsync("Болнични"),
                             HoursSpend = 8,
-                            WorkDate = workDate.Date
+                            WorkDate = workDate.Date,
+                            RegistrationDate = DateTime.Now.Date,
+                            InTimeRecord = inTime
+
                         };
-                      result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                        result = await this.tasks.SetWorkedHoursAsync(workedHours);
                         message = "Болничния е отразен в системата";
                     }
 
@@ -1742,6 +1800,8 @@ namespace TaskMenager.Client.Controllers
         {
             var data = this.tasks.GetAllTasks(currentUser.Id, withClosed, withDeleted)
                 .ProjectTo<TasksListViewModel>()
+                .OrderBy(t => t.TypeName)
+                .ThenByDescending(t => t.ChildrenCount)
                 .ToList();
             foreach (var task in data)
             {
@@ -1755,7 +1815,7 @@ namespace TaskMenager.Client.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int taskId)
         {
-            
+
             var taskFromDb = await this.tasks.CheckTaskByIdAsync(taskId);
             if (!taskFromDb)
             {

@@ -11,6 +11,9 @@
 @{ string rcolor = string.Empty;}
 @{ string ropacity = "1.00";}
 @{ string systemtaskname = string.Empty; ;}
+@{ string dateMetaInfo = string.Empty;}
+@{ string systemtaskMetaInfo = string.Empty;}
+@*@{ bool lateReport = false;}*@
 
 <div class="PrimeBox2 widthmobile" style="max-width:100%; position:relative; background-color:ghostwhite; margin-top:10px !important">
     <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
@@ -21,7 +24,7 @@
     </div>
     <div id="chartdiv" style="max-width:90%;"></div>
     <div>
-        <table class="table table-striped table-bordered compact" style="width:100%">
+        <table class="table table-bordered compact" style="width:100%">
             <thead style="display:table; width:100%; table-layout:fixed;">
                 <tr>
                     <th style="width:7%;">Дата</th>
@@ -45,39 +48,79 @@
 
                 @foreach (var worckedDate in dateList)
                 {
+                    //lateReport = false;
                     systemtaskname = string.Empty;
                     ropacity = "1.00";
                     rcolor = string.Empty;
                     sum = 0;
-                    if (Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date && w.TaskName == "Отпуски").FirstOrDefault() != null)
+                    var currentTask = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date && (w.TaskName == "Болнични" || w.TaskName == "Отпуски")).Select(t => new
                     {
-                        ropacity = "0.5";
-                        rcolor = "cornflowerblue";
-                        systemtaskname = "Отпуск";
-                    }
-                    else if (Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date && w.TaskName == "Болнични").FirstOrDefault() != null)
+                        taskName = t.TaskName,
+                        inTimeRecord = t.InTimeRecord,
+                        RegistrationDate = t.RegistrationDate
+                    }).FirstOrDefault();
+                    if (currentTask != null)
                     {
-                        ropacity = "0.5";
-                        rcolor = "salmon";
-                        systemtaskname = "Болничен";
+                        if (currentTask.taskName == "Отпуски")
+                        {
+                            //ropacity = "0.5";
+                            rcolor = "cornflowerblue";
+                            systemtaskname = "Отпуск";
+                        }
+                        else if (currentTask.taskName == "Болнични")
+                        {
+                            //ropacity = "0.5";
+                            rcolor = "salmon";
+                            systemtaskname = "Болничен";
+                        }
+                        if (Model.CheckRegistrationDate && !currentTask.inTimeRecord)
+                        {
+                            systemtaskMetaInfo = string.Format("Дата на въвеждане: {0}", currentTask.RegistrationDate.Value.Date.ToString("dd.MM.yyyy"));
+                            systemtaskMetaInfo = systemtaskMetaInfo.Replace(" ", "_");
+
+                        }
+                        <tr style=" display: table; width: 100%; table-layout: fixed; background-color:@(rcolor); opacity:@(ropacity.ToString());">
+                            <td style="width:7%; background-color:ghostwhite; opacity:1.00 !important;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
+                            <td colspan="@(TaskList.Count)" class="@((!currentTask.inTimeRecord && Model.CheckRegistrationDate) ? (currentTask.taskName == "Отпуски" ? "otpuski tooltip-red" : "bolnichni tooltip-red") : "") tooltip-big-text"  data-balloon-length=" xxlarge" aria-label=@(currentTask.inTimeRecord ? "" : systemtaskMetaInfo) data-balloon-pos="up"></td>
+                            <td style="background-color:ghostwhite; font-size: smaller; width: 5%; text-align: center;">@systemtaskname</td>
+                        </tr>
                     }
-                    <tr style=" display: table; width: 100%; table-layout: fixed; background-color:@(rcolor); opacity:@(ropacity.ToString()); /* even columns width , fix width of table too*/ ">
-                        <td style="width:7%;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
-                        @foreach (var id in TaskList)
-                        {
-                            hours = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(wh => wh.TaskId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
-                            sum = sum + hours;
-                            <td>@(hours > 0 ? hours.ToString() : "")</td>
-                        }
-                        @if (sum > 0)
-                        {
-                            <td style="background-color:ivory; font-size:medium; width:5%;"><strong>@sum</strong></td>
-                        }
-                        else
-                        {
-                            <td style="background-color:@(rcolor); font-size:smaller; width:5%;">@systemtaskname</td>
-                        }
-                    </tr>
+                    else
+                    {
+
+                        <tr style=" display: table; width: 100%; table-layout: fixed; /* even columns width , fix width of table too*/ ">
+                            <td style="width:7%; background-color:ghostwhite; opacity:1.00 !important;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
+                            @foreach (var id in TaskList)
+                            {
+                                dateMetaInfo = string.Empty;
+                                hours = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(wh => wh.TaskId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
+                                sum = sum + hours;
+                                if (hours > 0)
+                                {
+
+                                    if (Model.CheckRegistrationDate)
+                                    {
+                                        var inttime = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(wh => wh.TaskId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.InTimeRecord).FirstOrDefault();
+                                        if (!inttime)
+                                        {
+                                            dateMetaInfo = string.Format("Часовете са въведени след отчетния период! Дата на въвеждане: {0}", Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(wh => wh.TaskId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.RegistrationDate.Value.Date.ToString("dd.MM.yyyy")).FirstOrDefault());
+                                        }
+                                        dateMetaInfo = dateMetaInfo.Replace(" ", "_");
+                                    }
+
+
+                                    <td style="text-align: center;   @(dateMetaInfo.Length != 0 ? "background-color:#fee9e9; color:red;" : "")" class="tooltip-big-text @(dateMetaInfo.Length != 0 ? "tooltip-red" : "")" data-balloon-length="xxlarge" aria-label=@dateMetaInfo data-balloon-pos="up"><strong>@(hours > 0 ? hours.ToString() : "")</strong></td>
+                                    //@(hours > 0 ? hours.ToString() : "")
+                                }
+                                else
+                                {
+                                        <td></td>
+                                    //style = "@(dateMetaInfo.Length!=0 ? "background - color:#fee9e9; color:red;" : "")"    @(lateReport ? "systemlate" : "")
+                                }
+                            }
+                                <td style="background-color: ivory; font-size: medium; width: 5%; text-align: center;"><strong>@sum</strong></td>
+                        </tr>
+                    }
                 }
                 <tr style="background-color:ivory; font-size:medium; display: table; width: 100%; table-layout: fixed;">
                     <td style="width:7%;">Общо:</td>
@@ -85,10 +128,10 @@
                     @foreach (var id in TaskList)
                     {
                         hours = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(wh => wh.TaskId == id).Sum(wh => wh.HoursSpend);
-                        <td class="hours"><strong>@hours</strong></td>
+                        <td class="hours" style="text-align: center;"><strong>@hours</strong></td>
                         sum += hours;
                     }
-                    <td style="width:5%;"><strong>@sum</strong></td>
+                    <td style="width: 5%; text-align: center;"><strong>@sum</strong></td>
                 </tr>
             </tbody>
         </table>
@@ -105,6 +148,7 @@
         </form>
     </div>
 </div>
+<link href="~/css/report.css" rel="stylesheet">
 <script src="~/js/core.js"></script>
 <script src="~/js/charts.js"></script>
 <script src="~/js/animated.js"></script>

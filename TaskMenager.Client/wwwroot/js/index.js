@@ -4,7 +4,7 @@
     const lochref = window.location.href;
     const locOrigin = window.location.origin;
     let path;
-    if (lochref.toLowerCase().indexOf("taskmanager") >= 0) {
+    if (lochref.toLowerCase().indexOf("taskmanager") > 0) {
         path = locOrigin + "\\TaskManager";
     }
     else {
@@ -13,7 +13,7 @@
     var currentUserId = document.getElementById("currentUserId").value;
     var userId = document.getElementById("employeeId") == null ? currentUserId : document.getElementById("employeeId").value;
     var slideSource = document.getElementById('AREA_PARTIAL_VIEW');
-    var element = document.getElementById("btnZapis");
+    var btnZapis = document.getElementById("btnZapis");
 
     document.getElementById("apiNotWorking").hidden = true;
     GetDominions();
@@ -27,7 +27,7 @@
         //GetUserTaskForDate();
         //}, 2000);
 
-       
+
         //onclick евент за бутон Запис
         $('#btnZapis').on('click', UpdateHours);
         $('#holiday').on('change', ShowHolidayWaterMark);
@@ -40,8 +40,8 @@
             $('#watermarkholiday').hide('fast');
             $('.input-number').prop('readonly', false);
             $(".btn-number").removeAttr("disabled");
-            if (!element.classList.contains("special")) {
-                element.classList.add("special");
+            if (!btnZapis.classList.contains("special")) {
+                btnZapis.classList.add("special");
             }
         }
         else {
@@ -50,8 +50,8 @@
             toastr.error('Отчетените часове за тази дата ще бъдат нулирани при запис!');
             $('#watermarkholiday').show('fast');
             //var element = document.getElementById("btnZapis");
-            if (!element.classList.contains("special")) {
-                element.classList.add("special");
+            if (!btnZapis.classList.contains("special")) {
+                btnZapis.classList.add("special");
             }
             $('.input-number').prop('readonly', true);
             $(".btn-number").attr("disabled", true);
@@ -65,8 +65,8 @@
             $('#watermarkill').hide('fast');
             $('.input-number').prop('readonly', false);
             $(".btn-number").removeAttr("disabled");
-            if (!element.classList.contains("special")) {
-                element.classList.add("special");
+            if (!btnZapis.classList.contains("special")) {
+                btnZapis.classList.add("special");
             }
         }
         else {
@@ -75,8 +75,8 @@
             toastr.error('Отчетените часове за тази дата ще бъдат нулирани при запис!');
             $('#watermarkill').show('fast');
             //var element = document.getElementById("btnZapis");
-            if (!element.classList.contains("special")) {
-                element.classList.add("special");
+            if (!btnZapis.classList.contains("special")) {
+                btnZapis.classList.add("special");
             }
             $('.input-number').prop('readonly', true);
             $(".btn-number").attr("disabled", true);
@@ -188,13 +188,13 @@
         //console.log(selectedText);
 
         $('#dateSelector2').datepicker({ dateFormat: 'dd-M-yy', changeYear: true, showOtherMonths: true, firstDay: 1, maxDate: "+1m", inline: true, beforeShowDay: highLight });
-        
+
         //$("#dateSelector2").datepicker({ beforeShowDay: highLight });
 
         $('#dateSelector2').datepicker('setDate', new Date(selectedText));
-                //$('#dateSelector2').datepicker("refresh");
-                //let date2 = $('#dateSelector2').datepicker("getDate");
-                //console.log(date2);
+        //$('#dateSelector2').datepicker("refresh");
+        //let date2 = $('#dateSelector2').datepicker("getDate");
+        //console.log(date2);
 
         function highLight(date) {
             //for (var i = 0; i < holidays.length; i++) {
@@ -247,8 +247,8 @@
         let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
         // stop animation of button Zapis
         //var element = document.getElementById("btnZapis");
-        if (element.classList.contains("special")) {
-            element.classList.remove("special");
+        if (btnZapis.classList.contains("special")) {
+            btnZapis.classList.remove("special");
         }
         $.ajax({
             type: 'GET',
@@ -311,11 +311,149 @@
     }
 
     function UpdateHours() {
+        var currentUrl = path + '\\Tasks\\FrontEndDateCheck';
+        let newDate = $('#dateSelector2').datepicker("getDate");
+        let url = currentUrl + '?workDate=' + newDate.toUTCString();
+        $.get(url).done(function (data) {
+            console.log(data.success)
+            if (!data.success) {
+                swal({
+                    title: "Информация",
+                    text: "Ще редактирате данните за дата, която е от минал отчетен период. Промените ще бъдат отразени, но ще бъде отбелязано, че промените са правени след отчетния период.",
+                    icon: "warning",
+                    closeOnEsc: false,
+                    buttons: ["Отказ", "Потвърждение"],
+                    dangerMode: true
+                }).then((willEdit) => {
+                    if (willEdit) {
+                        SetHours(newDate);
+                    }
+                    else {
+                        if (btnZapis.classList.contains("special")) {
+                            btnZapis.classList.remove("special");
+                        }
+                        $('#btnZapis').blur();
+                        slideSource.classList.toggle('fade');
+                        setTimeout(function () {
+                            //GetUserTaskForDate();
+                            GetHolidays();
+                        }, 300);
+                    }
+                });
+            }
+            else {
+                SetHours(newDate);
+            }
+        });
+
+        //let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+        //var isholiday = $("#holiday").prop('checked');
+        //var isill = $("#illness").prop('checked');
+        //currentUrl = path + '\/Tasks\/SetDateTasksHours';
+        //let totallSuccess = true;
+        //var messageInfo = 'Часовете са записани успешно';
+        //if (!isholiday && !isill) {                                    //ако не е чекнато отпуска или болничен
+        //    var removeSystemTAsktUrl = path + '\/Tasks\/RemoveSystemTasks';
+        //    $.ajax({
+        //        type: 'GET',
+        //        url: removeSystemTAsktUrl,   // '..\\Tasks\\RemoveSystemTasks'
+        //        data: {
+        //            userId: bossUserId,
+        //            workDate: newDate.toUTCString()
+        //        },
+        //        success: function (data) {
+        //            totallSuccess == true;
+        //            messageInfo = data.message;
+        //        },
+        //        error: function (data) {
+        //            totallSuccess == false;
+        //            messageInfo = data.message;
+        //        }
+        //    });
+        //    if (totallSuccess) {                                    //ако успешно са изтрити болнични или отпуски --> почва отбелязването на работните часове
+        //        $('.PrimeBox3').each(function () {
+        //            let currenttaskId = $(this).attr('id');
+        //            if (currenttaskId != 'closedTask') {
+        //                let todayhours = $(this).find('input').first().val();
+        //                // заявка за запис на часовете
+        //                $.ajax({
+        //                    type: 'GET',
+        //                    url: currentUrl,   // '..\\Tasks\\SetDateTasksHours'
+        //                    data: {
+        //                        userId: bossUserId,
+        //                        workDate: newDate.toUTCString(),
+        //                        taskId: currenttaskId,
+        //                        hours: todayhours
+        //                    },
+        //                    success: function (data) {
+        //                        if (data.success) {
+        //                            if (todayhours != '0') {
+        //                                messageInfo = 'Часовете са записани успешно';
+        //                            }
+        //                        }
+        //                        else {
+        //                            totallSuccess = false;
+        //                            messageInfo = data.message;
+        //                        }
+        //                    },
+        //                    error: function (data) {
+        //                        totallSuccess = false;
+        //                        messageInfo = data.message;
+        //                    }
+        //                });
+        //            }
+        //        });
+        //    }
+        //}
+        //else {    //ако е чекнато отпуска или болничен
+        //    currentUrl = path + '\/Tasks\/SetDateSystemTasks';
+
+        //    $.ajax({
+        //        type: 'GET',
+        //        url: currentUrl,   // '..\\Tasks\\SetDateSystemTasks'
+        //        data: {
+        //            userId: bossUserId,
+        //            workDate: newDate.toUTCString(),
+        //            isholiday: isholiday,
+        //            isill: isill
+        //        },
+        //        success: function (data) {
+        //            totallSuccess == true;
+        //            messageInfo = data.message;
+        //        },
+        //        error: function (data) {
+        //            totallSuccess == false;
+        //            messageInfo = data.message;
+        //        }
+        //    });
+        //}
+        //slideSource.classList.toggle('fade');
+        //setTimeout(function () {
+        //    //GetUserTaskForDate();
+        //    GetHolidays();
+        //}, 300);
+
+        //setTimeout(function () {
+        //    if (totallSuccess == false) {
+        //        toastr.error(messageInfo);
+        //        $('#btnZapis').blur();
+        //    }
+        //    else {
+        //        //var element = document.getElementById("btnZapis");
+        //        if (btnZapis.classList.contains("special")) {
+        //            btnZapis.classList.remove("special");
+        //        }
+        //        $('#btnZapis').blur();
+        //        toastr.success(messageInfo);
+        //    }
+        //}, 800);
+    }
+
+    function SetHours(newDate) {
+        let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
         var isholiday = $("#holiday").prop('checked');
         var isill = $("#illness").prop('checked');
-        var currentUrl = path + '\/Tasks\/SetDateTasksHours';
-        let newDate = $('#dateSelector2').datepicker("getDate");
-        let bossUserId = $('#bosses :selected') == null ? currentUserId : $('#bosses :selected').val();
+        currentUrl = path + '\/Tasks\/SetDateTasksHours';
         let totallSuccess = true;
         var messageInfo = 'Часовете са записани успешно';
         if (!isholiday && !isill) {                                    //ако не е чекнато отпуска или болничен
@@ -406,8 +544,8 @@
             }
             else {
                 //var element = document.getElementById("btnZapis");
-                if (element.classList.contains("special")) {
-                    element.classList.remove("special");
+                if (btnZapis.classList.contains("special")) {
+                    btnZapis.classList.remove("special");
                 }
                 $('#btnZapis').blur();
                 toastr.success(messageInfo);
@@ -500,8 +638,8 @@
         $('.input-number').change(function (lastval) {
             // start animation of button Zapis
             //var element = document.getElementById("btnZapis");
-            if (!element.classList.contains("special")) {
-                element.classList.add("special");
+            if (!btnZapis.classList.contains("special")) {
+                btnZapis.classList.add("special");
             }
             minValue = parseInt($(this).attr('min'));
             maxValue = parseInt($(this).attr('max'));
@@ -554,5 +692,5 @@
         ///////////////////
     }
 
-//});
+    //});
 }

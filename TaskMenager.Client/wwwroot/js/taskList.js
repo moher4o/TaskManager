@@ -71,7 +71,15 @@ function loadDataTable(getClosed, withDeleted) {
         },
         "columns": [
             { "data": "id", "width": "5%" },
-            { "data": "taskName", "width": "40%" },
+            //{ "data": "taskName", "width": "40%" },
+            {
+                "data": null,
+                "render": function (row) {
+                    return `<a href="..\\Tasks\\TaskDetails?taskId=${row.id}" style="color:#5f9fec;" target="_blank" ${row.typeId == 8 ? "hidden" : ""}>
+                                ${row.taskName}
+                            </a>`
+                }, "width": "40%"
+            },
             { "data": "taskAssigner", "width": "14%" },
             { "data": "directorateName", "width": "10%" },
             { "data": "departmentName", "width": "12%" },
@@ -88,20 +96,21 @@ function loadDataTable(getClosed, withDeleted) {
                 "render": function (data, type, row) {
                     if (withDeleted || permisionType != 'SuperAdmin') {
                         return `<div  class="row">
-                        
-                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:15px; min-width:20%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
-                            <img class="chatnotifications" src="../png/info2.png" />
+                           <span style='padding-left:15px;'> </span>
+                        <a style='cursor:pointer; padding-left:5px; min-width:22%;' data-toggle='ajax-modal' onclick=GetChildren('${path}ShowModalChildren?taskId=${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
+                            <img class="chatnotifications" src="../png/child.png" />
+                            <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
                         </a>
-                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:20%;' ${((permisionType == "DirectorateAdmin" && (row.directorateId == empdirectorateId || row.assignerId == userId)) || (permisionType == "DepartmentAdmin" && (row.departmentId == empdepartmentId || row.assignerId == userId)) || (permisionType == "SectorAdmin" && (row.sectorId == empsectorId || row.assignerId == userId)) || (permisionType == "Employee" && row.assignerId == userId) || permisionType == 'SuperAdmin') ? "" : "hidden"} title='Отчет по задача'>
+                         <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:20%;' ${((permisionType == "DirectorateAdmin" && (row.directorateId == empdirectorateId || row.assignerId == userId)) || (permisionType == "DepartmentAdmin" && (row.departmentId == empdepartmentId || row.assignerId == userId)) || (permisionType == "SectorAdmin" && (row.sectorId == empsectorId || row.assignerId == userId)) || (permisionType == "Employee" && row.assignerId == userId) || permisionType == 'SuperAdmin') ? "" : "hidden"} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
+                        </a>
+                        <a style='cursor:pointer; min-width:20%; padding-left:5px;'
+                            onclick=Delete('${path}Delete?taskId=${row.id}') title='Изтриване' ${row.childrenCount == 0 && !withDeleted && ((permisionType == "DirectorateAdmin" && (row.directorateId == empdirectorateId || row.assignerId == userId)) || (permisionType == "DepartmentAdmin" && (row.departmentId == empdepartmentId || row.assignerId == userId)) || (permisionType == "SectorAdmin" && (row.sectorId == empsectorId || row.assignerId == userId)) || (permisionType == "Employee" && row.assignerId == userId)) ? "" : "hidden"}>
+                            <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
                         <a style='cursor:pointer; min-width:15%;'
                             onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName == "Ангел Иванов Вуков" && permisionType == 'SuperAdmin') ? "" : "hidden"}>
                             <img class="chatnotifications" src="../png/delete_total.png" />
-                        </a>
-                        <a style='cursor:pointer; padding-left:5px; min-width:22%;' data-toggle='ajax-modal' onclick=GetChildren('${path}ShowModalChildren?taskId=${row.id}') title='Подзадачи' ${(row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : ""}>
-                            <img class="chatnotifications" src="../png/child.png" />
-                            <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
                         </a>
                         <a href="..\\TasksFiles\\TaskFilesList?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:22%;' title='Прикачени файлове' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications2" src="../png/files3.png" />
@@ -112,20 +121,15 @@ function loadDataTable(getClosed, withDeleted) {
                     }
                     else {
                         return `<div class="row">
-                        
-                        <a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:12px; min-width:15%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
-                            <img class="chatnotifications" src="../png/info2.png" />
-                        </a>
-                        
-                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:5px; min-width:15%;' ${(row.typeId == 8 )? "hidden" : ""} title='Отчет по задача'>
+                        <a href="..\\Report\\TaskReportPeriod?taskId=${row.id}" style='cursor:pointer; padding-left:15px; min-width:18%;' ${(row.typeId == 8 )? "hidden" : ""} title='Отчет по задача'>
                             <img class="chatnotifications" src="../png/report.png" />
                         </a>
                        
-                        <a style='cursor:pointer; min-width:15%;'
+                        <a style='cursor:pointer; min-width:18%; padding-left:3px;'
                             onclick=Delete('${path}Delete?taskId=${row.id}') title='Изтриване' ${row.typeId == 8 ? "hidden" : ""}>
                             <img class="chatnotifications" src="../png/delete2.png" />
                         </a>
-                        <a style='cursor:pointer; min-width:15%;'
+                        <a style='cursor:pointer; min-width:18%;'
                             onclick=TotalDelete('${path}TotalDelete?taskId=${row.id}') title='Тотално Изтриване' ${(userFullName == "Ангел Иванов Вуков" && permisionType == 'SuperAdmin') ? "" : "hidden"}>
                             <img class="chatnotifications" src="../png/delete_total.png" />
                         </a>
@@ -176,7 +180,7 @@ function loadDataTable(getClosed, withDeleted) {
                  "visible": false
              },
          ],
-         "order": [[10, 'asc']],
+         "order": [[10, 'asc'], [12, 'asc']],
          "iDisplayLength": 25,
         "language": {
             "emptyTable": "Няма такива задачи!",
@@ -301,3 +305,12 @@ function CloseModalOutside() {
 //                            <img class="chatnotifications" src="../png/child.png" />
 //                            <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
 //                        </a >
+
+                       //<a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:15px; min-width:20%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
+                        //    <img class="chatnotifications" src="../png/info2.png" />
+                        //</a>
+
+                        //<a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:12px; min-width:15%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
+                        //    <img class="chatnotifications" src="../png/info2.png" />
+                        //</a>
+

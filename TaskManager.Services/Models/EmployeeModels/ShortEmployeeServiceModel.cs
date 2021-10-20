@@ -29,7 +29,9 @@ namespace TaskManager.Services.Models.EmployeeModels
                                                 TaskName = wh.Task.TaskName,
                                                 HoursSpend = wh.HoursSpend,
                                                 Text = wh.Text,
-                                                WorkDate = wh.WorkDate
+                                                WorkDate = wh.WorkDate,
+                                                RegistrationDate = wh.RegistrationDate,
+                                                InTimeRecord = wh.InTimeRecord
                                             })
                                             .ToList()));
         }

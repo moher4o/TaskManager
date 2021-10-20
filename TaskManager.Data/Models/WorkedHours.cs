@@ -22,6 +22,10 @@ namespace TaskManager.Data.Models
         [MaxLength(500)]
         public string Text { get; set; }
 
+        public DateTime? RegistrationDate { get; set; }
+
+        public bool InTimeRecord { get; set; } = true;
+
         public bool isDeleted { get; set; } = false;
     }
 }

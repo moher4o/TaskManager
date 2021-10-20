@@ -757,3 +757,10 @@ div.menuspace {
 
 /*FIXED TABLE*/
 
+.tooltip-red {
+    --balloon-color: red;
+}
+
+.tooltip-big-text {
+    --balloon-font-size: 13px;
+}

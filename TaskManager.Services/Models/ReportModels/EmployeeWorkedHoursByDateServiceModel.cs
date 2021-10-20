@@ -16,5 +16,8 @@ namespace TaskManager.Services.Models.ReportModels
 
         public string Text { get; set; }
 
+        public DateTime? RegistrationDate { get; set; }
+
+        public bool InTimeRecord { get; set; } = true;
     }
 }

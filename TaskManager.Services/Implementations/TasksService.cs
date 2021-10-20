@@ -792,7 +792,8 @@ namespace TaskManager.Services.Implementations
             {
                 var isDeletedEmployee = await this.db.EmployeesTasks
                     .Where(e => e.EmployeeId == workedHours.EmployeeId && e.TaskId == workedHours.TaskId)
-                    .Select(t => t.isDeleted).FirstOrDefaultAsync();
+                    .Select(t => t.isDeleted)
+                    .FirstOrDefaultAsync();
 
                 if (isDeletedEmployee)
                 {
@@ -800,6 +801,10 @@ namespace TaskManager.Services.Implementations
                 }
 
                 var currentTask = await this.db.Tasks.Where(t => t.Id == workedHours.TaskId && t.isDeleted == false).Include(t => t.TaskStatus).FirstOrDefaultAsync();
+                if (currentTask == null)
+                {
+                    return string.Format("Няма задача с номер {0} или е маркирана като изтрита", workedHours.TaskId);
+                }
                 if (currentTask.StartDate.Date > workedHours.WorkDate.Date)
                 {
                     return "Началната дата на задачата е : " + currentTask.StartDate.Date.ToString("dd/MM/yyyy") + "г.";
@@ -820,16 +825,32 @@ namespace TaskManager.Services.Implementations
                             EmployeeId = workedHours.EmployeeId,
                             TaskId = workedHours.TaskId,
                             HoursSpend = workedHours.HoursSpend,
-                            WorkDate = workedHours.WorkDate
+                            WorkDate = workedHours.WorkDate.Date,
+                            RegistrationDate = DateTime.Now.Date,
+                            InTimeRecord = workedHours.InTimeRecord
                         };
                         await this.db.WorkedHours.AddAsync(workedHoursDB);
+                        await this.db.SaveChangesAsync();
                     }
                 }
                 else
                 {
-                    currentTaskHours.HoursSpend = workedHours.HoursSpend;
+                    if (currentTaskHours.HoursSpend != workedHours.HoursSpend)
+                    {
+                        if (workedHours.HoursSpend == 0)
+                        {
+                            this.db.WorkedHours.Remove(currentTaskHours);
+                        }
+                        else
+                        {
+                            currentTaskHours.HoursSpend = workedHours.HoursSpend;
+                            currentTaskHours.RegistrationDate = DateTime.Now.Date;
+                            currentTaskHours.InTimeRecord = workedHours.InTimeRecord;
+                        }
+                        await this.db.SaveChangesAsync();
+                    }
                 }
-                await this.db.SaveChangesAsync();
+                //await this.db.SaveChangesAsync();
                 return "success";
 
             }

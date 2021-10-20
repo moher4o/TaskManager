@@ -28,16 +28,17 @@ namespace TaskMenager.Client.Controllers
     [Authorize(Policy = DataConstants.Employee)]
     public class ReportController : BaseController
     {
+        private readonly IDateManagementConfiguration dateConfiguration;
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
 
-        public ReportController(IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public ReportController(IDateManagementConfiguration _dateConfiguration, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
-
+            this.dateConfiguration = _dateConfiguration;
         }
 
         public IActionResult TaskReportPeriod(int taskId)
@@ -90,7 +91,7 @@ namespace TaskMenager.Client.Controllers
                 {
                     model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
                 }
-
+                model.CheckRegistrationDate = this.dateConfiguration.CheckRegistrationDate;
                 if (model.DateList.Count < 1)
                 {
                     TempData["Error"] = "[TaskReportResult] Няма отчет по задачата за този период.";
@@ -1421,6 +1422,7 @@ namespace TaskMenager.Client.Controllers
                 }
 
                 model.PersonalDateList = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
+                model.CheckRegistrationDate = this.dateConfiguration.CheckRegistrationDate;
 
                 if (model.PersonalDateList.WorkedHoursByTaskByPeriod.Count < 1)
                 {
@@ -1459,26 +1461,42 @@ namespace TaskMenager.Client.Controllers
                         TempData["Error"] = "Грешка при създаването на tab";
                         return RedirectToAction("Index", "Home");
                     }
-                    worksheet.Cells[1, 1, 1, 4].Merge = true;
+                    worksheet.Cells[1, 1, 1, 5].Merge = true;
                     worksheet.Row(1).Height = 25;
                     worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
                     worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     //worksheet.Cells[1, 1].Style.Indent = 10;
                     worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                    worksheet.Cells[1, 1].Value = "Телефонен указател към дата: " + DateTime.Now.Date.ToString("dd/MM/yyyy");
+                    worksheet.Cells[1, 1].Value = "Телефонен и email указател към дата: " + DateTime.Now.Date.ToString("dd/MM/yyyy");
                     worksheet.Cells[1, 1].Style.Font.Size = 14;
                     worksheet.Cells[1, 1].Style.Font.Bold = true;
-                    int row = 2;
+                    int row = 3;
                     //int col = 1;
                     worksheet.Column(1).Width = 40;
                     worksheet.Column(2).Width = 50;
                     worksheet.Column(3).Width = 16;
                     worksheet.Column(4).Width = 16;
+                    worksheet.Column(5).Width = 33;
+                    worksheet.Row(row).Style.Indent = 1;
+                    worksheet.Row(row).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheet.Row(row).Style.Font.Size = 13;
+                    worksheet.Cells[row, 1].Style.Font.Bold = true;
+                    worksheet.Cells[row, 1].Value = "Длъжност";
+                    worksheet.Cells[row, 2].Style.Font.Bold = true;
+                    worksheet.Cells[row, 2].Value = "Име";
+                    worksheet.Cells[row, 3].Style.Font.Bold = true;
+                    worksheet.Cells[row, 3].Value = "Телефон";
+                    worksheet.Cells[row, 4].Style.Font.Bold = true;
+                    worksheet.Cells[row, 4].Value = "Мобилен";
+                    worksheet.Cells[row, 5].Style.Font.Bold = true;
+                    worksheet.Cells[row, 5].Value = "Email";
+                    row += 1;
+
                     var directorates = users.Select(u => u.DirectorateId).ToHashSet();
                     foreach (var dirId in directorates)
                     {
-                        worksheet.Cells[row, 1, row, 4].Merge = true;
+                        worksheet.Cells[row, 1, row, 5].Merge = true;
                         worksheet.Row(row).Height = 15;
                         worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                         worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
@@ -1514,12 +1532,13 @@ namespace TaskMenager.Client.Controllers
                             worksheet.Cells[row, 2].Value = user.FullName;
                             worksheet.Cells[row, 3].Value = user.TelephoneNumber;
                             worksheet.Cells[row, 4].Value = user.MobileNumber;
+                            worksheet.Cells[row, 5].Value = user.Email;
                             row += 1;
                         }
                         var departments = users.Where(u => u.DirectorateId == dirId && u.DepartmentId != null).Select(u => u.DepartmentId).ToHashSet();
                         foreach (var depId in departments)
                         {
-                            worksheet.Cells[row, 1, row, 4].Merge = true;
+                            worksheet.Cells[row, 1, row, 5].Merge = true;
                             worksheet.Row(row).Height = 15;
                             worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
@@ -1543,6 +1562,7 @@ namespace TaskMenager.Client.Controllers
                                 worksheet.Cells[row, 2].Value = departmentBoss.FullName;
                                 worksheet.Cells[row, 3].Value = departmentBoss.TelephoneNumber;
                                 worksheet.Cells[row, 4].Value = departmentBoss.MobileNumber;
+                                worksheet.Cells[row, 5].Value = departmentBoss.Email;
                                 row += 1;
                                 expertsInDepartment.Remove(departmentBoss);
                             }
@@ -1555,12 +1575,13 @@ namespace TaskMenager.Client.Controllers
                                 worksheet.Cells[row, 2].Value = userInDepartment.FullName;
                                 worksheet.Cells[row, 3].Value = userInDepartment.TelephoneNumber;
                                 worksheet.Cells[row, 4].Value = userInDepartment.MobileNumber;
+                                worksheet.Cells[row, 5].Value = userInDepartment.Email;
                                 row += 1;
                             }
                             var sectors = users.Where(u => u.DirectorateId == dirId && u.DepartmentId == depId && u.SectorId != null).Select(u => u.SectorId).ToHashSet();
                             foreach (var sectorId in sectors)
                             {
-                                worksheet.Cells[row, 1, row, 4].Merge = true;
+                                worksheet.Cells[row, 1, row, 5].Merge = true;
                                 worksheet.Row(row).Height = 15;
                                 worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
@@ -1584,6 +1605,7 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, 2].Value = sectorBoss.FullName;
                                     worksheet.Cells[row, 3].Value = sectorBoss.TelephoneNumber;
                                     worksheet.Cells[row, 4].Value = sectorBoss.MobileNumber;
+                                    worksheet.Cells[row, 5].Value = sectorBoss.Email;
                                     row += 1;
                                     expertsInSector.Remove(sectorBoss);
                                 }
@@ -1596,6 +1618,7 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, 2].Value = userInSector.FullName;
                                     worksheet.Cells[row, 3].Value = userInSector.TelephoneNumber;
                                     worksheet.Cells[row, 4].Value = userInSector.MobileNumber;
+                                    worksheet.Cells[row, 5].Value = userInSector.Email;
                                     row += 1;
                                 }
 

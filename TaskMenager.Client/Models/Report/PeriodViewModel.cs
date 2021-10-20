@@ -26,6 +26,8 @@ namespace TaskMenager.Client.Models.Report
         [Display(Name = "Крайна дата *")]
         public DateTime EndDate { get; set; } = DateTime.Now.Date;
 
+        public bool CheckRegistrationDate { get; set; } = false;
+
         public List<TaskWorkedHoursServiceModel> DateList { get; set; } = new List<TaskWorkedHoursServiceModel>();
 
         public ShortEmployeeServiceModel PersonalDateList { get; set; } = new ShortEmployeeServiceModel();

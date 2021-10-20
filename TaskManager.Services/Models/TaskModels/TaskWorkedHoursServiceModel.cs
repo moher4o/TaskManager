@@ -25,6 +25,10 @@ namespace TaskManager.Services.Models.TaskModels
         [MaxLength(500)]
         public string Text { get; set; }
 
+        public DateTime? RegistrationDate { get; set; }
+
+        public bool InTimeRecord { get; set; } = true;
+
         public bool isDeleted { get; set; } = false;
 
         public void ConfigureMapping(Profile profile)

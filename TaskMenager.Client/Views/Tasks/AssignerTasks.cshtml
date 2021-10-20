@@ -21,7 +21,7 @@
     <partial name="../Home/_IndexHeadAssigners" />
     @*<h4>Задачи по които потребителя е отговорник</h4>*@
     <div style="min-height:600px; max-height:601px !important; overflow:auto;">
-        @foreach (var item in Model.AssignerTasks.Where(t => t.TaskStatusName != TaskStatusClosed).OrderBy(t => t.TaskTypeName.Length).ThenBy(t => t.ChildrenCount))
+        @foreach (var item in Model.AssignerTasks.Where(t => t.TaskStatusName != TaskStatusClosed).OrderBy(t => t.TaskTypeName.Length).ThenByDescending(t => t.ChildrenCount))
         {
 
             <div class="row PrimeBox3" style="margin-top:5px; font-size:small; background-color:@(item.TaskPriorityName==TaskPriorityHi ? "#fee9e9" : "");">

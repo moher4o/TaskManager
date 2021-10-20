@@ -33,7 +33,7 @@
                                         @item.Id
                                     </th>
                                     <th>
-                                        <a style="@(item.isDeleted == true ? " color:red" : "color:#5f9fec;")" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id">
+                                        <a style="@(item.isDeleted == true ? " color:red" : "color:#5f9fec;")" asp-controller="Tasks" asp-action="TaskDetails" asp-route-taskId="@item.Id"  target="_blank">
                                             @name
                                         </a>
                                     </th>
