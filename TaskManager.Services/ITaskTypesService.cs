@@ -10,6 +10,6 @@ namespace TaskManager.Services
     {
         IEnumerable<SelectServiceModel> GetTaskTypesNames();
 
-        Task<int> GetTaskTypeIdByNameAsync(string typeName);
+        int GetTaskTypeIdByNameAsync(string typeName);
     }
 }

@@ -18,9 +18,9 @@ namespace TaskManager.Services.Implementations
             this.db = db;
         }
 
-        public async Task<int> GetTaskTypeIdByNameAsync(string typeName)
+        public int GetTaskTypeIdByNameAsync(string typeName)
         {
-            return await this.db.TasksTypes.Where(tt => tt.TypeName == typeName).Select(tt => tt.Id).FirstOrDefaultAsync();
+            return this.db.TasksTypes.Where(tt => tt.TypeName == typeName).Select(tt => tt.Id).FirstOrDefault();
         }
 
         public IEnumerable<SelectServiceModel> GetTaskTypesNames()

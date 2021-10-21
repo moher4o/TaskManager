@@ -270,7 +270,7 @@ namespace TaskMenager.Client.Controllers
                 taskToEdit.HoursLimit = taskDetails.HoursLimit;
                 taskToEdit.ParentTaskId = taskDetails.ParentTaskId;
 
-                if (taskDetails.TypeId == await this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal))
+                if (taskDetails.TypeId == this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal))
                 {
                     var childrens = await this.tasks.GetTaskChildsIdsAsync(taskToEdit.Id);
                     taskToEdit.ChildrenTasksCount = childrens.Count();
@@ -304,7 +304,7 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction(nameof(EditTask), new { taskId = model.Id });
                 }
 
-                var globalTaskId = await this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal);
+                var globalTaskId = this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal);
                 if ((model.ParentTaskId == 0 || model.ParentTaskId == null) && model.TaskTypesId != globalTaskId.ToString())
                 {
                     TempData["Error"] = "Невалидни данни. Или изберете задача родител (полето \"Подзадача на:\"), или сменете типа на задачата на \"Глобална\".";
@@ -929,17 +929,6 @@ namespace TaskMenager.Client.Controllers
                     newTask.DirectoratesId = null;
                 }
 
-                //if (!string.IsNullOrWhiteSpace(oldTask.DirectoratesId) && newTask.Directorates.Where(d => d.Value == oldTask.DirectoratesId).FirstOrDefault() == null) //ако има дирекция, но не е от списъка. Пример: Ако задачата е от друга дирекция и др.
-                //{
-                //    var directorateIdInt = int.Parse(oldTask.DirectoratesId);
-                //    newTask.Directorates.Add(new SelectListItem
-                //    {
-                //        Text = this.directorates.GetDirectoratesNames(directorateIdInt).Select(d => d.TextValue).FirstOrDefault(),
-                //        Value = oldTask.DirectoratesId,
-                //        Selected = true
-                //    });
-                //}
-
                 newTask.DirectoratesId = newTask.Directorates.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
 
                 if (currentUser.DepartmentId != null)   //currentUser има departmentId
@@ -968,20 +957,6 @@ namespace TaskMenager.Client.Controllers
                     //                                    .ToList();
                     newTask.DepartmentsId = null;
                 }
-
-                //if (!string.IsNullOrWhiteSpace(oldTask.DepartmentsId) && newTask.Departments.Where(d => d.Value == oldTask.DepartmentsId).FirstOrDefault() == null) //ако има отдел, но не е от списъка с отдели от горните два селекта. Пример: Ако задачата е от друга дирекция и др.
-                //{
-                //    var departmentIdInt = int.Parse(oldTask.DepartmentsId);
-                //        newTask.Departments.Add(new SelectListItem
-                //        {
-                //            Text = this.departments.GetDepartmentsNames(departmentIdInt).Select(d => d.TextValue).FirstOrDefault(),
-                //            Value = oldTask.DepartmentsId,
-                //            Selected = true
-                //        });
-
-                //}
-
-                //newTask.DepartmentsId = newTask.Departments.Where(t => t.Selected == true).Select(t => t.Value).FirstOrDefault();
 
                 if (currentUser.SectorId != null)
                 {
@@ -1362,12 +1337,16 @@ namespace TaskMenager.Client.Controllers
                        Selected = a.Id == oldTask.ParentTaskId ? true : false
                    })
                    .ToList();
-            newTask.TaskParetns.Insert(0, new SelectListItem
+            var currentTypeId = int.Parse(oldTask.TaskTypesId);
+            if (currentTypeId == this.tasktypes.GetTaskTypeIdByNameAsync(TaskTypeGlobal))
             {
-                Text = ChooseValue,
-                Value = "0",
-                Selected = oldTask.ParentTaskId > 0 ? false : true
-            });
+                newTask.TaskParetns.Insert(0, new SelectListItem
+                {
+                    Text = ChooseValue,
+                    Value = "0",
+                    Selected = oldTask.ParentTaskId > 0 ? false : true
+                });
+            }
             newTask.TaskTypes = this.tasktypes.GetTaskTypesNames()
                    .Select(a => new SelectListItem
                    {
@@ -1811,7 +1790,7 @@ namespace TaskMenager.Client.Controllers
             return Json(new { data });
         }
 
-        [Authorize(Policy = SuperAdmin)]
+        [Authorize(Policy = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Delete(int taskId)
         {

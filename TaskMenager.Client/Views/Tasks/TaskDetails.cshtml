@@ -165,7 +165,7 @@
                 <div class="col-md-12">
 
                     @if (isClosed && !isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-|| Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+|| Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == DirectorateAdmin && Model.DirectorateId == User.Claims.Where(u => u.Type == "directorateId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == DepartmentAdmin && Model.DepartmentId == User.Claims.Where(u => u.Type == "departmentId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == SectorAdmin && Model.SectorId == User.Claims.Where(u => u.Type == "sectorId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         var modalId = "modal" + Model.Id.ToString();
                         <form method="post" asp-controller="Tasks" asp-action="ReopenTask" asp-route-taskId="@Model.Id">
@@ -204,7 +204,7 @@
                         </a>
                     }
                     @if (isDeleted && (permisionType == SuperAdmin || Model.AssignerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()
-|| Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
+|| Model.OwnerId == User.Claims.Where(u => u.Type == "userId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == DirectorateAdmin && Model.DirectorateId == User.Claims.Where(u => u.Type == "directorateId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == DepartmentAdmin && Model.DepartmentId == User.Claims.Where(u => u.Type == "departmentId").Select(u => int.Parse(u.Value)).FirstOrDefault() || permisionType == SectorAdmin && Model.SectorId == User.Claims.Where(u => u.Type == "sectorId").Select(u => int.Parse(u.Value)).FirstOrDefault()))
                     {
                         <div class="row">
                             @*<a href="#" >*@
