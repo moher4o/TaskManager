@@ -22,5 +22,7 @@ namespace TaskManager.Services.Models.ReportModels
 
         public string UserNotesForPeriod { get; set; }
 
+        public bool InTimeRecord { get; set; } = true;
+
     }
 }

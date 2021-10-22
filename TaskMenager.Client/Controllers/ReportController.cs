@@ -684,7 +684,6 @@ namespace TaskMenager.Client.Controllers
                 {
                     director.DepartmentId = 999;
                 }
-
                 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var stream = new System.IO.MemoryStream();
@@ -935,6 +934,13 @@ namespace TaskMenager.Client.Controllers
                     var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
                     if (curentColegue != null)
                     {
+                        if (curentColegue.InTimeRecord==false)
+                        {
+                            worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Gray125;
+                            worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                        }
+                        worksheet.Cells[row, taskExpertsColumn].Style.Font.Size = 12;
+                        worksheet.Cells[row, taskExpertsColumn].Style.Font.Bold = true;
                         worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
                         if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
                         {
@@ -1096,6 +1102,16 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Column(col).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 }
 
+                row += 1;
+
+                worksheet.Cells[row, 3].Style.Fill.PatternType = ExcelFillStyle.Gray125;
+                worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.Red);                              //предупреждението за цвета на закъснелите отчети
+                worksheet.Cells[row, 2].Style.Font.Size = 12;
+                worksheet.Cells[row, 2].Style.Font.Bold = true;
+                worksheet.Cells[row, 2].Value = "Всички или част от часовете са въведени след отчетния период";
+                worksheet.Cells[row - 1, 2].Value = "Легенда:";
+
+
                 row += 2;
                 var totalHoursWorckedByType = workingHoursSpecificSum + workingHoursProcurementSum + workingHoursLearningSum + workingHoursAdminSum +
                     workingHoursMeetingsSum + workingHoursOtherSum;
@@ -1194,7 +1210,7 @@ namespace TaskMenager.Client.Controllers
                         modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                         row = rowBeforeOtpuski;
                     }
-
+                     
                     //Графики начало
                     ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
 

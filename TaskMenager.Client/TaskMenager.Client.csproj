@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>d1fcce2e-b449-4c00-8aac-095b357b62ec</UserSecretsId>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />

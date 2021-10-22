@@ -1615,7 +1615,7 @@ namespace TaskMenager.Client.Controllers
                 {
                     return true;
                 }
-                if (diference.TotalDays <= 7)
+                if (diference.TotalDays < 7)
                 {
                     for (int i = ot4etday + 1; i <= ((todayDayOfWeek < (ot4etday + 1)) ? (todayDayOfWeek + 7) : todayDayOfWeek); i++)
                     {

@@ -53,6 +53,8 @@ namespace TaskManager.Services.Models.ReportModels
                                                                DirectorateId = e.Employee.DirectorateId,
                                                                DepartmentId = e.Employee.DepartmentId,
                                                                SectorId = e.Employee.SectorId,
+                                                               InTimeRecord = e.Employee.WorkedHoursByTask
+                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date).All(ir => ir.InTimeRecord == true),
                                                                TaskWorkedHours = e.Employee.WorkedHoursByTask
                                                                .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date).Sum(wh => wh.HoursSpend),
                                                                UserNotesForPeriod = string.Join(" | ", e.Employee.WorkedHoursByTask
