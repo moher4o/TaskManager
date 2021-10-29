@@ -315,7 +315,6 @@
         let newDate = $('#dateSelector2').datepicker("getDate");
         let url = currentUrl + '?workDate=' + newDate.toUTCString();
         $.get(url).done(function (data) {
-            console.log(data.success)
             if (!data.success) {
                 swal({
                     title: "Информация",

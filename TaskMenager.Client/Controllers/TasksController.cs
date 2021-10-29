@@ -1606,15 +1606,20 @@ namespace TaskMenager.Client.Controllers
 
         private bool CheckDate(DateTime workDate)   //проверява дали датата за която ще се прави отчет е в текущия отчетен период
         {
-                var daysAfterOtchet = new List<int>();
-                var ot4etday = this.dateConfiguration.ReportDate;
-                var todayDate = DateTime.Now.Date;
-                var todayDayOfWeek = ((int)todayDate.DayOfWeek);
-                var diference = todayDate.Date - workDate.Date;
-                if (diference.TotalDays < 0)
-                {
-                    return true;
-                }
+            var daysAfterOtchet = new List<int>();
+            var ot4etday = this.dateConfiguration.ReportDate;
+            var todayDate = DateTime.Now.Date;
+            var todayDayOfWeek = ((int)todayDate.DayOfWeek);
+            var diference = todayDate.Date - workDate.Date;
+            //int diferenceValue = todayDayOfWeek > ot4etday ? 8 : 7;
+
+            if (diference.TotalDays < 0)
+            {
+                return true;
+            }
+
+            if (diference.TotalDays <= 7)
+            {
                 if (diference.TotalDays < 7)
                 {
                     for (int i = ot4etday + 1; i <= ((todayDayOfWeek < (ot4etday + 1)) ? (todayDayOfWeek + 7) : todayDayOfWeek); i++)
@@ -1622,18 +1627,29 @@ namespace TaskMenager.Client.Controllers
                         daysAfterOtchet.Add(i > 6 ? i - 7 : i);
                     }
                 }
-                else
+                if (todayDayOfWeek == ot4etday+1 || (todayDayOfWeek == 0 && ot4etday == 7))    //за да може в деня след отчета да се попълва за миналата седмица (петък е примерен)
                 {
-                    return false;
+                    for (int i = 1; i <= 7; i++)
+                    {
+                        if (!daysAfterOtchet.Contains(i))
+                        {
+                            daysAfterOtchet.Add(i);
+                        }
+                    }
                 }
-                if (daysAfterOtchet.Contains(((int)workDate.DayOfWeek)))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+            }
+            else
+            {
+                return false;
+            }
+            if (daysAfterOtchet.Contains(((int)workDate.DayOfWeek)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         [HttpGet]
@@ -1647,7 +1663,7 @@ namespace TaskMenager.Client.Controllers
             {
                 return Json(new { success = true });
             }
-            
+
         }
 
 

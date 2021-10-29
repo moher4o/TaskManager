@@ -49,12 +49,17 @@
                         {
                             //hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.HoursSpend).FirstOrDefault();
                             hours = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Sum(wh => wh.HoursSpend);   //при глобалната може да е повече от една задача, затова сумирам
-                            var inTimeList = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(t => new
+
+                            var hasLateRecord = false;
+                            if (Model.CheckRegistrationDate)
                             {
-                                inTimeRecord = t.InTimeRecord,
-                                RegistrationDate = t.RegistrationDate
-                            }).ToList();
-                            var hasLateRecord = inTimeList.Any(laterecord => laterecord.inTimeRecord == false);
+                                var inTimeList = Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(t => new
+                                {
+                                    inTimeRecord = t.InTimeRecord,
+                                    RegistrationDate = t.RegistrationDate
+                                }).ToList();
+                                hasLateRecord = inTimeList.Any(laterecord => laterecord.inTimeRecord == false);
+                            }
                             tasksNames = string.Empty;
                             Model.DateList.Where(wh => wh.EmployeeId == id && wh.WorkDate.Date == worckedDate.Date).Select(wh => wh.TaskName).ToList().ForEach(tn => tasksNames += tn.Replace(" ", "_") + Environment.NewLine);
                             if (hasLateRecord)
@@ -64,7 +69,7 @@
                             sum = sum + hours;
                             if (hours > 0)
                             {
-                    <td style="text-align:center; @(hasLateRecord == true ? "background-color:#fee9e9; color:red;" : "")" class="tooltip-big-text @(hasLateRecord ? "tooltip-red" : "")" data-balloon-length="xxlarge" aria-label=@tasksNames data-balloon-pos="up">@(hours > 0 ? hours.ToString() : "")</td>
+                                <td style="text-align:center; @(hasLateRecord == true ? "background-color:#fee9e9; color:red;" : "")" class="tooltip-big-text @(hasLateRecord ? "tooltip-red" : "")" data-balloon-length="xxlarge" aria-label=@tasksNames data-balloon-pos="up">@(hours > 0 ? hours.ToString() : "")</td>
                             }
                             else
                             {
@@ -87,6 +92,13 @@
                 </tr>
             </tbody>
         </table>
+        @if (Model.CheckRegistrationDate)
+        {
+             <div class="row">
+                 <div class="col-md-1 offset-1" style="background-color: #fee9e9; color: red; display: flex; justify-content: center; align-items: center;"> x </div>
+                 <div class="col-md-10">Част или всички часове са въведени след отчетния период!</div>
+            </div>
+        }
         @if (employeeCount > 40)
         {
             <p style="color:red;">Внимание! Работилите по задачата експерти са повече от 40 и е възможно да има проблем с изобразяването на данните. За точна справка  -  изтеглете екселския файл !</p>

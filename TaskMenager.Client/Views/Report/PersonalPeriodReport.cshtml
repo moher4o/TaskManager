@@ -81,7 +81,7 @@
                         }
                         <tr style=" display: table; width: 100%; table-layout: fixed; background-color:@(rcolor); opacity:@(ropacity.ToString());">
                             <td style="width:7%; background-color:ghostwhite; opacity:1.00 !important;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
-                            <td colspan="@(TaskList.Count)" class="@((!currentTask.inTimeRecord && Model.CheckRegistrationDate) ? (currentTask.taskName == "Отпуски" ? "otpuski tooltip-red" : "bolnichni tooltip-red") : "") tooltip-big-text"  data-balloon-length=" xxlarge" aria-label=@(currentTask.inTimeRecord ? "" : systemtaskMetaInfo) data-balloon-pos="up"></td>
+                            <td colspan="@(TaskList.Count)" class="@((!currentTask.inTimeRecord && Model.CheckRegistrationDate) ? (currentTask.taskName == "Отпуски" ? "otpuski tooltip-red" : "bolnichni tooltip-red") : "") tooltip-big-text" data-balloon-length=" xxlarge" aria-label=@(currentTask.inTimeRecord ? "" : systemtaskMetaInfo) data-balloon-pos="up"></td>
                             <td style="background-color:ghostwhite; font-size: smaller; width: 5%; text-align: center;">@systemtaskname</td>
                         </tr>
                     }
@@ -114,11 +114,11 @@
                                 }
                                 else
                                 {
-                                        <td></td>
+                                    <td></td>
                                     //style = "@(dateMetaInfo.Length!=0 ? "background - color:#fee9e9; color:red;" : "")"    @(lateReport ? "systemlate" : "")
                                 }
                             }
-                                <td style="background-color: ivory; font-size: medium; width: 5%; text-align: center;"><strong>@sum</strong></td>
+                            <td style="background-color: ivory; font-size: medium; width: 5%; text-align: center;"><strong>@sum</strong></td>
                         </tr>
                     }
                 }
@@ -135,6 +135,13 @@
                 </tr>
             </tbody>
         </table>
+        @if (Model.CheckRegistrationDate)
+        {
+            <div class="row">
+                <div class="col-md-1 offset-1" style="background-color: #fee9e9; color: red; display: flex; justify-content: center; align-items: center;"> x </div>
+                <div class="col-md-10">Часовете са въведени след отчетния период! Ден на отчета: @(Model.ReportDay).</div>
+            </div>
+        }
         <form method="get" asp-action="ExportSpravkaForEmployee" asp-controller="Report">
             <input asp-for="userId" class="form-control" hidden />
             <input asp-for="StartDate" class="form-control" nopicker="true" hidden />
