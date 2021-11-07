@@ -16,5 +16,9 @@ namespace TaskMenager.Client.Models.Report
 
         public bool WithDepTabs { get; set; } = true;
 
+        public bool OnlyApprovedHours { get; set; } = false;
+
+        public bool ConfigurationApprovedHours { get; set; } = false;
+
     }
 }

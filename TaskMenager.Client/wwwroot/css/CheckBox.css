@@ -60,11 +60,26 @@
         opacity: 0.5;
     }*/
 
+#watermarkapproved {
+    position: absolute;
+    top: 55%;
+    right: 42%;
+    opacity: 0.5;
+    text-align: center;
+    color: lightgreen;
+    /*z-index: 10;*/
+    -ms-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -sand-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
 
 #watermarkholiday {
     position: absolute;
-    top: 45%;
-    right: 40%;
+    top: 50%;
+    right: 52%;
     opacity: 0.5;
     text-align: center;
     color: cornflowerblue;
@@ -79,8 +94,8 @@
 
 #watermarkill {
     position: absolute;
-    top: 45%;
-    right: 40%;
+    top: 47%;
+    right: 45%;
     opacity: 0.5;
     text-align: center;
     color:salmon;
@@ -92,6 +107,44 @@
     -sand-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
+
+/* Large checkboxes */
+
+/*.myinput.large {
+    height: 22px;
+    width: 22px;
+}
+
+    .myinput.large[type="checkbox"]:before {
+        width: 20px;
+        height: 20px;
+    }
+
+    .myinput.large[type="checkbox"]:after {
+        top: -20px;
+        width: 16px;
+        height: 16px;
+    }*/
+
+.myinput[type=checkbox] {
+    width: 25px;
+    height: 25px;
+    font-size: 22px;
+}
+
+    .myinput[type=checkbox]:after {
+        content: "";
+        background-color: lightgreen;
+        display: inline-block;
+        visibility: visible;
+    }
+
+    .myinput[type=checkbox]:checked:after {
+        content: "\2714";
+        background-color: ivory;
+        /* this is a checkmark symbol */
+    }
+
 
 .fancycheck {
     position: absolute;

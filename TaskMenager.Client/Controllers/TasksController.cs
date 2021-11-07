@@ -1752,7 +1752,8 @@ namespace TaskMenager.Client.Controllers
                             HoursSpend = 8,
                             WorkDate = workDate.Date,
                             RegistrationDate = DateTime.Now.Date,
-                            InTimeRecord = inTime
+                            InTimeRecord = inTime,
+                            Approved = false
                         };
                         result = await this.tasks.SetWorkedHoursAsync(workedHours);
                         message = "Отпускът е отразен в системата";
@@ -1766,8 +1767,8 @@ namespace TaskMenager.Client.Controllers
                             HoursSpend = 8,
                             WorkDate = workDate.Date,
                             RegistrationDate = DateTime.Now.Date,
-                            InTimeRecord = inTime
-
+                            InTimeRecord = inTime,
+                            Approved = false
                         };
                         result = await this.tasks.SetWorkedHoursAsync(workedHours);
                         message = "Болничния е отразен в системата";

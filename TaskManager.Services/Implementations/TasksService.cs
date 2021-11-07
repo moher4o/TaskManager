@@ -26,14 +26,29 @@ namespace TaskManager.Services.Implementations
 
         }
 
-        public async Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate)
+        public async Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate, bool onlyApprovedHours)
         {
-            var report = await this.db.WorkedHours
-                .Where(wh => wh.TaskId == taskId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate.Date <= endDate.Date && !wh.isDeleted)
-                .OrderBy(wh => wh.WorkDate.Date)
-                .ThenBy(wh => wh.EmployeeId)
-                .ProjectTo<TaskWorkedHoursServiceModel>()
-                .ToListAsync();
+            var report = new List<TaskWorkedHoursServiceModel>();
+
+            if (onlyApprovedHours)
+            {
+                report = await this.db.WorkedHours
+                    .Where(wh => wh.TaskId == taskId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate.Date <= endDate.Date && wh.Approved && !wh.isDeleted)
+                    .OrderBy(wh => wh.WorkDate.Date)
+                    .ThenBy(wh => wh.EmployeeId)
+                    .ProjectTo<TaskWorkedHoursServiceModel>()
+                    .ToListAsync();
+            }
+            else
+            {
+                report = await this.db.WorkedHours
+                    .Where(wh => wh.TaskId == taskId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate.Date <= endDate.Date && !wh.isDeleted)
+                    .OrderBy(wh => wh.WorkDate.Date)
+                    .ThenBy(wh => wh.EmployeeId)
+                    .ProjectTo<TaskWorkedHoursServiceModel>()
+                    .ToListAsync();
+            }
+
             return report;
         }
 
@@ -827,7 +842,9 @@ namespace TaskManager.Services.Implementations
                             HoursSpend = workedHours.HoursSpend,
                             WorkDate = workedHours.WorkDate.Date,
                             RegistrationDate = DateTime.Now.Date,
-                            InTimeRecord = workedHours.InTimeRecord
+                            InTimeRecord = workedHours.InTimeRecord,
+                            Approved = false,
+                            ApprovedBy = null
                         };
                         await this.db.WorkedHours.AddAsync(workedHoursDB);
                         await this.db.SaveChangesAsync();
@@ -846,6 +863,8 @@ namespace TaskManager.Services.Implementations
                             currentTaskHours.HoursSpend = workedHours.HoursSpend;
                             currentTaskHours.RegistrationDate = DateTime.Now.Date;
                             currentTaskHours.InTimeRecord = workedHours.InTimeRecord;
+                            currentTaskHours.Approved = false;
+                            currentTaskHours.ApprovedBy = null;
                         }
                         await this.db.SaveChangesAsync();
                     }
@@ -876,9 +895,9 @@ namespace TaskManager.Services.Implementations
             }
             catch (Exception)
             {
-                return "Service[SetWorkedHoursAsync]. Неуспешен запис.";
+                return "Service[SetWorkedHoursWithDeletedAsync]. Неуспешен запис.";
             }
-        }
+        }  //премахва отработените часове преди да се маркира отпуск или болничен
 
 
         public async Task<bool> CloseTaskAsync(int taskId, string endNote, int closerid)
@@ -1024,18 +1043,32 @@ namespace TaskManager.Services.Implementations
 
         }
 
-        public async Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate)
+        public async Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate, bool onlyApprovedHours)
         {
             var report = new ReportServiceModel();
             var tasksIdList = new List<int>();
             foreach (var employeeId in employeesIds)
             {
-                var empTaskIds = await this.db.WorkedHours
-                    .Where(wh => wh.EmployeeId == employeeId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate <= endDate.Date && !wh.isDeleted)
-                    .OrderBy(wh => wh.TaskId)
-                    .Select(wh => wh.TaskId)
-                    .Distinct()
-                    .ToListAsync();
+                var empTaskIds = new List<int>();
+                if (onlyApprovedHours)
+                {
+                    empTaskIds = await this.db.WorkedHours
+                        .Where(wh => wh.EmployeeId == employeeId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate <= endDate.Date && wh.Approved == true && !wh.isDeleted)
+                        .OrderBy(wh => wh.TaskId)
+                        .Select(wh => wh.TaskId)
+                        .Distinct()
+                        .ToListAsync();
+                }
+                else
+                {
+                    empTaskIds = await this.db.WorkedHours
+                        .Where(wh => wh.EmployeeId == employeeId && wh.WorkDate.Date >= startDate.Date && wh.WorkDate <= endDate.Date && !wh.isDeleted)
+                        .OrderBy(wh => wh.TaskId)
+                        .Select(wh => wh.TaskId)
+                        .Distinct()
+                        .ToListAsync();
+
+                }
 
                 tasksIdList = tasksIdList.Union(empTaskIds).ToList();
             }
@@ -1043,7 +1076,7 @@ namespace TaskManager.Services.Implementations
             var searchedTasks = await this.db.Tasks
                 .Where(t => tasksIdList.Contains(t.Id))
                 .OrderBy(t => t.Id)
-                .ProjectTo<ReportServiceModel>(new { employeesIds = employeesIds.ToArray(), startDate, endDate })
+                .ProjectTo<ReportServiceModel>(new { employeesIds = employeesIds.ToArray(), startDate, endDate, onlyApprovedHours })
                 .ToListAsync();
 
             return searchedTasks;
@@ -1125,6 +1158,32 @@ namespace TaskManager.Services.Implementations
             await this.db.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> ApproveTaskForDate(int bossId, int userId, DateTime currentDate)
+        {
+            var hoursToApprove = await this.db.WorkedHours.Where(wh => wh.EmployeeId == userId && wh.WorkDate.Date == currentDate.Date).ToListAsync();
+            foreach (var taskHour in hoursToApprove)
+            {
+                taskHour.ApprovedBy = bossId;
+                taskHour.Approved = true;
+            }
+            await this.db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RejectTaskForDate(int bossId, int userId, DateTime currentDate)
+        {
+            var hoursToReject = await this.db.WorkedHours.Where(wh => wh.EmployeeId == userId && wh.WorkDate.Date == currentDate.Date).ToListAsync();
+            foreach (var taskHour in hoursToReject)
+            {
+                taskHour.ApprovedBy = bossId;
+                taskHour.Approved = false;
+            }
+            await this.db.SaveChangesAsync();
+            return true;
+        }
+
+
 
         public async Task<List<int>> GetTaskChildsIdsAsync(int taskId)
         {

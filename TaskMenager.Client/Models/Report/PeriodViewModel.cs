@@ -30,6 +30,12 @@ namespace TaskMenager.Client.Models.Report
 
         public string ReportDay { get; set; }
 
+        public bool ReportApproval { get; set; } = false;
+
+        public bool UserCanApprove { get; set; } = false;
+
+        public bool OnlyApprovedHours { get; set; } = false;
+
         public List<TaskWorkedHoursServiceModel> DateList { get; set; } = new List<TaskWorkedHoursServiceModel>();
 
         public ShortEmployeeServiceModel PersonalDateList { get; set; } = new ShortEmployeeServiceModel();

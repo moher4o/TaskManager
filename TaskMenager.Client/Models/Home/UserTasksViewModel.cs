@@ -17,6 +17,8 @@ namespace TaskMenager.Client.Models.Home
 
         public DateTime workDate { get; set; } = DateTime.Now.Date;
 
+        public bool ReportApproval { get; set; } = false;
+
         public IEnumerable<TaskFewInfoServiceModel> ActiveTasks { get; set; } = new List<TaskFewInfoServiceModel>();
 
         public IEnumerable<TaskFewInfoServiceModel> AssignerTasks { get; set; } = new List<TaskFewInfoServiceModel>();

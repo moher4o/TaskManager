@@ -40,6 +40,11 @@ namespace TaskManager.Services.Models.TaskModels
 
         public int ChildrenCount { get; set; }
 
+        public bool ApprovedToday { get; set; } = false;
+
+        public string ApprovedByAdmninName { get; set; }
+
+
         IEnumerable<SelectServiceModel> Colleagues { get; set; } = new List<SelectServiceModel>();
 
         
@@ -66,6 +71,14 @@ namespace TaskManager.Services.Models.TaskModels
                    .ForMember(u => u.EmployeeHoursToday, cfg => cfg.MapFrom(s => s.WorkedHours
                                                                                 .Where(d => d.WorkDate.Date == workDate.Date && d.EmployeeId == currentEmployeeId)
                                                                                 .Sum(hr => hr.HoursSpend)))
+                   .ForMember(u => u.ApprovedToday, cfg => cfg.MapFrom(s => s.WorkedHours
+                                                                                .Where(d => d.WorkDate.Date == workDate.Date && d.EmployeeId == currentEmployeeId)
+                                                                                .Select(d => d.Approved)
+                                                                                .FirstOrDefault()))
+                   .ForMember(u => u.ApprovedByAdmninName, cfg => cfg.MapFrom(s => s.WorkedHours
+                                                                                .Where(d => d.WorkDate.Date == workDate.Date && d.EmployeeId == currentEmployeeId)
+                                                                                .Select(d => d.ApprovedByAdmnin.FullName)
+                                                                                .FirstOrDefault()))
                    .ForMember(u => u.EmployeeHours, cfg => cfg.MapFrom(s => s.WorkedHours
                                                                                 .Where(hr => hr.EmployeeId == currentEmployeeId)
                                                                                 .Sum(hr => hr.HoursSpend)))

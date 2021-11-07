@@ -29,12 +29,19 @@ namespace TaskManager.Services.Models.TaskModels
 
         public bool InTimeRecord { get; set; } = true;
 
+        public bool Approved { get; set; } = false;
+
+        public int ApprovedBy { get; set; }
+
+        public string ApprovedByAdmninName { get; set; }
+
         public bool isDeleted { get; set; } = false;
 
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<WorkedHours, TaskWorkedHoursServiceModel>()
                               .ForMember(u => u.TaskName, cfg => cfg.MapFrom(s => s.Task.TaskName))
+                              .ForMember(u => u.ApprovedByAdmninName, cfg => cfg.MapFrom(s => s.ApprovedByAdmnin.FullName))
                               .ForMember(u => u.EmployeeName, cfg => cfg.MapFrom(s => s.Employee.FullName));
         }
     }

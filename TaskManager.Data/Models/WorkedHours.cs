@@ -26,6 +26,12 @@ namespace TaskManager.Data.Models
 
         public bool InTimeRecord { get; set; } = true;
 
+        public bool Approved { get; set; } = false;
+
+        public int? ApprovedBy { get; set; }
+
+        public Employee ApprovedByAdmnin { get; set; }
+
         public bool isDeleted { get; set; } = false;
     }
 }

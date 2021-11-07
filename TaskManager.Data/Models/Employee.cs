@@ -76,5 +76,7 @@ namespace TaskManager.Data.Models
 
         public virtual ICollection<TaskNote> Notes { get; set; } = new List<TaskNote>();
 
+        public virtual ICollection<WorkedHours> ApprovedDateReports { get; set; } = new List<WorkedHours>();
+
     }
 }

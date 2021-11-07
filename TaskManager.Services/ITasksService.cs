@@ -38,7 +38,7 @@ namespace TaskManager.Services
 
         Task<bool> ReopenTaskAsync(int taskId);
         Task<string> EditTaskAsync(AddNewTaskServiceModel taskToEdit);
-        Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate);
+        Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate, bool OnlyApprovedHours);
         Task<TaskServiceModel> GetParentTaskAsync(int parentTaskId);
 
         IQueryable<TaskManager.Data.Models.Task> GetAllTasks(int userId, bool withClosed = false, bool withDeleted = false);
@@ -59,7 +59,7 @@ namespace TaskManager.Services
 
         Task<string> GetTaskNameAsync(int taskId);
 
-        Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate);
+        Task<List<TaskWorkedHoursServiceModel>> GetTaskReport(int taskId, DateTime startDate, DateTime endDate, bool onlyApprovedHours);
 
         Task<AddNoteToTaskServiceModel> GetTaskEmpNoteForDateAsync(int taskId, int empId, DateTime workDate);
         Task<bool> SetTaskEmpNoteForDateAsync(AddNoteToTaskServiceModel model);
@@ -69,5 +69,9 @@ namespace TaskManager.Services
         Task<bool> RemoveSystemTaskForDate(int userId, DateTime currentDate);
 
         Task<string> SetWorkedHoursWithDeletedAsync(TaskWorkedHoursServiceModel workedHours);
+
+        Task<bool> ApproveTaskForDate(int bossId, int userId, DateTime currentDate);
+
+        Task<bool> RejectTaskForDate(int bossId, int userId, DateTime currentDate);
     }
 }

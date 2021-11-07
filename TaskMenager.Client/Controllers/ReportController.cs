@@ -28,17 +28,19 @@ namespace TaskMenager.Client.Controllers
     [Authorize(Policy = DataConstants.Employee)]
     public class ReportController : BaseController
     {
-       private readonly IDateManagementConfiguration dateConfiguration;
+        private readonly IDateManagementConfiguration dateConfiguration;
+        private readonly IApprovalConfiguration approvalConfiguration;
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
 
-        public ReportController(IDateManagementConfiguration _dateConfiguration, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public ReportController(IDateManagementConfiguration _dateConfiguration, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
             this.dateConfiguration = _dateConfiguration;
+            this.approvalConfiguration = _approvalConfiguration;
         }
 
         public IActionResult TaskReportPeriod(int taskId)
@@ -54,6 +56,7 @@ namespace TaskMenager.Client.Controllers
 
                 var taskPeriod = new PeriodViewModel();
                 taskPeriod.taskId = taskId;
+                taskPeriod.ReportApproval = approvalConfiguration.ReportApproval;
                 return View(taskPeriod);
             }
             catch (Exception)
@@ -80,16 +83,20 @@ namespace TaskMenager.Client.Controllers
                 }
                 var currentTask = this.tasks.GetTaskDetails(model.taskId).FirstOrDefault();
                 model.TaskName = currentTask.TaskName;
+                if (!approvalConfiguration.ReportApproval)
+                {
+                    model.OnlyApprovedHours = false;
+                }
                 if (currentTask.TaskTypeName == DataConstants.TaskTypeGlobal)    //ако е глобална
                 {
                     foreach (var itemId in await this.tasks.GetTaskChildsIdsAsync(currentTask.Id))
                     {
-                        model.DateList.AddRange(await this.tasks.GetTaskReport(itemId, model.StartDate.Date, model.EndDate.Date));
+                        model.DateList.AddRange(await this.tasks.GetTaskReport(itemId, model.StartDate.Date, model.EndDate.Date, model.OnlyApprovedHours));
                     }
                 }
                 else
                 {
-                    model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                    model.DateList = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date, model.OnlyApprovedHours);
                 }
                 model.CheckRegistrationDate = this.dateConfiguration.CheckRegistrationDate;
                 if (model.DateList.Count < 1)
@@ -125,16 +132,20 @@ namespace TaskMenager.Client.Controllers
                 }
                 var taskReportForPeriod = new List<TaskWorkedHoursServiceModel>();
                 var currentTask = this.tasks.GetTaskDetails(model.taskId).FirstOrDefault();
+                if (!approvalConfiguration.ReportApproval)
+                {
+                    model.OnlyApprovedHours = false;
+                }
                 if (currentTask.TaskTypeName == DataConstants.TaskTypeGlobal)    //ако е глобална
                 {
                     foreach (var itemId in await this.tasks.GetTaskChildsIdsAsync(currentTask.Id))
                     {
-                        taskReportForPeriod.AddRange(await this.tasks.GetTaskReport(itemId, model.StartDate.Date, model.EndDate.Date));
+                        taskReportForPeriod.AddRange(await this.tasks.GetTaskReport(itemId, model.StartDate.Date, model.EndDate.Date, model.OnlyApprovedHours));
                     }
                 }
                 else
                 {
-                    taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
+                    taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date, model.OnlyApprovedHours);
                 }
                 //var taskReportForPeriod = await this.tasks.GetTaskReport(model.taskId, model.StartDate.Date, model.EndDate.Date);
 
@@ -421,6 +432,17 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Column(column).Width = 10;
                     worksheet.Cells[2, column].Value = "Общо за дата :";
 
+                    if (approvalConfiguration.ReportApproval)
+                    {
+                        column += 1;
+                        worksheet.Cells[2, column].Style.WrapText = true;
+                        worksheet.Cells[2, column].Style.Font.Size = 12;
+                        worksheet.Cells[2, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[2, column].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
+                        worksheet.Column(column).Width = 10;
+                        worksheet.Cells[2, column].Value = "Приет отчет";
+                    }
+
                     worksheet.Cells[1, 1, 1, column > 7 ? column : 7].Merge = true;
                     worksheet.Row(1).Height = 25;
                     worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -451,6 +473,14 @@ namespace TaskMenager.Client.Controllers
                                 holidayrow.Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 holidayrow.Style.Fill.BackgroundColor.SetColor(item.TaskName == "Отпуски" ? Color.LightBlue : Color.LightSalmon);
 
+                                if (approvalConfiguration.ReportApproval && item.ApprovedRecord)
+                                {
+                                    worksheet.Cells[row, col + 1].Style.Font.Size = 10;
+                                    worksheet.Cells[row, col + 1].Style.Font.Color.SetColor(Color.Green);
+                                    worksheet.Column(col + 1).Width = 10;
+                                    worksheet.Cells[row, col + 1].Value = "Да";
+                                }
+
 
                             }
                             else
@@ -463,10 +493,19 @@ namespace TaskMenager.Client.Controllers
                                     worksheet.Cells[row, col].Style.Font.Bold = true;
                                     worksheet.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                     worksheet.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
-                                    if (col > 15)
+
+                                    if (approvalConfiguration.ReportApproval && item.ApprovedRecord)
                                     {
-                                        worksheet.Cells[row, col + 1].Value = item.WorkDate.ToString("dd/MM/yyyy") + "г.";
+                                        worksheet.Cells[row, col + 1].Style.Font.Size = 10;
+                                        worksheet.Cells[row, col + 1].Style.Font.Color.SetColor(Color.Green);
                                         worksheet.Column(col + 1).Width = 10;
+                                        worksheet.Cells[row, col + 1].Value = "Да";
+                                    }
+
+                                    if (col+1 > 15)
+                                    {
+                                        worksheet.Cells[row, col + 2].Value = item.WorkDate.ToString("dd/MM/yyyy") + "г.";
+                                        worksheet.Column(col + 2).Width = 10;
                                     }
 
 
@@ -534,8 +573,13 @@ namespace TaskMenager.Client.Controllers
                         worksheet.Cells[row, column].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
 
                     }
-                    var bodyrange = worksheet.Cells[3, 2, row, col];
+                    var bodyrange = worksheet.Cells[2, 1, row, approvalConfiguration.ReportApproval ? col+1 : col];
                     bodyrange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    bodyrange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    bodyrange.Style.Border.Left.Style = ExcelBorderStyle.Thin;       //border
+                    bodyrange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    bodyrange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
 
                     //create a new piechart of type Doughnut
                     var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
@@ -562,7 +606,7 @@ namespace TaskMenager.Client.Controllers
 
                     if (dateConfiguration.CheckRegistrationDate)
                     {
-                        
+
                         worksheet.Cells[row + 3, 6].Style.Fill.PatternType = ExcelFillStyle.Gray125;
                         worksheet.Cells[row + 3, 6].Style.Fill.BackgroundColor.SetColor(Color.Red);                              //предупреждението за цвета на закъснелите отчети
                         worksheet.Cells[row + 3, 7].Style.Font.Size = 8;
@@ -590,6 +634,7 @@ namespace TaskMenager.Client.Controllers
             try
             {
                 var newPeriod = new PeriodReportViewModel();
+                newPeriod.ConfigurationApprovedHours = approvalConfiguration.ReportApproval;
                 newPeriod.Directorates = this.directorates.GetDirectoratesNames(null)
                                .Select(a => new SelectListItem
                                {
@@ -674,6 +719,7 @@ namespace TaskMenager.Client.Controllers
                 newReport.StartDate = model.StartDate.Date;
                 newReport.EndDate = model.EndDate.Date;
                 newReport.WithDepTabs = model.WithDepTabs;
+                newReport.OnlyApprovedHours = approvalConfiguration.ReportApproval ? model.OnlyApprovedHours : false;
                 return await ExportReport(newReport);
             }
             catch (Exception)
@@ -695,7 +741,7 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
-                var tasksList = await this.tasks.ExportTasksAsync(model.EmployeesIds, model.StartDate, model.EndDate);
+                var tasksList = await this.tasks.ExportTasksAsync(model.EmployeesIds, model.StartDate, model.EndDate, model.OnlyApprovedHours);
 
                 if (tasksList.Count < 1)
                 {
@@ -739,7 +785,7 @@ namespace TaskMenager.Client.Controllers
                 {
                     director.DepartmentId = 999;
                 }
-                
+
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var stream = new System.IO.MemoryStream();
                 using (ExcelPackage package = new ExcelPackage(stream))
@@ -752,7 +798,7 @@ namespace TaskMenager.Client.Controllers
                             worksheet.View.ZoomScale = 70;
                             try
                             {
-                                 worksheet.Name = "Разширен отчет";
+                                worksheet.Name = "Разширен отчет";
                             }
                             catch (Exception)
                             {
@@ -775,13 +821,13 @@ namespace TaskMenager.Client.Controllers
 
                             else
                             {
-                               var adminUnitName = (currentUser.RoleName == SuperAdmin || currentUser.RoleName == DirectorateAdmin) ? directorate.TextValue : currentUser.DepartmentName;
+                                var adminUnitName = (currentUser.RoleName == SuperAdmin || currentUser.RoleName == DirectorateAdmin) ? directorate.TextValue : currentUser.DepartmentName;
                                 worksheet.Cells[1, 1].Value = ((currentUser.RoleName == SuperAdmin || currentUser.RoleName == DirectorateAdmin) ? "Дирекция: \"" : "Отдел: \"") + adminUnitName + "\"  (" + model.StartDate.Date.ToString("dd/MM/yyyy") + "г. - " + model.EndDate.Date.ToString("dd/MM/yyyy") + "г.)";
                             }
                             worksheet.Cells[1, 1].Style.Font.Size = 14;
                             worksheet.Cells[1, 1].Style.Font.Bold = true;
                             //дотук се създава първия ред за отдела в екселския файл
-                            
+
                             await DrawExpertsData(tasksList, allExperts.OrderBy(e => e.Id), worksheet);
                         }
 
@@ -789,7 +835,7 @@ namespace TaskMenager.Client.Controllers
                     else
                     {
                         foreach (var department in departmentsList)
-                        {     
+                        {
                             if (allExperts.Where(s => s.DepartmentId == department.Id && s.SectorId == null).ToList().Count() > 0)   //ако има експерти в отдела
                             {
                                 ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
@@ -989,7 +1035,7 @@ namespace TaskMenager.Client.Controllers
                     var curentColegue = task.Colleagues.Where(cl => cl.Id == eId).FirstOrDefault();
                     if (curentColegue != null)
                     {
-                        if (curentColegue.InTimeRecord==false && dateConfiguration.CheckRegistrationDate)
+                        if (curentColegue.InTimeRecord == false && dateConfiguration.CheckRegistrationDate)
                         {
                             worksheet.Cells[row, taskExpertsColumn].Style.Fill.PatternType = ExcelFillStyle.Gray125;
                             worksheet.Cells[row, taskExpertsColumn].Style.Fill.BackgroundColor.SetColor(Color.Red);
@@ -1006,7 +1052,7 @@ namespace TaskMenager.Client.Controllers
                 }
                 string sufix = GetSufixByEmpCount(taskExpertsColumn);
                 var reminder = ((taskExpertsColumn - 2) % 26);
-                
+
                 formula = "=SUM(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : (sufix + ((char)('A' + reminder)).ToString())) + (row).ToString() + ")";  //общо часове по задачата
                 worksheet.Cells[row, taskExpertsColumn].Formula = formula;
 
@@ -1080,8 +1126,8 @@ namespace TaskMenager.Client.Controllers
                 worksheet.Cells[row, 5].Value = "Брой задачи по които е работено";
                 for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                 {
-                    var sufixCounta = GetSufixByEmpCount(col+1);
-                    var reminderCounta = ((col-1) % 26);
+                    var sufixCounta = GetSufixByEmpCount(col + 1);
+                    var reminderCounta = ((col - 1) % 26);
 
 
                     formula = "=COUNTA(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixCounta + ((char)('A' + reminderCounta)).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixCounta + ((char)('A' + reminderCounta)).ToString())) + (row - 1).ToString() + ")";
@@ -1092,7 +1138,7 @@ namespace TaskMenager.Client.Controllers
                 worksheet.Cells[row, taskExpertsColumn].Style.Numberformat.Format = "0.00";
 
                 var sufixAverage = GetSufixByEmpCount(taskExpertsColumn);
-                var reminderAverage = ((taskExpertsColumn-2) % 26);
+                var reminderAverage = ((taskExpertsColumn - 2) % 26);
                 formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : (sufixAverage + ((char)('A' + reminderAverage)).ToString())) + (row).ToString() + ")";
                 //formula = "=AVERAGE(F" + (row).ToString() + ":" + (taskExpertsColumn <= 27 ? ((char)('A' + (taskExpertsColumn - 2))).ToString() : ("A" + ((char)('A' + (taskExpertsColumn - 28))).ToString())) + (row).ToString() + ")";
 
@@ -1105,7 +1151,7 @@ namespace TaskMenager.Client.Controllers
                 modelTableBroiZadachi.Style.Fill.PatternType = ExcelFillStyle.Solid;
                 modelTableBroiZadachi.Style.Fill.BackgroundColor.SetColor(Color.Orange);
 
-                sufixAverage = GetSufixByEmpCount(taskExpertsColumn+2);
+                sufixAverage = GetSufixByEmpCount(taskExpertsColumn + 2);
                 reminderAverage = (taskExpertsColumn % 26);
                 formula = "=AVERAGE(" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : (sufixAverage + ((char)('A' + reminderAverage)).ToString())) + "3:" + (taskExpertsColumn <= 25 ? ((char)('A' + (taskExpertsColumn))).ToString() : (sufixAverage + ((char)('A' + reminderAverage)).ToString())) + (row - 1).ToString() + ")";   // ако има повече от 19 човека в сектора се променя генерацията на колоната
                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Numberformat.Format = "0.00";
@@ -1118,7 +1164,7 @@ namespace TaskMenager.Client.Controllers
                 worksheet.Cells[row, 5].Value = "Общо часове на служителя";
                 for (int col = 6; col < taskExpertsColumn; col++)   // taskExpertsColumn сочи колоната "Общо колко часа е работено..."
                 {
-                    var sufixSum = GetSufixByEmpCount(col+1);
+                    var sufixSum = GetSufixByEmpCount(col + 1);
                     var reminderSum = ((col - 1) % 26);
 
                     formula = "=SUM(" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixSum + ((char)('A' + reminderSum)).ToString())) + "3:" + (col <= 26 ? ((char)('A' + (col - 1))).ToString() : (sufixSum + ((char)('A' + reminderSum)).ToString())) + (row - 2).ToString() + ")";
@@ -1266,7 +1312,7 @@ namespace TaskMenager.Client.Controllers
                         modelOtpuski.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                         row = rowBeforeOtpuski;
                     }
-                     
+
                     //Графики начало
                     ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
 
@@ -1493,15 +1539,31 @@ namespace TaskMenager.Client.Controllers
                     return RedirectToAction("UsersList", "Users");
                 }
 
-                model.PersonalDateList = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
-                model = SetDateConfiguration(model);
-
-                if (model.PersonalDateList.WorkedHoursByTaskByPeriod.Count < 1)
+                var reportuser = await this.employees.GetEmployeeByIdAsync(model.userId);
+                if (currentUser.RoleName == SuperAdmin || currentUser.Id == reportuser.Id || (currentUser.RoleName == DirectorateAdmin && currentUser.DirectorateId == reportuser.DirectorateId) || (currentUser.RoleName == DepartmentAdmin && currentUser.DepartmentId == reportuser.DepartmentId) || (currentUser.RoleName == SectorAdmin && currentUser.SectorId == reportuser.SectorId))
                 {
-                    TempData["Error"] = $"Няма задачи по които да е работил/а {model.PersonalDateList.FullName} за избрания период";
+                    model.ReportApproval = this.approvalConfiguration.ReportApproval;
+                    model.UserCanApprove = true;
+                    if (currentUser.Id == reportuser.Id && (currentUser.RoleName != SuperAdmin && currentUser.RoleName != DirectorateAdmin))
+                    {
+                        model.UserCanApprove = false;
+                    }
+                    
+                    model.PersonalDateList = await this.employees.GetPersonalReport(model.userId, model.StartDate.Date, model.EndDate.Date);
+                    model = SetDateConfiguration(model);
+
+                    if (model.PersonalDateList.WorkedHoursByTaskByPeriod.Count < 1)
+                    {
+                        TempData["Error"] = $"Няма задачи по които да е работил/а {model.PersonalDateList.FullName} за избрания период";
+                        return RedirectToAction("UsersList", "Users");
+                    }
+                    return View(model);
+                }
+                else
+                {
+                    TempData["Error"] = $"Нямате достатъчно права, за да видите отчета на {reportuser.FullName} за избрания период";
                     return RedirectToAction("UsersList", "Users");
                 }
-                return View(model);
                 //return ExportSpravkaForEmployee(employeeWorkForPeriod, model.StartDate.Date, model.EndDate.Date);
             }
             catch (Exception)
@@ -1757,6 +1819,96 @@ namespace TaskMenager.Client.Controllers
         }
 
         #region API Calls
+        [Authorize(Policy = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> AcceptDateReport(int userId, DateTime workDate)
+        {
+            try
+            {
+
+                var userToEvaluate = await this.employees.GetEmployeeByIdAsync(userId);
+                var controlDate = DateTime.ParseExact("01/01/2000", "dd/MM/yyyy", null);
+                if (userToEvaluate == null)
+                {
+                    return Json(new { success = false, message = ($"Няма потребител с N: {userId}" + Environment.NewLine) });
+                }
+                if (workDate.Date < controlDate.Date)
+                {
+                    return Json(new { success = false, message = ($"Невалидна дата: {workDate.Date}" + Environment.NewLine) });
+                }
+                if (currentUser.RoleName == DataConstants.Employee || (currentUser.Id == userToEvaluate.Id && (currentUser.RoleName != SuperAdmin && currentUser.RoleName != DirectorateAdmin)))
+                {
+                    return Json(new { success = false, message = ("Недостатъчни права -" + Environment.NewLine) });
+                }
+                if (currentUser.RoleName == SuperAdmin || (currentUser.RoleName == DirectorateAdmin && currentUser.DirectorateId == userToEvaluate.DirectorateId) || (currentUser.RoleName == DepartmentAdmin && currentUser.DepartmentId == userToEvaluate.DepartmentId) || (currentUser.RoleName == SectorAdmin && currentUser.SectorId == userToEvaluate.SectorId))
+                {
+                    var result = await this.tasks.ApproveTaskForDate(currentUser.Id, userId, workDate.Date);
+                    if (result)
+                    {
+                        return Json(new { success = true, message = ($"Отчета за дата: {workDate.Date.ToString("dd/MM/yyyy")} е одобрен" + Environment.NewLine) });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = ("[Service error] ApproveTaskForDate" + Environment.NewLine) });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, message = ("Недостатъчни права" + Environment.NewLine) });
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { success = false, message = (ex.Message + Environment.NewLine) });
+            }
+
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> RejectDateReport(int userId, DateTime workDate)
+        {
+            try
+            {
+                var userToEvaluate = await this.employees.GetEmployeeByIdAsync(userId);
+                var controlDate = DateTime.ParseExact("01/01/2000", "dd/MM/yyyy", null);
+                if (userToEvaluate == null)
+                {
+                    return Json(new { success = false, message = ($"Няма потребител с N: {userId}" + Environment.NewLine) });
+                }
+                if (workDate.Date < controlDate.Date)
+                {
+                    return Json(new { success = false, message = ($"Невалидна дата: {workDate.Date}" + Environment.NewLine) });
+                }
+                if (currentUser.RoleName == DataConstants.Employee || (currentUser.Id == userToEvaluate.Id && (currentUser.RoleName != SuperAdmin && currentUser.RoleName != DirectorateAdmin)))
+                {
+                    return Json(new { success = false, message = ("Недостатъчни права -" + Environment.NewLine) });
+                }
+                if (currentUser.RoleName == SuperAdmin || (currentUser.RoleName == DirectorateAdmin && currentUser.DirectorateId == userToEvaluate.DirectorateId) || (currentUser.RoleName == DepartmentAdmin && currentUser.DepartmentId == userToEvaluate.DepartmentId) || (currentUser.RoleName == SectorAdmin && currentUser.SectorId == userToEvaluate.SectorId))
+                {
+                    var result = await this.tasks.RejectTaskForDate(currentUser.Id, userId, workDate.Date);
+                    if (result)
+                    {
+                        return Json(new { success = true, message = ($"Отчета за дата: {workDate.Date.ToString("dd/MM/yyyy")} e върнат за доработка" + Environment.NewLine) });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = ("[Service error] ApproveTaskForDate" + Environment.NewLine) });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, message = ("Недостатъчни права" + Environment.NewLine) });
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { success = false, message = (ex.Message + Environment.NewLine) });
+            }
+
+        }
 
         #endregion
 

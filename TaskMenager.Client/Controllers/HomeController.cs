@@ -25,50 +25,15 @@ namespace TaskMenager.Client.Controllers
 {
     public class HomeController : BaseController
     {
-        //private readonly ILogger<HomeController> _logger;
-        //private readonly IEmployeesService employees;
-        //private readonly IRolesService roles;
         private readonly IManageFilesService files;
-        //private readonly ITasksService tasks;
+        private readonly IApprovalConfiguration approvalConfiguration;
 
-        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IManageFilesService files, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IManageFilesService files, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
-            //_logger = logger;
             this.files = files;
-            //this.roles = roles;
-            //this.tasks = tasks;
-        }
+            this.approvalConfiguration = _approvalConfiguration;
+         }
 
-
-        
-        //public async Task<IActionResult> Index()
-        //{
-        //    if (this.User.Claims.Any(cl => cl.Value == "Guest"))
-        //    {
-        //       return RedirectToAction("WellCome", "Users");
-        //    }
-
-
-        //    if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
-        //    {
-        //        TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
-        //        return RedirectToAction("NotAuthorized", "Base");
-        //    }
-
-        //    var currentEmployee = new UserTasksViewModel()
-        //    {
-        //        userId = currentUser.Id,
-        //        ActiveTasks = await this.employees.GetUserActiveTaskAsync(currentUser.Id),
-        //        //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
-        //    };
-        //    foreach (var task in currentEmployee.ActiveTasks)
-        //    {
-        //        task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
-        //    }
-
-        //    currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
-        //    return View(currentEmployee);
-        //}
 
         public IActionResult Index()
         {
@@ -88,50 +53,7 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
-        //public async Task<IActionResult> Index(int? userId, DateTime? workDate)
-        //{
-        //    if (this.User.Claims.Any(cl => cl.Value == "Guest"))
-        //    {
-        //        return RedirectToAction("WellCome", "Users");
-        //    }
 
-
-        //    if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
-        //    {
-        //        TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
-        //        return RedirectToAction("NotAuthorized", "Base");
-        //    }
-
-        //    int identityId = userId.HasValue ? userId.Value : currentUser.Id;
-        //    DateTime dateToProcess = workDate.HasValue ? workDate.Value.Date : DateTime.Now.Date;
-
-        //    if (identityId != currentUser.Id)
-        //    {
-        //        var dominions = await this.employees.GetUserDominions(currentUser.Id);
-        //        if (!dominions.Any(d => d.Id == identityId))
-        //        {
-        //            var targetEmployee = await this.employees.GetEmployeeByIdAsync(identityId);
-        //            TempData["Error"] = $"[Index]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
-        //            return RedirectToAction("Index", "Home");
-        //        }
-        //    }
-
-
-        //    var currentEmployee = new UserTasksViewModel()
-        //    {
-        //        userId = identityId,
-        //        workDate = dateToProcess.Date,
-        //        ActiveTasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
-        //        //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
-        //    };
-        //    foreach (var task in currentEmployee.ActiveTasks)
-        //    {
-        //        task.FilesCount = this.files.GetFilesInDirectory(task.Id).Count();
-        //    }
-
-        //    currentEmployee.totalHoursPerDay = currentEmployee.ActiveTasks.Sum(at => at.EmployeeHoursToday);
-        //    return View(currentEmployee);
-        //}
 
         public IActionResult Privacy()
         {
@@ -160,6 +82,7 @@ namespace TaskMenager.Client.Controllers
                 userId = identityId,
                 workDate = dateToProcess.Date,
                 ActiveTasks =await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date),
+                ReportApproval = this.approvalConfiguration.ReportApproval
                 //AssignerTasks = await this.employees.GetUserAssignerTaskAsync(currentUser.Id)
             };
             foreach (var task in currentEmployee.ActiveTasks.Where(at => at.TaskTypeName != TaskTypeSystem).ToList())

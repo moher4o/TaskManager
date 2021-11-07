@@ -13,6 +13,7 @@
 @{ string systemtaskname = string.Empty; ;}
 @{ string dateMetaInfo = string.Empty;}
 @{ string systemtaskMetaInfo = string.Empty;}
+@Html.HiddenFor(model => model.userId, new { id = "employeeId" })
 @*@{ bool lateReport = false;}*@
 
 <div class="PrimeBox2 widthmobile" style="max-width:100%; position:relative; background-color:ghostwhite; margin-top:10px !important">
@@ -41,14 +42,20 @@
                             dateList.Add(item.WorkDate.Date);
                         }
                     }
-                    <th style="width:5%;">Общо</th>
+                    <th style="width: 5%; text-align: center">Общо</th>
+                    @if (Model.ReportApproval)
+                    {
+                        <th style="width: 5%; text-align:center">Приет отчет</th>
+                    }
+
                 </tr>
             </thead>
             <tbody style="display: block;">
 
                 @foreach (var worckedDate in dateList)
                 {
-                    //lateReport = false;
+                    var approvalAdmin = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date && w.HoursSpend > 0).Select(t => t.ApprovedAdminName).FirstOrDefault();
+                    var isapproved = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date).All(t => t.ApprovedRecord == true);
                     systemtaskname = string.Empty;
                     ropacity = "1.00";
                     rcolor = string.Empty;
@@ -82,14 +89,19 @@
                         <tr style=" display: table; width: 100%; table-layout: fixed; background-color:@(rcolor); opacity:@(ropacity.ToString());">
                             <td style="width:7%; background-color:ghostwhite; opacity:1.00 !important;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
                             <td colspan="@(TaskList.Count)" class="@((!currentTask.inTimeRecord && Model.CheckRegistrationDate) ? (currentTask.taskName == "Отпуски" ? "otpuski tooltip-red" : "bolnichni tooltip-red") : "") tooltip-big-text" data-balloon-length=" xxlarge" aria-label=@(currentTask.inTimeRecord ? "" : systemtaskMetaInfo) data-balloon-pos="up"></td>
-                            <td style="background-color:ghostwhite; font-size: smaller; width: 5%; text-align: center;">@systemtaskname</td>
+                            <td style="background-color:ivory; font-size: smaller; width: 5%; text-align: center;">@systemtaskname</td>
+                            @if (Model.ReportApproval)
+                            {
+                                approvalAdmin = "Приел отчета-" + approvalAdmin;
+                                approvalAdmin = approvalAdmin.Replace(" ", "_");
+                                <td style="background-color:ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
+                            }
                         </tr>
                     }
                     else
                     {
-
-                        <tr style=" display: table; width: 100%; table-layout: fixed; /* even columns width , fix width of table too*/ ">
-                            <td style="width:7%; background-color:ghostwhite; opacity:1.00 !important;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
+                        <tr style=" display: table; width: 100%; table-layout: fixed; @(Model.ReportApproval && isapproved ? "background-color:#f3fff3;" : "") /* even columns width , fix width of table too*/ ">
+                            <td class="rowdate" style="width:7%; background-color:ghostwhite; opacity:1.00 !important;">@worckedDate.Date.ToString("dd/MM/yyyy")</td>
                             @foreach (var id in TaskList)
                             {
                                 dateMetaInfo = string.Empty;
@@ -109,16 +121,22 @@
                                     }
 
 
-                                    <td style="text-align: center;   @(dateMetaInfo.Length != 0 ? "background-color:#fee9e9; color:red;" : "")" class="tooltip-big-text @(dateMetaInfo.Length != 0 ? "tooltip-red" : "")" data-balloon-length="xxlarge" aria-label=@dateMetaInfo data-balloon-pos="up"><strong>@(hours > 0 ? hours.ToString() : "")</strong></td>
+                                    <td style="text-align: center;   @(dateMetaInfo.Length != 0 ? "background-color:#fee9e9; color:red;" : "")" class="tooltip-big-text @(dateMetaInfo.Length != 0 ? "" : "setcolor")" @(dateMetaInfo.Length != 0 ? "tooltip-red" : "") data-balloon-length="xxlarge" aria-label=@dateMetaInfo data-balloon-pos="up"><strong>@(hours > 0 ? hours.ToString() : "")</strong></td>
                                     //@(hours > 0 ? hours.ToString() : "")
                                 }
                                 else
                                 {
-                                    <td></td>
+                                    <td class="setcolor"></td>
                                     //style = "@(dateMetaInfo.Length!=0 ? "background - color:#fee9e9; color:red;" : "")"    @(lateReport ? "systemlate" : "")
                                 }
                             }
                             <td style="background-color: ivory; font-size: medium; width: 5%; text-align: center;"><strong>@sum</strong></td>
+                            @if (Model.ReportApproval)
+                            {
+                                approvalAdmin = "Приел отчета-" + approvalAdmin;
+                                approvalAdmin = approvalAdmin.Replace(" ", "_");
+                                <td style="background-color: ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
+                            }
                         </tr>
                     }
                 }
@@ -132,6 +150,10 @@
                         sum += hours;
                     }
                     <td style="width: 5%; text-align: center;"><strong>@sum</strong></td>
+                    @if (Model.ReportApproval)
+                    {
+                        <td style="width: 5%; text-align: center;"><strong></strong></td>
+                    }
                 </tr>
             </tbody>
         </table>
@@ -156,6 +178,7 @@
     </div>
 </div>
 <link href="~/css/report.css" rel="stylesheet">
+<script src="~/js/pperiodreport.js"></script>
 <script src="~/js/core.js"></script>
 <script src="~/js/charts.js"></script>
 <script src="~/js/animated.js"></script>

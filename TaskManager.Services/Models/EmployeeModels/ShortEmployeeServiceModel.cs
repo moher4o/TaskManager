@@ -31,7 +31,9 @@ namespace TaskManager.Services.Models.EmployeeModels
                                                 Text = wh.Text,
                                                 WorkDate = wh.WorkDate,
                                                 RegistrationDate = wh.RegistrationDate,
-                                                InTimeRecord = wh.InTimeRecord
+                                                InTimeRecord = wh.InTimeRecord,
+                                                ApprovedRecord = wh.Approved,
+                                                ApprovedAdminName = wh.Approved ? wh.ApprovedByAdmnin.FullName : string.Empty
                                             })
                                             .ToList()));
         }

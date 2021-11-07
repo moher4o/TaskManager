@@ -519,7 +519,8 @@ namespace TaskMenager.Client.Controllers
                     DirectorateName = u.DirectorateName,
                     DepartmentName = u.DepartmentName,
                     SectorName = u.SectorName,
-                    TelephoneNumber = u.TelephoneNumber
+                    TelephoneNumber = u.TelephoneNumber,
+                    MobileNumber = u.MobileNumber
                 }).ToList();
                 foreach (var user in data)
                 {

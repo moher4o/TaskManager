@@ -19,5 +19,9 @@ namespace TaskManager.Services.Models.ReportModels
         public DateTime? RegistrationDate { get; set; }
 
         public bool InTimeRecord { get; set; } = true;
+
+        public bool ApprovedRecord { get; set; } = false;
+
+        public string ApprovedAdminName { get; set; }
     }
 }

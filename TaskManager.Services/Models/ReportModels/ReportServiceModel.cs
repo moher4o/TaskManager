@@ -40,6 +40,7 @@ namespace TaskManager.Services.Models.ReportModels
             int[] employeesIds = new int[1];
             DateTime startDate = DateTime.Now.Date.AddDays(-1);
             DateTime endDate = DateTime.Now.Date;
+            bool onlyApprovedHours = false;
             profile.CreateMap<Task, ReportServiceModel>()
                    .ForMember(u => u.TaskStatusName, cfg => cfg.MapFrom(s => s.TaskStatus.StatusName))
                    .ForMember(u => u.TaskTypeName, cfg => cfg.MapFrom(s => s.TaskType.TypeName))
@@ -56,7 +57,7 @@ namespace TaskManager.Services.Models.ReportModels
                                                                InTimeRecord = e.Employee.WorkedHoursByTask
                                                                .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date).All(ir => ir.InTimeRecord == true),
                                                                TaskWorkedHours = e.Employee.WorkedHoursByTask
-                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date).Sum(wh => wh.HoursSpend),
+                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date && (onlyApprovedHours ? t.Approved == true : true)).Sum(wh => wh.HoursSpend),
                                                                UserNotesForPeriod = string.Join(" | ", e.Employee.WorkedHoursByTask
                                                                .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date && !string.IsNullOrEmpty(t.Text)).Select(wh => wh.Text).ToArray())
                                                            })

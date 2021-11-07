@@ -294,23 +294,3 @@ function CloseModalOutside() {
     });
 }
 
-//<a style='cursor:pointer; padding-left:3px; min-width:20%;'
-//    onclick=CustomSearch('${row.id}') title = 'Подзадачи' ${ (row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : "" }>
-//                            <img class="chatnotifications2" src="../png/child.png" />
-//                            <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
-//</a >
-
-//<a style='cursor:pointer; padding-left:5px; min-width:22%;'
-//    onclick=CustomSearch('${row.id}') title = 'Подзадачи' ${ (row.parentTaskId > 0 || row.typeId != 7) ? "hidden" : "" }>
-//                            <img class="chatnotifications" src="../png/child.png" />
-//                            <span class="notificationsTodayCountValue" ${row.childrenCount > 0 ? "" : "hidden"}>${row.childrenCount}</span>
-//                        </a >
-
-                       //<a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:15px; min-width:20%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
-                        //    <img class="chatnotifications" src="../png/info2.png" />
-                        //</a>
-
-                        //<a href="${path}TaskDetails?taskId=${row.id}" style='cursor:pointer; padding-left:12px; min-width:15%;' title='Информация' ${row.typeId == 8 ? "hidden" : ""}>
-                        //    <img class="chatnotifications" src="../png/info2.png" />
-                        //</a>
-

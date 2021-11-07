@@ -23,6 +23,8 @@
     <Compile Remove="Migrations\20210120113319_RoleNameChange.Designer.cs" />
     <Compile Remove="Migrations\20210417070555_notify.cs" />
     <Compile Remove="Migrations\20210417070555_notify.Designer.cs" />
+    <Compile Remove="Migrations\20211101091702_approval.cs" />
+    <Compile Remove="Migrations\20211101091702_approval.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
