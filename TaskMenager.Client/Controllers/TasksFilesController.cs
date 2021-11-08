@@ -112,7 +112,6 @@ namespace TaskMenager.Client.Controllers
             return Json(result);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> UploadFiles(IFormFile file1, int taskId)
         {

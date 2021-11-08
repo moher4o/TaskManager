@@ -55,6 +55,10 @@
                 @foreach (var worckedDate in dateList)
                 {
                     var approvalAdmin = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date && w.HoursSpend > 0).Select(t => t.ApprovedAdminName).FirstOrDefault();
+                    if (approvalAdmin == null)
+                    {
+                        approvalAdmin = "Служебно приет";
+                    }
                     var isapproved = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(w => w.WorkDate.Date == worckedDate.Date).All(t => t.ApprovedRecord == true);
                     systemtaskname = string.Empty;
                     ropacity = "1.00";
@@ -94,7 +98,7 @@
                             {
                                 approvalAdmin = "Приел отчета-" + approvalAdmin;
                                 approvalAdmin = approvalAdmin.Replace(" ", "_");
-                                <td style="background-color:ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
+                        <td style="background-color:ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" style="cursor:@(Model.UserCanApprove ? "pointer" : "")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
                             }
                         </tr>
                     }
@@ -135,7 +139,7 @@
                             {
                                 approvalAdmin = "Приел отчета-" + approvalAdmin;
                                 approvalAdmin = approvalAdmin.Replace(" ", "_");
-                                <td style="background-color: ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
+                        <td style="background-color: ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" style="cursor:@(Model.UserCanApprove ? "pointer" : "")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
                             }
                         </tr>
                     }

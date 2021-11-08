@@ -20,5 +20,7 @@ namespace TaskManager.Services
         bool DeleteFile(int taskId, string fileName);
 
         Task<byte[]> ExportFile(int taskId, string fileName);
+
+        Task<string> MessageOnStart();
     }
 }

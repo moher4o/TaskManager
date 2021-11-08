@@ -568,5 +568,21 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<bool> MarkUserReadMessage(int userId)
+        {
+            try
+            {
+            var currentuser = await this.db.Employees.Where(u => u.Id == userId).FirstOrDefaultAsync();
+            currentuser.MessageReaded = true;
+            await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+        }
+
     }
 }

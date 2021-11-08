@@ -12,5 +12,7 @@ namespace TaskManager.Services
 
         string Location { get; set; }
 
+        string MessageFileName { get; set; }
+
     }
 }

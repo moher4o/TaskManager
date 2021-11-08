@@ -51,6 +51,7 @@ namespace TaskManager.Services.Models
 
         public string RepresentativeName { get; set; }
 
+        public bool MessageReaded { get; set; }
 
         public void ConfigureMapping(Profile profile)
         {

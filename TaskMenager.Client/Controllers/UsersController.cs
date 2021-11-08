@@ -23,13 +23,15 @@ namespace TaskMenager.Client.Controllers
         private readonly ISectorsService sectors;
         private readonly IRolesService roles;
         private readonly ITitleService jobTitles;
-        public UsersController(IEmployeesService employees, ITitleService jobTitles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        private readonly IManageFilesService files;
+        public UsersController(IManageFilesService _files, IEmployeesService employees, ITitleService jobTitles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.roles = roles;
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
             this.jobTitles = jobTitles;
+            this.files = _files;
         }
 
         [Authorize(Policy = "Guest")]
@@ -471,17 +473,28 @@ namespace TaskMenager.Client.Controllers
         }
 
         [HttpGet]
-        public IActionResult UserExistStatus()
+        public async Task<IActionResult> UserExistStatus()
         {
             string logedUserAccaunt = this.User.Identities.FirstOrDefault().Name.ToLower();
             var currentEmployee = this.employees.GetUserDataForCooky(logedUserAccaunt);
-            bool result = false;
+            //bool result = false;
             if (currentEmployee != null)
             {
-                result = true;
-
+                //result = true;
+                if (currentEmployee.isActive && !currentEmployee.MessageReaded)
+                {
+                        var message = await this.files.MessageOnStart();
+                    if (message != "notfound")
+                    {
+                        await this.employees.MarkUserReadMessage(currentEmployee.Id);
+                        return Json(new { success = true, message = (message + Environment.NewLine) });
+                    }
+                    return Json(new { success = false, message = ("Съобщението не беше намерено!") });
+                }
+                return Json(new { success = true, message = ("") });
             }
-            return Json(result);
+            return Json(new { success = false, message = ("") });
+            //return Json(result);
         }
 
         [Authorize(Policy = "Admin")]

@@ -59,5 +59,7 @@ namespace TaskManager.Services
         Task<bool> AddAllToSystemTasksAsync();
 
         Task<IEnumerable<TaskFewInfoServiceModel>> GetAllUserTaskAsync(int userId, DateTime dateToProcess);
+
+        Task<bool> MarkUserReadMessage(int userId);
     }
 }

@@ -186,6 +186,24 @@ namespace TaskManager.Services.Implementations
                 return null;
             }
         }
+
+        public async Task<string> MessageOnStart()
+        {
+            string globalPath = fileConfiguration.MessageFileName;
+            var messageText = string.Empty;
+            try
+            {
+                using (var sr = new StreamReader(globalPath))
+                {
+                    messageText = await sr.ReadToEndAsync();
+                }
+                return messageText;
+            }
+            catch (Exception)
+            {
+                return "notfound";
+            }
+        }
     }
 }
 

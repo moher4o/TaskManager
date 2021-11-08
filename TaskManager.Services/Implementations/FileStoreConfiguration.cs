@@ -11,5 +11,7 @@ namespace TaskManager.Services.Implementations
         public long TaskDirectorySize { get; set; }
 
         public string Location { get; set; }
+
+        public string MessageFileName { get; set; }
     }
 }
