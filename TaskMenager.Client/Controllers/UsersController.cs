@@ -445,7 +445,7 @@ namespace TaskMenager.Client.Controllers
             return View();
         }
 
-         #region API Calls
+        #region API Calls
         [HttpGet]
         public IActionResult GetDepartments(string direktorateId)
         {
@@ -473,29 +473,39 @@ namespace TaskMenager.Client.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UserExistStatus()
+        public async Task<IActionResult> UserExistStatus()             //Внимание! Извиква се от _Layout и от WellCome
         {
             string logedUserAccaunt = this.User.Identities.FirstOrDefault().Name.ToLower();
             var currentEmployee = this.employees.GetUserDataForCooky(logedUserAccaunt);
-            //bool result = false;
             if (currentEmployee != null)
             {
-                //result = true;
                 if (currentEmployee.isActive && !currentEmployee.MessageReaded)
                 {
-                        var message = await this.files.MessageOnStart();
+                    var message = await this.files.MessageOnStart();
                     if (message != "notfound")
                     {
                         await this.employees.MarkUserReadMessage(currentEmployee.Id);
                         return Json(new { success = true, message = (message + Environment.NewLine) });
                     }
-                    return Json(new { success = false, message = ("Съобщението не беше намерено!") });
+                    return Json(new { success = true, message });
                 }
                 return Json(new { success = true, message = ("") });
             }
             return Json(new { success = false, message = ("") });
-            //return Json(result);
         }
+
+        //[HttpGet]
+        //public IActionResult UserExistStatus()
+        //{
+        //    string logedUserAccaunt = this.User.Identities.FirstOrDefault().Name.ToLower();
+        //    var currentEmployee = this.employees.GetUserDataForCooky(logedUserAccaunt);
+        //    bool result = false;
+        //    if (currentEmployee != null)
+        //    {
+        //        result = true;
+        //    }
+        //    return Json(result);
+        //}
 
         [Authorize(Policy = "Admin")]
         [HttpGet]
@@ -638,7 +648,7 @@ namespace TaskMenager.Client.Controllers
             });
             return Json(new { data });
         }
-            #endregion
+        #endregion
 
-        }
     }
+}

@@ -27,7 +27,7 @@
                     window.location.href = `${path}Register`;
                 }
                 else {
-                    window.location.href = `https://staging.egov.bg/wps/portal/egov/home`;
+                    window.location.href = `https://egov.bg`;
                 }
             });
         }
@@ -50,12 +50,13 @@
                     closeOnClickOutside: false,
                     buttons: [false, "Ok"],
                 }).then((willRegister) => {
-                    window.location.href = `https://staging.egov.bg/wps/portal/egov/home`;
+                    //window.location.href = `https://staging.egov.bg/wps/portal/egov/home`;
+                    window.location.href = `https://egov.bg`;
                 });
             }
             else {
                 $.getJSON('\UserExistStatus', { get_param: 'value' }, function (data) {
-                    if (data) {
+                    if (data.success) {
                         const loc = window.location.href;
                         const path = loc.substr(0, loc.lastIndexOf('/') + 1);
                         window.location.href = `${path}Register`;

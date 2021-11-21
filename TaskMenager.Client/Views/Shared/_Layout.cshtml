@@ -203,7 +203,7 @@
                     <a asp-controller="Report" asp-action="PhonesAndEmails"><i class="fas fa-phone"></i>Тел. указател</a>
                 </li>
 
-                <li @(User.Identities.Any(u => u.Name.Contains("avukov") || u.Name.Contains("samso")) ? "" : "hidden")>
+                <li @(User.Identities.Any(u => (u.Name.Contains("avukov") || u.Name.Contains("samso")) && u.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() == "Ангел Иванов Вуков") ? "" : "hidden")>
                     <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-cog"></i>
                         <span class="chatnotifications">Разработчик</span>
@@ -312,8 +312,10 @@
             let urlNotActive = path + "\\Users\\GetNotActivatedUsers";
 
             //$.getJSON(urlExist, { get_param: 'value' }, function (data) {
+            //    console.log(data);
             //    if (data) {
             //        $.getJSON(urlNotActive, { get_param: 'value' }, function (data) {
+            //            console.log(data);
             //            if (data.data.length > 0) {
             //                $('#notActiveCount').removeAttr("hidden")
             //                $('#notActiveCount').text(data.data.length);
@@ -327,12 +329,21 @@
             //        });
             //    }
             //});
+
             $.getJSON(urlExist, { get_param: 'value' }, function (data) {
+                console.log(data);
                 if (data.success) {
                     if (data.message.length > 0) {
-                        swal("Информация", data.message, "info");
+                        if (data.message != "notfound") {
+                            swal("Информация", data.message, "info");
+                        }
+                        else {
+                            toastr.error("Съобщението не беше намерено!", { timeOut: 10000 });
+                        }
+                        
                     }
                     $.getJSON(urlNotActive, { get_param: 'value' }, function (data) {
+                        console.log(data);
                         if (data.data.length > 0) {
                             $('#notActiveCount').removeAttr("hidden")
                             $('#notActiveCount').text(data.data.length);
@@ -345,11 +356,11 @@
                         }
                     });
                 }
-                else {
-                    if (data.message.length > 0) {
-                        toastr.error(data.message, { timeOut: 10000 });
-                    }
-                }
+                //else {
+                //    if (data.message.length > 0) {
+                //        toastr.error(data.message, { timeOut: 10000 });
+                //    }
+                //}
             });
 
         });
