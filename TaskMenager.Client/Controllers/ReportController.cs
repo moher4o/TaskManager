@@ -1821,6 +1821,7 @@ namespace TaskMenager.Client.Controllers
         #region API Calls
         [Authorize(Policy = "Admin")]
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AcceptDateReport(int userId, DateTime workDate)
         {
             try
@@ -1867,6 +1868,7 @@ namespace TaskMenager.Client.Controllers
 
         [Authorize(Policy = "Admin")]
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RejectDateReport(int userId, DateTime workDate)
         {
             try

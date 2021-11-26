@@ -1666,8 +1666,6 @@ namespace TaskMenager.Client.Controllers
 
         }
 
-
-
         [HttpGet]
         public async Task<IActionResult> GetHolidayDates(int userId)
         {
