@@ -12,6 +12,42 @@
     let userId = document.getElementById("employeeId").value;
 
     attachEvents();
+    acceptAll();
+
+    function acceptAll() {
+        $('.acceptall').click(function (event) {
+            if ($(this).prop('checked') == false) {             // ако е отчекнато
+
+                swal({
+                    title: "Внимание",
+                    text: "Ще бъдат върнати за доработка всички отчети за периода. Сигурни ли сте?",
+                    icon: "warning",
+                    closeOnEsc: false,
+                    buttons: ["Отказ", "Потвърждение"],
+                    dangerMode: true
+                }).then((willEdit) => {
+                    $('.canapprove:checkbox:checked').each(function (event) {
+                        $(this).trigger("click");
+                    })
+                });
+            }
+            else {
+
+                swal({
+                    title: "Внимание",
+                    text: "Ще бъдат приети всички отчети за периода. Сигурни ли сте?",
+                    icon: "warning",
+                    closeOnEsc: false,
+                    buttons: ["Отказ", "Потвърждение"],
+                    dangerMode: true
+                }).then((willEdit) => {
+                    $('.canapprove:checkbox:not(:checked)').each(function (event) {
+                        $(this).trigger("click");
+                    })
+                });
+            }
+        })
+    }
 
     function attachEvents() {
         $('.canapprove').click(function (event) {
@@ -28,8 +64,8 @@
                 $.get(url).done(function (data) {
                     if (data.success) {
                         currow.css('background-color', '#f3fff3');
-                        toastr.success(data.message);
-                    }
+                        //toastr.success(data.message);
+                     }
                     else {
                         toastr.error(data.message);
                     }
@@ -40,7 +76,7 @@
                 let url = currentUrl + '?userId=' + userId + '&workDate=' + datetoaccept.toUTCString();
                 $.get(url).done(function (data) {
                     if (data.success) {
-                        toastr.success(data.message);
+                        //toastr.success(data.message);
                         currow.css('background-color', 'ghostwhite');
                     }
                     else {
@@ -54,5 +90,15 @@
             event.preventDefault();
         })
 
+        $(".canapprove").change(function () {
+            if ($('.canapprove:checked').length == $('.canapprove').length) {
+                $('.acceptall').prop("checked", true);
+            }
+            else {
+                $('.acceptall').prop("checked", false);
+            }
+        });
     }
+
+
 });

@@ -26,5 +26,6 @@ namespace TaskManager.Services
         Task<string> EditDepartmentDetails(int depId, int directoratesId, string departmentName);
 
         bool CheckDepartmentInDirectorate(int dirId, int depId);
+        Task<string> AproveDepReportsAsync(int depId, DateTime aproveDate, int adminId);
     }
 }

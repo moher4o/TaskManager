@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace TaskMenager.Client.Models.Structure
 {
@@ -10,5 +11,6 @@ namespace TaskMenager.Client.Models.Structure
         [MaxLength(200)]
         [Required(ErrorMessage = "Полето е задължително")]
         public string DirectorateName { get; set; }
+
     }
 }

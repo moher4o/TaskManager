@@ -309,5 +309,33 @@ namespace TaskManager.Services.Implementations
                 return ex.Message;
             }
         }
+
+        public async Task<string> AproveSecReportsAsync(int unitId, DateTime aproveDate, int adminId)
+        {
+            try
+            {
+
+                var sectorToAprove = await this.db.Sectors.FirstOrDefaultAsync(d => d.Id == unitId);
+                if (sectorToAprove == null)
+                {
+                    return $"Няма сектор с номер: {unitId}";
+                }
+
+                var secEmployeesIds = await this.db.Employees.Where(e => e.SectorId == unitId && e.isDeleted == false).Select(e => e.Id).ToListAsync();
+                var reports = await this.db.WorkedHours.Where(wh => secEmployeesIds.Contains(wh.EmployeeId) && wh.isDeleted == false && wh.Approved == false && wh.WorkDate.Date <= aproveDate).ToListAsync();
+                foreach (var report in reports)
+                {
+                    report.Approved = true;
+                    report.ApprovedBy = adminId;
+                }
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }

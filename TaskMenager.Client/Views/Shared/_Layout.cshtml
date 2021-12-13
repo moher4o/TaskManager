@@ -20,7 +20,7 @@
 
     <!-- checkbox styles -->
     <link rel="stylesheet" href="~/css/CheckBox.css">
- 
+
     <!-- балонни съобщения -->
     <link rel="stylesheet" href="~/css/balloon.css">
     @*<link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">*@
@@ -93,6 +93,7 @@
     @*cookieconsent*@
     <link rel="shortcut icon" href="~/ico/favicon.ico">
     <link rel="icon" type="image/gif" href="animated_favicon1.gif">
+
 </head>
 <body>
     <header>
@@ -178,7 +179,7 @@
                     </a>
                 </li>
 
-                <li @(User.Claims.Any(u => u.Value == DataConstants.SuperAdmin) ? "" : "hidden")>
+                <li @(User.Claims.Any(u => u.Value == "Admin") ? "" : "hidden")>
                     <a href="#optionsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-cog"></i>
                         <span class="chatnotifications">Структура</span>
@@ -331,7 +332,7 @@
             //});
 
             $.getJSON(urlExist, { get_param: 'value' }, function (data) {
-                console.log(data);
+                //console.log(data);
                 if (data.success) {
                     if (data.message.length > 0) {
                         if (data.message != "notfound") {
@@ -343,7 +344,7 @@
                         
                     }
                     $.getJSON(urlNotActive, { get_param: 'value' }, function (data) {
-                        console.log(data);
+                        //console.log(data);
                         if (data.data.length > 0) {
                             $('#notActiveCount').removeAttr("hidden")
                             $('#notActiveCount').text(data.data.length);

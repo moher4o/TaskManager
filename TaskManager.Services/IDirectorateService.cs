@@ -22,5 +22,6 @@ namespace TaskManager.Services
 
         Task<string> RenameDirectorateAsync(int dirId, string directorateName);
         Task<string> CreateDirectorateAsync(string directorateName);
+        Task<string> AproveDirReportsAsync(int dirId, DateTime aproveDate, int adminId);
     }
 }

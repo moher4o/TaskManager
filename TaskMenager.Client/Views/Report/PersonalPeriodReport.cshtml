@@ -34,7 +34,7 @@
                         if (!TaskList.Contains(item.TaskId) && item.TaskName != "Отпуски" && item.TaskName != "Болнични")
                         {
                             TaskList.Add(item.TaskId);
-                            <th class="tasks" style="min-width:30px; max-height:200px; writing-mode: vertical-rl; font-size:smaller; text-transform:lowercase !important;">@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)</th>
+                            @*<th class="tasks" style="min-width:30px; max-height:200px; writing-mode: vertical-rl; font-size:smaller; text-transform:lowercase !important;">@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)</th>*@
                         }
 
                         if (!dateList.Contains(item.WorkDate.Date))
@@ -42,10 +42,36 @@
                             dateList.Add(item.WorkDate.Date);
                         }
                     }
+
+                    @foreach (var id in TaskList)
+                    {
+                        var item = Model.PersonalDateList.WorkedHoursByTaskByPeriod.Where(wht => wht.TaskId == id).FirstOrDefault();
+                            if (TaskList.Count > 7)
+                            {
+                                <th class="tasks" style="min-width:30px; max-height:200px; writing-mode: vertical-rl; font-size:smaller; text-transform:lowercase !important;">@(item.TaskName.Length > 60 ? (item.TaskName).Substring(0, 60) + "..." : item.TaskName)</th>
+
+                            }
+                            else
+                            {
+                                <th class="tasks" style="min-width:30px; max-height:200px; font-size:smaller; text-transform:lowercase !important;">@(item.TaskName.Length > 120 ? (item.TaskName).Substring(0, 120) + "..." : item.TaskName)</th>
+
+                            }
+                     }
+
+
                     <th style="width: 5%; text-align: center">Общо</th>
                     @if (Model.ReportApproval)
                     {
-                        <th style="width: 5%; text-align:center">Приет отчет</th>
+                        if (Model.UserCanApprove)
+                        {
+                            var isapprovedAll = Model.PersonalDateList.WorkedHoursByTaskByPeriod.All(t => t.ApprovedRecord == true);
+                            <th style="width: 5%; text-align: center; font-size:x-small; vertical-align: bottom;">Приемане / отказване на всички отчети &emsp;&emsp;&emsp;&emsp;&emsp; <input class="myinput large acceptall" style="cursor:pointer" type="checkbox" @(isapprovedAll ? "checked" : "")></th>
+                        }
+                        else
+                        {
+                            <th style="width: 5%; text-align:center">Приет отчет</th>
+                        }
+
                     }
 
                 </tr>
@@ -98,7 +124,7 @@
                             {
                                 approvalAdmin = "Приел отчета-" + approvalAdmin;
                                 approvalAdmin = approvalAdmin.Replace(" ", "_");
-                        <td style="background-color:ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" style="cursor:@(Model.UserCanApprove ? "pointer" : "")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
+                                <td style="background-color:ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" style="cursor:@(Model.UserCanApprove ? "pointer" : "")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
                             }
                         </tr>
                     }
@@ -139,7 +165,7 @@
                             {
                                 approvalAdmin = "Приел отчета-" + approvalAdmin;
                                 approvalAdmin = approvalAdmin.Replace(" ", "_");
-                        <td style="background-color: ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" style="cursor:@(Model.UserCanApprove ? "pointer" : "")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
+                                <td style="background-color: ivory; width: 5%; text-align: center;" class="tooltip-big-text" data-balloon-length="xxlarge" aria-label=@(isapproved ? approvalAdmin : "") data-balloon-pos="right"><input class="myinput large @(Model.UserCanApprove ? "canapprove" : "cannotapprove")" style="cursor:@(Model.UserCanApprove ? "pointer" : "")" type="checkbox" @(isapproved ? "checked" : "") data-dateaccept="@worckedDate.Date.ToString("yyyy/MM/dd")"></td>
                             }
                         </tr>
                     }

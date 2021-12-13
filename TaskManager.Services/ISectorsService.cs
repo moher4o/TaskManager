@@ -25,5 +25,6 @@ namespace TaskManager.Services
         Task<string> MarkSectorDeleted(int secId);
         Task<string> MarkSectorActiveAsync(int secId);
         Task<string> EditSectorAsync(int secId, int directoratesId, int departmentsId, string sectorName);
+        Task<string> AproveSecReportsAsync(int unitId, DateTime aproveDate, int adminId);
     }
 }

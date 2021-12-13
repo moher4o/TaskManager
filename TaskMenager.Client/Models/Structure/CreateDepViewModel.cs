@@ -20,6 +20,5 @@ namespace TaskMenager.Client.Models.Structure
 
         public int DirectoratesId { get; set; }
 
-
     }
 }

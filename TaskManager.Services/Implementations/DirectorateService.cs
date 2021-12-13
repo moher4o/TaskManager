@@ -41,16 +41,53 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<string> AproveDirReportsAsync(int dirId, DateTime aproveDate, int adminId)
+        {
+            try
+            {
+
+                var directorateToAprove = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == dirId);
+                if (directorateToAprove == null)
+                {
+                    return $"Няма дирекция с номер: {dirId}";
+                }
+
+                var dirEmployeesIds = await this.db.Employees.Where(e => e.DirectorateId == dirId && e.isDeleted == false).Select(e => e.Id).ToListAsync();
+                var reports = await this.db.WorkedHours.Where(wh => dirEmployeesIds.Contains(wh.EmployeeId) && wh.isDeleted == false && wh.Approved == false && wh.WorkDate.Date <= aproveDate).ToListAsync();
+                foreach (var report in reports)
+                {
+                    report.Approved = true;
+                    report.ApprovedBy = adminId;
+                }
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
         public async Task<string> RenameDirectorateAsync(int dirId, string directorateName)
         {
-            var directorateToRename = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == dirId);
-            if (directorateToRename == null)
+            try
             {
-                return $"Няма дирекция с номер: {dirId}";
+
+                var directorateToRename = await this.db.Directorates.FirstOrDefaultAsync(d => d.Id == dirId);
+                if (directorateToRename == null)
+                {
+                    return $"Няма дирекция с номер: {dirId}";
+                }
+                directorateToRename.DirectorateName = directorateName;
+                await this.db.SaveChangesAsync();
+                return "success";
             }
-            directorateToRename.DirectorateName = directorateName;
-            await this.db.SaveChangesAsync();
-            return "success";
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
 
         }
 

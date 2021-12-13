@@ -88,6 +88,7 @@ namespace TaskManager.Services.Implementations
                     Name = d.DepartmentName,
                     Id = d.Id,
                     DirectorateName = d.Directorate.DirectorateName,
+                    DirectorateId = d.DirectorateId,
                     isDeleted = d.isDeleted
                 }).ToListAsync();
             return result;
@@ -294,6 +295,34 @@ namespace TaskManager.Services.Implementations
             else
             {
                 return false;
+            }
+        }
+
+        public async Task<string> AproveDepReportsAsync(int depId, DateTime aproveDate, int adminId)
+        {
+            try
+            {
+
+                var departmentToAprove = await this.db.Departments.FirstOrDefaultAsync(d => d.Id == depId);
+                if (departmentToAprove == null)
+                {
+                    return $"Няма отдел с номер: {depId}";
+                }
+
+                var depEmployeesIds = await this.db.Employees.Where(e => e.DepartmentId == depId && e.isDeleted == false).Select(e => e.Id).ToListAsync();
+                var reports = await this.db.WorkedHours.Where(wh => depEmployeesIds.Contains(wh.EmployeeId) && wh.isDeleted == false && wh.Approved == false && wh.WorkDate.Date <= aproveDate).ToListAsync();
+                foreach (var report in reports)
+                {
+                    report.Approved = true;
+                    report.ApprovedBy = adminId;
+                }
+                await this.db.SaveChangesAsync();
+                return "success";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
 

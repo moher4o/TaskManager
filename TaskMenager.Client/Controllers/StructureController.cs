@@ -13,21 +13,23 @@ using TaskMenager.Client.Models.Structure;
 
 namespace TaskMenager.Client.Controllers
 {
-    [Authorize(Policy = DataConstants.SuperAdmin)]
+    [Authorize(Policy = "Admin")]
     public class StructureController : BaseController
     {
+        private readonly IApprovalConfiguration approvalConfiguration;
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
         private readonly ITitleService titles;
 
 
-        public StructureController(ITitleService titles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public StructureController(ITitleService titles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
             this.titles = titles;
+            this.approvalConfiguration = _approvalConfiguration;
         }
 
         public IActionResult RenameTitle(int jobId)
@@ -327,6 +329,96 @@ namespace TaskMenager.Client.Controllers
             return PartialView("_CreateDirectorateModalPartial", model);
         }
 
+        public IActionResult AproveSecReport(int secId)
+        {
+            var model = new AproveViewModel();
+
+            model.UnitId = secId;
+            model.UnitName = this.sectors.GetSectorsNames(secId).Select(s => s.TextValue).FirstOrDefault();
+
+            return PartialView("_AproveSecReportModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AproveSecReport(AproveViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string result = await this.sectors.AproveSecReportsAsync(model.UnitId, model.AproveDate, currentUser.Id);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Отчетите до дата {model.AproveDate.Date.ToString("dd/MM/yyyy")} са одобрени";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_AproveSecReportModalPartial", model);
+        }
+
+        public IActionResult AproveDepReport(int depId)
+        {
+            var model = new AproveViewModel();
+
+            model.UnitId = depId;
+            model.UnitName = this.departments.GetDepartmentsNames(depId).Select(d =>d.TextValue).FirstOrDefault();
+
+            return PartialView("_AproveDepReportModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AproveDepReport(AproveViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string result = await this.departments.AproveDepReportsAsync(model.UnitId, model.AproveDate, currentUser.Id);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Отчетите до дата {model.AproveDate.Date.ToString("dd/MM/yyyy")} са одобрени";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_AproveDepReportModalPartial", model);
+        }
+
+        public IActionResult AproveDirReport(int dirId)
+        {
+            var model = new AproveViewModel();
+
+            model.UnitId = dirId;
+            model.UnitName = this.directorates.GetDirectoratesNames(dirId).Select(d => d.TextValue).FirstOrDefault();
+
+            return PartialView("_AproveDirReportModalPartial", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AproveDirReport(AproveViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await this.directorates.AproveDirReportsAsync(model.UnitId, model.AproveDate, currentUser.Id);
+                if (result == "success")
+                {
+                    TempData["Success"] = $"Отчетите до дата {model.AproveDate.Date.ToString("dd/MM/yyyy")} са одобрени";
+                }
+                else
+                {
+                    TempData["Error"] = $"[Service error] Уведомете администратора. {result}";
+                }
+
+            }
+            return PartialView("_AproveDirReportModalPartial", model);
+        }
+
 
         public IActionResult RenameDirectorate(int dirId)
         {
@@ -374,7 +466,7 @@ namespace TaskMenager.Client.Controllers
         {
             return View();
         }
-        
+
         public async Task<IActionResult> AddUsersToSystemTasks()
         {
             var result = await this.employees.AddAllToSystemTasksAsync();
@@ -390,7 +482,6 @@ namespace TaskMenager.Client.Controllers
             return RedirectToAction("UsersList", "Users");
         }
 
-
         public async Task<IActionResult> RemoveEmptyEmails()
         {
             var result = await this.employees.GenerateEmailWhenEmpty();
@@ -405,7 +496,6 @@ namespace TaskMenager.Client.Controllers
 
             return RedirectToAction("UsersList", "Users");
         }
-
 
 
         #region API Calls
@@ -527,7 +617,19 @@ namespace TaskMenager.Client.Controllers
             return Json(new { success = true, message = "Сектора е възстановен" });
         }
 
-
+        [Authorize(Policy = DataConstants.Employee)]
+        [HttpGet]
+        public IActionResult GetUserRole()
+        {
+            return Json(currentUser);
+        }
+        [Authorize(Policy = DataConstants.Employee)]
+        [HttpGet]
+        public IActionResult GetAprovalStatus()
+        {
+            return Json(this.approvalConfiguration.ReportApproval);
+        }
+        
         #endregion
     }
 }
