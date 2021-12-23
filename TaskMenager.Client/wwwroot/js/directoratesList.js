@@ -14,6 +14,7 @@ let newdirplaseholder = $('#newdir-placeholder');
 let datepickplaseholder = $('#datepick-placeholder');
 
 $(document).ready(function () {
+    $('#newdirectorate').hide();
     $('#showDeleted').on('change', DeletedUsersShowOrHile);
     GetUserPermision();
     GetAprovalStatus();
@@ -129,6 +130,10 @@ function GetUserPermision() {
             empsectorId = data.sectorId;
             userFullName = data.fullNam;
             userId = data.id;
+            if (permisionType == 'SuperAdmin') {
+                $('#newdirectorate').show();
+            }
+
         }
     });
 }

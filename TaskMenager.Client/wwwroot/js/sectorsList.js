@@ -13,6 +13,7 @@ let newdirplaseholder = $('#newdir-placeholder');
 let datepickplaseholder = $('#datepick-placeholder');
 
 $(document).ready(function () {
+    $('#newsector').hide();
     $('#showDeleted').on('change', DeletedSectorsShowOrHile);
     GetUserPermision();
     GetAprovalStatus();
@@ -173,6 +174,10 @@ function GetUserPermision() {
             empsectorId = data.sectorId;
             userFullName = data.fullNam;
             userId = data.id;
+            if (permisionType == 'SuperAdmin') {
+                $('#newsector').show();
+            }
+
         }
     });
 }

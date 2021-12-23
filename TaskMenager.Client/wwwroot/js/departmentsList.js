@@ -14,6 +14,7 @@ let newsecplaseholder = $('#newsec-placeholder');
 let datepickplaseholder = $('#datepick-placeholder');
 
 $(document).ready(function () {
+    $('#newdepartment').hide();
     $('#showDeleted').on('change', DeletedDepartShowOrHile);
     GetUserPermision();
     GetAprovalStatus();
@@ -167,6 +168,9 @@ function GetUserPermision() {
             empsectorId = data.sectorId;
             userFullName = data.fullNam;
             userId = data.id;
+            if (permisionType == 'SuperAdmin') {
+                $('#newdepartment').show();
+            }
         }
     });
 }

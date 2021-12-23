@@ -1,4 +1,11 @@
 ﻿var dataTable;
+var permisionType = 'Guest';
+var empdirectorateId;
+var empdepartmentId;
+var empsectorId;
+var userFullName;
+var userId;
+
 const loc = window.location.href;
 const path = loc.substr(0, loc.lastIndexOf('/') + 1);
 let placeholderElement = $('#modal-placeholder');
@@ -6,10 +13,13 @@ let newdirplaseholder = $('#newdir-placeholder');
 
 
 $(document).ready(function () {
+    $('#newjobtype').hide();
     $('#showDeleted').on('change', DeletedJobsShowOrHide);
+    GetUserPermision();
     loadDataTable(false);
     ModalAction();
     NewTitleModalAction();
+    
 });
 
 function DeletedJobsShowOrHide() {
@@ -39,14 +49,20 @@ function loadDataTable(deleted) {
                 "data": null,
                 "render": function (data, type, row) {
                     if (deleted) {
+                        if (permisionType == 'SuperAdmin') {
                         return `<div>
                         <a style='cursor:pointer; padding-left:10px;' onclick=Restore('${path}RestoreTitle?jobId=${row.id}') title='Възстановяване'>
                             <img class="chatnotifications" src="../png/restore-icon.png" />
                         </a>
                         </div>`;
+                        }
+                        else {
+                            return `<div></div>`;
+                        }
                     }
                     else {
-                        return `<div>
+                        if (permisionType == 'SuperAdmin') {
+                            return `<div>
                         <a style='cursor:pointer; padding-left:10px;' title='Редакция' data-toggle='ajax-modal' data-target='#add-contact' data-url='${path}RenameDirectorate' data-dirid='${row.id}' data-dirname='${row.name}' onclick=DirModalShow('${path}RenameTitle?jobId=${row.id}') >
                             <img class="chatnotifications" src="../png/edit-icon.png" />
                         </a>
@@ -56,6 +72,11 @@ function loadDataTable(deleted) {
                         </a>
 
                         </div>`;
+                        }
+                        else {
+                            return `<div></div>`;
+                        }
+
                     }
 
                 }, "width": "10%"
@@ -69,6 +90,26 @@ function loadDataTable(deleted) {
     });
 
 }
+
+function GetUserPermision() {
+    $.ajax({
+        type: "Get",
+        url: path + '\GetUserRole',
+        success: function (data) {
+            permisionType = data.roleName;
+            empdirectorateId = data.directorateId;
+            empdepartmentId = data.departmentId;
+            empsectorId = data.sectorId;
+            userFullName = data.fullNam;
+            userId = data.id;
+            if (permisionType == 'SuperAdmin') {
+                $('#newjobtype').show();
+            }
+        }
+    });
+    
+}
+
 
 function Delete(url) {
     swal({

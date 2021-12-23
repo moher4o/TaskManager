@@ -26,9 +26,14 @@
                     buttons: ["Отказ", "Потвърждение"],
                     dangerMode: true
                 }).then((willEdit) => {
-                    $('.canapprove:checkbox:checked').each(function (event) {
-                        $(this).trigger("click");
-                    })
+                    if (willEdit) {
+                        $('.canapprove:checkbox:checked').each(function (event) {
+                            $(this).trigger("click");
+                        })
+                    }
+                    else {
+                        $('.acceptall').prop("checked", true);
+                    }
                 });
             }
             else {
@@ -41,9 +46,15 @@
                     buttons: ["Отказ", "Потвърждение"],
                     dangerMode: true
                 }).then((willEdit) => {
-                    $('.canapprove:checkbox:not(:checked)').each(function (event) {
-                        $(this).trigger("click");
-                    })
+                    if (willEdit) {
+                        $('.canapprove:checkbox:not(:checked)').each(function (event) {
+                            $(this).trigger("click");
+                        })
+                    }
+                    else {
+                        $('.acceptall').prop("checked", false);
+                    }
+
                 });
             }
         })

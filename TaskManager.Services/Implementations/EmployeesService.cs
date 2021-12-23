@@ -424,7 +424,8 @@ namespace TaskManager.Services.Implementations
                             SectorId = newUser.SectorId,
                             DaeuAccaunt = newUser.DaeuAccaunt,
                             RoleId = await this.db.Roles.Where(r => r.Name == DataConstants.Employee).Select(r => r.Id).FirstOrDefaultAsync(),
-                            isActive = false
+                            isActive = false,
+                            MessageReaded = true
                         };
                         await this.db.Employees.AddAsync(employeeDb);
                         await this.db.SaveChangesAsync();

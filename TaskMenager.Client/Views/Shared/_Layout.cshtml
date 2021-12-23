@@ -312,25 +312,6 @@
             let urlExist = path + "\\Users\\UserExistStatus";
             let urlNotActive = path + "\\Users\\GetNotActivatedUsers";
 
-            //$.getJSON(urlExist, { get_param: 'value' }, function (data) {
-            //    console.log(data);
-            //    if (data) {
-            //        $.getJSON(urlNotActive, { get_param: 'value' }, function (data) {
-            //            console.log(data);
-            //            if (data.data.length > 0) {
-            //                $('#notActiveCount').removeAttr("hidden")
-            //                $('#notActiveCount').text(data.data.length);
-            //                $('#notActiveCountinner').removeAttr("hidden")
-            //                $('#notActiveCountinner').text(data.data.length);
-            //            }
-            //            else {
-            //                $('#notActiveCount').attr("hidden", true);
-            //                $('#notActiveCountinner').attr("hidden", true);
-            //            }
-            //        });
-            //    }
-            //});
-
             $.getJSON(urlExist, { get_param: 'value' }, function (data) {
                 //console.log(data);
                 if (data.success) {
@@ -357,11 +338,6 @@
                         }
                     });
                 }
-                //else {
-                //    if (data.message.length > 0) {
-                //        toastr.error(data.message, { timeOut: 10000 });
-                //    }
-                //}
             });
 
         });
