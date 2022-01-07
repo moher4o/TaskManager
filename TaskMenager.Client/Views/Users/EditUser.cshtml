@@ -4,6 +4,7 @@
     ViewData["Title"] = "Промяна на акаунт";
 }
 @{var permisionType = User.Claims.Where(u => u.Type == "permissionType").Select(u => u.Value).FirstOrDefault();}
+@{var workingUserId = User.Claims.Where(u => u.Type == "userId").Select(u => u.Value).FirstOrDefault();}
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     @Html.HiddenFor(model => model.Id)
@@ -132,11 +133,33 @@
                     </div>
                     <div class="col-md-10 checkbox" style="padding-top:15px;">
                         <label>
-                            @Html.CheckBoxFor(model => model.Notify, new { @class = "form-control fancycheck", name="emailnotify"})
+                            @Html.CheckBoxFor(model => model.Notify, new { @class = "form-control fancycheck", name = "emailnotify" })
                             <span aria-label="emailnotify">Получаване на email съобщения</span>
                         </label>
                         @*<label>@Html.CheckBoxFor(model => model.Notify)&nbsp;@Html.DisplayNameFor(model => model.Notify)</label>*@
                     </div>
+                    <div class="col-md-10 checkbox" style="padding-top:15px;" @(workingUserId != Model.Id.HasValue.ToString() ? "disabled" : "")>
+                        <label>
+                            @Html.CheckBoxFor(model => model.TwoFAActive,
+                           workingUserId != Model.Id.Value.ToString() ?
+                              new
+                              {
+                                  @class = "form-control fancycheck",
+                                  id = "twoFA",
+                                  name = "twoFA",
+                                  @disabled = "disabled"
+                              } as object :
+                              new
+                              {
+                                  @class = "form-control fancycheck",
+                                  id = "twoFA",
+                                  name = "twoFA"
+                              } as object
+                           )
+                            <span aria-label="twoFA">Двуфакторна автентикация</span>
+                        </label>
+                    </div>
+
                 </div>
             </div>
             <div class="col-md-6">
@@ -191,9 +214,9 @@
 
                     </div>
                     @Html.LabelFor(model => model.RepresentativeList, new { @class = "col-form-label strong" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor(a => a.RepresentativeId, Model.RepresentativeList, "***Без представител***", new { @class = "form-control", id = "representativeId", name = "represantativeId" })
-                </div>
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(a => a.RepresentativeId, Model.RepresentativeList, "***Без представител***", new { @class = "form-control", id = "representativeId", name = "represantativeId" })
+                    </div>
 
                 </div>
             </div>
@@ -320,12 +343,12 @@
 @section Scripts{
     <script src="~/js/createNewUser.js" charset="utf-8"></script>
     <script>
-               $(document).ready(function () {
-                   $('#representativeId').select2({
-                       width: '100%'
-                   });
-               });
-        </script>
+        $(document).ready(function () {
+            $('#representativeId').select2({
+                width: '100%'
+            });
+        });
+    </script>
 
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

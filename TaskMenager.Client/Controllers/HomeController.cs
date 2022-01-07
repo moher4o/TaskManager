@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Google.Authenticator;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Common;
 using TaskManager.Services;
@@ -27,11 +29,13 @@ namespace TaskMenager.Client.Controllers
     {
         private readonly IManageFilesService files;
         private readonly IApprovalConfiguration approvalConfiguration;
+        //private readonly I2FAConfiguration twoFAConfiguration;
 
         public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IManageFilesService files, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.files = files;
             this.approvalConfiguration = _approvalConfiguration;
+            //twoFAConfiguration = _twoFAConfiguration;
          }
 
 
@@ -70,6 +74,54 @@ namespace TaskMenager.Client.Controllers
         {
             return View();
         }
+
+        //public IActionResult SecondAuthentication()
+        //{
+        //    var userToAuthenticate = currentUser.Email;
+        //    var twoFactorAuthenticator = new TwoFactorAuthenticator();
+        //    var TwoFactorSecretCode = twoFAConfiguration.TwoFactorSecretCode;
+        //    var accountSecretKey = $"{TwoFactorSecretCode}-{userToAuthenticate}";
+        //    var setupCode = twoFactorAuthenticator.GenerateSetupCode("TaskManager", userToAuthenticate,
+        //        Encoding.ASCII.GetBytes(accountSecretKey));
+        //    var twoFAModel = new TwoFAViewModel()
+        //    {
+        //        Account = currentUser.Email,
+        //        ManualEntryKey = setupCode.ManualEntryKey,
+        //        QrCodeSetupImageUrl = setupCode.QrCodeSetupImageUrl
+        //    };
+
+        //    return View(twoFAModel);
+        //}
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult SecondAuthentication(TwoFAViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+        //    var userToAuthenticate = currentUser.Email;
+        //    var TwoFactorSecretCode = twoFAConfiguration.TwoFactorSecretCode;
+        //    var accountSecretKey = $"{TwoFactorSecretCode}-{userToAuthenticate}";
+        //    var twoFactorAuthenticator = new TwoFactorAuthenticator();
+        //    var result = twoFactorAuthenticator
+        //        .ValidateTwoFactorPIN(accountSecretKey, model.UserInputCode);
+        //    if (result)
+        //    {
+        //        TempData["Success"] = "Кода е приет!";
+        //        //HttpContext.User.Identities.FirstOrDefault().AddClaim(new Claim("your claim", "your field"));
+        //        HttpContext.Response.Cookies.Append("Test_cookie", "yo");
+        //        // HttpContext.Request.Headers.Add("2fa", "true");
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    else
+        //    {
+        //        TempData["Error"] = "Невалиден код!";
+        //        return RedirectToAction(nameof(SecondAuthentication));
+        //    }
+           
+        //}
 
         [HttpGet]
         public async Task<PartialViewResult> GetDateTasks(int? userId, DateTime? workDate)

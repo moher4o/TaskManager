@@ -62,6 +62,8 @@ namespace TaskManager.Data.Models
 
         public bool MessageReaded { get; set; } = false;
 
+        public bool TwoFAActiv { get; set; } = false;
+
         public virtual ICollection<Employee> UsersRepresentative { get; set; } = new List<Employee>();
 
         public virtual ICollection<Task> TasksCreator { get; set; } = new List<Task>();

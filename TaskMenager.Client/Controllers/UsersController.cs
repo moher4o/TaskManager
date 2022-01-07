@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Google.Authenticator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Services;
 using TaskManager.Services.Models;
@@ -24,7 +26,8 @@ namespace TaskMenager.Client.Controllers
         private readonly IRolesService roles;
         private readonly ITitleService jobTitles;
         private readonly IManageFilesService files;
-        public UsersController(IManageFilesService _files, IEmployeesService employees, ITitleService jobTitles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        private readonly I2FAConfiguration twoFAConfiguration;
+        public UsersController(IManageFilesService _files, IEmployeesService employees, ITitleService jobTitles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IRolesService roles, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, I2FAConfiguration _twoFAConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.roles = roles;
             this.directorates = directorates;
@@ -32,6 +35,54 @@ namespace TaskMenager.Client.Controllers
             this.sectors = sectors;
             this.jobTitles = jobTitles;
             this.files = _files;
+            twoFAConfiguration = _twoFAConfiguration;
+        }
+
+        public IActionResult SecondAuthentication()
+        {
+            var userToAuthenticate = currentUser.Email;
+            var twoFactorAuthenticator = new TwoFactorAuthenticator();
+            var TwoFactorSecretCode = twoFAConfiguration.TwoFactorSecretCode;
+            var accountSecretKey = $"{TwoFactorSecretCode}-{userToAuthenticate}";
+            var setupCode = twoFactorAuthenticator.GenerateSetupCode("TaskManager", userToAuthenticate,
+                Encoding.ASCII.GetBytes(accountSecretKey));
+            var twoFAModel = new TwoFAViewModel()
+            {
+                Account = currentUser.Email,
+                ManualEntryKey = setupCode.ManualEntryKey,
+                QrCodeSetupImageUrl = setupCode.QrCodeSetupImageUrl
+            };
+
+            return View(twoFAModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SecondAuthentication(TwoFAViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var userToAuthenticate = currentUser.Email;
+            var TwoFactorSecretCode = twoFAConfiguration.TwoFactorSecretCode;
+            var accountSecretKey = $"{TwoFactorSecretCode}-{userToAuthenticate}";
+            var twoFactorAuthenticator = new TwoFactorAuthenticator();
+            var result = twoFactorAuthenticator
+                .ValidateTwoFactorPIN(accountSecretKey, model.UserInputCode);
+            if (result)
+            {
+                TempData["Success"] = "Кода е приет!";
+                //HttpContext.User.Identities.FirstOrDefault().AddClaim(new Claim("your claim", "your field"));
+                HttpContext.Response.Cookies.Append("Test_cookie", "yo");
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                TempData["Error"] = "Невалиден код!";
+                return RedirectToAction(nameof(SecondAuthentication));
+            }
+
         }
 
         [Authorize(Policy = "Guest")]
@@ -70,7 +121,8 @@ namespace TaskMenager.Client.Controllers
                         DaeuAccaunt = currentEmployee.DaeuAccaunt,
                         RoleId = currentEmployee.RoleId,
                         Notify = currentEmployee.Notify,
-                        RepresentativeId = currentEmployee.RepresentativeId
+                        RepresentativeId = currentEmployee.RepresentativeId,
+                        TwoFAActive = currentEmployee.TwoFAActive
                     };
                     userToEdit = PrepareUserRegisterModel(userToEdit);
                     return View(userToEdit);

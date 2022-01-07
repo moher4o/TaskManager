@@ -73,5 +73,8 @@ namespace TaskMenager.Client.Models.Users
 
         [Display(Name = "email нотификации")]
         public bool Notify { get; set; }
+
+        [Display(Name = "Двуфакторна автентикация")]
+        public bool TwoFAActive { get; set; }
     }
 }

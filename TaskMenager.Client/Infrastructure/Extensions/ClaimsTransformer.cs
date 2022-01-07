@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +54,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     ci.AddClaim(new Claim("directorateId", currentEmployee.DirectorateId.HasValue ? currentEmployee.DirectorateId.ToString() : "-1"));
                     ci.AddClaim(new Claim("departmentId", currentEmployee.DepartmentId.HasValue ? currentEmployee.DepartmentId.ToString() : "-1"));
                     ci.AddClaim(new Claim("sectorId", currentEmployee.SectorId.HasValue ? currentEmployee.SectorId.ToString() : "-1"));
+                    ci.AddClaim(new Claim("2FA", currentEmployee.TwoFAActive ? "true" : "false"));
 
                     if (roleName != DataConstants.Employee)
                     {
@@ -81,7 +85,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                 }
                 else
                 {
-
+                    ci.AddClaim(new Claim("2FA", "false"));
                     ci.AddClaim(new Claim("permission", "Guest"));
                 }
             }
@@ -92,6 +96,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     ci.AddClaim(new Claim("permission", "Forbidden"));
                 }
                 ci.AddClaim(new Claim("permission", "Guest"));
+                ci.AddClaim(new Claim("2FA", "false"));
             }
             var cp = new ClaimsPrincipal(ci);
 

@@ -92,6 +92,8 @@ namespace TaskMenager.Client
 
             services.AddSingleton<IApprovalConfiguration>(Configuration.GetSection("ApprovalConfiguration").Get<ApprovalConfiguration>());
 
+            services.AddSingleton<I2FAConfiguration>(Configuration.GetSection("TwoFactorConfiguration").Get<TwoFAConfiguration>());
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,7 +116,7 @@ namespace TaskMenager.Client
             app.UseRouting();
 
             app.UseAuthentication();
-
+            app.UseMiddleware<TwoFACookiesMiddleware>();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

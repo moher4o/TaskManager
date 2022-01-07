@@ -53,6 +53,8 @@ namespace TaskManager.Services.Models
 
         public bool MessageReaded { get; set; }
 
+        public bool TwoFAActive { get; set; }
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Employee, UserServiceModel>()
