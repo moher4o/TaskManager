@@ -38,6 +38,46 @@ namespace TaskMenager.Client.Controllers
             twoFAConfiguration = _twoFAConfiguration;
         }
 
+        
+        public IActionResult SecondAuthenticationLogin()
+        {
+            return View();
+        }
+
+        [Authorize(Policy = Employee)]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SecondFALogin(string mobNumberCode)
+        {
+            try
+            {
+                var userToAuthenticate = currentUser.Email;
+                var TwoFactorSecretCode = twoFAConfiguration.TwoFactorSecretCode;
+                var accountSecretKey = $"{TwoFactorSecretCode}-{userToAuthenticate}";
+                var twoFactorAuthenticator = new TwoFactorAuthenticator();
+                var result = twoFactorAuthenticator
+                    .ValidateTwoFactorPIN(accountSecretKey, mobNumberCode);
+                if (result)
+                {
+                    TempData["Success"] = "Кода е приет";
+                    HttpContext.Response.Cookies.Append("Test_cookie", "CfDJ8FQQXKoRyUdDvRNz9BGHr8JIy1flxoQVv2BUOnrzwQcRuoxF08Hr33t13jmyc");
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    TempData["Error"] = "Невалиден код!";
+                    return RedirectToAction(nameof(SecondAuthenticationLogin));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Възникна грешка -  + {ex.Message}";
+                return RedirectToAction(nameof(SecondAuthenticationLogin));
+            }
+        }
+
+        [Authorize(Policy = Employee)]
         public IActionResult SecondAuthentication()
         {
             var userToAuthenticate = currentUser.Email;
@@ -50,15 +90,17 @@ namespace TaskMenager.Client.Controllers
             {
                 Account = currentUser.Email,
                 ManualEntryKey = setupCode.ManualEntryKey,
-                QrCodeSetupImageUrl = setupCode.QrCodeSetupImageUrl
+                QrCodeSetupImageUrl = setupCode.QrCodeSetupImageUrl,
+                TwoFAExplainLink = twoFAConfiguration.TwoFAExplainLink
             };
 
             return View(twoFAModel);
         }
 
+        [Authorize(Policy = Employee)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SecondAuthentication(TwoFAViewModel model)
+        public async Task<IActionResult> SecondAuthentication(TwoFAViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -72,9 +114,16 @@ namespace TaskMenager.Client.Controllers
                 .ValidateTwoFactorPIN(accountSecretKey, model.UserInputCode);
             if (result)
             {
-                TempData["Success"] = "Кода е приет!";
-                //HttpContext.User.Identities.FirstOrDefault().AddClaim(new Claim("your claim", "your field"));
-                HttpContext.Response.Cookies.Append("Test_cookie", "yo");
+                var two2FAresult = await this.employees.Set2FAFlagEnabled(currentUser.Id);
+                if (two2FAresult)
+                {
+                    TempData["Success"] = "Успешно конфигуриране на 2FA. Не забравяите да правите бекъп на профила си в мобилното у-во!";
+                    HttpContext.Response.Cookies.Append("Test_cookie", "CfDJ8FQQXKoRyUdDvRNz9BGHr8JIy1flxoQVv2BUOnrzwQcRuoxF08Hr33t13jmyc");
+                }
+                else
+                {
+                    TempData["Error"] = "Неуспешно конфигуриране на 2FA в БД.";
+                }
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -122,7 +171,7 @@ namespace TaskMenager.Client.Controllers
                         RoleId = currentEmployee.RoleId,
                         Notify = currentEmployee.Notify,
                         RepresentativeId = currentEmployee.RepresentativeId,
-                        TwoFAActive = currentEmployee.TwoFAActive
+                        TwoFAActive = currentEmployee.TwoFAActiv
                     };
                     userToEdit = PrepareUserRegisterModel(userToEdit);
                     return View(userToEdit);
@@ -211,6 +260,19 @@ namespace TaskMenager.Client.Controllers
                     if (result)
                     {
                         TempData["Success"] = "Профила е променен успешно.";
+                        if (model.TwoFAActive)
+                        {
+                            TempData["Success"] = "Профила е променен успешно. Пренасочване към страницата за конфигуриране на 2FA профил";
+                            return RedirectToAction("SecondAuthentication", "Users");
+                        }
+                        else
+                        {
+                           bool twoFAresult = await this.employees.Set2FADisabled(currentUser.Id);
+                            if (!twoFAresult)
+                            {
+                                TempData["Error"] = "Грешка при премахване на 2FA. Обърнете се към администратор";
+                            }
+                        }
                     }
                     else
                     {

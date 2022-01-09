@@ -53,7 +53,7 @@ namespace TaskManager.Services.Models
 
         public bool MessageReaded { get; set; }
 
-        public bool TwoFAActive { get; set; }
+        public bool TwoFAActiv { get; set; }
 
         public void ConfigureMapping(Profile profile)
         {

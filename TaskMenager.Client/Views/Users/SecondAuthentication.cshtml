@@ -4,46 +4,64 @@
     ViewData["Title"] = "2F Authentication";
 }
 
+
+
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    @Html.HiddenFor(model => model.QrCodeSetupImageUrl)
-<div class="PrimeBox2" style="margin-top:20px; max-width:50%; background-color:ghostwhite;">
-    <div class="row">
-        <div class="col-md-10 offset-md-1">
-            <div class="form-group">
-                @Html.LabelFor(model => model.Account, new { @class = "col-form-label strong" })
-                <div class="col-md-6">
-                    @Html.TextBoxFor(model => model.Account, new { @class = "form-control" })
-                </div>
-                <div class="col-md-12" style="margin-top:5px;>
-                    @Html.LabelFor(model => model.QrCodeSetupImageUrl, new { @class = "col-form-label strong" })
-                    <img src=@Model.QrCodeSetupImageUrl alt="QRCode" width="250" height="250">
-                </div>
-                @Html.LabelFor(model => model.ManualEntryKey, new { @class = "col-form-label strong" })
-                <div class="col-md-12">
-                    @Html.TextBoxFor(model => model.ManualEntryKey, new { @class = "form-control" })
-                </div>
-                @Html.LabelFor(model => model.UserInputCode, new { @class = "col-form-label strong" })
-                <div class="col-md-6">
-                    @Html.TextBoxFor(model => model.UserInputCode, new { @class = "form-control", placeholder = "Въведете получения код", id = "mobNumberCode", name = "mobNumberCode" })
-                    <span asp-validation-for="UserInputCode" class="text-danger"></span>
-                </div>
+    @*@Html.HiddenFor(model => model.QrCodeSetupImageUrl)*@
+    <div class="PrimeBox2" style="margin-top:20px; max-width:50%; background-color:ghostwhite;">
+        <div class="form-group row" style="background-color: #69a0f1; display: flex; justify-content: center;  align-items: center;" id="container">
+            <h5 style="color:white; margin-left:15px;">Създаване на акаунт в мобилно у-во</h5>
+            <button type="button" id="x" onclick="window.location.href='@Url.Action("Index", "Home")';">
+                X
+            </button>
+        </div>
 
+
+        <div class="row">
+            <div class="col-md-10 offset-md-1">
+                <div class="form-group">
+                    <a class="col-form-label" href="@(Model.TwoFAExplainLink)" style="margin-top: 5px; color: #278dbc; font-size: large; transition: 0.4s;" target="_blank" id="infotext">Какво е двуфакторна автентикация - кратко видео</a>
+                    <br>
+                    @Html.LabelFor(model => model.Account, new { @class = "col-form-label strong" })
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(model => model.Account, new { @class = "form-control", @disabled="disabled"})
+                    </div>
+                    <div class="col-md-12" style="margin-top:5px;">
+                        @Html.LabelFor(model => model.QrCodeSetupImageUrl, new { @class = "col-form-label strong" })
+                        <img src=@Model.QrCodeSetupImageUrl alt="QRCode" width="250" height="250">
+                    </div>
+                    @Html.LabelFor(model => model.ManualEntryKey, new { @class = "col-form-label strong" })
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(model => model.ManualEntryKey, new { @class = "form-control" })
+                    </div>
+                    @Html.LabelFor(model => model.UserInputCode, new { @class = "col-form-label strong" })
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(model => model.UserInputCode, new { @class = "form-control", placeholder = "Въведете получения код", id = "mobNumberCode", name = "mobNumberCode" })
+                        <span asp-validation-for="UserInputCode" class="text-danger"></span>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row" style="
+        <div class="row" style="
         display: flex;
         justify-content: center;
         align-items: center;
         margin-top:10px;">
-        <button type="button" class="button save" id="send">Вход</button>
+            <button type="button" class="button save" id="send">Активиране</button>
+        </div>
+        <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
     </div>
-    <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
-</div>
 </form>
 
 @section Scripts{
     <script src="~/js/2FAcheck.js" charset="utf-8"></script>
+    <script type="text/javascript">
+        var blink = document.getElementById('infotext');
+        setInterval(function () {
+            blink.style.opacity = (blink.style.opacity == 0 ? 1 : 0);
+        }, 1000);
+    </script>
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

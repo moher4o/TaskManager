@@ -29,17 +29,13 @@ namespace TaskManager.Services
 
         IEnumerable<SelectServiceModel> GetActiveEmployeesNames();
 
-        //IEnumerable<SelectServiceModel> GetEmployeesNamesBySector(int? sectorId);
-        Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesBySectorAsync(int? sectorId);
+         Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesBySectorAsync(int? sectorId);
 
         Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesBySectorWithDeletedAsync(int? sectorId);
 
-        //IEnumerable<SelectServiceModel> GetEmployeesNamesByDepartment(int? departmentId);
-
-        Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDepartmentAsync(int? departmentId);
+         Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDepartmentAsync(int? departmentId);
         Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDepartmentWithDeletedAsync(int? departmentId);
 
-        //IEnumerable<SelectServiceModel> GetEmployeesNamesByDirectorate(int? directorateId);
         Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDirectorateAsync(int? directorateId);
         Task<IEnumerable<SelectServiceModel>> GetEmployeesNamesByDirectorateWithDeletedAsync(int? directorateId);
 
@@ -61,5 +57,8 @@ namespace TaskManager.Services
         Task<IEnumerable<TaskFewInfoServiceModel>> GetAllUserTaskAsync(int userId, DateTime dateToProcess);
 
         Task<bool> MarkUserReadMessage(int userId);
+
+        Task<bool> Set2FAFlagEnabled(int userId);
+        Task<bool> Set2FADisabled(int userId);
     }
 }

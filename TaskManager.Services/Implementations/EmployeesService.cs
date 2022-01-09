@@ -585,5 +585,34 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<bool> Set2FAFlagEnabled(int userId)
+        {
+            try
+            {
+                var currentuser = await this.db.Employees.Where(u => u.Id == userId).FirstOrDefaultAsync();
+                currentuser.TwoFAActiv = true;
+                await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> Set2FADisabled(int userId)
+        {
+            try
+            {
+                var currentuser = await this.db.Employees.Where(u => u.Id == userId).FirstOrDefaultAsync();
+                currentuser.TwoFAActiv = false;
+                await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }

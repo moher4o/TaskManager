@@ -2,6 +2,7 @@
     attachEvents();
 
     function attachEvents() {
+        document.getElementById("mobNumberCode").focus();
         $('#mobNumberCode').on('change', function () { $("#mobNumberCode").css('background-color', '#ffffff'); });
         $('#mobNumberCode').on('click', function () { $("#mobNumberCode").css('background-color', '#ffffff'); });
 

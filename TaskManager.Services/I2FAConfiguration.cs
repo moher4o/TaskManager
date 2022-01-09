@@ -6,7 +6,7 @@ namespace TaskManager.Services
 {
     public interface I2FAConfiguration
     {
-        bool TwoFAEnabled { get; }
+        string TwoFAExplainLink { get; }
 
         string TwoFactorSecretCode { get; }
     }

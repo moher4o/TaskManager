@@ -54,7 +54,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     ci.AddClaim(new Claim("directorateId", currentEmployee.DirectorateId.HasValue ? currentEmployee.DirectorateId.ToString() : "-1"));
                     ci.AddClaim(new Claim("departmentId", currentEmployee.DepartmentId.HasValue ? currentEmployee.DepartmentId.ToString() : "-1"));
                     ci.AddClaim(new Claim("sectorId", currentEmployee.SectorId.HasValue ? currentEmployee.SectorId.ToString() : "-1"));
-                    ci.AddClaim(new Claim("2FA", currentEmployee.TwoFAActive ? "true" : "false"));
+                    ci.AddClaim(new Claim("2FA", currentEmployee.TwoFAActiv ? "true" : "false"));
 
                     if (roleName != DataConstants.Employee)
                     {
