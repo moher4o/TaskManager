@@ -425,7 +425,8 @@ namespace TaskManager.Services.Implementations
                             DaeuAccaunt = newUser.DaeuAccaunt,
                             RoleId = await this.db.Roles.Where(r => r.Name == DataConstants.Employee).Select(r => r.Id).FirstOrDefaultAsync(),
                             isActive = false,
-                            MessageReaded = true
+                            MessageReaded = false,
+                            TwoFAActiv = false
                         };
                         await this.db.Employees.AddAsync(employeeDb);
                         await this.db.SaveChangesAsync();
