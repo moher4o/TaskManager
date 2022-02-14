@@ -23,10 +23,6 @@ namespace TaskMenager.Client.Infrastructure.Extensions
             {
                 //var contentRoot = env.ContentRootPath;
                 // httpContext.Request.Path.Value != "/users/SecondAuthenticationLogin"
-                //if (glurl.ToLower().EndsWith("users/SecondAuthenticationLogin"))
-                //{
-                //    var result = "maube";
-                //}
                 if (httpContext.User.Claims.Where(cl => cl.Type == "2FA").Select(cl => cl.Value).FirstOrDefault() == "true" && !httpContext.Request.Cookies.Any(c => c.Key == "Test_cookie" && c.Value == "CfDJ8FQQXKoRyUdDvRNz9BGHr8JIy1flxoQVv2BUOnrzwQcRuoxF08Hr33t13jmyc"))
                 {
                     var contentRoot = env.ContentRootPath;
@@ -34,7 +30,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     if (!glurl.ToLower().EndsWith("users/secondauthenticationlogin"))
                     {
                         var pathToRedirect = string.Empty;
-                        if (!glurl.ToLower().Contains("taskmanager"))
+                        if (glurl.ToLower().Contains("localhost"))
                         {
                             pathToRedirect = "/users/SecondAuthenticationLogin";
                         }
