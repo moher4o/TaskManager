@@ -24,5 +24,7 @@ namespace TaskMenager.Client.Models.Users
 
         public string TwoFAExplainLink { get; set; }
 
+        public bool TwoFAActiv { get; set; } = false;
+
     }
 }

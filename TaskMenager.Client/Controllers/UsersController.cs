@@ -80,7 +80,7 @@ namespace TaskMenager.Client.Controllers
         [Authorize(Policy = Employee)]
         public IActionResult SecondAuthentication()
         {
-            var userToAuthenticate = currentUser.Email;
+            var userToAuthenticate = currentUser.Email; 
             var twoFactorAuthenticator = new TwoFactorAuthenticator();
             var TwoFactorSecretCode = twoFAConfiguration.TwoFactorSecretCode;
             var accountSecretKey = $"{TwoFactorSecretCode}-{userToAuthenticate}";
@@ -91,7 +91,8 @@ namespace TaskMenager.Client.Controllers
                 Account = currentUser.Email,
                 ManualEntryKey = setupCode.ManualEntryKey,
                 QrCodeSetupImageUrl = setupCode.QrCodeSetupImageUrl,
-                TwoFAExplainLink = twoFAConfiguration.TwoFAExplainLink
+                TwoFAExplainLink = twoFAConfiguration.TwoFAExplainLink,
+                TwoFAActiv = currentUser.TwoFAActiv
             };
 
             return View(twoFAModel);
@@ -130,6 +131,7 @@ namespace TaskMenager.Client.Controllers
             {
                 TempData["Error"] = "Невалиден код!";
                 return RedirectToAction(nameof(SecondAuthentication));
+                
             }
 
         }

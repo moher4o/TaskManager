@@ -16,7 +16,7 @@
         <div class="row">
             <div class="col-md-4 offset-md-1">
                 <div class="form-group">
-                      @Html.LabelFor(model => model.Account, new { @class = "col-form-label strong" })
+                    @Html.LabelFor(model => model.Account, new { @class = "col-form-label strong" })
                     <div class="col-md-6">
                         @Html.TextBoxFor(model => model.Account, new { @class = "form-control", @disabled = "disabled" })
                     </div>
@@ -28,12 +28,20 @@
                     <div class="col-md-12">
                         @Html.TextBoxFor(model => model.ManualEntryKey, new { @class = "form-control" })
                     </div>
-                    @Html.LabelFor(model => model.UserInputCode, new { @class = "col-form-label strong" })
-                    <div class="col-md-6">
-                        @Html.TextBoxFor(model => model.UserInputCode, new { @class = "form-control", placeholder = "Въведете получения код", id = "mobNumberCode", name = "mobNumberCode" })
-                        <span asp-validation-for="UserInputCode" class="text-danger"></span>
-                    </div>
-
+                    @if (!Model.TwoFAActiv)
+                    {
+                        @Html.LabelFor(model => model.UserInputCode, new { @class = "col-form-label strong" })
+                        <div class="col-md-6">
+                            @Html.TextBoxFor(model => model.UserInputCode, new { @class = "form-control", placeholder = "Въведете получения код", id = "mobNumberCode", name = "mobNumberCode" })
+                            <span asp-validation-for="UserInputCode" class="text-danger"></span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-12">
+                            <label style="margin-top: 5px; font-size:small; color:red;">Акаунта е с активирана 2ФА. Деактивиране е възможно в настройките на профила.</label>
+                        </div>
+                    }
                 </div>
             </div>
             <div class="col-md-6 offset-md-1">
@@ -41,7 +49,7 @@
                 @*<iframe loading="lazy" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" src="@(Model.TwoFAExplainLink)" width="560" height="315" frameborder="0"></iframe>       //така се добавя видео от тубата*@
                 <video src="@Url.Content("~/video/What_Is_Two-Factor_Authentication.mp4")" controls width="500" height="300" loop></video>
                 <br>
-                <label style="margin-top: 5px; font-size: large;">Мобилни приложения за двуфакторна автентикация:</label>
+                <label style="margin-top: 5px; font-size: large;">Връзки към мобилни приложения за двуфакторна автентикация:</label>
                 <br>
                 <a class="col-form-label" href="https://play.google.com/store/apps/details?id=com.authy.authy&hl=bg&gl=US" style="margin-top: 5px; color: #278dbc; font-size: large; transition: 0.4s;" target="_blank">Authy</a>,
                 <a class="col-form-label" href="https://play.google.com/store/apps/details?id=com.azure.authenticator&hl=bg&gl=US" style="margin-top: 5px; color: #278dbc; font-size: large; transition: 0.4s;" target="_blank">Microsoft Authenticator</a>,
@@ -56,7 +64,11 @@
         justify-content: center;
         align-items: center;
         margin-top:10px;">
-            <button type="button" class="button save" id="send">Активиране</button>
+            <button type="button" class="button save" id="send" @(Model.TwoFAActiv ? "hidden" : "")>Активиране</button>
+            <button type="button" class="button btncansel" onclick="window.location.href='@Url.Action("Index", "Home")';" @(Model.TwoFAActiv ? "" : "hidden")>
+                OK
+            </button>
+
         </div>
         <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
     </div>
@@ -65,10 +77,10 @@
 @section Scripts{
     <script src="~/js/2FAcheck.js" charset="utf-8"></script>
     @*<script type="text/javascript">
-        var blink = document.getElementById('infotext');
-        setInterval(function () {                                          //блинк ефект за даден елемент
-            blink.style.opacity = (blink.style.opacity == 0 ? 1 : 0);
-        }, 1000);
-    </script>*@
+            var blink = document.getElementById('infotext');
+            setInterval(function () {                                          //блинк ефект за даден елемент
+                blink.style.opacity = (blink.style.opacity == 0 ? 1 : 0);
+            }, 1000);
+        </script>*@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }

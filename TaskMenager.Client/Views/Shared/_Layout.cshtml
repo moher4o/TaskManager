@@ -149,8 +149,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                            <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                       </li>*@
+                     <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -203,6 +203,10 @@
                 <li>
                     <a asp-controller="Report" asp-action="PhonesAndEmails"><i class="fas fa-phone"></i>Тел. указател</a>
                 </li>
+                <li>
+                    <a asp-controller="Users" asp-action="SecondAuthentication"><i class="fas fa-user-shield"></i> 2Ф Автентикация</a>
+                </li>
+
 
                 <li @(User.Identities.Any(u => (u.Name.Contains("avukov") || u.Name.Contains("samso")) && u.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() == "Ангел Иванов Вуков") ? "" : "hidden")>
                     <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
@@ -215,9 +219,6 @@
                         </li>
                         <li>
                             <a asp-controller="Structure" asp-action="AddUsersToSystemTasks">Добавяне към системни задачи на всички служители</a>
-                        </li>
-                        <li>
-                            <a asp-controller="Users" asp-action="SecondAuthentication">2FA</a>
                         </li>
                     </ul>
                 </li>

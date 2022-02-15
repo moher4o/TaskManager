@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TaskMenager.Client.Infrastructure.Extensions
@@ -30,15 +31,16 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     if (!glurl.ToLower().EndsWith("users/secondauthenticationlogin"))
                     {
                         var pathToRedirect = string.Empty;
-                        if (glurl.ToLower().Contains("localhost"))
-                        {
-                            pathToRedirect = "/users/SecondAuthenticationLogin";
-                        }
-                        else
-                        {
-                            pathToRedirect = "TaskManager/users/SecondAuthenticationLogin";
-                        }
+                            if (Regex.Matches(glurl.ToLower(), "taskmanager").Count > 1 || glurl.ToLower().Contains("localhost"))      //ако адреса е например : https://taskmanager.e-gov.bg//taskmanager//
+                            {
+                                pathToRedirect = "users/SecondAuthenticationLogin";
+                            }
+                            else
+                            {
+                                pathToRedirect = "TaskManager/users/SecondAuthenticationLogin";
+                            }
                         httpContext.Response.Redirect(pathToRedirect);
+                        
                     }
                 }
             }
