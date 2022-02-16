@@ -24,6 +24,7 @@ namespace TaskMenager.Client.Infrastructure.Extensions
             {
                 //var contentRoot = env.ContentRootPath;
                 // httpContext.Request.Path.Value != "/users/SecondAuthenticationLogin"
+                //Regex.Matches(glurl.ToLower(), "taskmanager").Count > 1
                 if (httpContext.User.Claims.Where(cl => cl.Type == "2FA").Select(cl => cl.Value).FirstOrDefault() == "true" && !httpContext.Request.Cookies.Any(c => c.Key == "Test_cookie" && c.Value == "CfDJ8FQQXKoRyUdDvRNz9BGHr8JIy1flxoQVv2BUOnrzwQcRuoxF08Hr33t13jmyc"))
                 {
                     var contentRoot = env.ContentRootPath;
@@ -31,16 +32,24 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     if (!glurl.ToLower().EndsWith("users/secondauthenticationlogin"))
                     {
                         var pathToRedirect = string.Empty;
-                            if (Regex.Matches(glurl.ToLower(), "taskmanager").Count > 1 || glurl.ToLower().Contains("localhost"))      //ако адреса е например : https://taskmanager.e-gov.bg//taskmanager//
+                        if (glurl.ToLower().Contains("localhost"))      //ако адреса е например : https://taskmanager.e-gov.bg//taskmanager//
+                        {
+                            pathToRedirect = "users/SecondAuthenticationLogin";
+                        }
+                        else
+                        {
+                            if (glurl.ToLower() == "https://taskmanager.e-gov.bg/taskmanager")
                             {
-                                pathToRedirect = "users/SecondAuthenticationLogin";
+                                pathToRedirect = "taskmanager/users/SecondAuthenticationLogin";
                             }
                             else
                             {
-                                pathToRedirect = "TaskManager/users/SecondAuthenticationLogin";
+                                pathToRedirect = "TaskManager/users/SecondAuthenticationLogin/";
                             }
+
+                        }
                         httpContext.Response.Redirect(pathToRedirect);
-                        
+
                     }
                 }
             }
