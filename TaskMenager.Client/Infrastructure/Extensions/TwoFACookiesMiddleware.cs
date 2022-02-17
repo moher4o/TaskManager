@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TaskMenager.Client.Infrastructure.Extensions
@@ -32,24 +28,23 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     if (!glurl.ToLower().EndsWith("users/secondauthenticationlogin"))
                     {
                         var pathToRedirect = string.Empty;
-                        if (glurl.ToLower().Contains("localhost"))      //ако адреса е например : https://taskmanager.e-gov.bg//taskmanager//
+                        if (glurl.ToLower().Contains("taskmanager"))      //ако адреса е например : https://taskmanager.e-gov.bg//taskmanager//
                         {
-                            pathToRedirect = "users/SecondAuthenticationLogin";
+                            pathToRedirect = "/TaskManager/users/SecondAuthenticationLogin";
+                            
                         }
                         else
                         {
-                            if (glurl.ToLower() == "https://taskmanager.e-gov.bg/taskmanager")
-                            {
-                                pathToRedirect = "taskmanager/users/SecondAuthenticationLogin";
-                            }
-                            else
-                            {
-                                pathToRedirect = "TaskManager/users/SecondAuthenticationLogin/";
-                            }
-
+                            pathToRedirect = "/users/SecondAuthenticationLogin";
                         }
-                        httpContext.Response.Redirect(pathToRedirect);
-
+                        //httpContext.Response.Redirect(pathToRedirect);
+                        string fullUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetEncodedUrl(httpContext.Request);
+                        string strPathAndQuery = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetEncodedPathAndQuery(httpContext.Request);
+                        string host = fullUrl.Replace(strPathAndQuery, "/");
+                        //httpContext.Response.Headers[HeaderNames.Location] = httpContext.Request.Host + pathToRedirect;
+                        var newPath = httpContext.Request.Host + pathToRedirect;
+                        //httpContext.Response.Redirect(newPath);
+                        httpContext = RedirectToCustomPath.RedirectToPath(httpContext, "Users", "SecondAuthenticationLogin");
                     }
                 }
             }
