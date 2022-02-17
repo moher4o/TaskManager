@@ -8,6 +8,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <Optimize>true</Optimize>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Infrastructure\Extensions\RedirectToCustomPath.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />

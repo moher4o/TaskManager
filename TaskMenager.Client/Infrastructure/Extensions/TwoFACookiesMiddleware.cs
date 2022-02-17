@@ -30,21 +30,19 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                         var pathToRedirect = string.Empty;
                         if (glurl.ToLower().Contains("taskmanager"))      //ако адреса е например : https://taskmanager.e-gov.bg//taskmanager//
                         {
-                            pathToRedirect = "/TaskManager/users/SecondAuthenticationLogin";
+                            pathToRedirect = "TaskManager/users/SecondAuthenticationLogin";
                             
                         }
                         else
                         {
-                            pathToRedirect = "/users/SecondAuthenticationLogin";
+                            pathToRedirect = "users/SecondAuthenticationLogin";
                         }
                         //httpContext.Response.Redirect(pathToRedirect);
                         string fullUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetEncodedUrl(httpContext.Request);
                         string strPathAndQuery = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetEncodedPathAndQuery(httpContext.Request);
                         string host = fullUrl.Replace(strPathAndQuery, "/");
-                        //httpContext.Response.Headers[HeaderNames.Location] = httpContext.Request.Host + pathToRedirect;
-                        var newPath = httpContext.Request.Host + pathToRedirect;
-                        //httpContext.Response.Redirect(newPath);
-                        httpContext = RedirectToCustomPath.RedirectToPath(httpContext, "Users", "SecondAuthenticationLogin");
+                        var newPath = host + pathToRedirect;
+                        httpContext.Response.Redirect(newPath);
                     }
                 }
             }
