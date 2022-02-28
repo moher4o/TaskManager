@@ -32,7 +32,8 @@ namespace TaskMenager.Client.Controllers
         private readonly ITaskPrioritysService taskprioritys;
         private readonly IStatusService statuses;
         private readonly IManageFilesService files;
-        public TasksController(IDateManagementConfiguration _dateConfiguration, IManageFilesService files, IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        private readonly I2FAConfiguration twoFAConfiguration;
+        public TasksController(IDateManagementConfiguration _dateConfiguration, IManageFilesService files, IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, I2FAConfiguration _twoFAConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.statuses = statuses;
             this.directorates = directorates;
@@ -42,16 +43,28 @@ namespace TaskMenager.Client.Controllers
             this.taskprioritys = taskprioritys;
             this.files = files;
             this.dateConfiguration = _dateConfiguration;
+            twoFAConfiguration = _twoFAConfiguration;
         }
 
         public IActionResult TasksList()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             return View();
         }
 
 
         public async Task<IActionResult> CreatedTasks()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
+
             var currentEmployee = new UserTasksViewModel()
             {
                 userId = currentUser.Id,
@@ -62,6 +75,12 @@ namespace TaskMenager.Client.Controllers
 
         public async Task<IActionResult> AssignerTasks()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
+
             var currentEmployee = new UserTasksViewModel()
             {
                 userId = currentUser.Id,
@@ -75,95 +94,15 @@ namespace TaskMenager.Client.Controllers
             return View(currentEmployee);
         }
 
-        public async Task<IActionResult> AddWorkHours(string taskName, int taskId, int employeeId)
-        {
-            try
-            {
-                if (employeeId != currentUser.Id)
-                {
-                    var dominions = await this.employees.GetUserDominions(currentUser.Id);
-                    if (!dominions.Any(d => d.Id == employeeId))
-                    {
-                        var targetEmployee = await this.employees.GetEmployeeByIdAsync(employeeId);
-                        TempData["Error"] = $"[AddWorkHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
-                        return RedirectToAction("Index", "Home");
-                    }
-                }
-
-                var newWork = new AddWorkedHoursViewModel()
-                {
-                    employeeId = employeeId,
-                    taskId = taskId,
-                    TaskName = taskName,
-                    employeeFullName = await this.employees.GetEmployeeNameByIdAsync(employeeId)
-                };
-                return View(newWork);
-            }
-            catch (Exception)
-            {
-                TempData["Error"] = "[AddWorkHours]. Неуспешно генериране на модела за отчитане на часове.";
-                return RedirectToAction("Index", "Home");
-            }
-
-        }    //old
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddWorkHours(AddWorkedHoursViewModel model)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return View(model);
-                }
-
-                if (model.employeeId != currentUser.Id)
-                {
-                    var dominions = await this.employees.GetUserDominions(currentUser.Id);
-                    if (!dominions.Any(d => d.Id == model.employeeId))
-                    {
-                        var targetEmployee = await this.employees.GetEmployeeByIdAsync(model.employeeId);
-                        TempData["Error"] = $"[AddWorkHours]. {currentUser.FullName} не е представител на {targetEmployee.FullName} ";
-                        return RedirectToAction("Index", "Home");
-                    }
-                }
-
-
-                var workedHours = new TaskWorkedHoursServiceModel()
-                {
-                    EmployeeId = model.employeeId,
-                    EmployeeName = model.employeeFullName,
-                    TaskName = model.TaskName,
-                    TaskId = model.taskId,
-                    HoursSpend = model.HoursSpend,
-                    Text = model.Text,
-                    WorkDate = model.WorkDate.Date
-                };
-
-                string result = await this.tasks.SetWorkedHoursAsyncOld(workedHours);
-                if (result == "success")
-                {
-                    TempData["Success"] = "Часовете са актуализирани успешно.";
-                    return View(model);
-                }
-                else
-                {
-                    TempData["Error"] = result;
-                    return View(model);
-                }
-
-            }
-            catch (Exception)
-            {
-                TempData["Error"] = "Основна грешка. Моля проверете логиката на входните данни.";
-                return View(model);
-            }
-
-        }       //old
 
         public async Task<IActionResult> EditTask(int taskId)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
+
             try
             {
                 var taskDetails = this.tasks.GetTaskDetails(taskId)
@@ -295,6 +234,11 @@ namespace TaskMenager.Client.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditTask(AddNewTaskViewModel model)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 if (!ModelState.IsValid)
@@ -438,6 +382,11 @@ namespace TaskMenager.Client.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateNewTask()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 var newTask = new AddNewTaskViewModel();
@@ -459,6 +408,11 @@ namespace TaskMenager.Client.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateNewTask(AddNewTaskViewModel model)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 if (!ModelState.IsValid)
@@ -565,6 +519,11 @@ namespace TaskMenager.Client.Controllers
 
         public async Task<IActionResult> AddDateNote(int taskId, int userId, string taskName, DateTime workDate)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             var currentNote = await this.tasks.GetTaskEmpNoteForDateAsync(taskId, userId, workDate);
             if (currentNote == null)
             {
@@ -584,6 +543,11 @@ namespace TaskMenager.Client.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddDateNote(AddNoteToTaskServiceModel model)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             if (!ModelState.IsValid)
             {
                 return PartialView("_AddNoteModalPartial", model);
@@ -599,6 +563,11 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult CloseTask(int taskId, string taskName)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             var model = new CloseTaskViewModel();
 
             model.TaskId = taskId;
@@ -611,6 +580,11 @@ namespace TaskMenager.Client.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CloseTask(CloseTaskViewModel model)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 if (ModelState.IsValid)
@@ -1373,6 +1347,11 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult TaskDetails(int taskId)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             var taskDetails = new TaskViewModel();
 
             taskDetails = this.tasks.GetTaskDetails(taskId)
@@ -1384,6 +1363,11 @@ namespace TaskMenager.Client.Controllers
 
         public async Task<IActionResult> ReopenTask(int taskId)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 var result = await this.tasks.ReopenTaskAsync(taskId);
@@ -1399,6 +1383,11 @@ namespace TaskMenager.Client.Controllers
 
         public async Task<IActionResult> UndeleteTask(int taskId)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 var result = await this.tasks.MarkTaskActiveAsync(taskId, currentUser.Id);

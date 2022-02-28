@@ -21,15 +21,17 @@ namespace TaskMenager.Client.Controllers
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
         private readonly ITitleService titles;
+        private readonly I2FAConfiguration twoFAConfiguration;
 
 
-        public StructureController(ITitleService titles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public StructureController(ITitleService titles, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IHttpContextAccessor httpContextAccessor, ITasksService tasks, IEmployeesService employees, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration, I2FAConfiguration _twoFAConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
             this.titles = titles;
             this.approvalConfiguration = _approvalConfiguration;
+            twoFAConfiguration = _twoFAConfiguration;
         }
 
         public IActionResult RenameTitle(int jobId)
@@ -93,6 +95,11 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult JobtitlesList()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             return View();
         }
 
@@ -454,16 +461,31 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult DirectoratesList()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             return View();
         }
 
         public IActionResult DepartmentsList()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             return View();
         }
 
         public IActionResult SectorsList()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             return View();
         }
 

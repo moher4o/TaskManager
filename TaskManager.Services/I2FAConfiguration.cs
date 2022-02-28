@@ -9,5 +9,7 @@ namespace TaskManager.Services
         string TwoFAExplainLink { get; }
 
         string TwoFactorSecretCode { get; }
+
+        bool TwoFAMandatory { get; }
     }
 }

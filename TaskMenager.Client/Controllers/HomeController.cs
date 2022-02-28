@@ -29,29 +29,35 @@ namespace TaskMenager.Client.Controllers
     {
         private readonly IManageFilesService files;
         private readonly IApprovalConfiguration approvalConfiguration;
-        //private readonly I2FAConfiguration twoFAConfiguration;
+        private readonly I2FAConfiguration twoFAConfiguration;
 
-        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IManageFilesService files, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public HomeController(ILogger<HomeController> logger, IEmployeesService employees, IManageFilesService files, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration, I2FAConfiguration _twoFAConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.files = files;
             this.approvalConfiguration = _approvalConfiguration;
-            //twoFAConfiguration = _twoFAConfiguration;
+            twoFAConfiguration = _twoFAConfiguration;
          }
 
 
         public IActionResult Index()
         {
-            if (this.User.Claims.Any(cl => cl.Value == "Guest"))
-            {
-                return RedirectToAction("WellCome", "Users");
-            }
-
-
             if (this.User.Claims.Any(cl => cl.Type == "DbUpdated"))
             {
                 TempData["Error"] = this.User.Claims.Where(cl => cl.Type == "DbUpdated").Select(cl => cl.Value).FirstOrDefault();
                 return RedirectToAction("NotAuthorized", "Base");
             }
+
+
+            if (this.User.Claims.Any(cl => cl.Value == "Guest"))
+            {
+                return RedirectToAction("WellCome", "Users");
+            }
+
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
 
 
             return View();

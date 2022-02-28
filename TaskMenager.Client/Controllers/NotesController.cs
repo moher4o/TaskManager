@@ -22,7 +22,8 @@ namespace TaskMenager.Client.Controllers
         private readonly ITaskPrioritysService taskprioritys;
         private readonly IStatusService statuses;
         private readonly INotesService taskNotes;
-        public NotesController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, INotesService taskNotes, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        private readonly I2FAConfiguration twoFAConfiguration;
+        public NotesController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, INotesService taskNotes, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, I2FAConfiguration _twoFAConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.statuses = statuses;
             this.directorates = directorates;
@@ -31,10 +32,16 @@ namespace TaskMenager.Client.Controllers
             this.tasktypes = tasktypes;
             this.taskprioritys = taskprioritys;
             this.taskNotes = taskNotes;
+            twoFAConfiguration = _twoFAConfiguration;
         }
 
         public async Task<IActionResult> TaskNotesList(int taskId)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 var taskWithNotes = await this.taskNotes.GetTaskNotesAsync(taskId);

@@ -33,18 +33,25 @@ namespace TaskMenager.Client.Controllers
         private readonly IDirectorateService directorates;
         private readonly IDepartmentsService departments;
         private readonly ISectorsService sectors;
+        private readonly I2FAConfiguration twoFAConfiguration;
 
-        public ReportController(IDateManagementConfiguration _dateConfiguration, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public ReportController(IDateManagementConfiguration _dateConfiguration, IDirectorateService directorates, IDepartmentsService departments, ISectorsService sectors, IEmployeesService employees, ITasksService tasks, IHttpContextAccessor httpContextAccessor, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, IApprovalConfiguration _approvalConfiguration, I2FAConfiguration _twoFAConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.directorates = directorates;
             this.departments = departments;
             this.sectors = sectors;
             this.dateConfiguration = _dateConfiguration;
             this.approvalConfiguration = _approvalConfiguration;
+            twoFAConfiguration = _twoFAConfiguration;
         }
 
         public IActionResult TaskReportPeriod(int taskId)
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 var currentTask = this.tasks.GetTaskDetails(taskId).FirstOrDefault();
@@ -631,6 +638,11 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult PeriodReport()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 var newPeriod = new PeriodReportViewModel();
@@ -1502,6 +1514,11 @@ namespace TaskMenager.Client.Controllers
 
         public IActionResult SetPersonalPeriodDate(int userId = 0)    //employee 1 step
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
+
             try
             {
                 var myPeriod = new PeriodViewModel();

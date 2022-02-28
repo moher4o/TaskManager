@@ -196,6 +196,7 @@ namespace TaskMenager.Client.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(UserRegisterViewModel model)
         {
+
             try
             {
                 if (!ModelState.IsValid)
@@ -558,6 +559,10 @@ namespace TaskMenager.Client.Controllers
         [Authorize(Policy = Employee)]
         public IActionResult UsersList()
         {
+            if (this.User.Claims.Any(cl => cl.Type == "2FA" && cl.Value == "false") && twoFAConfiguration.TwoFAMandatory)
+            {
+                return RedirectToAction("SecondAuthentication", "Users");
+            }
             return View();
         }
 

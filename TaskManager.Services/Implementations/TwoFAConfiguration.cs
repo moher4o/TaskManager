@@ -5,5 +5,7 @@
         public string TwoFAExplainLink { get; set; }
 
         public string TwoFactorSecretCode { get; set; }
+
+        public bool TwoFAMandatory { get; set; }
     }
 }
