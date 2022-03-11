@@ -149,8 +149,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                     <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                </li>*@
+                                 <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                            </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -252,35 +252,35 @@
             </nav>
 
             @*<div class="row">*@
-                <div class="container widthmobile"  style="max-width:100%;">
+            <div class="container widthmobile" style="max-width:100%;">
 
-                    <main role="main" class="pb-3">
-                        @RenderBody()
-                        @if (TempData["Success"] != null)
-                        {
-                            <script type="text/javascript">
-                                $(document).ready(function () {
-                                    var data = $('#successMessage').text();
-                                    toastr.success(data, { timeOut: 4000 });
-                                    //notify.showSuccess(data);
-                                });
-                            </script>
-                            <p class="alert alert-success" id="successMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
-                        }
-                        @if (TempData["Error"] != null)
-                        {
-                            <script type="text/javascript">
-                                $(document).ready(function () {
-                                    var data = $('#errorMessage').text();
-                                    toastr.error(data, { timeOut: 6000 });
-                                    //notify.showError(data);
-                                });
-                            </script>
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                    @if (TempData["Success"] != null)
+                    {
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                var data = $('#successMessage').text();
+                                toastr.success(data, { timeOut: 4000 });
+                                //notify.showSuccess(data);
+                            });
+                        </script>
+                        <p class="alert alert-success" id="successMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                var data = $('#errorMessage').text();
+                                toastr.error(data, { timeOut: 6000 });
+                                //notify.showError(data);
+                            });
+                        </script>
 
-                            <p class="alert alert-danger" id="errorMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
-                        }
-                    </main>
-                </div>
+                        <p class="alert alert-danger" id="errorMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
+                    }
+                </main>
+            </div>
         </div>
         <footer class="border-top footer text-muted hideonmobile">
             <div class="container">
@@ -326,7 +326,7 @@
                         else {
                             toastr.error("Съобщението не беше намерено!", { timeOut: 10000 });
                         }
-                        
+
                     }
                     $.getJSON(urlNotActive, { get_param: 'value' }, function (data) {
                         //console.log(data);
