@@ -19,7 +19,7 @@ namespace TaskMenager.Client.Models.Report
         [Required(ErrorMessage = "Полето е задължително")]
         [DataType(DataType.Date)]
         [Display(Name = "Начална дата *")]
-        public DateTime StartDate { get; set; } = DateTime.Now.Date.AddDays(-7);
+        public DateTime StartDate { get; set; } = DateTime.Now.Date.AddDays(-6);
 
         [Required(ErrorMessage = "Полето е задължително")]
         [DataType(DataType.Date)]

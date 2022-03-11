@@ -374,6 +374,13 @@ function SetHours(newDate) {
     let totallSuccess = true;
     var messageInfo = 'Часовете са записани успешно';
     if (!isholiday && !isill) {                                    //ако не е чекнато отпуска или болничен
+
+        var now = new Date();
+        if (newDate > now) {
+            swal("Информация", "Отчитането на свършена работа за бъдеща дата противоречи на замисъла на \"Мениджър Задачи\". Желателно е да маркирате само отпуски или болнични за бъдещ период.", "warning");
+        }
+
+
         var removeSystemTAsktUrl = path + '\/Tasks\/RemoveSystemTasks';
         $.ajax({
             type: 'GET',
