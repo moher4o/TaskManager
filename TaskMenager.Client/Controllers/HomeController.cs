@@ -152,6 +152,16 @@ namespace TaskMenager.Client.Controllers
 
             return PartialView("~/Views/Home/_ShowTasksPartial.cshtml", currentEmployee);
         }
+
+        public async Task<JsonResult> GetDateTasksJsonAsync()
+        {
+            int identityId = 1;
+            DateTime dateToProcess =  DateTime.Now.Date;
+            var emptasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date);
+
+            return Json(new { emptasks });
+        }
+
         #region API Calls
         //[Authorize(Policy = Employee)]
         //[HttpGet]
