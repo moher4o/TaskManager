@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.Common;
 using TaskManager.Services;
 using TaskManager.WebApi.Models;
 
@@ -25,16 +26,18 @@ namespace TaskManager.WebApi.Controllers
             DateTime dateToProcess = DateTime.Now.Date;
             var emptasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date);
             var result = new List<SimpleTask>();
-            foreach (var itemTask in emptasks)
+            int count = 1;
+            foreach (var itemTask in emptasks.Where(at => at.TaskStatusName == DataConstants.TaskStatusClosed))
             {
                 var item = new SimpleTask()
                 {
                     Id = itemTask.Id,
-                    Name = itemTask.TaskName,
-                    Roaster = itemTask.TaskTypeName,
+                    Name = "Еспресо "+count.ToString(),
+                    Roaster = itemTask.TaskStatusName,
                     Image = "coffeebag.png"
                 };
                 result.Add(item);
+                count++;
             }
             return result;
         }
