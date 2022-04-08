@@ -20,24 +20,36 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<List<SimpleTask>> Get()
+        public async Task<List<TaskApiModel>> Get()
         {
             int identityId = 1;
             DateTime dateToProcess = DateTime.Now.Date;
             var emptasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date);
-            var result = new List<SimpleTask>();
-            int count = 1;
-            foreach (var itemTask in emptasks.Where(at => at.TaskStatusName == DataConstants.TaskStatusClosed))
+            var result = new List<TaskApiModel>();
+            foreach (var itemTask in emptasks.Where(at => at.TaskStatusName == DataConstants.TaskStatusInProgres))
             {
-                var item = new SimpleTask()
+                var item = new TaskApiModel()
                 {
                     Id = itemTask.Id,
-                    Name = "Еспресо "+count.ToString(),
-                    Roaster = itemTask.TaskStatusName,
-                    Image = "coffeebag.png"
+                    TaskName = itemTask.TaskName,
+                    TaskStatusName = itemTask.TaskStatusName,
+                    EmployeeHoursToday = itemTask.EmployeeHoursToday,
+                    TaskPriorityName = itemTask.TaskPriorityName,
+                    ApprovedByAdmninName = itemTask.ApprovedByAdmninName,
+                    ApprovedToday = itemTask.ApprovedToday,
+                    ChildrenCount = itemTask.ChildrenCount,
+                    EmployeeHours = itemTask.EmployeeHours,
+                    EndDate = itemTask.EndDate,
+                    EndDatePrognose = itemTask.EndDatePrognose,
+                    FilesCount = itemTask.FilesCount,
+                    HoursLimit = itemTask.HoursLimit,
+                    NotesCount = itemTask.NotesCount,
+                    ParentTaskId = itemTask.ParentTaskId,
+                    TaskNoteForToday = itemTask.TaskNoteForToday,
+                    TaskTypeName = itemTask.TaskTypeName
                 };
                 result.Add(item);
-                count++;
+                
             }
             return result;
         }
