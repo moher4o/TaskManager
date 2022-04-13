@@ -15,6 +15,8 @@ namespace TaskManager.Services
         Task<IEnumerable<SelectServiceModel>> GetUserDominions(int userId);
         Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(int userId, DateTime dateToProcess);
 
+        Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(string userName, DateTime dateToProcess);
+
         Task<IEnumerable<TaskFewInfoServiceModel>> GetUserAssignerTaskAsync(int userId);
 
         Task<IEnumerable<TaskFewInfoServiceModel>> GetUserCreatedTaskAsync(int userId);

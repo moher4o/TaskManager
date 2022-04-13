@@ -5,27 +5,38 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Common;
 using TaskManager.Services;
+using TaskManager.Services.Models.TaskModels;
 using TaskManager.WebApi.Models;
 
 namespace TaskManager.WebApi.Controllers
 {
-    [Route("api/[Controller]")]
-    public class WorkController : Controller
+    
+    public class WorkController : BaseController
     {
         protected readonly IEmployeesService employees;
+        protected readonly ITasksService tasks;
 
-        public WorkController(IEmployeesService _employees)
+        public WorkController(IEmployeesService _employees, ITasksService _tasks)
         {
+            this.tasks = _tasks;
             this.employees = _employees;
         }
 
         [HttpGet]
-        public async Task<List<TaskApiModel>> Get()
+        public async Task<List<TaskApiModel>> Get([FromQuery] string username, [FromQuery] DateTime workdate)
         {
-            int identityId = 1;
-            DateTime dateToProcess = DateTime.Now.Date;
-            var emptasks = await this.employees.GetUserActiveTaskAsync(identityId, dateToProcess.Date);
             var result = new List<TaskApiModel>();
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return result;
+            }
+            if (workdate.Date < DateTime.Today.AddYears(-30))
+            {
+                return result;
+            }
+
+            var emptasks = await this.employees.GetUserActiveTaskAsync(username, workdate.Date);
+            
             foreach (var itemTask in emptasks.Where(at => at.TaskStatusName == DataConstants.TaskStatusInProgres))
             {
                 var item = new TaskApiModel()
@@ -52,6 +63,42 @@ namespace TaskManager.WebApi.Controllers
                 
             }
             return result;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post(AuthTaskUpdate requestMob)
+        {
+            return Ok();
+            //try
+            //{
+
+            //    var inTime = workDate.Date < DateTime.Now.Date.AddDays(-7) ? false : true; 
+            //    var workedHours = new TaskWorkedHoursServiceModel()
+            //    {
+            //        EmployeeId = userId,
+            //        TaskId = taskId,
+            //        HoursSpend = hours,
+            //        WorkDate = workDate.Date,
+            //        RegistrationDate = DateTime.Now.Date,
+            //        InTimeRecord = inTime
+            //    };
+
+            //    string result = await this.tasks.SetWorkedHoursAsync(workedHours);
+            //    if (result == "success")
+            //    {
+            //        return Ok();
+            //        //return Json(new { success = true, message = ("Часовете са отразени успешно" + inTime.ToString() + Environment.NewLine) });
+            //    }
+            //    else
+            //    {
+            //        return BadRequest("Database not updated");
+            //    }
+
+            //}
+            //catch (Exception)
+            //{
+            //    return BadRequest();
+            //}
         }
     }
 }

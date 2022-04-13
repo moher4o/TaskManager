@@ -53,6 +53,32 @@ namespace TaskManager.Services.Implementations
             return tasks;
         }
 
+        public async Task<IEnumerable<TaskFewInfoServiceModel>> GetUserActiveTaskAsync(string userName, DateTime dateToProcess)
+        {
+
+            //int userId = await this.db.Employees.Where(e => (e.DaeuAccaunt.Substring(e.DaeuAccaunt.IndexOf("\\") + 1)) == userName).Select(e => e.Id).FirstOrDefaultAsync();
+            int userId = await this.db.Employees.Where(e => e.DaeuAccaunt == userName).Select(e => e.Id).FirstOrDefaultAsync();
+            var tasks = await this.db.EmployeesTasks
+                    .Where(et => et.EmployeeId == userId)
+                    .Select(t => t.Task)
+                    .Where(t => t.isDeleted == false && t.StartDate.Date <= dateToProcess.Date)
+                    .Distinct()
+                    .OrderBy(t => t.PriorityId)
+                    .ThenByDescending(t => t.EndDatePrognose)
+                    .ProjectTo<TaskFewInfoServiceModel>(new { currentEmployeeId = userId, workDate = dateToProcess.Date })
+                    .ToListAsync();
+
+            foreach (var item in tasks)
+            {
+                if (await this.db.EmployeesTasks.Where(et => et.EmployeeId == userId && et.TaskId == item.Id).Select(et => et.isDeleted).FirstOrDefaultAsync() == true && item.TaskStatusName != TaskStatusClosed)
+                {
+                    item.TaskStatusName = "Изтрит";
+                }
+            }
+
+            return tasks;
+        }
+
         public async Task<IEnumerable<TaskFewInfoServiceModel>> GetAllUserTaskAsync(int userId, DateTime dateToProcess)
         {
             var tasks = await this.db.EmployeesTasks
