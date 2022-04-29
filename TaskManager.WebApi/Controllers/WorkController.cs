@@ -26,15 +26,58 @@ namespace TaskManager.WebApi.Controllers
         public async Task<List<TaskApiModel>> Get([FromQuery] string username, [FromQuery] DateTime workdate)
         {
             var result = new List<TaskApiModel>();
+
             if (string.IsNullOrWhiteSpace(username))
             {
+                var nulltask = new TaskApiModel()             //за информация, ако няма параметри
+                {
+                    Id = 1,
+                    TaskName = "Не са подадени валидни параметри - потребителско име",
+                    TaskStatusName = "работи се",
+                    EmployeeHoursToday = 0,
+                    TaskPriorityName = "нисък",
+                    ApprovedByAdmninName = "Ангел Вуков",
+                    ApprovedToday = true,
+                    ChildrenCount = 0,
+                    EmployeeHours = 0,
+                    EndDate = DateTime.Now.Date,
+                    EndDatePrognose = DateTime.Now.Date,
+                    FilesCount = 0,
+                    HoursLimit = 0,
+                    NotesCount = 0,
+                    ParentTaskId = 0,
+                    TaskNoteForToday = "",
+                    TaskTypeName = "системна"
+                };
+                result.Add(nulltask);
                 return result;
             }
             if (workdate.Date < DateTime.Today.AddYears(-30))
             {
+                var nulltask = new TaskApiModel()             //за информация, ако няма параметри
+                {
+                    Id = 1,
+                    TaskName = "Не са подадени валидни параметри - дата",
+                    TaskStatusName = "работи се",
+                    EmployeeHoursToday = 0,
+                    TaskPriorityName = "нисък",
+                    ApprovedByAdmninName = "Ангел Вуков",
+                    ApprovedToday = true,
+                    ChildrenCount = 0,
+                    EmployeeHours = 0,
+                    EndDate = DateTime.Now.Date,
+                    EndDatePrognose = DateTime.Now.Date,
+                    FilesCount = 0,
+                    HoursLimit = 0,
+                    NotesCount = 0,
+                    ParentTaskId = 0,
+                    TaskNoteForToday = "",
+                    TaskTypeName = "системна"
+                };
+                result.Add(nulltask);
                 return result;
             }
-
+           
             var emptasks = await this.employees.GetUserActiveTaskAsync(username, workdate.Date);
             
             foreach (var itemTask in emptasks.Where(at => at.TaskStatusName == DataConstants.TaskStatusInProgres))
