@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Services;
+using TaskManager.Services.Implementations;
 using TaskManager.Services.Models;
 using TaskManager.Services.Models.EmployeeModels;
 using TaskMenager.Client.Models.Users;
@@ -145,6 +146,7 @@ namespace TaskMenager.Client.Controllers
         [Authorize(Policy = Employee)]
         public async Task<IActionResult> EditUser(int userId)
         {
+            
             try
             {
                 var currentEmployee = await this.employees.GetEmployeeByIdAsync(userId);
@@ -155,7 +157,6 @@ namespace TaskMenager.Client.Controllers
                 }
                 if (currentUser.RoleName == SuperAdmin || currentUser.Id == currentEmployee.Id || (currentUser.RoleName == DirectorateAdmin && currentUser.DirectorateId == currentEmployee.DirectorateId) || (currentUser.RoleName == DepartmentAdmin && currentUser.DepartmentId == currentEmployee.DepartmentId) || (currentUser.RoleName == SectorAdmin && currentUser.SectorId == currentEmployee.SectorId))
                 {
-
                     var userToEdit = new UserRegisterViewModel()
                     {
                         Id = currentEmployee.Id,

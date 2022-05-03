@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace TaskManager.Services.Implementations
 {
-    public class KeyGenerator
+    public static class KeyGenerator
     {
         internal static readonly char[] chars =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
@@ -44,6 +44,13 @@ namespace TaskManager.Services.Implementations
                 result.Append(chars[b % (chars.Length)]);
             }
             return result.ToString();
+        }
+
+        public static string GenerateRandomString()
+        {
+            using Aes crypto = Aes.Create();
+            crypto.GenerateKey();
+            return Convert.ToBase64String(crypto.Key, 0, 9, Base64FormattingOptions.None);
         }
     }
 }
