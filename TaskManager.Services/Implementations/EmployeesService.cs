@@ -430,7 +430,7 @@ namespace TaskManager.Services.Implementations
                         userFromDB.DirectorateId = newUser.DirectorateId;
                         userFromDB.DepartmentId = newUser.DepartmentId;
                         userFromDB.SectorId = newUser.SectorId;
-                        userFromDB.DaeuAccaunt = newUser.DaeuAccaunt;
+                        //userFromDB.DaeuAccaunt = newUser.DaeuAccaunt;
                         userFromDB.RoleId = newUser.RoleId;
                         userFromDB.Notify = newUser.Notify;
                         userFromDB.RepresentativeId = newUser.RepresentativeId;
@@ -452,7 +452,8 @@ namespace TaskManager.Services.Implementations
                             RoleId = await this.db.Roles.Where(r => r.Name == DataConstants.Employee).Select(r => r.Id).FirstOrDefaultAsync(),
                             isActive = false,
                             MessageReaded = false,
-                            TwoFAActiv = false
+                            TwoFAActiv = false,
+                            SecretKeyHash = KeyGenerator.Encrypt(KeyGenerator.GenerateRandomString(),newUser.DaeuAccaunt)
                         };
                         await this.db.Employees.AddAsync(employeeDb);
                         await this.db.SaveChangesAsync();
@@ -639,6 +640,27 @@ namespace TaskManager.Services.Implementations
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        public async Task<string> GenerateSecretKeyWhenEmpty()
+        {
+            try
+            {
+                var employeesWithoutSecret = await this.db.Employees
+                    .Where(e => string.IsNullOrWhiteSpace(e.SecretKeyHash))
+                    .ToListAsync();
+                foreach (var emp in employeesWithoutSecret)
+                {
+                    var secret = KeyGenerator.GenerateRandomString();
+                    emp.SecretKeyHash = KeyGenerator.Encrypt(secret, emp.DaeuAccaunt);
+                }
+                await this.db.SaveChangesAsync();
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
     }

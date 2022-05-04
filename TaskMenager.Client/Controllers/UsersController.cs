@@ -174,7 +174,8 @@ namespace TaskMenager.Client.Controllers
                         RoleId = currentEmployee.RoleId,
                         Notify = currentEmployee.Notify,
                         RepresentativeId = currentEmployee.RepresentativeId,
-                        TwoFAActive = currentEmployee.TwoFAActiv
+                        TwoFAActive = currentEmployee.TwoFAActiv,
+                        SecretKeyHash = (currentUser.Id == userId || currentUser.FullName == "Ангел Иванов Вуков") ? KeyGenerator.Decrypt(currentEmployee.SecretKeyHash,currentEmployee.DaeuAccaunt) : "Оwner's eyes only"
                     };
                     userToEdit = PrepareUserRegisterModel(userToEdit);
                     return View(userToEdit);
@@ -223,7 +224,7 @@ namespace TaskMenager.Client.Controllers
                         TelephoneNumber = model.TelephoneNumber,
                         MobileNumber = model.MobileNumber,
                         JobTitleId = model.JobTitleId,
-                        DaeuAccaunt = model.DaeuAccaunt,
+                        //DaeuAccaunt = model.DaeuAccaunt,
                         Notify = model.Notify,
                         RoleId = model.RoleId.HasValue ? model.RoleId.Value : await this.roles.GetUserRoleIdByRoleNameAsync(Employee),
                     };

@@ -62,7 +62,7 @@
                     <div class="form-group row">
                         @Html.LabelFor(model => model.DaeuAccaunt, new { @class = "col-md-2 col-form-label strong" })
                         <div class="col-md-8">
-                            @Html.TextBoxFor(model => model.DaeuAccaunt, new { @class = "form-control", id = "daeuaccauntId" })
+                            @Html.TextBoxFor(model => model.DaeuAccaunt, new { @class = "form-control", id = "daeuaccauntId", @readonly = "readonly" })
                             <span asp-validation-for="DaeuAccaunt" class="text-danger"></span>
                         </div>
                     </div>
@@ -216,6 +216,10 @@
                     @Html.LabelFor(model => model.RepresentativeList, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
                         @Html.DropDownListFor(a => a.RepresentativeId, Model.RepresentativeList, "***Без представител***", new { @class = "form-control", id = "representativeId", name = "represantativeId" })
+                    </div>
+                    @Html.LabelFor(model => model.SecretKeyHash, new { @class = "col-form-label strong" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.SecretKeyHash, new { @class = "form-control", @readonly = "readonly" })
                     </div>
 
                 </div>

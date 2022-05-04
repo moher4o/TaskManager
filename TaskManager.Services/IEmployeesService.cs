@@ -62,5 +62,6 @@ namespace TaskManager.Services
 
         Task<bool> Set2FAFlagEnabled(int userId);
         Task<bool> Set2FADisabled(int userId);
+        Task<string> GenerateSecretKeyWhenEmpty();
     }
 }

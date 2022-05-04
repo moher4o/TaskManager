@@ -149,8 +149,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                                 <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                            </li>*@
+                     <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -207,13 +207,35 @@
                     <a asp-controller="Users" asp-action="SecondAuthentication"><i class="fas fa-user-shield"></i> 2Ф Автентикация</a>
                 </li>
 
-
-                <li @(User.Identities.Any(u => (u.Name.Contains("avukov") || u.Name.Contains("samso")) && u.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() == "Ангел Иванов Вуков") ? "" : "hidden")>
+                @if (User.Identities.Any(u => (u.Name.Contains("avukov") || u.Name.Contains("samso")) && u.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() == "Ангел Иванов Вуков"))
+                {
+                    <li>
+                        <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                            <i class="fas fa-cog"></i>
+                            <span class="chatnotifications">Разработчик</span>
+                        </a>
+                        <ul class="collapse list-unstyled" id="developerSubmenu">
+                            <li>
+                                <a asp-controller="Structure" asp-action="RemoveEmptySecretKey">Генериране на secretkey автоматично</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Добавяне на email автоматично</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="AddUsersToSystemTasks">Добавяне към системни задачи на всички служители</a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @*<li @(User.Identities.Any(u => (u.Name.Contains("avukov") || u.Name.Contains("samso")) && u.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() == "Ангел Иванов Вуков") ? "" : "hidden")>
                     <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fas fa-cog"></i>
                         <span class="chatnotifications">Разработчик</span>
                     </a>
                     <ul class="collapse list-unstyled" id="developerSubmenu">
+                        <li>
+                            <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Генериране на secretkey автоматично</a>
+                        </li>
                         <li>
                             <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Добавяне на email автоматично</a>
                         </li>
@@ -221,7 +243,7 @@
                             <a asp-controller="Structure" asp-action="AddUsersToSystemTasks">Добавяне към системни задачи на всички служители</a>
                         </li>
                     </ul>
-                </li>
+                </li>*@
 
             </ul>
         </nav>

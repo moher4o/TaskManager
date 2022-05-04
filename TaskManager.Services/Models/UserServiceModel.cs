@@ -51,6 +51,8 @@ namespace TaskManager.Services.Models
 
         public string RepresentativeName { get; set; }
 
+        public string SecretKeyHash { get; set; }
+
         public bool MessageReaded { get; set; }
 
         public bool TwoFAActiv { get; set; }

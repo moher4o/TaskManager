@@ -67,6 +67,9 @@ namespace TaskMenager.Client.Models.Users
         [StringLength(50)]
         public string DaeuAccaunt { get; set; }
 
+        [Display(Name = "Код за мобилното приложение:")]
+        public string SecretKeyHash { get; set; }
+
         public bool isActive { get; set; }
 
         public bool isDeleted { get; set; }

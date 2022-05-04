@@ -519,6 +519,20 @@ namespace TaskMenager.Client.Controllers
             return RedirectToAction("UsersList", "Users");
         }
 
+        public async Task<IActionResult> RemoveEmptySecretKey()
+        {
+            var result = await this.employees.GenerateSecretKeyWhenEmpty();
+            if (result != "success")
+            {
+                TempData["Error"] = $"[Service error] {result}";
+            }
+            else
+            {
+                TempData["Success"] = "Всички празни секрети са генерирани автоматично";
+            }
+
+            return RedirectToAction("UsersList", "Users");
+        }
 
         #region API Calls
         [HttpGet]

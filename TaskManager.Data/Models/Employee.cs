@@ -50,6 +50,8 @@ namespace TaskManager.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string DaeuAccaunt { get; set; }
 
+        public string SecretKeyHash { get; set; }
+
         public bool isDeleted { get; set; } = false;
 
         public bool isActive { get; set; } = true;
