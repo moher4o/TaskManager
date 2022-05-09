@@ -663,5 +663,26 @@ namespace TaskManager.Services.Implementations
                 return ex.Message;
             }
         }
+
+        public async Task<string> GetUserNameBySKAsync(string secretKey)
+        {
+            try
+            {
+                var usersHashs = await this.db.Employees
+                                            .Where(e => e.isActive == true)
+                                            .Select(e => new {
+                                                daeuAcount = e.DaeuAccaunt,
+                                                secret = KeyGenerator.Decrypt(e.SecretKeyHash, e.DaeuAccaunt)
+                                            }).ToListAsync();
+
+                var username = usersHashs.Where(uh => uh.secret == secretKey).Select(uh => uh.daeuAcount).FirstOrDefault();
+                return username;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+        }
     }
 }

@@ -23,61 +23,52 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<List<TaskApiModel>> Get([FromQuery] string username, [FromQuery] DateTime workdate)
+        public async Task<List<TaskApiModel>> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate)
         {
             var result = new List<TaskApiModel>();
+            var nulltask = new TaskApiModel()             //за информация, ако няма параметри
+            {
+                Id = 1,
+                TaskName = "Не са подадени валидни параметри",
+                TaskStatusName = "работи се",
+                EmployeeHoursToday = 0,
+                TaskPriorityName = "нисък",
+                ApprovedByAdmninName = "Ангел Вуков",
+                ApprovedToday = true,
+                ChildrenCount = 0,
+                EmployeeHours = 0,
+                EndDate = DateTime.Now.Date,
+                EndDatePrognose = DateTime.Now.Date,
+                FilesCount = 0,
+                HoursLimit = 0,
+                NotesCount = 0,
+                ParentTaskId = 0,
+                TaskNoteForToday = "",
+                TaskTypeName = DataConstants.TaskTypeSystem
+            };
 
+
+            if (string.IsNullOrWhiteSpace(userSecretKey))
+            {
+                nulltask.TaskName = "Невалидни параметри - потребителско име";
+                result.Add(nulltask);
+                return result;
+            }
+            else if (workdate.Date < DateTime.Today.AddYears(-30))
+            {
+                nulltask.TaskName = "Невалидни параметри - дата";
+                result.Add(nulltask);
+                return result;
+            }
+
+            var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
             if (string.IsNullOrWhiteSpace(username))
             {
-                var nulltask = new TaskApiModel()             //за информация, ако няма параметри
-                {
-                    Id = 1,
-                    TaskName = "Не са подадени валидни параметри - потребителско име",
-                    TaskStatusName = "работи се",
-                    EmployeeHoursToday = 0,
-                    TaskPriorityName = "нисък",
-                    ApprovedByAdmninName = "Ангел Вуков",
-                    ApprovedToday = true,
-                    ChildrenCount = 0,
-                    EmployeeHours = 0,
-                    EndDate = DateTime.Now.Date,
-                    EndDatePrognose = DateTime.Now.Date,
-                    FilesCount = 0,
-                    HoursLimit = 0,
-                    NotesCount = 0,
-                    ParentTaskId = 0,
-                    TaskNoteForToday = "",
-                    TaskTypeName = "системна"
-                };
+                nulltask.TaskName = "Невалидни параметри - Няма такъв потребител или е неактивен";
                 result.Add(nulltask);
                 return result;
             }
-            if (workdate.Date < DateTime.Today.AddYears(-30))
-            {
-                var nulltask = new TaskApiModel()             //за информация, ако няма параметри
-                {
-                    Id = 1,
-                    TaskName = "Не са подадени валидни параметри - дата",
-                    TaskStatusName = "работи се",
-                    EmployeeHoursToday = 0,
-                    TaskPriorityName = "нисък",
-                    ApprovedByAdmninName = "Ангел Вуков",
-                    ApprovedToday = true,
-                    ChildrenCount = 0,
-                    EmployeeHours = 0,
-                    EndDate = DateTime.Now.Date,
-                    EndDatePrognose = DateTime.Now.Date,
-                    FilesCount = 0,
-                    HoursLimit = 0,
-                    NotesCount = 0,
-                    ParentTaskId = 0,
-                    TaskNoteForToday = "",
-                    TaskTypeName = "системна"
-                };
-                result.Add(nulltask);
-                return result;
-            }
-           
+
             var emptasks = await this.employees.GetUserActiveTaskAsync(username, workdate.Date);
             
             foreach (var itemTask in emptasks.Where(at => at.TaskStatusName == DataConstants.TaskStatusInProgres))
