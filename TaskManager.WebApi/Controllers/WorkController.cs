@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Common;
@@ -100,8 +101,9 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(AuthTaskUpdate requestMob)
+        public async Task<IActionResult> Post([FromQuery] string userSecretKey, [FromBody] AuthTaskUpdate requestMob)
         {
+            //var posts = await response.Content.ReadFromJsonAsync<IEnumerable<Post>>();
             return Ok();
             //try
             //{

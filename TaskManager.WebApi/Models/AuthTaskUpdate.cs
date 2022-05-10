@@ -7,9 +7,9 @@ namespace TaskManager.WebApi.Models
 {
     public class AuthTaskUpdate
     {
-        public string username { get; set; }
-        public string Hmac { get; set; }
-        public string Data { get; set; }
+        public int taskId { get; set; }
+        public int hoursSpend { get; set; }
+        public string workDate { get; set; }
     }
 
 
