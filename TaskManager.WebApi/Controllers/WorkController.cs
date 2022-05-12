@@ -16,11 +16,13 @@ namespace TaskManager.WebApi.Controllers
     {
         protected readonly IEmployeesService employees;
         protected readonly ITasksService tasks;
+        private readonly IDateManagementConfiguration dateConfiguration;
 
-        public WorkController(IEmployeesService _employees, ITasksService _tasks)
+        public WorkController(IDateManagementConfiguration _dateConfiguration, IEmployeesService _employees, ITasksService _tasks)
         {
             this.tasks = _tasks;
             this.employees = _employees;
+            this.dateConfiguration = _dateConfiguration;
         }
 
         [HttpGet]
@@ -103,38 +105,167 @@ namespace TaskManager.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromQuery] string userSecretKey, [FromBody] AuthTaskUpdate requestMob)
         {
-            //var posts = await response.Content.ReadFromJsonAsync<IEnumerable<Post>>();
-            return Ok();
-            //try
-            //{
+            try
+            {
+                var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+                var user = this.employees.GetUserDataForCooky(username);
+                var systemTaskList = await this.tasks.GetSystemTasksAsync();
+                //var inTime = requestMob.workDate.Date < DateTime.Now.Date.AddDays(-7) ? false : true;
+                
+                string result = String.Empty;
+                if (systemTaskList.Any(st => st.Id == requestMob.taskId))
+                {
+                    var systemTaskName = systemTaskList.Where(st => st.Id == requestMob.taskId).Select(st => st.TextValue).FirstOrDefault();
+                    if (systemTaskName == "Отпуски")
+                    {
+                        result = await this.SetDateSystemTasks(user.Id, requestMob.workDate.Date, true, false);
+                    }
+                    else if (systemTaskName == "Болнични")
+                    {
+                        result = await this.SetDateSystemTasks(user.Id, requestMob.workDate.Date, false, true);
+                    }
+                }
+                else
+                {
+                    var inTime = this.CheckDate(requestMob.workDate.Date);
+                    var workedHours = new TaskWorkedHoursServiceModel()
+                    {
+                        EmployeeId = user.Id,
+                        TaskId = requestMob.taskId,
+                        HoursSpend = requestMob.hoursSpend,
+                        WorkDate = requestMob.workDate.Date,
+                        RegistrationDate = DateTime.Now.Date,
+                        InTimeRecord = inTime
+                    };
 
-            //    var inTime = workDate.Date < DateTime.Now.Date.AddDays(-7) ? false : true; 
-            //    var workedHours = new TaskWorkedHoursServiceModel()
-            //    {
-            //        EmployeeId = userId,
-            //        TaskId = taskId,
-            //        HoursSpend = hours,
-            //        WorkDate = workDate.Date,
-            //        RegistrationDate = DateTime.Now.Date,
-            //        InTimeRecord = inTime
-            //    };
+                    result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                }
 
-            //    string result = await this.tasks.SetWorkedHoursAsync(workedHours);
-            //    if (result == "success")
-            //    {
-            //        return Ok();
-            //        //return Json(new { success = true, message = ("Часовете са отразени успешно" + inTime.ToString() + Environment.NewLine) });
-            //    }
-            //    else
-            //    {
-            //        return BadRequest("Database not updated");
-            //    }
+                if (result == "success")
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Database not updated");
+                }
 
-            //}
-            //catch (Exception)
-            //{
-            //    return BadRequest();
-            //}
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        private async Task<string> SetDateSystemTasks(int userId, DateTime workDate, bool isholiday = false, bool isill = false)
+        {
+            try
+            {
+                var result = string.Empty;
+                var message = string.Empty;
+                if (isholiday || isill)
+                {
+                    var dateTaskList = await this.employees.GetAllUserTaskAsync(userId, workDate.Date);
+                    var inTime = CheckDate(workDate.Date);
+                    foreach (var itemTask in dateTaskList)
+                    {
+                        var workedHours = new TaskWorkedHoursServiceModel()
+                        {
+                            EmployeeId = userId,
+                            TaskId = itemTask.Id,
+                            HoursSpend = 0,
+                            WorkDate = workDate.Date,
+                        };
+
+                        await this.tasks.SetWorkedHoursWithDeletedAsync(workedHours);
+                    }
+                    if (isholiday)
+                    {
+                        var workedHours = new TaskWorkedHoursServiceModel()
+                        {
+                            EmployeeId = userId,
+                            TaskId = await this.tasks.GetSystemTaskIdByNameAsync("Отпуски"),
+                            HoursSpend = 8,
+                            WorkDate = workDate.Date,
+                            RegistrationDate = DateTime.Now.Date,
+                            InTimeRecord = inTime,
+                            Approved = false
+                        };
+                        result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                        message = "Отпускът е отразен в системата";
+                    }
+                    else if (isill)
+                    {
+                        var workedHours = new TaskWorkedHoursServiceModel()
+                        {
+                            EmployeeId = userId,
+                            TaskId = await this.tasks.GetSystemTaskIdByNameAsync("Болнични"),
+                            HoursSpend = 8,
+                            WorkDate = workDate.Date,
+                            RegistrationDate = DateTime.Now.Date,
+                            InTimeRecord = inTime,
+                            Approved = false
+                        };
+                        result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                        message = "Болничния е отразен в системата";
+                    }
+
+                }
+                return result;
+            }
+            catch (Exception)
+            {
+                return "exception";
+            }
+        }
+
+
+        private bool CheckDate(DateTime workDate)   //проверява дали датата за която ще се прави отчет е в текущия отчетен период
+        {
+            var daysAfterOtchet = new List<int>();
+            var ot4etday = this.dateConfiguration.ReportDate;
+            var todayDate = DateTime.Now.Date;
+            var todayDayOfWeek = ((int)todayDate.DayOfWeek);
+            var diference = todayDate.Date - workDate.Date;
+            //int diferenceValue = todayDayOfWeek > ot4etday ? 8 : 7;
+
+            if (diference.TotalDays < 0)
+            {
+                return true;
+            }
+
+            if (diference.TotalDays <= 7)
+            {
+                if (diference.TotalDays < 7)
+                {
+                    for (int i = ot4etday + 1; i <= ((todayDayOfWeek < (ot4etday + 1)) ? (todayDayOfWeek + 7) : todayDayOfWeek); i++)
+                    {
+                        daysAfterOtchet.Add(i > 6 ? i - 7 : i);
+                    }
+                }
+                if (todayDayOfWeek == ot4etday + 1 || (todayDayOfWeek == 0 && ot4etday == 7))    //за да може в деня след отчета да се попълва за миналата седмица (петък е примерен)
+                {
+                    for (int i = 1; i <= 7; i++)
+                    {
+                        if (!daysAfterOtchet.Contains(i))
+                        {
+                            daysAfterOtchet.Add(i);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+            if (daysAfterOtchet.Contains(((int)workDate.DayOfWeek)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

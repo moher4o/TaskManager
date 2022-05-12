@@ -9,7 +9,7 @@ namespace TaskManager.WebApi.Models
     {
         public int taskId { get; set; }
         public int hoursSpend { get; set; }
-        public string workDate { get; set; }
+        public DateTime workDate { get; set; }
     }
 
 

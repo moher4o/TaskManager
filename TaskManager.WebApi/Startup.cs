@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TaskManager.Data;
+using TaskManager.Services;
+using TaskManager.Services.Implementations;
 using TaskMenager.WebApi.Infrastructure.Extensions;
 
 namespace TaskManager.WebApi
@@ -33,9 +35,10 @@ namespace TaskManager.WebApi
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddAutoMapper();
             services.AddDomainServices();
-            
-        }
 
+            services.AddSingleton<IDateManagementConfiguration>(Configuration.GetSection("DateManagement").Get<DateManagementConfiguration>());
+        }
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

@@ -73,5 +73,7 @@ namespace TaskManager.Services
         Task<bool> ApproveTaskForDate(int bossId, int userId, DateTime currentDate);
 
         Task<bool> RejectTaskForDate(int bossId, int userId, DateTime currentDate);
+
+        Task<List<SelectServiceModel>> GetSystemTasksAsync();
     }
 }
