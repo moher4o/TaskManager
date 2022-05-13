@@ -137,8 +137,15 @@ namespace TaskManager.WebApi.Controllers
                         RegistrationDate = DateTime.Now.Date,
                         InTimeRecord = inTime
                     };
-
-                    result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                    var removedSystemTask = await RemoveSystemTasks(user.Id, requestMob.workDate.Date);
+                    if (removedSystemTask)
+                    {
+                        result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                    }
+                    else
+                    {
+                        result = "error";
+                    }
                 }
 
                 if (result == "success")
@@ -154,6 +161,33 @@ namespace TaskManager.WebApi.Controllers
             catch (Exception)
             {
                 return BadRequest();
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ClearSystemTasks([FromQuery] string userSecretKey, [FromBody] AuthTaskUpdate requestMob)
+        {
+            try
+            {
+                var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+                var user = this.employees.GetUserDataForCooky(username);
+                if (user == null)
+                {
+                    return BadRequest("Database not updated");
+                }
+                bool result = await this.RemoveSystemTasks(user.Id, requestMob.workDate.Date);
+                if (result)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Database not updated");
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest("Database not updated");
             }
         }
 
@@ -216,6 +250,19 @@ namespace TaskManager.WebApi.Controllers
             catch (Exception)
             {
                 return "exception";
+            }
+        }
+
+        private async Task<bool> RemoveSystemTasks(int userId, DateTime workDate)
+        {
+            try
+            {
+                bool result = await this.tasks.RemoveSystemTaskForDate(userId, workDate);
+                return result;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

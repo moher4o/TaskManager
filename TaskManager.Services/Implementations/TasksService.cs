@@ -1185,11 +1185,12 @@ namespace TaskManager.Services.Implementations
 
         public async Task<List<SelectServiceModel>> GetSystemTasksAsync()
         {
-            var systemTasks = await this.db.TasksTypes
-                                .Where(c => c.isDeleted == false && c.TypeName == DataConstants.TaskTypeSystem)
+            var systemTask = await this.db.TasksTypes.Where(tt => tt.TypeName == DataConstants.TaskTypeSystem).FirstOrDefaultAsync();
+            var systemTasks = await this.db.Tasks
+                                .Where(c => c.isDeleted == false && c.TaskType == systemTask)
                                 .Select(d => new SelectServiceModel
                                 {
-                                    TextValue = d.TypeName,
+                                    TextValue = d.TaskName,
                                     Id = d.Id
                                 })
                                 .ToListAsync();
