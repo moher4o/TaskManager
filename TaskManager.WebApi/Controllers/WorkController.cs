@@ -9,6 +9,7 @@ using TaskManager.Services;
 using TaskManager.Services.Models.TaskModels;
 using TaskManager.WebApi.Models;
 
+
 namespace TaskManager.WebApi.Controllers
 {
     
@@ -26,7 +27,41 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<List<TaskApiModel>> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate)
+        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int rType)
+        {
+            var responce = new ResponceApiModel();
+            if (rType == 1)
+            {
+                return await GetTasksAsync(userSecretKey, workdate, responce);
+            }
+            else
+            {
+                return await GetEmployeesAsync(userSecretKey, responce);
+            }
+        }
+
+        private async Task<ResponceApiModel> GetEmployeesAsync(string userSecretKey, ResponceApiModel responce)
+        {
+            var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+
+            var users = await this.employees.GetAllUsers();
+            var data = users.Select(u => new UsersListViewModel
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                Email = u.Email,
+                DirectorateName = u.DirectorateName,
+                DepartmentName = u.DepartmentName,
+                SectorName = u.SectorName,
+                TelephoneNumber = u.TelephoneNumber,
+                MobileNumber = u.MobileNumber
+            }).ToList();
+
+            responce.Employees = data;
+            return responce;
+        }
+
+        private async Task<ResponceApiModel> GetTasksAsync(string userSecretKey, DateTime workdate, ResponceApiModel responce)
         {
             var result = new List<TaskApiModel>();
             var nulltask = new TaskApiModel()             //за информация, ако няма параметри
@@ -55,13 +90,15 @@ namespace TaskManager.WebApi.Controllers
             {
                 nulltask.TaskName = "Невалидни параметри - потребителско име";
                 result.Add(nulltask);
-                return result;
+                responce.Taskove = result;
+                return responce;
             }
             else if (workdate.Date < DateTime.Today.AddYears(-30))
             {
                 nulltask.TaskName = "Невалидни параметри - дата";
                 result.Add(nulltask);
-                return result;
+                responce.Taskove = result;
+                return responce;
             }
 
             var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
@@ -69,11 +106,12 @@ namespace TaskManager.WebApi.Controllers
             {
                 nulltask.TaskName = "Невалидни параметри - Няма такъв потребител или е неактивен";
                 result.Add(nulltask);
-                return result;
+                responce.Taskove = result;
+                return responce;
             }
 
             var emptasks = await this.employees.GetUserActiveTaskAsync(username, workdate.Date);
-            
+
             foreach (var itemTask in emptasks.Where(at => at.TaskStatusName == DataConstants.TaskStatusInProgres))
             {
                 var item = new TaskApiModel()
@@ -97,9 +135,10 @@ namespace TaskManager.WebApi.Controllers
                     TaskTypeName = itemTask.TaskTypeName
                 };
                 result.Add(item);
-                
+
             }
-            return result;
+            responce.Taskove = result;
+            return responce;
         }
 
         [HttpPost]
