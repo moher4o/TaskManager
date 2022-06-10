@@ -1,6 +1,13 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+.blink {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2d38be;
+    transition: 0.5s;
+}
+
 .button.focus, .button:focus {
     outline: 0;
     box-shadow: none !important;
@@ -328,6 +335,13 @@ body {
     font-size: 18px;
     font-family: "Roboto",sans-serif;
     line-height: 17px;
+    width: 100%;
+    padding: 10px 0 0 0;
+}
+.logo-text-three {
+    font-size: 12px;
+    font-family: "Roboto",sans-serif;
+    line-height: 14px;
     width: 100%;
     padding: 10px 0 0 0;
 }

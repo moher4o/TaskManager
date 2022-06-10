@@ -254,10 +254,10 @@
                 $('#Subjects_dropdown').multiselect('disable');
                 DeselectEmployees();
             }
-            for (let i = 0; i < 3; i++) {
-                $('.blinking').fadeOut(500);
-                $('.blinking').fadeIn(500);
-            } 
+            //for (let i = 0; i < 5; i++) {
+            //    $('.blinking').fadeOut(500);
+            //    $('.blinking').fadeIn(500);
+            //} 
 
         });
 

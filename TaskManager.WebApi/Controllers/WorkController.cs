@@ -43,21 +43,23 @@ namespace TaskManager.WebApi.Controllers
         private async Task<ResponceApiModel> GetEmployeesAsync(string userSecretKey, ResponceApiModel responce)
         {
             var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
-
-            var users = await this.employees.GetAllUsers();
-            var data = users.Select(u => new UsersListViewModel
+            if (!string.IsNullOrWhiteSpace(username))
             {
-                Id = u.Id,
-                FullName = u.FullName,
-                Email = u.Email,
-                DirectorateName = u.DirectorateName,
-                DepartmentName = u.DepartmentName,
-                SectorName = u.SectorName,
-                TelephoneNumber = u.TelephoneNumber,
-                MobileNumber = u.MobileNumber
-            }).ToList();
+                var users = await this.employees.GetAllUsers();
+                var data = users.Select(u => new UsersListViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    DirectorateName = u.DirectorateName,
+                    DepartmentName = u.DepartmentName,
+                    SectorName = u.SectorName,
+                    TelephoneNumber = u.TelephoneNumber,
+                    MobileNumber = u.MobileNumber
+                }).ToList();
 
-            responce.Employees = data;
+                responce.Employees = data;
+            }
             return responce;
         }
 
