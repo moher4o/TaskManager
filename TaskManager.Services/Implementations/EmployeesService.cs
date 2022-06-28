@@ -424,7 +424,7 @@ namespace TaskManager.Services.Implementations
                         var userFromDB = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == newUser.Id);
                         userFromDB.FullName = newUser.FullName;
                         userFromDB.Email = newUser.Email;
-                        userFromDB.TelephoneNumber = newUser.TelephoneNumber;
+                        userFromDB.TelephoneNumber = newUser.TelephoneNumber.Replace(" ", "");
                         userFromDB.MobileNumber = newUser.MobileNumber;
                         userFromDB.JobTitleId = newUser.JobTitleId;
                         userFromDB.DirectorateId = newUser.DirectorateId;
@@ -442,7 +442,7 @@ namespace TaskManager.Services.Implementations
                         {
                             FullName = newUser.FullName,
                             Email = newUser.Email,
-                            TelephoneNumber = newUser.TelephoneNumber,
+                            TelephoneNumber = newUser.TelephoneNumber.Replace(" ", ""),
                             MobileNumber = newUser.MobileNumber,
                             JobTitleId = newUser.JobTitleId,
                             DirectorateId = newUser.DirectorateId,

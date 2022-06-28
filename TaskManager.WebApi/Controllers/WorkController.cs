@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Common;
@@ -50,6 +51,7 @@ namespace TaskManager.WebApi.Controllers
                 {
                     Id = u.Id,
                     FullName = u.FullName,
+                    JobTitleName = u.JobTitleName,
                     Email = u.Email,
                     DirectorateName = u.DirectorateName,
                     DepartmentName = u.DepartmentName,
@@ -58,7 +60,19 @@ namespace TaskManager.WebApi.Controllers
                     MobileNumber = u.MobileNumber
                 }).ToList();
 
-                responce.Employees = data;
+                foreach (var user in data)
+                {
+                    if (!string.IsNullOrWhiteSpace(user.TelephoneNumber) && Regex.Match(user.TelephoneNumber, @"^\d{4}$").Success)
+                    {
+                        user.TelephoneNumber = "02949" + user.TelephoneNumber;
+                    }
+                    else
+                    {
+                        user.TelephoneNumber = user.TelephoneNumber;
+                    }
+                }
+
+                    responce.Employees = data;
             }
             return responce;
         }
