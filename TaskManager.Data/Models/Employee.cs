@@ -52,6 +52,8 @@ namespace TaskManager.Data.Models
 
         public string SecretKeyHash { get; set; }
 
+        public string TokenHash { get; set; }
+
         public bool isDeleted { get; set; } = false;
 
         public bool isActive { get; set; } = true;

@@ -65,5 +65,9 @@ namespace TaskManager.Services
         Task<string> GenerateSecretKeyWhenEmpty();
 
         Task<string> GetUserNameBySKAsync(string secretKey);
+
+        Task<int> GetUserIdBySKAsync(string secretKey);
+
+        Task<string> AddTokenHash(int userId, string token);
     }
 }

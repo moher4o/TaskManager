@@ -643,6 +643,30 @@ namespace TaskManager.Services.Implementations
             }
         }
 
+        public async Task<string> AddTokenHash(int userId, string token)
+        {
+            try
+            {
+
+                var user = await this.db.Employees
+                    .Where(e => e.Id == userId).FirstOrDefaultAsync();
+                if (user != null)
+                {
+                    user.TokenHash = KeyGenerator.Encrypt(token, user.DaeuAccaunt);
+                    await this.db.SaveChangesAsync();
+                    return "success";
+                }
+                else
+                {
+                    return $"Няма потребител с Id: {userId}";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
         public async Task<string> GenerateSecretKeyWhenEmpty()
         {
             try
@@ -681,6 +705,27 @@ namespace TaskManager.Services.Implementations
             catch (Exception)
             {
                 return null;
+            }
+
+        }
+
+        public async Task<int> GetUserIdBySKAsync(string secretKey)
+        {
+            try
+            {
+                var usersHashs = await this.db.Employees
+                                            .Where(e => e.isActive == true)
+                                            .Select(e => new {
+                                                userId = e.Id,
+                                                secret = KeyGenerator.Decrypt(e.SecretKeyHash, e.DaeuAccaunt)
+                                            }).ToListAsync();
+
+                var userId = usersHashs.Where(uh => uh.secret == secretKey).Select(uh => uh.userId).FirstOrDefault();
+                return userId;
+            }
+            catch (Exception)
+            {
+                return 0;
             }
 
         }

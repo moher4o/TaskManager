@@ -162,47 +162,33 @@ namespace TaskManager.WebApi.Controllers
         {
             try
             {
-                var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
-                var user = this.employees.GetUserDataForCooky(username);
-                var systemTaskList = await this.tasks.GetSystemTasksAsync();
-                //var inTime = requestMob.workDate.Date < DateTime.Now.Date.AddDays(-7) ? false : true;
-                
-                string result = String.Empty;
-                if (systemTaskList.Any(st => st.Id == requestMob.taskId))
+                if (requestMob.RType == 1)
                 {
-                    var systemTaskName = systemTaskList.Where(st => st.Id == requestMob.taskId).Select(st => st.TextValue).FirstOrDefault();
-                    if (systemTaskName == "Отпуски")
-                    {
-                        result = await this.SetDateSystemTasks(user.Id, requestMob.workDate.Date, true, false);
-                    }
-                    else if (systemTaskName == "Болнични")
-                    {
-                        result = await this.SetDateSystemTasks(user.Id, requestMob.workDate.Date, false, true);
-                    }
+                    return await SetWorckedHowersAsync(userSecretKey, requestMob);
+                }
+                else if(requestMob.RType == 2)
+                {
+                    return await SetUserTokenAsync(userSecretKey, requestMob.Token);
                 }
                 else
                 {
-                    var inTime = this.CheckDate(requestMob.workDate.Date);
-                    var workedHours = new TaskWorkedHoursServiceModel()
-                    {
-                        EmployeeId = user.Id,
-                        TaskId = requestMob.taskId,
-                        HoursSpend = requestMob.hoursSpend,
-                        WorkDate = requestMob.workDate.Date,
-                        RegistrationDate = DateTime.Now.Date,
-                        InTimeRecord = inTime
-                    };
-                    var removedSystemTask = await RemoveSystemTasks(user.Id, requestMob.workDate.Date);
-                    if (removedSystemTask)
-                    {
-                        result = await this.tasks.SetWorkedHoursAsync(workedHours);
-                    }
-                    else
-                    {
-                        result = "error";
-                    }
+                    return BadRequest("Iligal Type");
                 }
 
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        private async Task<IActionResult> SetUserTokenAsync(string userSecretKey, string token)
+        {
+            string result = String.Empty;
+            var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+            if (userId != 0)
+            {
+                result = await this.employees.AddTokenHash(userId, token);
                 if (result == "success")
                 {
                     return Ok();
@@ -211,11 +197,64 @@ namespace TaskManager.WebApi.Controllers
                 {
                     return BadRequest("Database not updated");
                 }
-
             }
-            catch (Exception)
+            else
             {
-                return BadRequest();
+                return BadRequest("Invalid user");
+            }
+            
+        }
+
+        private async Task<IActionResult> SetWorckedHowersAsync(string userSecretKey, AuthTaskUpdate requestMob)
+        {
+            var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+            var user = this.employees.GetUserDataForCooky(username);
+            var systemTaskList = await this.tasks.GetSystemTasksAsync();
+            //var inTime = requestMob.workDate.Date < DateTime.Now.Date.AddDays(-7) ? false : true;
+
+            string result = String.Empty;
+            if (systemTaskList.Any(st => st.Id == requestMob.TaskId))
+            {
+                var systemTaskName = systemTaskList.Where(st => st.Id == requestMob.TaskId).Select(st => st.TextValue).FirstOrDefault();
+                if (systemTaskName == "Отпуски")
+                {
+                    result = await this.SetDateSystemTasks(user.Id, requestMob.WorkDate.Date, true, false);
+                }
+                else if (systemTaskName == "Болнични")
+                {
+                    result = await this.SetDateSystemTasks(user.Id, requestMob.WorkDate.Date, false, true);
+                }
+            }
+            else
+            {
+                var inTime = this.CheckDate(requestMob.WorkDate.Date);
+                var workedHours = new TaskWorkedHoursServiceModel()
+                {
+                    EmployeeId = user.Id,
+                    TaskId = requestMob.TaskId,
+                    HoursSpend = requestMob.HoursSpend,
+                    WorkDate = requestMob.WorkDate.Date,
+                    RegistrationDate = DateTime.Now.Date,
+                    InTimeRecord = inTime
+                };
+                var removedSystemTask = await RemoveSystemTasks(user.Id, requestMob.WorkDate.Date);
+                if (removedSystemTask)
+                {
+                    result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                }
+                else
+                {
+                    result = "error";
+                }
+            }
+
+            if (result == "success")
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Database not updated");
             }
         }
 
@@ -230,7 +269,7 @@ namespace TaskManager.WebApi.Controllers
                 {
                     return BadRequest("Database not updated");
                 }
-                bool result = await this.RemoveSystemTasks(user.Id, requestMob.workDate.Date);
+                bool result = await this.RemoveSystemTasks(user.Id, requestMob.WorkDate.Date);
                 if (result)
                 {
                     return Ok();
