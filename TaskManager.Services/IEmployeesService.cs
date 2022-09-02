@@ -69,5 +69,7 @@ namespace TaskManager.Services
         Task<int> GetUserIdBySKAsync(string secretKey);
 
         Task<string> AddTokenHash(int userId, string token);
+
+        Task<string> GetMobileToken(int userId);
     }
 }

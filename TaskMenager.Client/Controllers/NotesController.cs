@@ -23,7 +23,8 @@ namespace TaskMenager.Client.Controllers
         private readonly IStatusService statuses;
         private readonly INotesService taskNotes;
         private readonly I2FAConfiguration twoFAConfiguration;
-        public NotesController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, INotesService taskNotes, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, I2FAConfiguration _twoFAConfiguration) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        private readonly IMessageService mobmessage;
+        public NotesController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, INotesService taskNotes, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, I2FAConfiguration _twoFAConfiguration, IMessageService _mobmessage) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
             this.statuses = statuses;
             this.directorates = directorates;
@@ -32,6 +33,7 @@ namespace TaskMenager.Client.Controllers
             this.tasktypes = tasktypes;
             this.taskprioritys = taskprioritys;
             this.taskNotes = taskNotes;
+            this.mobmessage = _mobmessage;
             twoFAConfiguration = _twoFAConfiguration;
         }
 
@@ -125,6 +127,7 @@ namespace TaskMenager.Client.Controllers
             if (result)
             {
                 await this.NotificationAsync(taskId, EmailType.Note);
+                await this.mobmessage.SendMessage(currentUser.Id, $"Добавен е коментар по задача с N:{taskId}.", text.Substring(0,200));
                 return Json(new { success = result, message = "Коментара е добавен успешно" });
             }
             {

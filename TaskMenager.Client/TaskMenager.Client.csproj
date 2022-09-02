@@ -12,6 +12,10 @@
   <ItemGroup>
     <Compile Remove="Infrastructure\Extensions\RedirectToCustomPath.cs" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Content Remove="private_key.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
@@ -39,5 +43,11 @@
     <Folder Include="Services\" />
     <Folder Include="wwwroot\css\images\" />
     <Folder Include="wwwroot\video\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="private_key.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
  </Project>

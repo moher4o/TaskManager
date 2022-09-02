@@ -667,6 +667,28 @@ namespace TaskManager.Services.Implementations
             }
         }
 
+        public async Task<string> GetMobileToken(int userId)
+        {
+            try
+            {
+
+                var user = await this.db.Employees
+                    .Where(e => e.Id == userId).FirstOrDefaultAsync();
+                if (user != null)
+                {
+                    return KeyGenerator.Decrypt(user.TokenHash, user.DaeuAccaunt);
+                }
+                else
+                {
+                    return "error";
+                }
+            }
+            catch (Exception)
+            {
+                return "error";
+            }
+        }
+
         public async Task<string> GenerateSecretKeyWhenEmpty()
         {
             try

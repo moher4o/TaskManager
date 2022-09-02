@@ -19,12 +19,14 @@ namespace TaskManager.WebApi.Controllers
         protected readonly IEmployeesService employees;
         protected readonly ITasksService tasks;
         private readonly IDateManagementConfiguration dateConfiguration;
+        protected readonly IMessageService mobmessage;
 
-        public WorkController(IDateManagementConfiguration _dateConfiguration, IEmployeesService _employees, ITasksService _tasks)
+        public WorkController(IDateManagementConfiguration _dateConfiguration, IEmployeesService _employees, ITasksService _tasks, IMessageService _mobmessage)
         {
             this.tasks = _tasks;
             this.employees = _employees;
             this.dateConfiguration = _dateConfiguration;
+            this.mobmessage = _mobmessage;
         }
 
         [HttpGet]
@@ -191,6 +193,17 @@ namespace TaskManager.WebApi.Controllers
                 result = await this.employees.AddTokenHash(userId, token);
                 if (result == "success")
                 {
+                    
+                    //var mobresult = await mobmessage.SendMessage(userId, "Конфигурацията на вашето устройство за работа с сървъра на МЕУ е успешна.");
+                    //System.Threading.Thread.Sleep(5000);
+                    // if (mobresult)
+                    // {
+                    //     return Ok();
+                    // }
+                    // else
+                    // {
+                    //     return Created("", "Push notification not send!");
+                    // }
                     return Ok();
                 }
                 else
