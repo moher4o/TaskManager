@@ -31,6 +31,8 @@ namespace TaskManager.Data
 
         public DbSet<Role> Roles { get; set; }
 
+        public DbSet<MobMessage> Messages { get; set; }
+
         public TasksDbContext(DbContextOptions<TasksDbContext> options)
              : base(options)
         {
@@ -219,6 +221,18 @@ namespace TaskManager.Data
             builder.Entity<Directorate>()
                .HasIndex(p => p.DirectorateName)
                .IsUnique();
+
+            builder.Entity<Employee>()
+                .HasMany(tt => tt.SendMessages)
+                .WithOne(t => t.Sender)
+                .HasForeignKey(t => t.SenderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Employee>()
+                .HasMany(tt => tt.ReceivedMessages)
+                .WithOne(t => t.Receiver)
+                .HasForeignKey(t => t.ReceiverId)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
             base.OnModelCreating(builder);

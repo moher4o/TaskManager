@@ -86,5 +86,9 @@ namespace TaskManager.Data.Models
 
         public virtual ICollection<WorkedHours> ApprovedDateReports { get; set; } = new List<WorkedHours>();
 
+        public virtual ICollection<MobMessage> SendMessages { get; set; } = new List<MobMessage>();
+
+        public virtual ICollection<MobMessage> ReceivedMessages { get; set; } = new List<MobMessage>();
+
     }
 }

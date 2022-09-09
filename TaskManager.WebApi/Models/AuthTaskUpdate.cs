@@ -7,13 +7,15 @@ namespace TaskManager.WebApi.Models
 {
     public class AuthTaskUpdate
     {
+        public string UserSecretKey { get; set; }
+        public string Token { get; set; }
+        public string Message { get; set; }
+        public virtual ICollection<int> Receivers { get; set; } = new List<int>();
+        public int RType { get; set; }
         public int TaskId { get; set; }
         public int HoursSpend { get; set; }
-        public DateTime WorkDate { get; set; } = DateTime.Now.Date;
+        public DateTime WorkDate { get; set; } = DateTime.Now;
 
-        public string Token { get; set; }
-
-        public int RType { get; set; }
     }
 
 

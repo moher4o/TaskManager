@@ -127,7 +127,7 @@ namespace TaskMenager.Client.Controllers
             if (result)
             {
                 await this.NotificationAsync(taskId, EmailType.Note);
-                await this.mobmessage.SendMessage(currentUser.Id, $"Добавен е коментар по задача с N:{taskId}.", text.Substring(0,200));
+                await this.mobmessage.SendMessage(currentUser.Id, $"Добавен е коментар по задача с N:{taskId}.", text.Substring(0,300));
                 return Json(new { success = result, message = "Коментара е добавен успешно" });
             }
             {

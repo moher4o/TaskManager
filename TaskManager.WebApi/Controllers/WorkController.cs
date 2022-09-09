@@ -160,17 +160,22 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromQuery] string userSecretKey, [FromBody] AuthTaskUpdate requestMob)
+        //public async Task<IActionResult> Post([FromQuery] string userSecretKey, [FromBody] AuthTaskUpdate requestMob)
+        public async Task<IActionResult> Post([FromBody] AuthTaskUpdate requestMob)
         {
             try
             {
                 if (requestMob.RType == 1)
                 {
-                    return await SetWorckedHowersAsync(userSecretKey, requestMob);
+                    return await SetWorckedHowersAsync(requestMob.UserSecretKey, requestMob);
                 }
                 else if(requestMob.RType == 2)
                 {
-                    return await SetUserTokenAsync(userSecretKey, requestMob.Token);
+                    return await SetUserTokenAsync(requestMob.UserSecretKey, requestMob.Token);
+                }
+                else if (requestMob.RType == 3)
+                {
+                    return await SendMessageAsync(requestMob.UserSecretKey, requestMob.Message);
                 }
                 else
                 {
@@ -184,6 +189,11 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
+        private async Task<IActionResult> SendMessageAsync(string userSecretKey, string message)
+        {
+            return Ok();
+        }
+
         private async Task<IActionResult> SetUserTokenAsync(string userSecretKey, string token)
         {
             string result = String.Empty;
@@ -193,17 +203,6 @@ namespace TaskManager.WebApi.Controllers
                 result = await this.employees.AddTokenHash(userId, token);
                 if (result == "success")
                 {
-                    
-                    //var mobresult = await mobmessage.SendMessage(userId, "Конфигурацията на вашето устройство за работа с сървъра на МЕУ е успешна.");
-                    //System.Threading.Thread.Sleep(5000);
-                    // if (mobresult)
-                    // {
-                    //     return Ok();
-                    // }
-                    // else
-                    // {
-                    //     return Created("", "Push notification not send!");
-                    // }
                     return Ok();
                 }
                 else
@@ -272,11 +271,11 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> ClearSystemTasks([FromQuery] string userSecretKey, [FromBody] AuthTaskUpdate requestMob)
+        public async Task<IActionResult> ClearSystemTasks([FromBody] AuthTaskUpdate requestMob)
         {
             try
             {
-                var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+                var username = await this.employees.GetUserNameBySKAsync(requestMob.UserSecretKey);
                 var user = this.employees.GetUserDataForCooky(username);
                 if (user == null)
                 {
