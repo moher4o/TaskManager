@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 using TaskManager.Common;
 using TaskManager.Services;
 using TaskMenager.Client.Models.Notes;
+using TaskMenager.Client.Models.Tasks;
 
 namespace TaskMenager.Client.Controllers
 {
@@ -127,12 +130,27 @@ namespace TaskMenager.Client.Controllers
             if (result)
             {
                 await this.NotificationAsync(taskId, EmailType.Note);
-                await this.mobmessage.SendMessage(currentUser.Id, $"Добавен е коментар по задача с N:{taskId}.", text.Substring(0,300));
+                await SendMobMessage(text, taskId);
                 return Json(new { success = result, message = "Коментара е добавен успешно" });
             }
             {
                 return Json(new { success = false, message = "[Service] Коментара не е добавен" });
             }
+        }
+
+        private async Task SendMobMessage(string text, int taskId)
+        {
+            var currentTask = await this.tasks.GetTaskDetails(taskId)
+                .ProjectTo<TaskViewModel>()
+                .FirstOrDefaultAsync();
+            var usersIdList = currentTask.Colleagues
+                        .Where(e => e.isDeleted == false && !string.IsNullOrWhiteSpace(e.Email) && e.Notify)
+                        .Select(e => e.Id).ToList();
+            if (usersIdList.Count > 0)
+            {
+                await this.mobmessage.SendMessage($"Добавен е коментар по задача с N:{taskId}.", text, usersIdList);
+            }
+            
         }
 
         [Authorize(Policy = DataConstants.Employee)]

@@ -14,14 +14,84 @@ namespace TaskManager.Services.Implementations
         public MessageService(IEmployeesService _employees)
         {
             this.employees = _employees;
-            //FirebaseApp.Create(new AppOptions()
-            //{
-            //    Credential = GoogleCredential.FromFile("private_key.json")
-            //});
         }
 
-        public async Task<bool> SendMessage(int userId, string messagetitle, string messageToUser)
+        //public bool MessTest(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
+        //{
+        //    return true;
+        //}
+
+        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers)
         {
+            try
+            {
+                if (FirebaseApp.DefaultInstance == null)
+                {
+                    FirebaseApp.Create(new AppOptions()
+                    {
+                        Credential = GoogleCredential.FromFile("private_key.json")
+                    });
+                }
+
+                if (messageText.Length > 299)
+                {
+                    messageText = messageText.Substring(0, 299) + "...";
+                }
+                var receiversTokens = new List<string>();
+                foreach (var userId in receivers)
+                {
+                    var registrationToken = await employees.GetMobileToken(userId);
+                    if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
+                    {
+                        receiversTokens.Add(registrationToken);
+                    }
+
+                }
+                if (receiversTokens.Count > 0)
+                {
+                    var message = new MulticastMessage()
+                    {
+                        Tokens = receiversTokens,
+                        Notification = new Notification()
+                        {
+                            Title = messageTitle,
+                            Body = messageText
+                        },
+                        
+                        Android = new AndroidConfig()
+                        {
+                            TimeToLive = TimeSpan.FromHours(2),
+                            Notification = new AndroidNotification()
+                            {
+                                Icon = "stock_ticker_update",
+                                Color = "#f45342"
+                            },
+                            Priority = Priority.Normal,
+                        }
+                    };
+
+                    var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
+
+                    if (response.SuccessCount > 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        public async Task<bool> SendMessage(string messageText, int toUserId, int fromUserId)
+        {
+            try
+            {
             if (FirebaseApp.DefaultInstance == null)
             {
                 FirebaseApp.Create(new AppOptions()
@@ -29,30 +99,33 @@ namespace TaskManager.Services.Implementations
                     Credential = GoogleCredential.FromFile("private_key.json")
                 });
             }
-            // This registration token comes from the client FCM SDKs.
-            var registrationToken = await employees.GetMobileToken(userId);
+            if (messageText.Length > 299)
+            {
+                messageText = messageText.Substring(0, 299) + "...";
+            }
+            string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
+            var registrationToken = await employees.GetMobileToken(toUserId);
             if (registrationToken != "error")
             {
-
-
-                // See documentation on defining a message payload.
                 var message = new Message()
                 {
-                    Data = new Dictionary<string, string>()
-                {
-                    { "myData", "1337" },
-                },
                     Token = registrationToken,
-                    //Topic = "all",
                     Notification = new Notification()
                     {
-                        Title = messagetitle,
-                        Body = messageToUser
+                        Title = $"{senderName} :",
+                        Body = messageText
+                    },
+                    Android = new AndroidConfig()
+                    {
+                        TimeToLive = TimeSpan.FromHours(2),
+                        Notification = new AndroidNotification()
+                        {
+                            Icon = "stock_ticker_update",
+                            Color = "#f45342"
+                        }
                     }
-                };
 
-                // Send a message to the device corresponding to the provided
-                // registration token.
+                };
 
                 string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
                 // Response is a message ID string.
@@ -66,7 +139,75 @@ namespace TaskManager.Services.Implementations
                 }
             }
             return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
+
+        //public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers)
+        //{
+        //    if (FirebaseApp.DefaultInstance == null)
+        //    {
+        //        FirebaseApp.Create(new AppOptions()
+        //        {
+        //            Credential = GoogleCredential.FromFile("private_key.json")
+        //        });
+        //    }
+        //    if (messageText.Length > 299)
+        //    {
+        //        messageText = messageText.Substring(0, 299) + "...";
+        //    }
+
+        //    var receiversTokens = new List<string>();
+        //    foreach (var userId in receivers)
+        //    {
+        //        var registrationToken = await employees.GetMobileToken(userId);
+        //        if (registrationToken != "error")
+        //        {
+        //            receiversTokens.Add(registrationToken);
+        //        }
+
+        //    }
+        //    // This registration token comes from the client FCM SDKs.
+        //    //var registrationToken = await employees.GetMobileToken(toUserId);
+        //    if (receiversTokens.Count > 0)
+        //    {
+        //        var message = new MulticastMessage()
+        //        {
+        //            Tokens = receiversTokens,
+        //            Notification = new Notification()
+        //            {
+        //                Title = messageTitle,
+        //                Body = messageText
+        //            },
+
+        //            Android = new AndroidConfig()
+        //            {
+        //                TimeToLive = TimeSpan.FromHours(2),
+        //                Notification = new AndroidNotification()
+        //                {
+        //                    Icon = "stock_ticker_update",
+        //                    Color = "#f45342"
+        //                }
+        //            }
+        //        };
+
+        //        var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
+
+        //        if (response.SuccessCount > 0)
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+
+        //    return false;
+        //}
 
     }
 }

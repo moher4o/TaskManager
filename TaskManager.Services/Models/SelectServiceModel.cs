@@ -23,5 +23,7 @@ namespace TaskManager.Services.Models
         public string SectorName { get; set; }
 
         public string Email { get; set; }
+
+        public string TokenHash { get; set; }
     }
 }

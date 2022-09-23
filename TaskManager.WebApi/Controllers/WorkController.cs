@@ -175,7 +175,7 @@ namespace TaskManager.WebApi.Controllers
                 }
                 else if (requestMob.RType == 3)
                 {
-                    return await SendMessageAsync(requestMob.UserSecretKey, requestMob.Message);
+                    return await SendMessageAsync(requestMob.UserSecretKey, requestMob.Message, requestMob.Receivers);
                 }
                 else
                 {
@@ -189,9 +189,29 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
-        private async Task<IActionResult> SendMessageAsync(string userSecretKey, string message)
+        private async Task<IActionResult> SendMessageAsync(string userSecretKey, string message, ICollection<int> receivers)
         {
-            return Ok();
+            int fromUserId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+            string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
+            if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(message))
+            {
+                var sendResult = false;
+                sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers);
+                //sendResult = this.mobmessage.MessTest($"{senderName} :", message, receivers, fromUserId);
+                if (sendResult)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("No valid users!");
+                }
+
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         private async Task<IActionResult> SetUserTokenAsync(string userSecretKey, string token)

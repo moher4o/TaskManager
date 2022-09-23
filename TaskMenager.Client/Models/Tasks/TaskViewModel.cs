@@ -125,7 +125,8 @@ namespace TaskMenager.Client.Models.Tasks
                                                                isDeleted = e.isDeleted,
                                                                DepartmentName = e.Employee.Department.DepartmentName,
                                                                DirectorateName = e.Employee.Directorate.DirectorateName,
-                                                               SectorName = e.Employee.Sector.SectorName
+                                                               SectorName = e.Employee.Sector.SectorName,
+                                                               TokenHash = e.Employee.TokenHash
                                                            })
                                                            .ToList()));
         }
