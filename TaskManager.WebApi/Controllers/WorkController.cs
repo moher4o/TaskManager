@@ -193,10 +193,10 @@ namespace TaskManager.WebApi.Controllers
         {
             int fromUserId = await this.employees.GetUserIdBySKAsync(userSecretKey);
             string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
-            if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(message))
+            if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(message) && !string.IsNullOrWhiteSpace(senderName))
             {
-                var sendResult = false;
-                sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers);
+                //var sendResult = false;
+                var sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers);
                 //sendResult = this.mobmessage.MessTest($"{senderName} :", message, receivers, fromUserId);
                 if (sendResult)
                 {

@@ -7,6 +7,8 @@
         public string SmtpUsername { get; set; }
         public string SmtpPassword { get; set; }
 
+        public bool EnableSsl { get; set; } = false;
+
         public string PopServer { get; set; }
         public int PopPort { get; set; }
         public string PopUsername { get; set; }

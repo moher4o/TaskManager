@@ -63,8 +63,9 @@ namespace TaskManager.Services.Implementations
                             TimeToLive = TimeSpan.FromHours(2),
                             Notification = new AndroidNotification()
                             {
-                                Icon = "stock_ticker_update",
+                                Icon = "logo",
                                 Color = "#f45342"
+                                
                             },
                             Priority = Priority.Normal,
                         }

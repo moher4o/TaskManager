@@ -129,7 +129,11 @@ namespace TaskMenager.Client.Controllers
             bool result = await this.taskNotes.AddNoteAsync(text, taskId, currentUser.Id);
             if (result)
             {
-                await this.NotificationAsync(taskId, EmailType.Note);
+                var testresult = await this.NotificationAsync(taskId, EmailType.Note);
+                if (testresult != "success")
+                {
+                    TempData["Error"] = testresult;
+                }
                 await SendMobMessage(text, taskId);
                 return Json(new { success = result, message = "Коментара е добавен успешно" });
             }

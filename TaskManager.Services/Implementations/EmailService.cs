@@ -53,18 +53,28 @@ namespace TaskManager.Services.Implementations
                     emailClient.SslProtocols = SslProtocols.Ssl3 | SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
                     emailClient.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                    //The last parameter here is to use SSL (Which you should!)
-                    //emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);
+                    if (_emailConfiguration.EnableSsl)
+                    {
+                        await emailClient.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, MailKit.Security.SecureSocketOptions.StartTls);
+                        await emailClient.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
+                    }
+                    else
+                    {
+                        await emailClient.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);
+                    }
+
+                    ////The last parameter here is to use SSL (Which you should!)
+                    ////emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);
 
 
-                    await emailClient.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);     //1 вариант без автентикация
+                    //await emailClient.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, SecureSocketOptions.Auto);     //1 вариант без автентикация
 
-                    //emailClient.Connect(_emailConfiguration.SmtpServer, 587, SecureSocketOptions.StartTls);   //2 вариант с автентикация
-                    //emailClient.Authenticate(sasl);
+                    ////emailClient.Connect(_emailConfiguration.SmtpServer, 587, SecureSocketOptions.StartTls);   //2 вариант с автентикация
+                    ////emailClient.Authenticate(sasl);
 
-                    //Remove any OAuth functionality as we won't be using it. 
-                    //emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
-                    //await emailClient.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
+                    ////Remove any OAuth functionality as we won't be using it. 
+                    ////emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
+                    ////await emailClient.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
 
                     await emailClient.SendAsync(message);
 
