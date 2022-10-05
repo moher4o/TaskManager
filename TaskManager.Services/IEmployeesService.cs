@@ -56,6 +56,8 @@ namespace TaskManager.Services
 
         Task<bool> AddAllToSystemTasksAsync();
 
+        Task<bool> AddSystemAccountMethod();
+
         Task<IEnumerable<TaskFewInfoServiceModel>> GetAllUserTaskAsync(int userId, DateTime dateToProcess);
 
         Task<bool> MarkUserReadMessage(int userId);
@@ -71,5 +73,6 @@ namespace TaskManager.Services
         Task<string> AddTokenHash(int userId, string token);
 
         Task<string> GetMobileToken(int userId);
+        Task<int> GetSystemAccountId();
     }
 }

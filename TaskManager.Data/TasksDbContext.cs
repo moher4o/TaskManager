@@ -31,7 +31,9 @@ namespace TaskManager.Data
 
         public DbSet<Role> Roles { get; set; }
 
-        public DbSet<MobMessage> Messages { get; set; }
+        public DbSet<MobMessage> MessagesParticipants { get; set; }
+
+        public DbSet<MobMessageText> Messages { get; set; }
 
         public TasksDbContext(DbContextOptions<TasksDbContext> options)
              : base(options)
@@ -234,6 +236,11 @@ namespace TaskManager.Data
                 .HasForeignKey(t => t.ReceiverId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.Entity<MobMessageText>()
+                .HasMany(tt => tt.SendReceivers)
+                .WithOne(t => t.Message)
+                .HasForeignKey(t => t.MessageId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
         }

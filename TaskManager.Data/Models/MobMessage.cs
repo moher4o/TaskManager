@@ -13,12 +13,9 @@ namespace TaskManager.Data.Models
         public int ReceiverId { get; set; }
         public Employee Receiver { get; set; }
 
-        public DateTime MessageDate { get; set; }
+        public int MessageId { get; set; }
+        public MobMessageText Message { get; set; }
 
-        [Required]
-        [MaxLength(350)]
-        public string Text { get; set; }
-
-
+        public bool isReceived { get; set; } = false;
     }
 }

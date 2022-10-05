@@ -45,6 +45,9 @@ namespace TaskManager.Common
         public const string DeveloperFirstName = "Ангел";
         public const string DeveloperLastName = "Вуков";
         //public const string DeveloperJobTitle = "Employee"; //for first use
+        public const string SystemUsername = "taskmanagersystemUser";
+        public const string SystemEmail = "notusedmail@e-gov.bg";
+        public const string SystemName = "Taskmanager";
 
         public const string FirmName = "Мениджър задачи";
         //public const string ClassFilesSubDirectory = "TasksFiles";
@@ -69,7 +72,7 @@ namespace TaskManager.Common
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
-                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text-secondary"">Изпълнителна агенция ""Инфраструктура на електронното управление""</div>
                                                 <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>
@@ -94,7 +97,7 @@ namespace TaskManager.Common
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
-                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text-secondary"">Изпълнителна агенция ""Инфраструктура на електронното управление""</div>
                                                 <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>
@@ -120,7 +123,7 @@ namespace TaskManager.Common
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
-                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text-secondary"">Изпълнителна агенция ""Инфраструктура на електронното управление""</div>
                                                 <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>
@@ -147,7 +150,7 @@ namespace TaskManager.Common
                                         <td style = ""padding-left:10px;"" >
                                             <div>
                                                 <div class=""logo-text""><a href = ""{1}"">Мениджър задачи</a></div>
-                                                <div class=""logo-text-secondary"">Държавна агенция ""Електронно управление""</div>
+                                                <div class=""logo-text-secondary"">Изпълнителна агенция ""Инфраструктура на електронното управление""</div>
                                                 <div class=""logo-text"" style=""padding-left:100px;"">Ако не желаете да получавате уведомления, натиснете {3}</div>
                                             </div>
                                         </td>

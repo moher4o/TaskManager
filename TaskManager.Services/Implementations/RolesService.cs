@@ -84,8 +84,20 @@ namespace TaskManager.Services.Implementations
                     Role = this.db.Roles.Where(r => r.Name == DataConstants.SuperAdmin).FirstOrDefault(),
                     Email = DataConstants.DeveloperEmail
                 };
+                var secret = KeyGenerator.GenerateRandomString();
+                firstSuperAdmin.SecretKeyHash = KeyGenerator.Encrypt(secret, firstSuperAdmin.DaeuAccaunt);
                 await this.db.Employees.AddAsync(firstSuperAdmin);
+                var sistemAccount = new Employee()
+                {
+                    FullName = DataConstants.SystemName,
+                    DaeuAccaunt = DataConstants.SystemUsername,
+                    Role = this.db.Roles.Where(r => r.Name == DataConstants.Employee).FirstOrDefault(),
+                    Email = DataConstants.SystemEmail
+                };
+                secret = KeyGenerator.GenerateRandomString();
+                sistemAccount.SecretKeyHash = KeyGenerator.Encrypt(secret, sistemAccount.DaeuAccaunt);
 
+                await this.db.Employees.AddAsync(sistemAccount);
                 await this.db.SaveChangesAsync();
             }
             catch (Exception)

@@ -152,7 +152,16 @@ namespace TaskMenager.Client.Controllers
                         .Select(e => e.Id).ToList();
             if (usersIdList.Count > 0)
             {
-                await this.mobmessage.SendMessage($"Добавен е коментар по задача с N:{taskId}.", text, usersIdList);
+                int systemAccountId = await this.employees.GetSystemAccountId();
+                if (systemAccountId != 0 && systemAccountId != 99999)
+                {
+                    await this.mobmessage.SendMessage($"Добавен е коментар по задача с N:{taskId}.", text, usersIdList, systemAccountId);
+                }
+                else
+                {
+                    TempData["Error"] = "System account Id not set!!!";
+                }
+                
             }
             
         }

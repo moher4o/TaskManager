@@ -215,7 +215,7 @@ namespace TaskManager.Services.Implementations
         public async Task<IList<UserServiceModel>> GetAllUsers(bool withDeleted = false)
         {
             return await this.db.Employees
-                    .Where(t => t.isDeleted == withDeleted && t.isActive == true)
+                    .Where(t => t.isDeleted == withDeleted && t.isActive == true && t.Email != DataConstants.SystemEmail)
                     .OrderBy(t => t.DirectorateId)
                     .ThenBy(t => t.DepartmentId)
                     .ThenBy(e => e.SectorId != null ? e.SectorId : 999)
@@ -228,7 +228,7 @@ namespace TaskManager.Services.Implementations
         public IEnumerable<SelectServiceModel> GetActiveEmployeesNames()
         {
             var names = this.db.Employees
-                .Where(c => c.isDeleted == false && c.isActive == true)
+                .Where(c => c.isDeleted == false && c.isActive == true && c.Email != DataConstants.SystemEmail)
                 .OrderBy(e => e.FullName)
                 .Select(d => new SelectServiceModel
                 {
@@ -750,6 +750,44 @@ namespace TaskManager.Services.Implementations
                 return 0;
             }
 
+        }
+
+        public async Task<bool> AddSystemAccountMethod()
+        {
+            try
+            {
+                var sistemAccount = new Employee()
+                {
+                    FullName = DataConstants.SystemName,
+                    DaeuAccaunt = DataConstants.SystemUsername,
+                    Role = this.db.Roles.Where(r => r.Name == DataConstants.Employee).FirstOrDefault(),
+                    Email = DataConstants.SystemEmail
+                };
+                var secret = KeyGenerator.GenerateRandomString();
+                sistemAccount.SecretKeyHash = KeyGenerator.Encrypt(secret, sistemAccount.DaeuAccaunt);
+
+                await this.db.Employees.AddAsync(sistemAccount);
+                await this.db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+        }
+
+        public async Task<int> GetSystemAccountId()
+        {
+            try
+            {
+                var systemId = await this.db.Employees.Where(e => e.DaeuAccaunt == DataConstants.SystemUsername).Select(e => e.Id).FirstOrDefaultAsync();
+                return systemId;
+            }
+            catch (Exception)
+            {
+                return 99999;
+            }
         }
     }
 }

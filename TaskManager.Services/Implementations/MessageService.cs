@@ -5,15 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManager.Data;
+using TaskManager.Data.Models;
 
 namespace TaskManager.Services.Implementations
 {
     public class MessageService : IMessageService
     {
         protected readonly IEmployeesService employees;
-        public MessageService(IEmployeesService _employees)
+        private readonly TasksDbContext db;
+        public MessageService(TasksDbContext _db, IEmployeesService _employees)
         {
             this.employees = _employees;
+            this.db = _db;
         }
 
         //public bool MessTest(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
@@ -21,10 +25,15 @@ namespace TaskManager.Services.Implementations
         //    return true;
         //}
 
-        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers)
+        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
         {
             try
             {
+                var messageDb = new MobMessageText() { 
+                Text = messageText,
+                MessageDate = DateTime.Now
+                };
+
                 if (FirebaseApp.DefaultInstance == null)
                 {
                     FirebaseApp.Create(new AppOptions()
@@ -44,6 +53,11 @@ namespace TaskManager.Services.Implementations
                     if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
                     {
                         receiversTokens.Add(registrationToken);
+                        //messageDb.SendReceivers.Add(new MobMessage()
+                        //{
+                        //    ReceiverId = userId,
+                        //    SenderId = fromUserId
+                        //});
                     }
 
                 }
@@ -67,7 +81,7 @@ namespace TaskManager.Services.Implementations
                                 Color = "#f45342"
                                 
                             },
-                            Priority = Priority.Normal,
+                            Priority = FirebaseAdmin.Messaging.Priority.Normal,
                         }
                     };
 
@@ -75,6 +89,12 @@ namespace TaskManager.Services.Implementations
 
                     if (response.SuccessCount > 0)
                     {
+                        foreach (var item in messageDb.SendReceivers)
+                        {
+                            item.isReceived = true;
+                        }
+                        await this.db.Messages.AddAsync(messageDb);
+                        await this.db.SaveChangesAsync();
                         return true;
                     }
                     else
@@ -89,63 +109,63 @@ namespace TaskManager.Services.Implementations
                 return false;
             }
         }
-        public async Task<bool> SendMessage(string messageText, int toUserId, int fromUserId)
-        {
-            try
-            {
-            if (FirebaseApp.DefaultInstance == null)
-            {
-                FirebaseApp.Create(new AppOptions()
-                {
-                    Credential = GoogleCredential.FromFile("private_key.json")
-                });
-            }
-            if (messageText.Length > 299)
-            {
-                messageText = messageText.Substring(0, 299) + "...";
-            }
-            string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
-            var registrationToken = await employees.GetMobileToken(toUserId);
-            if (registrationToken != "error")
-            {
-                var message = new Message()
-                {
-                    Token = registrationToken,
-                    Notification = new Notification()
-                    {
-                        Title = $"{senderName} :",
-                        Body = messageText
-                    },
-                    Android = new AndroidConfig()
-                    {
-                        TimeToLive = TimeSpan.FromHours(2),
-                        Notification = new AndroidNotification()
-                        {
-                            Icon = "stock_ticker_update",
-                            Color = "#f45342"
-                        }
-                    }
+        //public async Task<bool> SendMessage(string messageText, int toUserId, int fromUserId)
+        //{
+        //    try
+        //    {
+        //    if (FirebaseApp.DefaultInstance == null)
+        //    {
+        //        FirebaseApp.Create(new AppOptions()
+        //        {
+        //            Credential = GoogleCredential.FromFile("private_key.json")
+        //        });
+        //    }
+        //    if (messageText.Length > 299)
+        //    {
+        //        messageText = messageText.Substring(0, 299) + "...";
+        //    }
+        //    string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
+        //    var registrationToken = await employees.GetMobileToken(toUserId);
+        //    if (registrationToken != "error")
+        //    {
+        //        var message = new Message()
+        //        {
+        //            Token = registrationToken,
+        //            Notification = new Notification()
+        //            {
+        //                Title = $"{senderName} :",
+        //                Body = messageText
+        //            },
+        //            Android = new AndroidConfig()
+        //            {
+        //                TimeToLive = TimeSpan.FromHours(2),
+        //                Notification = new AndroidNotification()
+        //                {
+        //                    Icon = "stock_ticker_update",
+        //                    Color = "#f45342"
+        //                }
+        //            }
 
-                };
+        //        };
 
-                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                // Response is a message ID string.
-                if (!string.IsNullOrWhiteSpace(response))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            return false;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+        //        string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+        //        // Response is a message ID string.
+        //        if (!string.IsNullOrWhiteSpace(response))
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    return false;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
+        //}
 
         //public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers)
         //{

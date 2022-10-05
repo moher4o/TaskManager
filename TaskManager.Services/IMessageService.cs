@@ -7,9 +7,9 @@ namespace TaskManager.Services
 {
     public interface IMessageService
     {
-        Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers);
+        Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId);
 
-        Task<bool> SendMessage(string messageText, int toUserId, int fromUserId);
+        //Task<bool> SendMessage(string messageText, int toUserId, int fromUserId);
 
         //Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId);
 

@@ -195,8 +195,8 @@ namespace TaskManager.WebApi.Controllers
             string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
             if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(message) && !string.IsNullOrWhiteSpace(senderName))
             {
-                //var sendResult = false;
-                var sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers);
+                
+                var sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers, fromUserId);
                 //sendResult = this.mobmessage.MessTest($"{senderName} :", message, receivers, fromUserId);
                 if (sendResult)
                 {

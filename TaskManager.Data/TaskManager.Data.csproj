@@ -25,6 +25,12 @@
     <Compile Remove="Migrations\20210417070555_notify.Designer.cs" />
     <Compile Remove="Migrations\20211101091702_approval.cs" />
     <Compile Remove="Migrations\20211101091702_approval.Designer.cs" />
+    <Compile Remove="Migrations\20220905113116_mobmessagesAdded.cs" />
+    <Compile Remove="Migrations\20220905113116_mobmessagesAdded.Designer.cs" />
+    <Compile Remove="Migrations\20221004075338_messageRefactoring.cs" />
+    <Compile Remove="Migrations\20221004075338_messageRefactoring.Designer.cs" />
+    <Compile Remove="Migrations\20221004080009_messageRefactoring1.cs" />
+    <Compile Remove="Migrations\20221004080009_messageRefactoring1.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

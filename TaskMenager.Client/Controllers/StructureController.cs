@@ -534,6 +534,22 @@ namespace TaskMenager.Client.Controllers
             return RedirectToAction("UsersList", "Users");
         }
 
+        public async Task<IActionResult> AddSystemAccount()
+        {
+            var result = await this.employees.AddSystemAccountMethod();
+            if (!result)
+            {
+                TempData["Error"] = $"[Service error]";
+            }
+            else
+            {
+                TempData["Success"] = "Успешно добавен системен акаунт";
+            }
+
+            return RedirectToAction("UsersList", "Users");
+        }
+        //AddSystemAccount
+
         #region API Calls
         [HttpGet]
         public async Task<IActionResult> getAllJobs(bool deleted = false)
