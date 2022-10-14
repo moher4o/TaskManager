@@ -32,15 +32,45 @@ namespace TaskManager.WebApi.Controllers
         [HttpGet]
         public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int rType)
         {
-            var responce = new ResponceApiModel();
+            var responce = new ResponceApiModel() { 
+               ApiResponce = "error"
+            };
             if (rType == 1)
             {
                 return await GetTasksAsync(userSecretKey, workdate, responce);
             }
-            else
+            else if (rType == 2)
             {
                 return await GetEmployeesAsync(userSecretKey, responce);
             }
+            else if (rType == 3)
+            {
+                return await GetMessagesAsync(userSecretKey, responce);
+            }
+            else
+            {
+                return responce;
+            }
+        }
+
+        private async Task<ResponceApiModel> GetMessagesAsync(string userSecretKey, ResponceApiModel responce)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId >= 0)
+                {
+                    responce.UserMessages = await this.mobmessage.GetLast50UserMessages(userId, null);
+                }
+                responce.ApiResponce = "success";
+                return responce;
+            }
+            catch (Exception)
+            {
+
+                return responce;
+            }
+            
         }
 
         private async Task<ResponceApiModel> GetEmployeesAsync(string userSecretKey, ResponceApiModel responce)
@@ -75,6 +105,7 @@ namespace TaskManager.WebApi.Controllers
                 }
 
                     responce.Employees = data;
+                responce.ApiResponce = "success";
             }
             return responce;
         }
@@ -156,6 +187,7 @@ namespace TaskManager.WebApi.Controllers
 
             }
             responce.Taskove = result;
+            responce.ApiResponce = "success";
             return responce;
         }
 

@@ -1,12 +1,17 @@
-﻿using FirebaseAdmin;
+﻿using AutoMapper.QueryableExtensions;
+using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Data;
 using TaskManager.Data.Models;
+using TaskManager.Services.Models;
+using TaskManager.Services.Models.MobMessages;
 
 namespace TaskManager.Services.Implementations
 {
@@ -20,10 +25,38 @@ namespace TaskManager.Services.Implementations
             this.db = _db;
         }
 
-        //public bool MessTest(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
-        //{
-        //    return true;
-        //}
+        public async Task<List<MessageListModel>> GetLast50UserMessages(int userId, int? senderId)
+        {
+            var messages = new List<MessageListModel>();
+                 
+            try
+            {
+                if (senderId.HasValue)
+                {
+                    messages = await this.db.MessagesParticipants
+                        .Where(sr => sr.ReceiverId == userId && sr.SenderId == senderId)
+                        .OrderBy(sr => sr.Message.MessageDate)
+                        .TakeLast(50)
+                        .ProjectTo<MessageListModel>()
+                        .ToListAsync();
+                }
+                else
+                {
+                   messages = await this.db.MessagesParticipants
+                        .Where(sr => sr.ReceiverId == userId)
+                        .OrderByDescending(sr => sr.Message.MessageDate)
+                        .ProjectTo<MessageListModel>()
+                        .Take(50)
+                        .ToListAsync();
+                }
+                return messages;
+            }
+            catch (Exception)
+            {
+                return messages;
+            }
+
+        }
 
         public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
         {
@@ -53,11 +86,11 @@ namespace TaskManager.Services.Implementations
                     if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
                     {
                         receiversTokens.Add(registrationToken);
-                        //messageDb.SendReceivers.Add(new MobMessage()
-                        //{
-                        //    ReceiverId = userId,
-                        //    SenderId = fromUserId
-                        //});
+                        messageDb.SendReceivers.Add(new MobMessage()
+                        {
+                            ReceiverId = userId,
+                            SenderId = fromUserId
+                        });
                     }
 
                 }
