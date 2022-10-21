@@ -30,11 +30,9 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int rType)
+        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int rType)
         {
-            var responce = new ResponceApiModel() { 
-               ApiResponce = "error"
-            };
+            var responce = new ResponceApiModel();
             if (rType == 1)
             {
                 return await GetTasksAsync(userSecretKey, workdate, responce);
@@ -47,22 +45,47 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await GetMessagesAsync(userSecretKey, responce);
             }
+            else if (rType == 4)
+            {
+                return await GetNewMessagesAsync(userSecretKey, lastMessageId, responce);
+            }
+
             else
             {
                 return responce;
             }
         }
 
+        private async Task<ResponceApiModel> GetNewMessagesAsync(string userSecretKey, int lastMessageId , ResponceApiModel responce)
+        {
+            try
+            {
+                
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId > 0)
+                {
+                    responce.UserMessages = await this.mobmessage.GetNewUserMessages(userId, lastMessageId);
+                    responce.ApiResponce = "success";
+                }
+                return responce;
+            }
+            catch (Exception)
+            {
+                return responce;
+            }
+
+        }
         private async Task<ResponceApiModel> GetMessagesAsync(string userSecretKey, ResponceApiModel responce)
         {
             try
             {
                 var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
-                if (userId >= 0)
+                if (userId > 0)
                 {
                     responce.UserMessages = await this.mobmessage.GetLast50UserMessages(userId, null);
+                    responce.ApiResponce = "success";
                 }
-                responce.ApiResponce = "success";
+                
                 return responce;
             }
             catch (Exception)

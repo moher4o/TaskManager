@@ -26,6 +26,7 @@ namespace TaskManager.Services.Models.MobMessages
 
         public void ConfigureMapping(Profile profile)
         {
+            
             profile.CreateMap<MobMessage, MessageServiceModel>()
                .ForMember(u => u.SenderName, cfg => cfg.MapFrom(r => r.Sender.FullName))
                .ForMember(u => u.ReceiverName, cfg => cfg.MapFrom(r => r.Receiver.FullName))

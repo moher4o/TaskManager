@@ -34,21 +34,22 @@ namespace TaskManager.Services.Implementations
                 if (senderId.HasValue)
                 {
                     messages = await this.db.MessagesParticipants
-                        .Where(sr => sr.ReceiverId == userId && sr.SenderId == senderId)
+                        .Where(sr => sr.ReceiverId == userId || sr.SenderId == senderId || sr.SenderId == userId)
                         .OrderBy(sr => sr.Message.MessageDate)
                         .TakeLast(50)
-                        .ProjectTo<MessageListModel>()
+                        .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
                         .ToListAsync();
                 }
                 else
                 {
                    messages = await this.db.MessagesParticipants
-                        .Where(sr => sr.ReceiverId == userId)
+                        .Where(sr => sr.ReceiverId == userId || sr.SenderId == userId)
                         .OrderByDescending(sr => sr.Message.MessageDate)
-                        .ProjectTo<MessageListModel>()
+                        .ProjectTo<MessageListModel>(new { currentEmployeeId = userId})
                         .Take(50)
                         .ToListAsync();
                 }
+
                 return messages;
             }
             catch (Exception)
@@ -56,6 +57,26 @@ namespace TaskManager.Services.Implementations
                 return messages;
             }
 
+        }
+
+        public async Task<List<MessageListModel>> GetNewUserMessages(int userId, int lastMessageId)
+        {
+            var messages = new List<MessageListModel>();
+            try
+            {
+                    messages = await this.db.MessagesParticipants
+                         .Where(sr => (sr.ReceiverId == userId || sr.SenderId == userId) && sr.MessageId > lastMessageId)
+                         .OrderByDescending(sr => sr.Message.MessageDate)
+                         .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                         .Take(50)
+                         .ToListAsync();
+
+                return messages;
+            }
+            catch (Exception)
+            {
+                return messages;
+            }
         }
 
         public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
