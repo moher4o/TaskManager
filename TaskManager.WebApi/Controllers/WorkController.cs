@@ -4,7 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TaskManager.Common;
 using TaskManager.Services;
 using TaskManager.Services.Models.TaskModels;
@@ -13,20 +15,35 @@ using TaskManager.WebApi.Models;
 
 namespace TaskManager.WebApi.Controllers
 {
-    
+    enum ConnectionType
+    {
+        GetTasks = 1,
+        GetEmployees = 2,
+        GetMessages = 3,
+        GetNewMessages = 4,
+        SetWorckedHowers = 21,
+        SetUserToken = 22,
+        SendMessage = 23,
+        SetNote = 24,
+        TaskSendMessage = 25
+    }
     public class WorkController : BaseController
     {
+        private readonly IManageFilesService files;
         protected readonly IEmployeesService employees;
         protected readonly ITasksService tasks;
         private readonly IDateManagementConfiguration dateConfiguration;
         protected readonly IMessageService mobmessage;
+        private readonly INotesService taskNotes;
 
-        public WorkController(IDateManagementConfiguration _dateConfiguration, IEmployeesService _employees, ITasksService _tasks, IMessageService _mobmessage)
+        public WorkController(IDateManagementConfiguration _dateConfiguration, IManageFilesService _files, IEmployeesService _employees, ITasksService _tasks, INotesService _taskNotes, IMessageService _mobmessage)
         {
+            this.files = _files;
             this.tasks = _tasks;
             this.employees = _employees;
             this.dateConfiguration = _dateConfiguration;
             this.mobmessage = _mobmessage;
+            taskNotes = _taskNotes;
         }
 
         [HttpGet]
@@ -199,12 +216,13 @@ namespace TaskManager.WebApi.Controllers
                     EmployeeHours = itemTask.EmployeeHours,
                     EndDate = itemTask.EndDate,
                     EndDatePrognose = itemTask.EndDatePrognose,
-                    FilesCount = itemTask.FilesCount,
+                    FilesCount = this.files.GetFilesInDirectory(itemTask.Id).Count(),
                     HoursLimit = itemTask.HoursLimit,
                     NotesCount = itemTask.NotesCount,
                     ParentTaskId = itemTask.ParentTaskId,
                     TaskNoteForToday = itemTask.TaskNoteForToday,
                     TaskTypeName = itemTask.TaskTypeName
+                    
                 };
                 result.Add(item);
 
@@ -220,17 +238,25 @@ namespace TaskManager.WebApi.Controllers
         {
             try
             {
-                if (requestMob.RType == 1)
+                if (requestMob.RType == (int)ConnectionType.SetWorckedHowers)
                 {
                     return await SetWorckedHowersAsync(requestMob.UserSecretKey, requestMob);
                 }
-                else if(requestMob.RType == 2)
+                else if(requestMob.RType == (int)ConnectionType.SetUserToken)
                 {
                     return await SetUserTokenAsync(requestMob.UserSecretKey, requestMob.Token);
                 }
-                else if (requestMob.RType == 3)
+                else if (requestMob.RType == (int)ConnectionType.SendMessage)
                 {
                     return await SendMessageAsync(requestMob.UserSecretKey, requestMob.Message, requestMob.Receivers);
+                }
+                else if (requestMob.RType == (int)ConnectionType.SetNote)
+                {
+                    return await SetTaskNoteAsync(requestMob.UserSecretKey, requestMob);            //добавянена дневен коментар
+                }
+                else if (requestMob.RType == (int)ConnectionType.TaskSendMessage)
+                {
+                    return await TaskMessageAsync(requestMob);            //Изпращане на съобщение до участници в задача
                 }
                 else
                 {
@@ -241,6 +267,72 @@ namespace TaskManager.WebApi.Controllers
             catch (Exception)
             {
                 return BadRequest();
+            }
+        }
+
+        private async Task<IActionResult> TaskMessageAsync(AuthTaskUpdate requestMob)
+        {
+            int fromUserId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+            string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
+
+            var currentTask = await this.tasks.GetTaskDetails(requestMob.TaskId)
+                                        .ProjectTo<TaskApiViewModel>()
+                                        .FirstOrDefaultAsync();
+            if (currentTask != null)
+            {
+                var receivers = currentTask.Colleagues
+                                        .Where(e => e.isDeleted == false)
+                                        .Select(e => e.Id).ToList();
+                if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(requestMob.Message) && !string.IsNullOrWhiteSpace(senderName))
+                {
+
+                    var sendResult = await this.mobmessage.SendMessage($"{senderName} :", requestMob.Message, receivers, fromUserId);
+                    if (sendResult)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest("No valid users!");
+                    }
+
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        private async Task<IActionResult> SetTaskNoteAsync(string userSecretKey, AuthTaskUpdate requestMob)    //AddDateNote в TaskController
+        {
+            var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+            var user = this.employees.GetUserDataForCooky(username);
+
+            var taskFromDb = await this.tasks.CheckTaskByIdAsync(requestMob.TaskId);
+            if (!taskFromDb)
+            {
+                return BadRequest("Database not updated");
+            }
+            var model = new AddNoteToTaskServiceModel()
+            {
+                TaskId = requestMob.TaskId,
+                EmployeeId = user.Id,
+                Text = requestMob.Note,
+                WorkDate = requestMob.WorkDate.Date
+            };
+            bool result = await this.tasks.SetTaskEmpNoteForDateAsync(model);
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Database not updated");
             }
         }
 

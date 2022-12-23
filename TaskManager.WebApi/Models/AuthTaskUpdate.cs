@@ -10,6 +10,7 @@ namespace TaskManager.WebApi.Models
         public string UserSecretKey { get; set; }
         public string Token { get; set; }
         public string Message { get; set; }
+        public string Note { get; set; }
         public virtual ICollection<int> Receivers { get; set; } = new List<int>();
         public int RType { get; set; }
         public int TaskId { get; set; }

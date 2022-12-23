@@ -43,6 +43,7 @@ namespace TaskManager.Services
 
         IEnumerable<ReportUserServiceModel> GetEmployeesByList(IEnumerable<int> employeesList);
         Task<bool> RegisterNewUserAsync(UserServiceModel newUser);
+        Task<string> SetSecretKey(int userId);
         Task<string> DeactivateUserAsync(int userId);
         Task<bool> АctivateUserAsync(int userId);
 

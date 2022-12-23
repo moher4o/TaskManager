@@ -219,7 +219,15 @@
                     </div>
                     @Html.LabelFor(model => model.SecretKeyHash, new { @class = "col-form-label strong" })
                     <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.SecretKeyHash, new { @class = "form-control", @readonly = "readonly" })
+                        <div class="form-group row">
+                            <div class="col-md-10">
+                                @Html.TextBoxFor(model => model.SecretKeyHash, new { @class = "form-control", @readonly = "readonly", id = "mobkey" })
+                            </div>
+                            <div class="col-md-2">
+                                <img class="chatnotifications resetmobcode" src="../png/restore-icon.png" onclick="NewMobSecret(@Model.Id ?? 0)" style=" cursor : pointer "  />
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -240,6 +248,26 @@
     <input type="submit" class="btn button-invisible" value="REALSENDSEND" id="realsend" />
 </form>
 <script type="text/javascript">
+
+    function NewMobSecret(userId) {
+        $.getJSON('\NewMobSecret?userId=' + userId, { get_param: 'value' }, function (data) {
+            console.log(data.secretkey);
+            if (data.success) {
+                $('#mobkey').val(data.secretkey);
+                toastr.success('Създаден е нов мобилен ключ');
+            }
+            else {
+                toastr.error('Грешка при създаването на мобилен ключ');
+            }
+
+            //if (data) {
+            //    toastr.success('Създаден е нов мобилен ключ');
+            //}
+            //else {
+            //    toastr.error('Грешка при създаването на мобилен ключ');
+            //}
+        });
+    }
 
     function ActivateUser(userId) {
         $.getJSON('\АctivateUser?userId=' + userId, { get_param: 'value' }, function (data) {

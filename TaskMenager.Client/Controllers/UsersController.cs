@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManager.Common;
 using TaskManager.Services;
 using TaskManager.Services.Implementations;
 using TaskManager.Services.Models;
@@ -771,6 +772,31 @@ namespace TaskMenager.Client.Controllers
             });
             return Json(new { data });
         }
+
+        [Authorize(Policy = Employee)]
+        [HttpGet]
+        public async Task<IActionResult> NewMobSecret(int userId)
+        {
+            try
+            {
+                var user = await this.employees.GetEmployeeByIdAsync(userId);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = ("") }); ;
+                }
+                if (currentUser.RoleName == DataConstants.DirectorateAdmin || currentUser.RoleName == DataConstants.SuperAdmin || user.Id == currentUser.Id)
+                {
+                    var secretkey = await this.employees.SetSecretKey(user.Id);
+                    return Json(new { success = true, secretkey });
+                }
+                return Json(false);
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = ("") }); ;
+            }
+        }
+
         #endregion
 
     }

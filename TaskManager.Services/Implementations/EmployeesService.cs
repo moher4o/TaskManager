@@ -468,6 +468,26 @@ namespace TaskManager.Services.Implementations
             }
         }
 
+        public async Task<string> SetSecretKey(int userId)
+        {
+            try
+            {
+                var userFromDB = await this.db.Employees.FirstOrDefaultAsync(e => e.Id == userId);
+                if (userFromDB == null)
+                {
+                    return "error";
+                }
+
+                userFromDB.SecretKeyHash = KeyGenerator.Encrypt(KeyGenerator.GenerateRandomString(), userFromDB.DaeuAccaunt);
+                await this.db.SaveChangesAsync();
+                return KeyGenerator.Decrypt(userFromDB.SecretKeyHash, userFromDB.DaeuAccaunt);
+            }
+            catch (Exception)
+            {
+                return "error";
+            }
+        }
+
         public async Task<string> DeactivateUserAsync(int userId)
         {
             try
