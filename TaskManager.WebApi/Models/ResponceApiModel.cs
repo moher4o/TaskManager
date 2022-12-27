@@ -14,6 +14,8 @@ namespace TaskManager.WebApi.Models
         public List<TaskApiModel> Taskove { get; set; } = new List<TaskApiModel>();
 
         public List<UsersListViewModel> Employees { get; set; } = new List<UsersListViewModel>();
+
+        public IEnumerable<string> FilesNameList { get; set; } = new List<string>();
     }
 }
 

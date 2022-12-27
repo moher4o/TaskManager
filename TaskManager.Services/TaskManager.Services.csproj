@@ -16,4 +16,8 @@
     <ProjectReference Include="..\TaskManager.Data\TaskManager.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Files\" />
+  </ItemGroup>
+
 </Project>

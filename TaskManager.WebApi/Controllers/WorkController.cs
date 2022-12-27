@@ -21,6 +21,7 @@ namespace TaskManager.WebApi.Controllers
         GetEmployees = 2,
         GetMessages = 3,
         GetNewMessages = 4,
+        GetFileList = 5,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
@@ -47,24 +48,28 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int rType)
+        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int taskId, [FromQuery] int rType)
         {
             var responce = new ResponceApiModel();
-            if (rType == 1)
+            if (rType == (int)ConnectionType.GetTasks)
             {
                 return await GetTasksAsync(userSecretKey, workdate, responce);
             }
-            else if (rType == 2)
+            else if (rType == (int)ConnectionType.GetEmployees)
             {
                 return await GetEmployeesAsync(userSecretKey, responce);
             }
-            else if (rType == 3)
+            else if (rType == (int)ConnectionType.GetMessages)
             {
                 return await GetMessagesAsync(userSecretKey, responce);
             }
-            else if (rType == 4)
+            else if (rType == (int)ConnectionType.GetNewMessages)
             {
                 return await GetNewMessagesAsync(userSecretKey, lastMessageId, responce);
+            }
+            else if (rType == (int)ConnectionType.GetFileList)
+            {
+                return await GetFileListAsync(userSecretKey, taskId, responce);
             }
 
             else
@@ -73,6 +78,40 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
+        private async Task<ResponceApiModel> GetFileListAsync(string userSecretKey, int taskId, ResponceApiModel responce)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                var currentUser = await this.employees.GetEmployeeByIdAsync(userId);
+                var currentTask = await this.tasks.GetTaskDetails(taskId)
+                                            .ProjectTo<TaskApiViewModel>()
+                                            .FirstOrDefaultAsync();
+
+                if (currentTask != null)
+                {
+                    var assignedEmployees = currentTask.Colleagues
+                                            .Where(e => e.isDeleted == false)
+                                            .Select(e => e.Id).ToList();
+                   if (currentUser.RoleName == DataConstants.SuperAdmin || currentTask.OwnerId == userId || currentTask.AssignerId == userId || assignedEmployees.Contains(userId))
+                    {
+                        responce.FilesNameList = this.files.GetFilesInDirectory(taskId);
+                        responce.ApiResponce = "success";
+                    }
+                    return responce;
+
+                }
+                else
+                {
+                    return responce;
+                }
+            }
+            catch (Exception)
+            {
+                return responce;
+            }
+
+        }
         private async Task<ResponceApiModel> GetNewMessagesAsync(string userSecretKey, int lastMessageId , ResponceApiModel responce)
         {
             try
