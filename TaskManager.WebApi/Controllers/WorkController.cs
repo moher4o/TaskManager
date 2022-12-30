@@ -22,6 +22,7 @@ namespace TaskManager.WebApi.Controllers
         GetMessages = 3,
         GetNewMessages = 4,
         GetFileList = 5,
+        GetFile = 6,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
@@ -48,7 +49,7 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int taskId, [FromQuery] int rType)
+        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int taskId, [FromQuery] string fileName, [FromQuery] int rType)
         {
             var responce = new ResponceApiModel();
             if (rType == (int)ConnectionType.GetTasks)
@@ -71,11 +72,50 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await GetFileListAsync(userSecretKey, taskId, responce);
             }
+            else if (rType == (int)ConnectionType.GetFile)
+            {
+                return await GetFileAsync(userSecretKey, taskId, fileName, responce);
+            }
 
             else
             {
                 return responce;
             }
+        }
+
+        private async Task<ResponceApiModel> GetFileAsync(string userSecretKey, int taskId, string fileName, ResponceApiModel responce)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                var currentUser = await this.employees.GetEmployeeByIdAsync(userId);
+                var currentTask = await this.tasks.GetTaskDetails(taskId)
+                                            .ProjectTo<TaskApiViewModel>()
+                                            .FirstOrDefaultAsync();
+
+                if (currentTask != null)
+                {
+                    var assignedEmployees = currentTask.Colleagues
+                                            .Where(e => e.isDeleted == false)
+                                            .Select(e => e.Id).ToList();
+                    if (currentUser.RoleName == DataConstants.SuperAdmin || currentTask.OwnerId == userId || currentTask.AssignerId == userId || assignedEmployees.Contains(userId))
+                    {
+                        responce.FilesNameList = this.files.GetFilesInDirectory(taskId);
+                        responce.ApiResponce = "success";
+                    }
+                    return responce;
+
+                }
+                else
+                {
+                    return responce;
+                }
+            }
+            catch (Exception)
+            {
+                return responce;
+            }
+
         }
 
         private async Task<ResponceApiModel> GetFileListAsync(string userSecretKey, int taskId, ResponceApiModel responce)
