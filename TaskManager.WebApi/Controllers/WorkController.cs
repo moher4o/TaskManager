@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -22,12 +23,12 @@ namespace TaskManager.WebApi.Controllers
         GetMessages = 3,
         GetNewMessages = 4,
         GetFileList = 5,
-        GetFile = 6,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
         SetNote = 24,
-        TaskSendMessage = 25
+        TaskSendMessage = 25,
+        GetFile = 26,
     }
     public class WorkController : BaseController
     {
@@ -72,51 +73,12 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await GetFileListAsync(userSecretKey, taskId, responce);
             }
-            else if (rType == (int)ConnectionType.GetFile)
-            {
-                return await GetFileAsync(userSecretKey, taskId, fileName, responce);
-            }
-
             else
             {
                 return responce;
             }
         }
 
-        private async Task<ResponceApiModel> GetFileAsync(string userSecretKey, int taskId, string fileName, ResponceApiModel responce)
-        {
-            try
-            {
-                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
-                var currentUser = await this.employees.GetEmployeeByIdAsync(userId);
-                var currentTask = await this.tasks.GetTaskDetails(taskId)
-                                            .ProjectTo<TaskApiViewModel>()
-                                            .FirstOrDefaultAsync();
-
-                if (currentTask != null)
-                {
-                    var assignedEmployees = currentTask.Colleagues
-                                            .Where(e => e.isDeleted == false)
-                                            .Select(e => e.Id).ToList();
-                    if (currentUser.RoleName == DataConstants.SuperAdmin || currentTask.OwnerId == userId || currentTask.AssignerId == userId || assignedEmployees.Contains(userId))
-                    {
-                        responce.FilesNameList = this.files.GetFilesInDirectory(taskId);
-                        responce.ApiResponce = "success";
-                    }
-                    return responce;
-
-                }
-                else
-                {
-                    return responce;
-                }
-            }
-            catch (Exception)
-            {
-                return responce;
-            }
-
-        }
 
         private async Task<ResponceApiModel> GetFileListAsync(string userSecretKey, int taskId, ResponceApiModel responce)
         {
@@ -337,6 +299,11 @@ namespace TaskManager.WebApi.Controllers
                 {
                     return await TaskMessageAsync(requestMob);            //Изпращане на съобщение до участници в задача
                 }
+                else if (requestMob.RType == (int)ConnectionType.GetFile)
+                {
+                    return await ExportFileAsync(requestMob);            //Изпращане на съобщение до участници в задача
+                }
+
                 else
                 {
                     return BadRequest("Iligal Type");
@@ -347,6 +314,62 @@ namespace TaskManager.WebApi.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        private async Task<IActionResult> ExportFileAsync(AuthTaskUpdate requestMob)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+                var currentUser = await this.employees.GetEmployeeByIdAsync(userId);
+                var currentTask = await this.tasks.GetTaskDetails(requestMob.TaskId)
+                                            .ProjectTo<TaskApiViewModel>()
+                                            .FirstOrDefaultAsync();
+
+                if (currentTask != null)
+                {
+                    var assignedEmployees = currentTask.Colleagues
+                                            .Where(e => e.isDeleted == false)
+                                            .Select(e => e.Id).ToList();
+                    if (currentUser.RoleName == DataConstants.SuperAdmin || (currentUser.RoleName == DataConstants.DirectorateAdmin && currentTask.DirectorateId == currentUser.DirectorateId) || (currentUser.RoleName == DataConstants.DepartmentAdmin && currentTask.DepartmentId == currentUser.DepartmentId) || (currentUser.RoleName == DataConstants.SectorAdmin && currentTask.SectorId == currentUser.SectorId) || currentTask.OwnerId == userId || currentTask.AssignerId == userId || assignedEmployees.Contains(userId))
+                    {
+                        var file = await this.files.ExportFile(requestMob.TaskId, requestMob.FileName);
+                        var reg = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(Path.GetExtension(requestMob.FileName).ToLower());
+                        string contentType = "application/unknown";
+
+                        if (reg != null)
+                        {
+                            string registryContentType = reg.GetValue("Content Type") as string;
+
+                            if (!String.IsNullOrWhiteSpace(registryContentType))
+                            {
+                                contentType = registryContentType;
+                            }
+                        }
+
+
+                        if (file == null)
+                        {
+                            return BadRequest();
+                        }
+                        else
+                        {
+                            return File(file, contentType, requestMob.FileName);
+                        }
+                    }
+                    return BadRequest();
+
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
         }
 
         private async Task<IActionResult> TaskMessageAsync(AuthTaskUpdate requestMob)
