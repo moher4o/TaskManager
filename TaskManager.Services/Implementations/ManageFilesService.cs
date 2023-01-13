@@ -95,7 +95,7 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-        public IList<string> GetFilesInDirectory(int taskId)
+        public List<string> GetFilesInDirectory(int taskId)
         {
             var fileList = new List<string>();
             try

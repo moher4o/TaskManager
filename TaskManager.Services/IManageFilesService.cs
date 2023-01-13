@@ -15,7 +15,7 @@ namespace TaskManager.Services
 
         bool DeleteTaskDirectory(int taskId);
 
-        IList<string> GetFilesInDirectory(int taskId);
+        List<string> GetFilesInDirectory(int taskId);
 
         bool DeleteFile(int taskId, string fileName);
 

@@ -18,6 +18,7 @@ namespace TaskManager.WebApi.Models
         public int TaskId { get; set; }
         public int HoursSpend { get; set; }
         public DateTime WorkDate { get; set; } = DateTime.Now;
+        public MediaChunk Chunk { get; set; }
 
     }
 

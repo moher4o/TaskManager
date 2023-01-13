@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Common;
@@ -23,12 +24,14 @@ namespace TaskManager.WebApi.Controllers
         GetMessages = 3,
         GetNewMessages = 4,
         GetFileList = 5,
+        BeginFileUpload = 6,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
         SetNote = 24,
         TaskSendMessage = 25,
         GetFile = 26,
+        UploadChunk = 27
     }
     public class WorkController : BaseController
     {
@@ -38,8 +41,9 @@ namespace TaskManager.WebApi.Controllers
         private readonly IDateManagementConfiguration dateConfiguration;
         protected readonly IMessageService mobmessage;
         private readonly INotesService taskNotes;
+        private readonly IWebHostEnvironment environment;
 
-        public WorkController(IDateManagementConfiguration _dateConfiguration, IManageFilesService _files, IEmployeesService _employees, ITasksService _tasks, INotesService _taskNotes, IMessageService _mobmessage)
+        public WorkController(IDateManagementConfiguration _dateConfiguration, IManageFilesService _files, IEmployeesService _employees, ITasksService _tasks, INotesService _taskNotes, IMessageService _mobmessage, IWebHostEnvironment _environment)
         {
             this.files = _files;
             this.tasks = _tasks;
@@ -47,6 +51,7 @@ namespace TaskManager.WebApi.Controllers
             this.dateConfiguration = _dateConfiguration;
             this.mobmessage = _mobmessage;
             taskNotes = _taskNotes;
+            environment = _environment ?? throw new ArgumentNullException(nameof(_environment));
         }
 
         [HttpGet]
@@ -73,13 +78,58 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await GetFileListAsync(userSecretKey, taskId, responce);
             }
+            else if (rType == (int)ConnectionType.BeginFileUpload)
+            {
+                return await BeginFileUpload(userSecretKey, fileName, responce);
+            }
+
             else
             {
                 return responce;
             }
         }
 
+        /// <summary>
+        /// Start uploading a new file to the server.
+        /// This method will allocate a unique file handle and create an empty file in the temporary upload folder.
+        /// </summary>
+        /// <param name="fileName">The name of the file to upload. This name will be used in the created file handle.</param>
+        /// <returns>The created file handle when the file was successfully allocated. Or an error if a file with that name is already being uploaded.</returns>
+        private async Task<ResponceApiModel> BeginFileUpload(string userSecretKey, string fileName, ResponceApiModel responce)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId <= 0)
+                {
+                    return responce;
+                }
 
+                if (string.IsNullOrEmpty(fileName))
+                    return responce;
+
+                var filePath = Path.Combine(environment.ContentRootPath, "temp");
+
+                if (!Directory.Exists(filePath))
+                    Directory.CreateDirectory(filePath); //Create the temp upload directory if it doesn't exist yet.
+
+                fileName = fileName.Substring(0, fileName.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase)); //Remove the extension.
+                var tempFileName = $"{fileName} {Guid.NewGuid()}{Path.GetExtension(fileName)}"; //Build the temp filename.
+
+                //Create a new empty file that will be filled later chunk by chunk.
+                var fs = new FileStream(Path.Combine(filePath, tempFileName), FileMode.CreateNew);
+                fs.Close();
+                responce.FilesNameList.Add(tempFileName);
+                responce.ApiResponce = "success";
+            }
+            catch (Exception e)
+            {
+                //_logger.LogError(e, "Error");
+                return responce;
+            }
+
+            return responce;
+        }
         private async Task<ResponceApiModel> GetFileListAsync(string userSecretKey, int taskId, ResponceApiModel responce)
         {
             try
@@ -95,7 +145,7 @@ namespace TaskManager.WebApi.Controllers
                     var assignedEmployees = currentTask.Colleagues
                                             .Where(e => e.isDeleted == false)
                                             .Select(e => e.Id).ToList();
-                   if (currentUser.RoleName == DataConstants.SuperAdmin || currentTask.OwnerId == userId || currentTask.AssignerId == userId || assignedEmployees.Contains(userId))
+                    if (currentUser.RoleName == DataConstants.SuperAdmin || currentTask.OwnerId == userId || currentTask.AssignerId == userId || assignedEmployees.Contains(userId))
                     {
                         responce.FilesNameList = this.files.GetFilesInDirectory(taskId);
                         responce.ApiResponce = "success";
@@ -114,11 +164,11 @@ namespace TaskManager.WebApi.Controllers
             }
 
         }
-        private async Task<ResponceApiModel> GetNewMessagesAsync(string userSecretKey, int lastMessageId , ResponceApiModel responce)
+        private async Task<ResponceApiModel> GetNewMessagesAsync(string userSecretKey, int lastMessageId, ResponceApiModel responce)
         {
             try
             {
-                
+
                 var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
                 if (userId > 0)
                 {
@@ -143,7 +193,7 @@ namespace TaskManager.WebApi.Controllers
                     responce.UserMessages = await this.mobmessage.GetLast50UserMessages(userId, null);
                     responce.ApiResponce = "success";
                 }
-                
+
                 return responce;
             }
             catch (Exception)
@@ -151,7 +201,7 @@ namespace TaskManager.WebApi.Controllers
 
                 return responce;
             }
-            
+
         }
 
         private async Task<ResponceApiModel> GetEmployeesAsync(string userSecretKey, ResponceApiModel responce)
@@ -185,7 +235,7 @@ namespace TaskManager.WebApi.Controllers
                     }
                 }
 
-                    responce.Employees = data;
+                responce.Employees = data;
                 responce.ApiResponce = "success";
             }
             return responce;
@@ -263,7 +313,7 @@ namespace TaskManager.WebApi.Controllers
                     ParentTaskId = itemTask.ParentTaskId,
                     TaskNoteForToday = itemTask.TaskNoteForToday,
                     TaskTypeName = itemTask.TaskTypeName
-                    
+
                 };
                 result.Add(item);
 
@@ -283,7 +333,7 @@ namespace TaskManager.WebApi.Controllers
                 {
                     return await SetWorckedHowersAsync(requestMob.UserSecretKey, requestMob);
                 }
-                else if(requestMob.RType == (int)ConnectionType.SetUserToken)
+                else if (requestMob.RType == (int)ConnectionType.SetUserToken)
                 {
                     return await SetUserTokenAsync(requestMob.UserSecretKey, requestMob.Token);
                 }
@@ -301,7 +351,11 @@ namespace TaskManager.WebApi.Controllers
                 }
                 else if (requestMob.RType == (int)ConnectionType.GetFile)
                 {
-                    return await ExportFileAsync(requestMob);            //Изпращане на съобщение до участници в задача
+                    return await ExportFileAsync(requestMob);            //файл 1
+                }
+                else if (requestMob.RType == (int)ConnectionType.UploadChunk)
+                {
+                    return await UploadChunk(requestMob);            //файл 2
                 }
 
                 else
@@ -314,6 +368,38 @@ namespace TaskManager.WebApi.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        /// <summary>
+        /// Upload a part of a media file.
+        /// This method takes a part of the media file and appends it to the incomplete file. This method is to be called repeatedly until the upload is complete.
+        /// </summary>
+        /// <param name="mediaChunk">The chunk of the media file to upload.</param>
+        /// <returns>Returns the Ok code if the chunk was uploaded and appended successfully. Or an error when it failed.</returns>
+        private async Task<IActionResult> UploadChunk(AuthTaskUpdate requestMob)
+        {
+            var path = Path.Combine(environment.ContentRootPath, "temp", requestMob.Chunk.FileHandle);
+            var fileInfo = new FileInfo(path);
+            var start = Convert.ToInt64(requestMob.Chunk.StartAt);
+
+            if (!fileInfo.Exists)
+                return NotFound(); //Temp file not found, maybe BeginFileUpload was not called?
+
+            if (fileInfo.Length != start)
+                return BadRequest(); //The temp file is not the same length as the starting position of the next chunk, Maybe they are sent out of order?
+
+            try
+            {
+                using var fs = new FileStream(path, FileMode.Append);
+
+                var bytes = Convert.FromBase64String(requestMob.Chunk.Data);
+                fs.Write(bytes, 0, bytes.Length);
+            }
+            catch (Exception e)
+            {
+                return new StatusCodeResult(500);
+            }
+            return Ok();
         }
 
         private async Task<IActionResult> ExportFileAsync(AuthTaskUpdate requestMob)
@@ -444,7 +530,7 @@ namespace TaskManager.WebApi.Controllers
             string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
             if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(message) && !string.IsNullOrWhiteSpace(senderName))
             {
-                
+
                 var sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers, fromUserId);
                 //sendResult = this.mobmessage.MessTest($"{senderName} :", message, receivers, fromUserId);
                 if (sendResult)
@@ -483,7 +569,7 @@ namespace TaskManager.WebApi.Controllers
             {
                 return BadRequest("Invalid user");
             }
-            
+
         }
 
         private async Task<IActionResult> SetWorckedHowersAsync(string userSecretKey, AuthTaskUpdate requestMob)
