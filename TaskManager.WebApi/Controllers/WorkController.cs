@@ -31,7 +31,9 @@ namespace TaskManager.WebApi.Controllers
         SetNote = 24,
         TaskSendMessage = 25,
         GetFile = 26,
-        UploadChunk = 27
+        UploadChunk = 27,
+        EndFileUpload = 28,
+        DeleteTaskFile = 29
     }
     public class WorkController : BaseController
     {
@@ -130,6 +132,7 @@ namespace TaskManager.WebApi.Controllers
 
             return responce;
         }
+
         private async Task<ResponceApiModel> GetFileListAsync(string userSecretKey, int taskId, ResponceApiModel responce)
         {
             try
@@ -351,12 +354,21 @@ namespace TaskManager.WebApi.Controllers
                 }
                 else if (requestMob.RType == (int)ConnectionType.GetFile)
                 {
-                    return await ExportFileAsync(requestMob);            //файл 1
+                    return await ExportFileAsync(requestMob);            //файл download
                 }
                 else if (requestMob.RType == (int)ConnectionType.UploadChunk)
                 {
-                    return await UploadChunk(requestMob);            //файл 2
+                    return await UploadChunk(requestMob);            //файл 2 upload
                 }
+                else if (requestMob.RType == (int)ConnectionType.EndFileUpload)
+                {
+                    return await EndFileUpload(requestMob);            //файл 3 upload
+                }
+                else if (requestMob.RType == (int)ConnectionType.DeleteTaskFile)
+                {
+                    return await DeleteTaskFile(requestMob);            //изтриване на файл
+                }
+
 
                 else
                 {
@@ -368,6 +380,28 @@ namespace TaskManager.WebApi.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        public async Task<IActionResult> DeleteTaskFile(AuthTaskUpdate requestMob)
+        {
+            
+            try
+            {
+               var result = this.files.DeleteTaskFile(requestMob.TaskId,requestMob.FileName);
+                if (result)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+            
         }
 
         /// <summary>
@@ -395,13 +429,44 @@ namespace TaskManager.WebApi.Controllers
                 var bytes = Convert.FromBase64String(requestMob.Chunk.Data);
                 fs.Write(bytes, 0, bytes.Length);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return new StatusCodeResult(500);
+                return BadRequest();
             }
             return Ok();
         }
+        /// <summary>
+        /// Finish a file upload and copy the completed file to the upload folder so it can be streamed or retrieved.
+        /// </summary>
+        /// <param name="fileHandle">The file handle of the file that the upload is complete for.</param>
+        /// <param name="quitUpload">If this is true the file upload will be aborted. The temporary file will be deleted.</param>
+        /// <param name="fileSize">The size of the original file that was uploaded. This is used to check if the upload was successful.</param>
+        /// <returns>Code Ok if the upload was successfully ended. Code 404 if the file handle was not found. Or code 500 if the file could not be moved or deleted.</returns>
+        public async Task<IActionResult> EndFileUpload(AuthTaskUpdate requestMob)
+        {
+            var result = string.Empty;
+            var fileInfo = new FileInfo(Path.Combine(environment.ContentRootPath, "temp", requestMob.FileName));
+            if (!fileInfo.Exists)
+                return NotFound(); //Temp file not found, maybe BeginFileUpload was not called?
+            try
+            {
+                if (requestMob.QuitUpload)
+                    fileInfo.Delete(); //Upload is being aborted, so the temp file is no longer needed.
+                else
+                {
+                    if (fileInfo.Length != requestMob.FileSize)
+                        return Conflict(); //The local file does not have the same size as the file that was uploaded. This could indicate the upload was not completed properly.
 
+                    result = await this.files.AddFile(requestMob.TaskId, fileInfo, requestMob.Message);  //в requestMob.Message е оригиналното име на файла
+                }
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(e, "Error");
+                return BadRequest(ex.Message);
+            }
+            return Ok(result);
+        }
         private async Task<IActionResult> ExportFileAsync(AuthTaskUpdate requestMob)
         {
             try

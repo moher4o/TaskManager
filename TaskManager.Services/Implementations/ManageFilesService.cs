@@ -23,7 +23,7 @@ namespace TaskManager.Services.Implementations
             string directoryName = taskId.ToString();
             string globalPath = fileConfiguration.Location;
 
-            var path = Path.Combine(globalPath, directoryName,fileName);
+            var path = Path.Combine(globalPath, directoryName, fileName);
 
             FileInfo file = new FileInfo(path);
             if (file.Exists)
@@ -39,7 +39,7 @@ namespace TaskManager.Services.Implementations
             string directoryName = taskId.ToString();
             string globalPath = fileConfiguration.Location;
 
-            var path = Path.Combine(globalPath,directoryName);
+            var path = Path.Combine(globalPath, directoryName);
 
             if (Directory.Exists(path))
             {
@@ -69,7 +69,7 @@ namespace TaskManager.Services.Implementations
                 var sumSizeMb = (dirSize + file.Length) / 1048576;  //в мегабайти
                 if (sumSizeMb > fileConfiguration.TaskDirectorySize)
                 {
-                    return $"Файловото пространство({fileConfiguration.TaskDirectorySize}Mb) заделено за задачата, ще бъде превишено. Оставащото свободно пространство е {fileConfiguration.TaskDirectorySize - (dirSize/ 1048576)}Mb";
+                    return $"Файловото пространство({fileConfiguration.TaskDirectorySize}Mb) заделено за задачата, ще бъде превишено. Оставащото свободно пространство е {fileConfiguration.TaskDirectorySize - (dirSize / 1048576)}Mb";
                 }
 
                 var filePath = Path.Combine(classDirectory, file.FileName);
@@ -92,6 +92,52 @@ namespace TaskManager.Services.Implementations
             else
             {
                 return "Услугата не е разрешена";
+            }
+        }
+
+        public async Task<string> AddFile(int taskId, FileInfo file, string originalFileName)
+        {
+            try
+            {
+                if (fileConfiguration.StoreFiles)
+                {
+                    string directoryName = taskId.ToString();
+                    string globalPath = fileConfiguration.Location;
+
+                    var classDirectory = Path.Combine(
+                                globalPath, directoryName);
+
+                    if (!Directory.Exists(classDirectory))
+                    {
+                        Directory.CreateDirectory(classDirectory);
+                    }
+
+                    DirectoryInfo dirInfo = new DirectoryInfo(classDirectory);
+                    long dirSize = await Task.Run(() => dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length));
+
+                    var sumSizeMb = (dirSize + file.Length) / 1048576;  //в мегабайти
+                    if (sumSizeMb > fileConfiguration.TaskDirectorySize)
+                    { 
+                        file.Delete();  //изтрива се качения временен файл
+                        return $"Файловото пространство({fileConfiguration.TaskDirectorySize}Mb) заделено за задачата, ще бъде превишено. Оставащото свободно пространство е {fileConfiguration.TaskDirectorySize - (dirSize / 1048576)}Mb";
+                    }
+
+                    var newFile = new FileInfo(Path.Combine(classDirectory, originalFileName));
+                    if (newFile.Exists)
+                        newFile.Delete(); //Delete a file with the same name if it already exists, effectively overwriting it.
+
+                    file.MoveTo(newFile.FullName); //Move the completed file to the main upload directory.
+
+                    return "Файла е качен успешно";
+                }
+                else
+                {
+                    return "Услугата не е разрешена";
+                }
+            }
+            catch (Exception)
+            {
+                return "Сервизна грешка";
             }
         }
 

@@ -11,6 +11,8 @@ namespace TaskManager.Services
     {
         Task<string> AddFile(int taskId, IFormFile file);
 
+        Task<string> AddFile(int taskId, FileInfo file, string originalFileName);
+
         bool DeleteTaskFile(int taskId, string fileName);
 
         bool DeleteTaskDirectory(int taskId);
