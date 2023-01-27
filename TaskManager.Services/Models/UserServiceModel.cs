@@ -57,6 +57,8 @@ namespace TaskManager.Services.Models
 
         public bool TwoFAActiv { get; set; }
 
+        public bool HasTokenHash { get; set; }
+
         public void ConfigureMapping(Profile profile)
         {
             profile.CreateMap<Employee, UserServiceModel>()
@@ -64,6 +66,7 @@ namespace TaskManager.Services.Models
                    .ForMember(u => u.DepartmentName, cfg => cfg.MapFrom(r => r.Department.DepartmentName))
                    .ForMember(u => u.SectorName, cfg => cfg.MapFrom(r => r.Sector.SectorName))
                    .ForMember(u => u.JobTitleName, cfg => cfg.MapFrom(r => r.JobTitle.TitleName))
+                   .ForMember(u => u.HasTokenHash, cfg => cfg.MapFrom(r => !string.IsNullOrEmpty(r.TokenHash)))
                    //.ForMember(u => u.RepresentativeName, cfg => cfg.MapFrom(r => r.Representative.FullName))
                    .ForMember(u => u.RoleName, cfg => cfg.MapFrom(r => r.Role.Name));
         }

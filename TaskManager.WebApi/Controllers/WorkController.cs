@@ -25,6 +25,8 @@ namespace TaskManager.WebApi.Controllers
         GetNewMessages = 4,
         GetFileList = 5,
         BeginFileUpload = 6,
+        GetCompanyMessages =7,
+        GetCurrentUserName = 8,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
@@ -84,11 +86,41 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await BeginFileUpload(userSecretKey, fileName, responce);
             }
+            else if (rType == (int)ConnectionType.GetCompanyMessages)
+            {
+                return await GetTaskMessagesAsync(userSecretKey, taskId, responce);
+            }
+            else if (rType == (int)ConnectionType.GetCurrentUserName)
+            {
+                return await GetCurrentUserName(userSecretKey, responce);
+            }
 
             else
             {
                 return responce;
             }
+        }
+
+        private async Task<ResponceApiModel> GetCurrentUserName(string userSecretKey, ResponceApiModel responce)
+        {
+            try
+            {
+
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                var currentUser = await this.employees.GetEmployeeNameByIdAsync(userId);
+
+                if (userId > 0)
+                {
+                    responce.UserName = currentUser;
+                    responce.ApiResponce = "success";
+                }
+                return responce;
+            }
+            catch (Exception)
+            {
+                return responce;
+            }
+
         }
 
         /// <summary>
@@ -207,6 +239,38 @@ namespace TaskManager.WebApi.Controllers
 
         }
 
+        private async Task<ResponceApiModel> GetTaskMessagesAsync(string userSecretKey, int taskId, ResponceApiModel responce)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId > 0)
+                {
+                    var task = this.tasks.GetTaskDetails(taskId);
+                    var participation = await task.Where(t => t.AssignedExperts.Contains(new Data.Models.EmployeesTasks
+                    {
+                        EmployeeId = userId,
+                        TaskId = taskId,
+                        isDeleted = false
+                    })).FirstOrDefaultAsync();
+                    if (participation != null)
+                    {
+                        responce.UserMessages = await this.mobmessage.Get50CompanyMessages(userId, taskId);
+                        responce.ApiResponce = "success";
+                    }
+                }
+
+                return responce;
+            }
+            catch (Exception)
+            {
+
+                return responce;
+            }
+
+        }
+
+
         private async Task<ResponceApiModel> GetEmployeesAsync(string userSecretKey, ResponceApiModel responce)
         {
             var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
@@ -223,7 +287,8 @@ namespace TaskManager.WebApi.Controllers
                     DepartmentName = u.DepartmentName,
                     SectorName = u.SectorName,
                     TelephoneNumber = u.TelephoneNumber,
-                    MobileNumber = u.MobileNumber
+                    MobileNumber = u.MobileNumber,
+                    HasMobileApp = u.HasTokenHash
                 }).ToList();
 
                 foreach (var user in data)
@@ -636,6 +701,7 @@ namespace TaskManager.WebApi.Controllers
             }
 
         }
+
 
         private async Task<IActionResult> SetWorckedHowersAsync(string userSecretKey, AuthTaskUpdate requestMob)
         {

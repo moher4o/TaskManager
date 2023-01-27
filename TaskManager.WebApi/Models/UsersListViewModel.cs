@@ -31,5 +31,7 @@ namespace TaskManager.WebApi.Models
 
         public string Status { get; set; }
 
+        public bool HasMobileApp { get; set; } = false;
+
     }
 }

@@ -42,7 +42,7 @@ namespace TaskMenager.Client.Controllers
         
         public IActionResult SelectFileWithData()
         {
-            var br = this.User.Claims.Count();
+            //var br = this.User.Claims.Count();
             var FileTypeSelected = new SelectedFileToInsertViewModel();
             FileTypeSelected.FileTypes.Insert(0, new SelectListItem
             {

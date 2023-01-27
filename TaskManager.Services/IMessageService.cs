@@ -12,6 +12,8 @@ namespace TaskManager.Services
         Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId);
         Task<List<MessageListModel>> GetNewUserMessages(int userId, int lastMessageId);
 
+        Task<List<MessageListModel>> Get50CompanyMessages(int userId, int taskId);
+
         //Task<bool> SendMessage(string messageText, int toUserId, int fromUserId);
 
         //Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId);

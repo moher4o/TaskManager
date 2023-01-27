@@ -10,8 +10,8 @@ namespace TaskManager.Services.Models.MobMessages
     public class MessageListModel : IMapFrom<MobMessage>, IHaveCustomMapping
     {
         public int MessageId { get; set; }
-        public string MessageText { get; set; }
-        public string SenderName { get; set; }
+        public string Text { get; set; }
+        public string User { get; set; }
 
         public string ReceiverName { get; set; }
         public DateTime MessageDate { get; set; }
@@ -22,9 +22,9 @@ namespace TaskManager.Services.Models.MobMessages
         {
             int currentEmployeeId = 0;
             profile.CreateMap<MobMessage, MessageListModel>()
-               .ForMember(u => u.SenderName, cfg => cfg.MapFrom(r => r.Sender.FullName))
+               .ForMember(u => u.User, cfg => cfg.MapFrom(r => r.Sender.FullName))
                .ForMember(u => u.ReceiverName, cfg => cfg.MapFrom(r => r.Receiver.FullName))
-               .ForMember(u => u.MessageText, cfg => cfg.MapFrom(r => r.Message.Text))
+               .ForMember(u => u.Text, cfg => cfg.MapFrom(r => r.Message.Text))
                .ForMember(u => u.Аlignment, cfg => cfg.MapFrom(r => r.ReceiverId == currentEmployeeId))
                .ForMember(u => u.MessageDate, cfg => cfg.MapFrom(r => r.Message.MessageDate));
         }

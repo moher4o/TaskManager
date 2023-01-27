@@ -18,23 +18,23 @@ namespace TaskMenager.Client.Controllers
     [Authorize(Policy = DataConstants.Employee)]
     public class NotesController : BaseController
     {
-        private readonly IDirectorateService directorates;
-        private readonly IDepartmentsService departments;
-        private readonly ISectorsService sectors;
-        private readonly ITaskTypesService tasktypes;
-        private readonly ITaskPrioritysService taskprioritys;
-        private readonly IStatusService statuses;
+        //private readonly IDirectorateService directorates;
+        //private readonly IDepartmentsService departments;
+        //private readonly ISectorsService sectors;
+        //private readonly ITaskTypesService tasktypes;
+        //private readonly ITaskPrioritysService taskprioritys;
+        //private readonly IStatusService statuses;
         private readonly INotesService taskNotes;
         private readonly I2FAConfiguration twoFAConfiguration;
         private readonly IMessageService mobmessage;
-        public NotesController(IDirectorateService directorates, IEmployeesService employees, IDepartmentsService departments, ISectorsService sectors, ITaskTypesService tasktypes, ITaskPrioritysService taskprioritys, IHttpContextAccessor httpContextAccessor, IStatusService statuses, ITasksService tasks, INotesService taskNotes, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, I2FAConfiguration _twoFAConfiguration, IMessageService _mobmessage) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
+        public NotesController(IEmployeesService employees, IHttpContextAccessor httpContextAccessor, ITasksService tasks, INotesService taskNotes, IEmailService email, IWebHostEnvironment env, IEmailConfiguration _emailConfiguration, I2FAConfiguration _twoFAConfiguration, IMessageService _mobmessage) : base(httpContextAccessor, employees, tasks, email, env, _emailConfiguration)
         {
-            this.statuses = statuses;
-            this.directorates = directorates;
-            this.departments = departments;
-            this.sectors = sectors;
-            this.tasktypes = tasktypes;
-            this.taskprioritys = taskprioritys;
+            //this.statuses = statuses;
+            //this.directorates = directorates;
+            //this.departments = departments;
+            //this.sectors = sectors;
+            //this.tasktypes = tasktypes;
+            //this.taskprioritys = taskprioritys;
             this.taskNotes = taskNotes;
             this.mobmessage = _mobmessage;
             twoFAConfiguration = _twoFAConfiguration;

@@ -16,6 +16,7 @@ namespace TaskManager.Data.Models
         public int MessageId { get; set; }
         public MobMessageText Message { get; set; }
 
+        public int TaskId { get; set; }
         public bool isReceived { get; set; } = false;
     }
 }

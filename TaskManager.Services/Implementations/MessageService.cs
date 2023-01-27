@@ -59,6 +59,32 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<List<MessageListModel>> Get50CompanyMessages(int userId, int taskId)
+        {
+            var messages = new List<MessageListModel>();
+            try
+            {
+                messages = await this.db.MessagesParticipants
+                     .Where(sr => sr.TaskId == taskId)
+                     .OrderByDescending(sr => sr.Message.MessageDate)
+                     .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                     .ToListAsync();
+
+                messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
+                                   .GroupBy(x => x.MessageId)
+                                   .Select(x => x.FirstOrDefault())
+                                   .TakeLast(50)
+                                   .ToList();
+
+                return messages;
+            }
+            catch (Exception)
+            {
+                return messages;
+            }
+        }
+
+
         public async Task<List<MessageListModel>> GetNewUserMessages(int userId, int lastMessageId)
         {
             var messages = new List<MessageListModel>();
