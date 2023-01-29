@@ -25,7 +25,7 @@ namespace TaskManager.WebApi.Controllers
         GetNewMessages = 4,
         GetFileList = 5,
         BeginFileUpload = 6,
-        GetCompanyMessages =7,
+        GetCompanyMessages = 7,
         GetCurrentUserName = 8,
         SetWorckedHowers = 21,
         SetUserToken = 22,
@@ -246,14 +246,14 @@ namespace TaskManager.WebApi.Controllers
                 var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
                 if (userId > 0)
                 {
-                    var task = this.tasks.GetTaskDetails(taskId);
-                    var participation = await task.Where(t => t.AssignedExperts.Contains(new Data.Models.EmployeesTasks
-                    {
-                        EmployeeId = userId,
-                        TaskId = taskId,
-                        isDeleted = false
-                    })).FirstOrDefaultAsync();
-                    if (participation != null)
+                    var task = this.tasks.GetTaskDetails(taskId).FirstOrDefault();
+                    //var participation = await task.Where(t => t.AssignedExperts.Contains(new Data.Models.EmployeesTasks
+                    //{
+                    //    EmployeeId = userId,
+                    //    TaskId = taskId,
+                    //    isDeleted = false
+                    //})).FirstOrDefaultAsync();
+                    if (task.AssignedExperts.Where(e => e.EmployeeId == userId).FirstOrDefault() != null)
                     {
                         responce.UserMessages = await this.mobmessage.Get50CompanyMessages(userId, taskId);
                         responce.ApiResponce = "success";
@@ -449,10 +449,10 @@ namespace TaskManager.WebApi.Controllers
 
         public async Task<IActionResult> DeleteTaskFile(AuthTaskUpdate requestMob)
         {
-            
+
             try
             {
-               var result = this.files.DeleteTaskFile(requestMob.TaskId,requestMob.FileName);
+                var result = this.files.DeleteTaskFile(requestMob.TaskId, requestMob.FileName);
                 if (result)
                 {
                     return Ok();
@@ -466,7 +466,7 @@ namespace TaskManager.WebApi.Controllers
             {
                 return BadRequest();
             }
-            
+
         }
 
         /// <summary>
@@ -588,67 +588,120 @@ namespace TaskManager.WebApi.Controllers
 
         }
 
+        //private async Task<IActionResult> TaskMessageAsync(AuthTaskUpdate requestMob)
+        //{
+        //    int fromUserId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+        //    string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
+
+        //    var currentTask = await this.tasks.GetTaskDetails(requestMob.TaskId)
+        //                                .ProjectTo<TaskApiViewModel>()
+        //                                .FirstOrDefaultAsync();
+        //    if (currentTask != null)
+        //    {
+        //        var receivers = currentTask.Colleagues
+        //                                .Where(e => e.isDeleted == false)
+        //                                .Select(e => e.Id).ToList();
+        //        if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(requestMob.Message) && !string.IsNullOrWhiteSpace(senderName))
+        //        {
+
+        //            var sendResult = await this.mobmessage.SendMessage($"{senderName} :", requestMob.Message, receivers, fromUserId);
+        //            if (sendResult)
+        //            {
+        //                return Ok();
+        //            }
+        //            else
+        //            {
+        //                return BadRequest("No valid users!");
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            return BadRequest();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
+
         private async Task<IActionResult> TaskMessageAsync(AuthTaskUpdate requestMob)
         {
-            int fromUserId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
-            string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
-
-            var currentTask = await this.tasks.GetTaskDetails(requestMob.TaskId)
-                                        .ProjectTo<TaskApiViewModel>()
-                                        .FirstOrDefaultAsync();
-            if (currentTask != null)
+            try
             {
-                var receivers = currentTask.Colleagues
-                                        .Where(e => e.isDeleted == false)
-                                        .Select(e => e.Id).ToList();
-                if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(requestMob.Message) && !string.IsNullOrWhiteSpace(senderName))
-                {
+                int fromUserId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+                string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
 
-                    var sendResult = await this.mobmessage.SendMessage($"{senderName} :", requestMob.Message, receivers, fromUserId);
-                    if (sendResult)
+                var currentTask = await this.tasks.GetTaskDetails(requestMob.TaskId)
+                                            .ProjectTo<TaskApiViewModel>()
+                                            .FirstOrDefaultAsync();
+                if (currentTask != null)
+                {
+                    var receivers = currentTask.Colleagues
+                                            .Where(e => e.isDeleted == false)
+                                            .Select(e => e.Id).ToList();
+                    if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(requestMob.Message) && !string.IsNullOrWhiteSpace(senderName))
                     {
-                        return Ok();
+
+                        var sendResult = await this.mobmessage.SendMessage($"{senderName} :", requestMob.Message, receivers, currentTask.Id, fromUserId);
+                        if (sendResult)
+                        {
+                            return Ok();
+                        }
+                        else
+                        {
+                            return BadRequest();
+                        }
+
                     }
                     else
                     {
-                        return BadRequest("No valid users!");
+                        return BadRequest();
                     }
-
                 }
                 else
                 {
                     return BadRequest();
                 }
             }
-            else
+            catch (Exception)
             {
                 return BadRequest();
             }
         }
 
+
         private async Task<IActionResult> SetTaskNoteAsync(string userSecretKey, AuthTaskUpdate requestMob)    //AddDateNote в TaskController
         {
-            var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
-            var user = this.employees.GetUserDataForCooky(username);
+            try
+            {
+                var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+                var user = this.employees.GetUserDataForCooky(username);
 
-            var taskFromDb = await this.tasks.CheckTaskByIdAsync(requestMob.TaskId);
-            if (!taskFromDb)
-            {
-                return BadRequest("Database not updated");
+                var taskFromDb = await this.tasks.CheckTaskByIdAsync(requestMob.TaskId);
+                if (!taskFromDb)
+                {
+                    return BadRequest("Database not updated");
+                }
+                var model = new AddNoteToTaskServiceModel()
+                {
+                    TaskId = requestMob.TaskId,
+                    EmployeeId = user.Id,
+                    Text = requestMob.Note,
+                    WorkDate = requestMob.WorkDate.Date
+                };
+                bool result = await this.tasks.SetTaskEmpNoteForDateAsync(model);
+                if (result)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Database not updated");
+                }
             }
-            var model = new AddNoteToTaskServiceModel()
-            {
-                TaskId = requestMob.TaskId,
-                EmployeeId = user.Id,
-                Text = requestMob.Note,
-                WorkDate = requestMob.WorkDate.Date
-            };
-            bool result = await this.tasks.SetTaskEmpNoteForDateAsync(model);
-            if (result)
-            {
-                return Ok();
-            }
-            else
+            catch (Exception)
             {
                 return BadRequest("Database not updated");
             }
@@ -681,11 +734,80 @@ namespace TaskManager.WebApi.Controllers
 
         private async Task<IActionResult> SetUserTokenAsync(string userSecretKey, string token)
         {
-            string result = String.Empty;
-            var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
-            if (userId != 0)
+            try
             {
-                result = await this.employees.AddTokenHash(userId, token);
+                string result = String.Empty;
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId != 0)
+                {
+                    result = await this.employees.AddTokenHash(userId, token);
+                    if (result == "success")
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest("Database not updated");
+                    }
+                }
+                else
+                {
+                    return BadRequest("Invalid user");
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+        }
+
+
+        private async Task<IActionResult> SetWorckedHowersAsync(string userSecretKey, AuthTaskUpdate requestMob)
+        {
+            try
+            {
+                var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
+                var user = this.employees.GetUserDataForCooky(username);
+                var systemTaskList = await this.tasks.GetSystemTasksAsync();
+                //var inTime = requestMob.workDate.Date < DateTime.Now.Date.AddDays(-7) ? false : true;
+
+                string result = String.Empty;
+                if (systemTaskList.Any(st => st.Id == requestMob.TaskId))
+                {
+                    var systemTaskName = systemTaskList.Where(st => st.Id == requestMob.TaskId).Select(st => st.TextValue).FirstOrDefault();
+                    if (systemTaskName == "Отпуски")
+                    {
+                        result = await this.SetDateSystemTasks(user.Id, requestMob.WorkDate.Date, true, false);
+                    }
+                    else if (systemTaskName == "Болнични")
+                    {
+                        result = await this.SetDateSystemTasks(user.Id, requestMob.WorkDate.Date, false, true);
+                    }
+                }
+                else
+                {
+                    var inTime = this.CheckDate(requestMob.WorkDate.Date);
+                    var workedHours = new TaskWorkedHoursServiceModel()
+                    {
+                        EmployeeId = user.Id,
+                        TaskId = requestMob.TaskId,
+                        HoursSpend = requestMob.HoursSpend,
+                        WorkDate = requestMob.WorkDate.Date,
+                        RegistrationDate = DateTime.Now.Date,
+                        InTimeRecord = inTime
+                    };
+                    var removedSystemTask = await RemoveSystemTasks(user.Id, requestMob.WorkDate.Date);
+                    if (removedSystemTask)
+                    {
+                        result = await this.tasks.SetWorkedHoursAsync(workedHours);
+                    }
+                    else
+                    {
+                        result = "error";
+                    }
+                }
+
                 if (result == "success")
                 {
                     return Ok();
@@ -695,65 +817,11 @@ namespace TaskManager.WebApi.Controllers
                     return BadRequest("Database not updated");
                 }
             }
-            else
-            {
-                return BadRequest("Invalid user");
-            }
-
-        }
-
-
-        private async Task<IActionResult> SetWorckedHowersAsync(string userSecretKey, AuthTaskUpdate requestMob)
-        {
-            var username = await this.employees.GetUserNameBySKAsync(userSecretKey);
-            var user = this.employees.GetUserDataForCooky(username);
-            var systemTaskList = await this.tasks.GetSystemTasksAsync();
-            //var inTime = requestMob.workDate.Date < DateTime.Now.Date.AddDays(-7) ? false : true;
-
-            string result = String.Empty;
-            if (systemTaskList.Any(st => st.Id == requestMob.TaskId))
-            {
-                var systemTaskName = systemTaskList.Where(st => st.Id == requestMob.TaskId).Select(st => st.TextValue).FirstOrDefault();
-                if (systemTaskName == "Отпуски")
-                {
-                    result = await this.SetDateSystemTasks(user.Id, requestMob.WorkDate.Date, true, false);
-                }
-                else if (systemTaskName == "Болнични")
-                {
-                    result = await this.SetDateSystemTasks(user.Id, requestMob.WorkDate.Date, false, true);
-                }
-            }
-            else
-            {
-                var inTime = this.CheckDate(requestMob.WorkDate.Date);
-                var workedHours = new TaskWorkedHoursServiceModel()
-                {
-                    EmployeeId = user.Id,
-                    TaskId = requestMob.TaskId,
-                    HoursSpend = requestMob.HoursSpend,
-                    WorkDate = requestMob.WorkDate.Date,
-                    RegistrationDate = DateTime.Now.Date,
-                    InTimeRecord = inTime
-                };
-                var removedSystemTask = await RemoveSystemTasks(user.Id, requestMob.WorkDate.Date);
-                if (removedSystemTask)
-                {
-                    result = await this.tasks.SetWorkedHoursAsync(workedHours);
-                }
-                else
-                {
-                    result = "error";
-                }
-            }
-
-            if (result == "success")
-            {
-                return Ok();
-            }
-            else
+            catch (Exception)
             {
                 return BadRequest("Database not updated");
             }
+
         }
 
         [HttpPut]

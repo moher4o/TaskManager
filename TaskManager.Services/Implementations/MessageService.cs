@@ -104,14 +104,14 @@ namespace TaskManager.Services.Implementations
                 return messages;
             }
         }
-
-        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
+        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId)
         {
             try
             {
-                var messageDb = new MobMessageText() { 
-                Text = messageText,
-                MessageDate = DateTime.Now
+                var messageDb = new MobMessageText()
+                {
+                    Text = messageText,
+                    MessageDate = DateTime.Now
                 };
 
                 if (FirebaseApp.DefaultInstance == null)
@@ -136,7 +136,8 @@ namespace TaskManager.Services.Implementations
                         messageDb.SendReceivers.Add(new MobMessage()
                         {
                             ReceiverId = userId,
-                            SenderId = fromUserId
+                            SenderId = fromUserId,
+                            TaskId = taskId
                         });
                     }
 
@@ -151,7 +152,93 @@ namespace TaskManager.Services.Implementations
                             Title = messageTitle,
                             Body = messageText
                         },
-                        
+
+                        Android = new AndroidConfig()
+                        {
+                            TimeToLive = TimeSpan.FromHours(4),
+                            Notification = new AndroidNotification()
+                            {
+                                Icon = "logo",
+                                Color = "#f45342"
+
+                            },
+                            Priority = FirebaseAdmin.Messaging.Priority.Normal,
+                        }
+                    };
+
+                    var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
+
+                    if (response.SuccessCount > 0)
+                    {
+                        foreach (var item in messageDb.SendReceivers)
+                        {
+                            item.isReceived = true;
+                        }
+                        await this.db.Messages.AddAsync(messageDb);
+                        await this.db.SaveChangesAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
+        {
+            try
+            {
+                var messageDb = new MobMessageText()
+                {
+                    Text = messageText,
+                    MessageDate = DateTime.Now
+                };
+
+                if (FirebaseApp.DefaultInstance == null)
+                {
+                    FirebaseApp.Create(new AppOptions()
+                    {
+                        Credential = GoogleCredential.FromFile("private_key.json")
+                    });
+                }
+
+                if (messageText.Length > 299)
+                {
+                    messageText = messageText.Substring(0, 299) + "...";
+                }
+                var receiversTokens = new List<string>();
+                foreach (var userId in receivers)
+                {
+                    var registrationToken = await employees.GetMobileToken(userId);
+                    if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
+                    {
+                        receiversTokens.Add(registrationToken);
+                        messageDb.SendReceivers.Add(new MobMessage()
+                        {
+                            ReceiverId = userId,
+                            SenderId = fromUserId,
+                            TaskId = -1
+                        });
+                    }
+
+                }
+                if (receiversTokens.Count > 0)
+                {
+                    var message = new MulticastMessage()
+                    {
+                        Tokens = receiversTokens,
+                        Notification = new Notification()
+                        {
+                            Title = messageTitle,
+                            Body = messageText
+                        },
+
                         Android = new AndroidConfig()
                         {
                             TimeToLive = TimeSpan.FromHours(2),
@@ -159,7 +246,7 @@ namespace TaskManager.Services.Implementations
                             {
                                 Icon = "logo",
                                 Color = "#f45342"
-                                
+
                             },
                             Priority = FirebaseAdmin.Messaging.Priority.Normal,
                         }
