@@ -27,6 +27,7 @@ namespace TaskManager.WebApi.Controllers
         BeginFileUpload = 6,
         GetCompanyMessages = 7,
         GetCurrentUserName = 8,
+        GetNewCompMessages = 9,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
@@ -93,6 +94,10 @@ namespace TaskManager.WebApi.Controllers
             else if (rType == (int)ConnectionType.GetCurrentUserName)
             {
                 return await GetCurrentUserName(userSecretKey, responce);
+            }
+            else if (rType == (int)ConnectionType.GetNewCompMessages)
+            {
+                return await GetTaskMessagesAsync(userSecretKey, taskId, lastMessageId, responce);
             }
 
             else
@@ -269,7 +274,30 @@ namespace TaskManager.WebApi.Controllers
             }
 
         }
+        private async Task<ResponceApiModel> GetTaskMessagesAsync(string userSecretKey, int taskId, int lastMessageId, ResponceApiModel responce)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId > 0)
+                {
+                    var task = this.tasks.GetTaskDetails(taskId).FirstOrDefault();
+                    if (task.AssignedExperts.Where(e => e.EmployeeId == userId).FirstOrDefault() != null)
+                    {
+                        responce.UserMessages = await this.mobmessage.GetNewCompMessages(userId, taskId, lastMessageId);
+                        responce.ApiResponce = "success";
+                    }
+                }
 
+                return responce;
+            }
+            catch (Exception)
+            {
+
+                return responce;
+            }
+
+        }
 
         private async Task<ResponceApiModel> GetEmployeesAsync(string userSecretKey, ResponceApiModel responce)
         {
@@ -393,7 +421,7 @@ namespace TaskManager.WebApi.Controllers
 
         [HttpPost]
         //public async Task<IActionResult> Post([FromQuery] string userSecretKey, [FromBody] AuthTaskUpdate requestMob)
-        public async Task<IActionResult> Post([FromBody] AuthTaskUpdate requestMob)
+        public async Task<ActionResult<int>> Post([FromBody] AuthTaskUpdate requestMob)
         {
             try
             {
@@ -447,7 +475,7 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
-        public async Task<IActionResult> DeleteTaskFile(AuthTaskUpdate requestMob)
+        public async Task<ActionResult> DeleteTaskFile(AuthTaskUpdate requestMob)
         {
 
             try
@@ -475,7 +503,7 @@ namespace TaskManager.WebApi.Controllers
         /// </summary>
         /// <param name="mediaChunk">The chunk of the media file to upload.</param>
         /// <returns>Returns the Ok code if the chunk was uploaded and appended successfully. Or an error when it failed.</returns>
-        private async Task<IActionResult> UploadChunk(AuthTaskUpdate requestMob)
+        private async Task<ActionResult> UploadChunk(AuthTaskUpdate requestMob)
         {
             var path = Path.Combine(environment.ContentRootPath, "temp", requestMob.Chunk.FileHandle);
             var fileInfo = new FileInfo(path);
@@ -507,7 +535,7 @@ namespace TaskManager.WebApi.Controllers
         /// <param name="quitUpload">If this is true the file upload will be aborted. The temporary file will be deleted.</param>
         /// <param name="fileSize">The size of the original file that was uploaded. This is used to check if the upload was successful.</param>
         /// <returns>Code Ok if the upload was successfully ended. Code 404 if the file handle was not found. Or code 500 if the file could not be moved or deleted.</returns>
-        public async Task<IActionResult> EndFileUpload(AuthTaskUpdate requestMob)
+        public async Task<ActionResult> EndFileUpload(AuthTaskUpdate requestMob)
         {
             var result = string.Empty;
             var fileInfo = new FileInfo(Path.Combine(environment.ContentRootPath, "temp", requestMob.FileName));
@@ -532,7 +560,7 @@ namespace TaskManager.WebApi.Controllers
             }
             return Ok(result);
         }
-        private async Task<IActionResult> ExportFileAsync(AuthTaskUpdate requestMob)
+        private async Task<ActionResult> ExportFileAsync(AuthTaskUpdate requestMob)
         {
             try
             {
@@ -626,7 +654,7 @@ namespace TaskManager.WebApi.Controllers
         //    }
         //}
 
-        private async Task<IActionResult> TaskMessageAsync(AuthTaskUpdate requestMob)
+        private async Task<ActionResult<int>> TaskMessageAsync(AuthTaskUpdate requestMob)
         {
             try
             {
@@ -645,9 +673,10 @@ namespace TaskManager.WebApi.Controllers
                     {
 
                         var sendResult = await this.mobmessage.SendMessage($"{senderName} :", requestMob.Message, receivers, currentTask.Id, fromUserId);
-                        if (sendResult)
+                        if (sendResult > 0)
                         {
-                            return Ok();
+                            //return CreatedAtAction(nameof(GetById_IActionResult), new { id = sendResult }, product);
+                            return sendResult;
                         }
                         else
                         {
@@ -672,7 +701,7 @@ namespace TaskManager.WebApi.Controllers
         }
 
 
-        private async Task<IActionResult> SetTaskNoteAsync(string userSecretKey, AuthTaskUpdate requestMob)    //AddDateNote в TaskController
+        private async Task<ActionResult> SetTaskNoteAsync(string userSecretKey, AuthTaskUpdate requestMob)    //AddDateNote в TaskController
         {
             try
             {
@@ -707,7 +736,7 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
-        private async Task<IActionResult> SendMessageAsync(string userSecretKey, string message, ICollection<int> receivers)
+        private async Task<ActionResult<int>> SendMessageAsync(string userSecretKey, string message, ICollection<int> receivers)
         {
             int fromUserId = await this.employees.GetUserIdBySKAsync(userSecretKey);
             string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
@@ -716,9 +745,9 @@ namespace TaskManager.WebApi.Controllers
 
                 var sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers, fromUserId);
                 //sendResult = this.mobmessage.MessTest($"{senderName} :", message, receivers, fromUserId);
-                if (sendResult)
+                if (sendResult > 0)
                 {
-                    return Ok();
+                    return sendResult;
                 }
                 else
                 {
@@ -732,7 +761,7 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
-        private async Task<IActionResult> SetUserTokenAsync(string userSecretKey, string token)
+        private async Task<ActionResult> SetUserTokenAsync(string userSecretKey, string token)
         {
             try
             {
@@ -763,7 +792,7 @@ namespace TaskManager.WebApi.Controllers
         }
 
 
-        private async Task<IActionResult> SetWorckedHowersAsync(string userSecretKey, AuthTaskUpdate requestMob)
+        private async Task<ActionResult> SetWorckedHowersAsync(string userSecretKey, AuthTaskUpdate requestMob)
         {
             try
             {

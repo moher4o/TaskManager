@@ -10,11 +10,14 @@ namespace TaskManager.Services
     {
         Task<List<MessageListModel>> GetLast50UserMessages(int userId, int? senderId);
 
-        Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId);
-        Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId);
+        Task<int> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId);
+        Task<int> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId);
         Task<List<MessageListModel>> GetNewUserMessages(int userId, int lastMessageId);
 
         Task<List<MessageListModel>> Get50CompanyMessages(int userId, int taskId);
+
+        Task<List<MessageListModel>> GetNewCompMessages(int userId, int taskId, int lastMessageId);
+
 
         //Task<bool> SendMessage(string messageText, int toUserId, int fromUserId);
 

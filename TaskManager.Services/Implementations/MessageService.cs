@@ -36,7 +36,7 @@ namespace TaskManager.Services.Implementations
                     messages = await this.db.MessagesParticipants
                         .Where(sr => sr.ReceiverId == userId || sr.SenderId == senderId || sr.SenderId == userId)
                         .OrderBy(sr => sr.Message.MessageDate)
-                        .TakeLast(50)
+                        .TakeLast(200)
                         .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
                         .ToListAsync();
                 }
@@ -46,9 +46,14 @@ namespace TaskManager.Services.Implementations
                         .Where(sr => sr.ReceiverId == userId || sr.SenderId == userId)
                         .OrderByDescending(sr => sr.Message.MessageDate)
                         .ProjectTo<MessageListModel>(new { currentEmployeeId = userId})
-                        .Take(50)
+                        .Take(200)
                         .ToListAsync();
                 }
+                messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
+                   .GroupBy(x => x.MessageId)
+                   .Select(x => x.FirstOrDefault())
+                   .TakeLast(100)
+                   .ToList();
 
                 return messages;
             }
@@ -73,7 +78,30 @@ namespace TaskManager.Services.Implementations
                 messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
                                    .GroupBy(x => x.MessageId)
                                    .Select(x => x.FirstOrDefault())
-                                   .TakeLast(50)
+                                   .TakeLast(100)
+                                   .ToList();
+
+                return messages;
+            }
+            catch (Exception)
+            {
+                return messages;
+            }
+        }
+        public async Task<List<MessageListModel>> GetNewCompMessages(int userId, int taskId, int lastMessageId)
+        {
+            var messages = new List<MessageListModel>();
+            try
+            {
+                messages = await this.db.MessagesParticipants
+                     .Where(sr => sr.TaskId == taskId && sr.MessageId > lastMessageId)
+                     .OrderByDescending(sr => sr.Message.MessageDate)
+                     .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                     .ToListAsync();
+
+                messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
+                                   .GroupBy(x => x.MessageId)
+                                   .Select(x => x.FirstOrDefault())
                                    .ToList();
 
                 return messages;
@@ -84,7 +112,6 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-
         public async Task<List<MessageListModel>> GetNewUserMessages(int userId, int lastMessageId)
         {
             var messages = new List<MessageListModel>();
@@ -94,7 +121,7 @@ namespace TaskManager.Services.Implementations
                          .Where(sr => (sr.ReceiverId == userId || sr.SenderId == userId) && sr.MessageId > lastMessageId)
                          .OrderByDescending(sr => sr.Message.MessageDate)
                          .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
-                         .Take(50)
+                         //.Take(50)    // не е удачно
                          .ToListAsync();
 
                 return messages;
@@ -104,7 +131,7 @@ namespace TaskManager.Services.Implementations
                 return messages;
             }
         }
-        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId)
+        public async Task<int> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId)
         {
             try
             {
@@ -114,20 +141,35 @@ namespace TaskManager.Services.Implementations
                     MessageDate = DateTime.Now
                 };
 
-                if (FirebaseApp.DefaultInstance == null)
-                {
-                    FirebaseApp.Create(new AppOptions()
-                    {
-                        Credential = GoogleCredential.FromFile("private_key.json")
-                    });
-                }
+                messageDb = await SendFirebaseMessage(messageTitle, messageText, receivers, taskId, fromUserId, messageDb);
+                await this.db.Messages.AddAsync(messageDb);
+                await this.db.SaveChangesAsync();
+                return messageDb.Id;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
 
-                if (messageText.Length > 299)
+        private async Task<MobMessageText> SendFirebaseMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId, MobMessageText messageDb)
+        {
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                FirebaseApp.Create(new AppOptions()
                 {
-                    messageText = messageText.Substring(0, 299) + "...";
-                }
-                var receiversTokens = new List<string>();
-                foreach (var userId in receivers)
+                    Credential = GoogleCredential.FromFile("private_key.json")
+                });
+            }
+
+            if (messageText.Length > 299)
+            {
+                messageText = messageText.Substring(0, 299) + "...";
+            }
+            var receiversTokens = new List<string>();
+            foreach (var userId in receivers)
+            {
+                if (userId != fromUserId || taskId <= 0)     //второто условие пропуска тестовите съобщения лично до себе си
                 {
                     var registrationToken = await employees.GetMobileToken(userId);
                     if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
@@ -137,145 +179,150 @@ namespace TaskManager.Services.Implementations
                         {
                             ReceiverId = userId,
                             SenderId = fromUserId,
-                            TaskId = taskId
+                            TaskId = taskId,
+                            isReceived = true
                         });
-                    }
 
-                }
-                if (receiversTokens.Count > 0)
-                {
-                    var message = new MulticastMessage()
-                    {
-                        Tokens = receiversTokens,
-                        Notification = new Notification()
-                        {
-                            Title = messageTitle,
-                            Body = messageText
-                        },
-
-                        Android = new AndroidConfig()
-                        {
-                            TimeToLive = TimeSpan.FromHours(4),
-                            Notification = new AndroidNotification()
-                            {
-                                Icon = "logo",
-                                Color = "#f45342"
-
-                            },
-                            Priority = FirebaseAdmin.Messaging.Priority.Normal,
-                        }
-                    };
-
-                    var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
-
-                    if (response.SuccessCount > 0)
-                    {
-                        foreach (var item in messageDb.SendReceivers)
-                        {
-                            item.isReceived = true;
-                        }
-                        await this.db.Messages.AddAsync(messageDb);
-                        await this.db.SaveChangesAsync();
-                        return true;
                     }
                     else
                     {
-                        return false;
+                        messageDb.SendReceivers.Add(new MobMessage()
+                        {
+                            ReceiverId = userId,
+                            SenderId = fromUserId,
+                            TaskId = taskId,
+                            isReceived = false
+                        });
                     }
                 }
-                return false;
             }
-            catch (Exception)
+            if (receiversTokens.Count > 0)
             {
-                return false;
-            }
-        }
-        public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
-        {
-            try
-            {
-                var messageDb = new MobMessageText()
+                var message = new MulticastMessage()
                 {
-                    Text = messageText,
-                    MessageDate = DateTime.Now
+                    Tokens = receiversTokens,
+                    Notification = new Notification()
+                    {
+                        Title = messageTitle,
+                        Body = messageText
+                    },
+
+                    Android = new AndroidConfig()
+                    {
+                        TimeToLive = TimeSpan.FromHours(4),
+                        Notification = new AndroidNotification()
+                        {
+                            Icon = "logo",
+                            Color = "#f45342"
+
+                        },
+                        Priority = FirebaseAdmin.Messaging.Priority.Normal,
+                    }
                 };
 
-                if (FirebaseApp.DefaultInstance == null)
+                var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
+
+                if (response.SuccessCount > 0)        //дали получателя е уведомен чрез FirebaseMessaging. Това не означава , че не е получил съобщението (api)
                 {
-                    FirebaseApp.Create(new AppOptions()
+                    foreach (var item in messageDb.SendReceivers)
                     {
-                        Credential = GoogleCredential.FromFile("private_key.json")
-                    });
-                }
-
-                if (messageText.Length > 299)
-                {
-                    messageText = messageText.Substring(0, 299) + "...";
-                }
-                var receiversTokens = new List<string>();
-                foreach (var userId in receivers)
-                {
-                    var registrationToken = await employees.GetMobileToken(userId);
-                    if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
-                    {
-                        receiversTokens.Add(registrationToken);
-                        messageDb.SendReceivers.Add(new MobMessage()
-                        {
-                            ReceiverId = userId,
-                            SenderId = fromUserId,
-                            TaskId = -1
-                        });
-                    }
-
-                }
-                if (receiversTokens.Count > 0)
-                {
-                    var message = new MulticastMessage()
-                    {
-                        Tokens = receiversTokens,
-                        Notification = new Notification()
-                        {
-                            Title = messageTitle,
-                            Body = messageText
-                        },
-
-                        Android = new AndroidConfig()
-                        {
-                            TimeToLive = TimeSpan.FromHours(2),
-                            Notification = new AndroidNotification()
-                            {
-                                Icon = "logo",
-                                Color = "#f45342"
-
-                            },
-                            Priority = FirebaseAdmin.Messaging.Priority.Normal,
-                        }
-                    };
-
-                    var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
-
-                    if (response.SuccessCount > 0)
-                    {
-                        foreach (var item in messageDb.SendReceivers)
-                        {
-                            item.isReceived = true;
-                        }
-                        await this.db.Messages.AddAsync(messageDb);
-                        await this.db.SaveChangesAsync();
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
+                        item.isReceived = true;
                     }
                 }
-                return false;
             }
-            catch (Exception)
-            {
-                return false;
-            }
+            return messageDb;
         }
+
+        public async Task<int> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
+        {
+            return await this.SendMessage(messageTitle, messageText, receivers, -1, fromUserId);
+        }
+
+        //public async Task<bool> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId)
+        //{
+        //    try
+        //    {
+        //        var messageDb = new MobMessageText()
+        //        {
+        //            Text = messageText,
+        //            MessageDate = DateTime.Now
+        //        };
+
+        //        if (FirebaseApp.DefaultInstance == null)
+        //        {
+        //            FirebaseApp.Create(new AppOptions()
+        //            {
+        //                Credential = GoogleCredential.FromFile("private_key.json")
+        //            });
+        //        }
+        //        if (messageText.Length > 299)
+        //        {
+        //            messageText = messageText.Substring(0, 299) + "...";
+        //        }
+        //        var receiversTokens = new List<string>();
+        //        foreach (var userId in receivers)
+        //        {
+        //            var registrationToken = await employees.GetMobileToken(userId);
+        //            if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
+        //            {
+        //                receiversTokens.Add(registrationToken);
+        //                messageDb.SendReceivers.Add(new MobMessage()
+        //                {
+        //                    ReceiverId = userId,
+        //                    SenderId = fromUserId,
+        //                    TaskId = -1
+        //                });
+        //            }
+
+        //        }
+        //        if (receiversTokens.Count > 0)
+        //        {
+        //            var message = new MulticastMessage()
+        //            {
+        //                Tokens = receiversTokens,
+        //                Notification = new Notification()
+        //                {
+        //                    Title = messageTitle,
+        //                    Body = messageText
+        //                },
+
+        //                Android = new AndroidConfig()
+        //                {
+        //                    TimeToLive = TimeSpan.FromHours(2),
+        //                    Notification = new AndroidNotification()
+        //                    {
+        //                        Icon = "logo",
+        //                        Color = "#f45342"
+
+        //                    },
+        //                    Priority = FirebaseAdmin.Messaging.Priority.Normal,
+        //                }
+        //            };
+
+        //            var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
+
+        //            if (response.SuccessCount > 0)
+        //            {
+        //                foreach (var item in messageDb.SendReceivers)
+        //                {
+        //                    item.isReceived = true;
+        //                }
+        //                await this.db.Messages.AddAsync(messageDb);
+        //                await this.db.SaveChangesAsync();
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //        return false;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
+        //}
         //public async Task<bool> SendMessage(string messageText, int toUserId, int fromUserId)
         //{
         //    try
