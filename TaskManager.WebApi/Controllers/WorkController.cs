@@ -858,13 +858,14 @@ namespace TaskManager.WebApi.Controllers
         {
             try
             {
-                var username = await this.employees.GetUserNameBySKAsync(requestMob.UserSecretKey);
-                var user = this.employees.GetUserDataForCooky(username);
-                if (user == null)
+                //var username = await this.employees.GetUserNameBySKAsync(requestMob.UserSecretKey);
+                //var user = this.employees.GetUserDataForCooky(username);
+                var userId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+                if (userId == 0)
                 {
                     return BadRequest("Database not updated");
                 }
-                bool result = await this.RemoveSystemTasks(user.Id, requestMob.WorkDate.Date);
+                bool result = await this.RemoveSystemTasks(userId, requestMob.WorkDate.Date);
                 if (result)
                 {
                     return Ok();
@@ -885,7 +886,7 @@ namespace TaskManager.WebApi.Controllers
             try
             {
                 var result = string.Empty;
-                var message = string.Empty;
+                //var message = string.Empty;
                 if (isholiday || isill)
                 {
                     var dateTaskList = await this.employees.GetAllUserTaskAsync(userId, workDate.Date);
@@ -915,7 +916,7 @@ namespace TaskManager.WebApi.Controllers
                             Approved = false
                         };
                         result = await this.tasks.SetWorkedHoursAsync(workedHours);
-                        message = "Отпускът е отразен в системата";
+                        //message = "Отпускът е отразен в системата";
                     }
                     else if (isill)
                     {
@@ -930,7 +931,7 @@ namespace TaskManager.WebApi.Controllers
                             Approved = false
                         };
                         result = await this.tasks.SetWorkedHoursAsync(workedHours);
-                        message = "Болничния е отразен в системата";
+                        //message = "Болничния е отразен в системата";
                     }
 
                 }

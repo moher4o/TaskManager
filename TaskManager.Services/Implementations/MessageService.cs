@@ -152,7 +152,7 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-        private async Task<MobMessageText> SendFirebaseMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId, MobMessageText messageDb)
+        private async Task<MobMessageText> SendFirebaseMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId, MobMessageText messageDb) 
         {
             if (FirebaseApp.DefaultInstance == null)
             {
