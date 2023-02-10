@@ -341,6 +341,16 @@ namespace TaskManager.Services.Implementations
                 var notesOnTask = await this.db.Notes.Where(wh => wh.TaskId == taskId).ToListAsync();
                 this.db.Notes.RemoveRange(notesOnTask);
                 await this.db.SaveChangesAsync();
+                //messages
+                var messagesIdsOnTask = await this.db.MessagesParticipants.Where(m => m.TaskId == taskId).Select(m => m.MessageId).ToArrayAsync();
+                var messagesOnTaskParticipants = await this.db.MessagesParticipants.Where(m => m.TaskId == taskId).ToArrayAsync();
+                this.db.MessagesParticipants.RemoveRange(messagesOnTaskParticipants);
+                await this.db.SaveChangesAsync();
+                var messages = await this.db.Messages.Where(m => messagesIdsOnTask.Contains(m.Id)).ToListAsync();
+                this.db.Messages.RemoveRange(messages);
+                await this.db.SaveChangesAsync();
+                //messages
+
                 this.db.Tasks.Remove(taskToDelete);
                 await this.db.SaveChangesAsync();
                 return true;

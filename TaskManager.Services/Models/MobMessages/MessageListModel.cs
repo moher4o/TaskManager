@@ -16,16 +16,16 @@ namespace TaskManager.Services.Models.MobMessages
         public string ReceiverName { get; set; }
         public DateTime MessageDate { get; set; }
 
-        public bool Аlignment { get; set; } = false;  //ако получателя е текущия потребител = true
+        public bool Аlignment { get; set; } = false;  //ако изпращача е текущия потребител = true
 
         public void ConfigureMapping(Profile profile)
         {
             int currentEmployeeId = 0;
             profile.CreateMap<MobMessage, MessageListModel>()
                .ForMember(u => u.User, cfg => cfg.MapFrom(r => r.Sender.FullName))
-               .ForMember(u => u.ReceiverName, cfg => cfg.MapFrom(r => r.Receiver.FullName))
+               .ForMember(u => u.ReceiverName, cfg => cfg.MapFrom(r => r.TaskId <= 0 ? r.Receiver.FullName : r.TaskId.ToString()))
                .ForMember(u => u.Text, cfg => cfg.MapFrom(r => r.Message.Text))
-               .ForMember(u => u.Аlignment, cfg => cfg.MapFrom(r => r.ReceiverId == currentEmployeeId))
+               .ForMember(u => u.Аlignment, cfg => cfg.MapFrom(r => r.SenderId == currentEmployeeId))
                .ForMember(u => u.MessageDate, cfg => cfg.MapFrom(r => r.Message.MessageDate));
         }
     }

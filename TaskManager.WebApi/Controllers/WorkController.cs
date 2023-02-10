@@ -28,6 +28,8 @@ namespace TaskManager.WebApi.Controllers
         GetCompanyMessages = 7,
         GetCurrentUserName = 8,
         GetNewCompMessages = 9,
+        GetUserMessages = 10,
+        GetNewUserMessages = 11,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
@@ -60,7 +62,7 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int taskId, [FromQuery] string fileName, [FromQuery] int rType)
+        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int taskId, [FromQuery] int senderId, [FromQuery] string fileName, [FromQuery] int rType)
         {
             var responce = new ResponceApiModel();
             if (rType == (int)ConnectionType.GetTasks)
@@ -75,9 +77,17 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await GetMessagesAsync(userSecretKey, responce);
             }
+            else if (rType == (int)ConnectionType.GetUserMessages)
+            {
+                return await GetMessagesAsync(userSecretKey, senderId, responce);
+            }
             else if (rType == (int)ConnectionType.GetNewMessages)
             {
                 return await GetNewMessagesAsync(userSecretKey, lastMessageId, responce);
+            }
+            else if (rType == (int)ConnectionType.GetNewUserMessages)
+            {
+                return await GetNewMessagesAsync(userSecretKey, senderId, lastMessageId, responce);
             }
             else if (rType == (int)ConnectionType.GetFileList)
             {
@@ -204,6 +214,9 @@ namespace TaskManager.WebApi.Controllers
             }
 
         }
+        /// <summary>
+        /// Връща всички нови n съобщения до потребителя
+        /// </summary>
         private async Task<ResponceApiModel> GetNewMessagesAsync(string userSecretKey, int lastMessageId, ResponceApiModel responce)
         {
             try
@@ -212,7 +225,7 @@ namespace TaskManager.WebApi.Controllers
                 var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
                 if (userId > 0)
                 {
-                    responce.UserMessages = await this.mobmessage.GetNewUserMessages(userId, lastMessageId);
+                    responce.UserMessages = await this.mobmessage.GetNewUserMessages(userId, null, lastMessageId);
                     responce.ApiResponce = "success";
                 }
                 return responce;
@@ -221,8 +234,32 @@ namespace TaskManager.WebApi.Controllers
             {
                 return responce;
             }
-
         }
+        /// <summary>
+        /// Връща всички нови n съобщения между двама потребители
+        /// </summary>
+        private async Task<ResponceApiModel> GetNewMessagesAsync(string userSecretKey, int senderId, int lastMessageId, ResponceApiModel responce)
+        {
+            try
+            {
+
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId > 0)
+                {
+                    responce.UserMessages = await this.mobmessage.GetNewUserMessages(userId, senderId, lastMessageId);
+                    responce.ApiResponce = "success";
+                }
+                return responce;
+            }
+            catch (Exception)
+            {
+                return responce;
+            }
+        }
+
+        /// <summary>
+        /// Връща всички n съобщения до потребителя
+        /// </summary>
         private async Task<ResponceApiModel> GetMessagesAsync(string userSecretKey, ResponceApiModel responce)
         {
             try
@@ -243,6 +280,27 @@ namespace TaskManager.WebApi.Controllers
             }
 
         }
+        /// <summary>
+        /// Връща всички n съобщения между двамата потребители
+        /// </summary>
+        private async Task<ResponceApiModel> GetMessagesAsync(string userSecretKey, int senderId, ResponceApiModel responce)
+        {
+            try
+            {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+                if (userId > 0)
+                {
+                    responce.UserMessages = await this.mobmessage.GetLast50UserMessages(userId, senderId);
+                    responce.ApiResponce = "success";
+                }
+                return responce;
+            }
+            catch (Exception)
+            {
+                return responce;
+            }
+        }
+
 
         private async Task<ResponceApiModel> GetTaskMessagesAsync(string userSecretKey, int taskId, ResponceApiModel responce)
         {
@@ -435,7 +493,7 @@ namespace TaskManager.WebApi.Controllers
                 }
                 else if (requestMob.RType == (int)ConnectionType.SendMessage)
                 {
-                    return await SendMessageAsync(requestMob.UserSecretKey, requestMob.Message, requestMob.Receivers);
+                    return await SendMessageAsync(requestMob);
                 }
                 else if (requestMob.RType == (int)ConnectionType.SetNote)
                 {
@@ -736,14 +794,14 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
-        private async Task<ActionResult<int>> SendMessageAsync(string userSecretKey, string message, ICollection<int> receivers)
+        private async Task<ActionResult<int>> SendMessageAsync(AuthTaskUpdate requestMob)
         {
-            int fromUserId = await this.employees.GetUserIdBySKAsync(userSecretKey);
+            int fromUserId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
             string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
-            if (receivers.Count > 0 && !string.IsNullOrWhiteSpace(message) && !string.IsNullOrWhiteSpace(senderName))
+            if (requestMob.Receivers.Count > 0 && !string.IsNullOrWhiteSpace(requestMob.Message) && !string.IsNullOrWhiteSpace(senderName))
             {
 
-                var sendResult = await this.mobmessage.SendMessage($"{senderName} :", message, receivers, fromUserId);
+                var sendResult = await this.mobmessage.SendMessage($"{senderName} :", requestMob.Message, requestMob.Receivers, fromUserId);
                 //sendResult = this.mobmessage.MessTest($"{senderName} :", message, receivers, fromUserId);
                 if (sendResult > 0)
                 {

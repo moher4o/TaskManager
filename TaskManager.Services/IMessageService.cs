@@ -12,7 +12,7 @@ namespace TaskManager.Services
 
         Task<int> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId);
         Task<int> SendMessage(string messageTitle, string messageText, ICollection<int> receivers, int fromUserId);
-        Task<List<MessageListModel>> GetNewUserMessages(int userId, int lastMessageId);
+        Task<List<MessageListModel>> GetNewUserMessages(int userId, int? colleagueId, int lastMessageId);
 
         Task<List<MessageListModel>> Get50CompanyMessages(int userId, int taskId);
 

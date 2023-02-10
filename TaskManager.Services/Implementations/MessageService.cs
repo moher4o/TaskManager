@@ -18,42 +18,45 @@ namespace TaskManager.Services.Implementations
     public class MessageService : IMessageService
     {
         protected readonly IEmployeesService employees;
+        protected readonly ITasksService tasks;
         private readonly TasksDbContext db;
-        public MessageService(TasksDbContext _db, IEmployeesService _employees)
+        public MessageService(TasksDbContext _db, IEmployeesService _employees, ITasksService _tasks)
         {
             this.employees = _employees;
+            this.tasks = _tasks;
             this.db = _db;
         }
 
-        public async Task<List<MessageListModel>> GetLast50UserMessages(int userId, int? senderId)
+        public async Task<List<MessageListModel>> GetLast50UserMessages(int userId, int? colleagueId)
         {
             var messages = new List<MessageListModel>();
-                 
             try
             {
-                if (senderId.HasValue)
+                if (colleagueId.HasValue)
                 {
                     messages = await this.db.MessagesParticipants
-                        .Where(sr => sr.ReceiverId == userId || sr.SenderId == senderId || sr.SenderId == userId)
-                        .OrderBy(sr => sr.Message.MessageDate)
-                        .TakeLast(200)
+                        .Where(sr => (sr.ReceiverId == userId && sr.SenderId == colleagueId) || (sr.ReceiverId == colleagueId && sr.SenderId == userId))
+                        .OrderByDescending(sr => sr.Message.MessageDate)
                         .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                        .Take(80)
                         .ToListAsync();
                 }
                 else
                 {
-                   messages = await this.db.MessagesParticipants
-                        .Where(sr => sr.ReceiverId == userId || sr.SenderId == userId)
-                        .OrderByDescending(sr => sr.Message.MessageDate)
-                        .ProjectTo<MessageListModel>(new { currentEmployeeId = userId})
-                        .Take(200)
-                        .ToListAsync();
+                    var tasksIds = await this.tasks.GetAllTasks(userId).Select(t => t.Id).ToListAsync();
+                    messages = await this.db.MessagesParticipants
+                         .Where(sr => sr.ReceiverId == userId || sr.SenderId == userId || tasksIds.Contains(sr.TaskId))
+                         .OrderByDescending(sr => sr.Message.MessageDate)
+                         .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                         .Take(80)
+                         .ToListAsync();
+                    messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
+                               .GroupBy(x => x.MessageId)
+                               .Select(x => x.FirstOrDefault())
+                               .TakeLast(80)
+                               .ToList();
+
                 }
-                messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
-                   .GroupBy(x => x.MessageId)
-                   .Select(x => x.FirstOrDefault())
-                   .TakeLast(100)
-                   .ToList();
 
                 return messages;
             }
@@ -72,14 +75,16 @@ namespace TaskManager.Services.Implementations
                 messages = await this.db.MessagesParticipants
                      .Where(sr => sr.TaskId == taskId)
                      .OrderByDescending(sr => sr.Message.MessageDate)
+                     //.TakeLast(100)
                      .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                     .Take(80)
                      .ToListAsync();
 
-                messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
-                                   .GroupBy(x => x.MessageId)
-                                   .Select(x => x.FirstOrDefault())
-                                   .TakeLast(100)
-                                   .ToList();
+                //messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
+                //                   .GroupBy(x => x.MessageId)
+                //                   .Select(x => x.FirstOrDefault())
+                //                   .TakeLast(100)
+                //                   .ToList();
 
                 return messages;
             }
@@ -97,12 +102,13 @@ namespace TaskManager.Services.Implementations
                      .Where(sr => sr.TaskId == taskId && sr.MessageId > lastMessageId)
                      .OrderByDescending(sr => sr.Message.MessageDate)
                      .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                     .Take(100)
                      .ToListAsync();
 
-                messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
-                                   .GroupBy(x => x.MessageId)
-                                   .Select(x => x.FirstOrDefault())
-                                   .ToList();
+                //messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
+                //                   .GroupBy(x => x.MessageId)
+                //                   .Select(x => x.FirstOrDefault())
+                //                   .ToList();
 
                 return messages;
             }
@@ -112,17 +118,42 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-        public async Task<List<MessageListModel>> GetNewUserMessages(int userId, int lastMessageId)
+        public async Task<List<MessageListModel>> GetNewUserMessages(int userId, int? colleagueId, int lastMessageId)
         {
             var messages = new List<MessageListModel>();
             try
             {
+                if (colleagueId.HasValue)
+                {
+                    if (lastMessageId < await this.db.MessagesParticipants.Where(mp => (mp.SenderId == userId && mp.ReceiverId == colleagueId) || (mp.SenderId == colleagueId && mp.ReceiverId == userId)).Select(m => m.Id).LastOrDefaultAsync())
+                    {
+                        messages = await this.db.MessagesParticipants
+                             .Where(mp => (mp.SenderId == userId && mp.ReceiverId == colleagueId) || (mp.SenderId == colleagueId && mp.ReceiverId == userId) && mp.MessageId > lastMessageId)
+                             .OrderByDescending(sr => sr.Message.MessageDate)
+                             .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                             //.Take(50)    // не е удачно
+                             .ToListAsync();
+                    }
+                }
+                else
+                {
+                    var tasksIds = await this.tasks.GetAllTasks(userId).Select(t => t.Id).ToListAsync();
                     messages = await this.db.MessagesParticipants
-                         .Where(sr => (sr.ReceiverId == userId || sr.SenderId == userId) && sr.MessageId > lastMessageId)
-                         .OrderByDescending(sr => sr.Message.MessageDate)
-                         .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
-                         //.Take(50)    // не е удачно
-                         .ToListAsync();
+                             .Where(sr => (sr.ReceiverId == userId || sr.SenderId == userId || tasksIds.Contains(sr.TaskId)) && sr.MessageId > lastMessageId)
+                             .OrderByDescending(sr => sr.Message.MessageDate)
+                             .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
+                             .Take(80)    // не е удачно
+                             .ToListAsync();
+                    messages = messages                                     //Distinct  на съобщенията по Id, за да не се повтарят
+                       .GroupBy(x => x.MessageId)
+                       .Select(x => x.FirstOrDefault())
+                       .TakeLast(80)
+                       .ToList();
+
+                    //if (lastMessageId < messages.Select(m => m.MessageId).LastOrDefault())
+                    //{
+                    //}
+                }
 
                 return messages;
             }
@@ -152,7 +183,7 @@ namespace TaskManager.Services.Implementations
             }
         }
 
-        private async Task<MobMessageText> SendFirebaseMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId, MobMessageText messageDb) 
+        private async Task<MobMessageText> SendFirebaseMessage(string messageTitle, string messageText, ICollection<int> receivers, int taskId, int fromUserId, MobMessageText messageDb)
         {
             if (FirebaseApp.DefaultInstance == null)
             {
@@ -172,29 +203,42 @@ namespace TaskManager.Services.Implementations
                 if (userId != fromUserId || taskId <= 0)     //второто условие пропуска тестовите съобщения лично до себе си
                 {
                     var registrationToken = await employees.GetMobileToken(userId);
-                    if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
+                    if (taskId <= 0)        // добявя се всеки получател, само ако това не е съобщение до задача
                     {
-                        receiversTokens.Add(registrationToken);
-                        messageDb.SendReceivers.Add(new MobMessage()
+                        if (registrationToken != "error" && !string.IsNullOrWhiteSpace(registrationToken))
                         {
-                            ReceiverId = userId,
-                            SenderId = fromUserId,
-                            TaskId = taskId,
-                            isReceived = true
-                        });
+                            receiversTokens.Add(registrationToken);
+                            messageDb.SendReceivers.Add(new MobMessage()
+                            {
+                                ReceiverId = userId,
+                                SenderId = fromUserId,
+                                TaskId = taskId,
+                                isReceived = false
+                            });
 
-                    }
-                    else
-                    {
-                        messageDb.SendReceivers.Add(new MobMessage()
+                        }
+                        else
                         {
-                            ReceiverId = userId,
-                            SenderId = fromUserId,
-                            TaskId = taskId,
-                            isReceived = false
-                        });
+                            messageDb.SendReceivers.Add(new MobMessage()
+                            {
+                                ReceiverId = userId,
+                                SenderId = fromUserId,
+                                TaskId = taskId,
+                                isReceived = false
+                            });
+                        }
                     }
                 }
+            }
+            if (taskId > 0)   //ако е съобщение до задача, се добавя само един ред в MobMessage
+            {
+                messageDb.SendReceivers.Add(new MobMessage()
+                {
+                    ReceiverId = receivers.FirstOrDefault(),
+                    SenderId = fromUserId,
+                    TaskId = taskId,
+                    isReceived = true
+                });
             }
             if (receiversTokens.Count > 0)
             {
@@ -222,7 +266,7 @@ namespace TaskManager.Services.Implementations
 
                 var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
 
-                if (response.SuccessCount > 0)        //дали получателя е уведомен чрез FirebaseMessaging. Това не означава , че не е получил съобщението (api)
+                if (response.SuccessCount > 0 && taskId <= 0)        //дали получателя е уведомен чрез FirebaseMessaging. Това не означава , че не е получил съобщението (api)
                 {
                     foreach (var item in messageDb.SendReceivers)
                     {
