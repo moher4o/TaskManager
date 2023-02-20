@@ -62,9 +62,19 @@ namespace TaskManager.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponceApiModel> Get([FromQuery] string userSecretKey, [FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int taskId, [FromQuery] int senderId, [FromQuery] string fileName, [FromQuery] int rType)
+        public async Task<ResponceApiModel> Get([FromQuery] DateTime workdate, [FromQuery] int lastMessageId, [FromQuery] int taskId, [FromQuery] int senderId, [FromQuery] string fileName, [FromQuery] int rType)    //[FromQuery] string userSecretKey, 
         {
             var responce = new ResponceApiModel();
+            string userSecretKey = "notset";
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                userSecretKey = Request.Headers.FirstOrDefault(h => h.Key.Equals("Authorization")).Value;
+            }
+            else
+            {
+                return responce;
+            }
+            
             if (rType == (int)ConnectionType.GetTasks)
             {
                 return await GetTasksAsync(userSecretKey, workdate, responce);
@@ -483,29 +493,40 @@ namespace TaskManager.WebApi.Controllers
         {
             try
             {
+                string userSecretKey = "notset";
+                if (Request.Headers.ContainsKey("Authorization"))
+                {
+                    userSecretKey = Request.Headers.FirstOrDefault(h => h.Key.Equals("Authorization")).Value;
+                }
+                else
+                {
+                    return BadRequest();
+                }
+
+
                 if (requestMob.RType == (int)ConnectionType.SetWorckedHowers)
                 {
-                    return await SetWorckedHowersAsync(requestMob.UserSecretKey, requestMob);
+                    return await SetWorckedHowersAsync(userSecretKey, requestMob);
                 }
                 else if (requestMob.RType == (int)ConnectionType.SetUserToken)
                 {
-                    return await SetUserTokenAsync(requestMob.UserSecretKey, requestMob.Token);
+                    return await SetUserTokenAsync(userSecretKey, requestMob.Token);
                 }
                 else if (requestMob.RType == (int)ConnectionType.SendMessage)
                 {
-                    return await SendMessageAsync(requestMob);
+                    return await SendMessageAsync(userSecretKey, requestMob);
                 }
                 else if (requestMob.RType == (int)ConnectionType.SetNote)
                 {
-                    return await SetTaskNoteAsync(requestMob.UserSecretKey, requestMob);            //добавянена дневен коментар
+                    return await SetTaskNoteAsync(userSecretKey, requestMob);            //добавянена дневен коментар
                 }
                 else if (requestMob.RType == (int)ConnectionType.TaskSendMessage)
                 {
-                    return await TaskMessageAsync(requestMob);            //Изпращане на съобщение до участници в задача
+                    return await TaskMessageAsync(userSecretKey, requestMob);            //Изпращане на съобщение до участници в задача
                 }
                 else if (requestMob.RType == (int)ConnectionType.GetFile)
                 {
-                    return await ExportFileAsync(requestMob);            //файл download
+                    return await ExportFileAsync(userSecretKey, requestMob);            //файл download
                 }
                 else if (requestMob.RType == (int)ConnectionType.UploadChunk)
                 {
@@ -517,7 +538,7 @@ namespace TaskManager.WebApi.Controllers
                 }
                 else if (requestMob.RType == (int)ConnectionType.DeleteTaskFile)
                 {
-                    return await DeleteTaskFile(requestMob);            //изтриване на файл
+                    return await DeleteTaskFile(userSecretKey,  requestMob);            //изтриване на файл
                 }
 
 
@@ -533,11 +554,16 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
-        public async Task<ActionResult> DeleteTaskFile(AuthTaskUpdate requestMob)
+        public async Task<ActionResult> DeleteTaskFile(string userSecretKey, AuthTaskUpdate requestMob)
         {
 
             try
             {
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);   //проверка дали има потребител
+                if (userId <= 0)
+                {
+                    return BadRequest();
+                }
                 var result = this.files.DeleteTaskFile(requestMob.TaskId, requestMob.FileName);
                 if (result)
                 {
@@ -618,11 +644,11 @@ namespace TaskManager.WebApi.Controllers
             }
             return Ok(result);
         }
-        private async Task<ActionResult> ExportFileAsync(AuthTaskUpdate requestMob)
+        private async Task<ActionResult> ExportFileAsync(string userSecretKey, AuthTaskUpdate requestMob)
         {
             try
             {
-                var userId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
                 var currentUser = await this.employees.GetEmployeeByIdAsync(userId);
                 var currentTask = await this.tasks.GetTaskDetails(requestMob.TaskId)
                                             .ProjectTo<TaskApiViewModel>()
@@ -712,11 +738,11 @@ namespace TaskManager.WebApi.Controllers
         //    }
         //}
 
-        private async Task<ActionResult<int>> TaskMessageAsync(AuthTaskUpdate requestMob)
+        private async Task<ActionResult<int>> TaskMessageAsync(string userSecretKey, AuthTaskUpdate requestMob)
         {
             try
             {
-                int fromUserId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+                int fromUserId = await this.employees.GetUserIdBySKAsync(userSecretKey);
                 string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
 
                 var currentTask = await this.tasks.GetTaskDetails(requestMob.TaskId)
@@ -794,9 +820,9 @@ namespace TaskManager.WebApi.Controllers
             }
         }
 
-        private async Task<ActionResult<int>> SendMessageAsync(AuthTaskUpdate requestMob)
+        private async Task<ActionResult<int>> SendMessageAsync(string userSecretKey, AuthTaskUpdate requestMob)
         {
-            int fromUserId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+            int fromUserId = await this.employees.GetUserIdBySKAsync(userSecretKey);
             string senderName = await this.employees.GetEmployeeNameByIdAsync(fromUserId);
             if (requestMob.Receivers.Count > 0 && !string.IsNullOrWhiteSpace(requestMob.Message) && !string.IsNullOrWhiteSpace(senderName))
             {
@@ -916,9 +942,16 @@ namespace TaskManager.WebApi.Controllers
         {
             try
             {
-                //var username = await this.employees.GetUserNameBySKAsync(requestMob.UserSecretKey);
-                //var user = this.employees.GetUserDataForCooky(username);
-                var userId = await this.employees.GetUserIdBySKAsync(requestMob.UserSecretKey);
+                string userSecretKey = "notset";
+                if (Request.Headers.ContainsKey("Authorization"))
+                {
+                    userSecretKey = Request.Headers.FirstOrDefault(h => h.Key.Equals("Authorization")).Value;
+                }
+                else
+                {
+                    return BadRequest();
+                }
+                var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
                 if (userId == 0)
                 {
                     return BadRequest("Database not updated");
