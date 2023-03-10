@@ -735,7 +735,7 @@ namespace TaskManager.Services.Implementations
             try
             {
                 var usersHashs = await this.db.Employees
-                                            .Where(e => e.isActive == true)
+                                            .Where(e => e.isDeleted == false)
                                             .Select(e => new {
                                                 daeuAcount = e.DaeuAccaunt,
                                                 secret = KeyGenerator.Decrypt(e.SecretKeyHash, e.DaeuAccaunt)
@@ -756,7 +756,7 @@ namespace TaskManager.Services.Implementations
             try
             {
                 var usersHashs = await this.db.Employees
-                                            .Where(e => e.isActive == true)
+                                            .Where(e => e.isDeleted == false)
                                             .Select(e => new {
                                                 userId = e.Id,
                                                 secret = KeyGenerator.Decrypt(e.SecretKeyHash, e.DaeuAccaunt)

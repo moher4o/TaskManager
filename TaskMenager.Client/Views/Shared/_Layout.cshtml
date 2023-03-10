@@ -114,10 +114,10 @@
                                     <div class="logo-text">Мениджър задачи</div>
                                     <div class="logo-text-secondary">ИА "Инфраструктура на електронното управление"</div>
                                     @*<div class="logo-text-secondary">
-                                        Държавна агенция "Електронно управление" 
-                                    </div>
-                                    
-                                    <div class="logo-text-secondary">архивен сайт</div>*@
+                                            Държавна агенция "Електронно управление"
+                                        </div>
+
+                                        <div class="logo-text-secondary">архивен сайт</div>*@
                                 </div>
                             </td>
                         </tr>
@@ -132,9 +132,9 @@
         <!-- Sidebar  -->
         <nav id="sidebar">
             @*<div class="sidebar-header">
-                <h3>Мениджър задачи</h3>
-                <strong>МЗ</strong>
-            </div>*@
+                    <h3>Мениджър задачи</h3>
+                    <strong>МЗ</strong>
+                </div>*@
 
             <ul class="list-unstyled components" style="padding-top:9em;">
                 <li>
@@ -155,8 +155,8 @@
                             <a asp-controller="Tasks" asp-action="AssignerTasks">Наблюдавани задачи</a>
                         </li>
                         @*<li>
-                             <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
-                        </li>*@
+                                 <a asp-controller="Tasks" asp-action="CreatedTasks">Създадени задачи</a>
+                            </li>*@
                         <li>
                             <a asp-controller="Tasks" asp-action="TasksList">Списък задачи</a>
                         </li>
@@ -215,57 +215,57 @@
 
                 @if (User.Identities.Any(u => (u.Name.Contains("avukov") || u.Name.Contains("samso")) && u.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() == "Ангел Иванов Вуков"))
                 {
-                <li>
-                    <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-cog"></i>
-                        <span class="chatnotifications">Разработчик</span>
-                    </a>
-                    <ul class="collapse list-unstyled" id="developerSubmenu">
-                        <li>
-                            <a asp-controller="Structure" asp-action="AddSystemAccount">Добавяне на системен акаунт</a>
-                        </li>
+                    <li>
+                        <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                            <i class="fas fa-cog"></i>
+                            <span class="chatnotifications">Разработчик</span>
+                        </a>
+                        <ul class="collapse list-unstyled" id="developerSubmenu">
+                            <li>
+                                <a asp-controller="Structure" asp-action="AddSystemAccount">Добавяне на системен акаунт</a>
+                            </li>
 
-                        <li>
-                            <a asp-controller="Structure" asp-action="RemoveEmptySecretKey">Генериране на secretkey автоматично</a>
-                        </li>
-                        <li>
-                            <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Добавяне на email автоматично</a>
-                        </li>
-                        <li>
-                            <a asp-controller="Structure" asp-action="AddUsersToSystemTasks">Добавяне към системни задачи на всички служители</a>
-                        </li>
-                    </ul>
-                </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="RemoveEmptySecretKey">Генериране на secretkey автоматично</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Добавяне на email автоматично</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="AddUsersToSystemTasks">Добавяне към системни задачи на всички служители</a>
+                            </li>
+                        </ul>
+                    </li>
                 }
                 @*<li @(User.Identities.Any(u => (u.Name.Contains("avukov") || u.Name.Contains("samso")) && u.Claims.Where(u => u.Type == "fullName").Select(u => u.Value).FirstOrDefault() == "Ангел Иванов Вуков") ? "" : "hidden")>
-                    <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-cog"></i>
-                        <span class="chatnotifications">Разработчик</span>
-                    </a>
-                    <ul class="collapse list-unstyled" id="developerSubmenu">
-                        <li>
-                            <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Генериране на secretkey автоматично</a>
-                        </li>
-                        <li>
-                            <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Добавяне на email автоматично</a>
-                        </li>
-                        <li>
-                            <a asp-controller="Structure" asp-action="AddUsersToSystemTasks">Добавяне към системни задачи на всички служители</a>
-                        </li>
-                    </ul>
-                </li>*@
+                        <a href="#developerSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                            <i class="fas fa-cog"></i>
+                            <span class="chatnotifications">Разработчик</span>
+                        </a>
+                        <ul class="collapse list-unstyled" id="developerSubmenu">
+                            <li>
+                                <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Генериране на secretkey автоматично</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="RemoveEmptyEmails">Добавяне на email автоматично</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Structure" asp-action="AddUsersToSystemTasks">Добавяне към системни задачи на всички служители</a>
+                            </li>
+                        </ul>
+                    </li>*@
 
             </ul>
         </nav>
 
         <!-- Page Content  -->
-        
+
         <div id="content">
-            
+
             @*<div class="logo-text-three" style="margin-left: 325px; margin-bottom: 10px;"> Сайт със структурата на ИА ИЕУ >>>  <a href="https://taskmanager.e-gov.bg" target="_blank" style="margin-left:5px; color: cornflowerblue; font-size: 18px;">
-    <span class="blinking"><u>https://taskmanager.e-gov.bg</u></span>
-</a>  сайта е достъпен свободно в интернет, не само в мрежата на ИА ИЕУ!
-            </div>*@
+                    <span class="blinking"><u>https://taskmanager.e-gov.bg</u></span>
+                </a>  сайта е достъпен свободно в интернет, не само в мрежата на ИА ИЕУ!
+                            </div>*@
             <nav class="navbar navbar-expand-sm navbar-light bg-light marginbmobile" style="max-height:40px !important;">
                 <div class="container-fluid">
                     <button type="button" id="sidebarCollapse" class="btn btn-info" style="background-color: #69a0f1;">
@@ -296,26 +296,26 @@
                     @RenderBody()
                     @if (TempData["Success"] != null)
                     {
-                    <script type="text/javascript">
-                        $(document).ready(function () {
-                            var data = $('#successMessage').text();
-                            toastr.success(data, { timeOut: 4000 });
-                            //notify.showSuccess(data);
-                        });
-                    </script>
-                    <p class="alert alert-success" id="successMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                var data = $('#successMessage').text();
+                                toastr.success(data, { timeOut: 4000 });
+                                //notify.showSuccess(data);
+                            });
+                        </script>
+                        <p class="alert alert-success" id="successMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Success"]</p>
                     }
                     @if (TempData["Error"] != null)
                     {
-                    <script type="text/javascript">
-                        $(document).ready(function () {
-                            var data = $('#errorMessage').text();
-                            toastr.error(data, { timeOut: 6000 });
-                            //notify.showError(data);
-                        });
-                    </script>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                var data = $('#errorMessage').text();
+                                toastr.error(data, { timeOut: 6000 });
+                                //notify.showError(data);
+                            });
+                        </script>
 
-                    <p class="alert alert-danger" id="errorMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
+                        <p class="alert alert-danger" id="errorMessage" hidden style="text-align:center; margin-top: 15px; margin-right:100px; margin-left:100px;">@TempData["Error"]</p>
                     }
                 </main>
             </div>
@@ -339,7 +339,7 @@
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
                 $('#sidebar').toggleClass('active');
-                
+
             });
             //$('#sidebar').height() = $('#content').height();
             const lochref = window.location.href;
@@ -402,7 +402,16 @@
                 buttons: [false, "Ok"]
             })
         }
-    </script>
+        //(function (s, t, a, n) {
+        //    s[t] || (s[t] = a, n = s[a] = function () { n.q.push(arguments) },
+        //        n.q = [], n.v = 2, n.l = 1 * new Date)
+        //})(window, "InstanaEumObject", "ineum");
 
+        //ineum('reportingUrl', 'https://172.23.228.66:446/eum/');
+        //ineum('key', 'euNKBPzsQ8uuu4ng4SfIGg');
+        //ineum('trackSessions');
+
+    </script>
+    @*<script defer crossorigin="anonymous" src="https://172.23.228.66:446/eum/eum.min.js"></script>*@
 </body>
 </html>
