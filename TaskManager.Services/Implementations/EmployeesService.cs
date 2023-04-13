@@ -693,7 +693,7 @@ namespace TaskManager.Services.Implementations
             {
 
                 var user = await this.db.Employees
-                    .Where(e => e.Id == userId).FirstOrDefaultAsync();
+                    .Where(e => e.Id == userId && e.isDeleted == false).FirstOrDefaultAsync();
                 if (user != null)
                 {
                     return KeyGenerator.Decrypt(user.TokenHash, user.DaeuAccaunt);
