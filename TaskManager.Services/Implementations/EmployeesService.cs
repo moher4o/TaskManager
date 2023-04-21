@@ -806,7 +806,7 @@ namespace TaskManager.Services.Implementations
             }
             catch (Exception)
             {
-                return 99999;
+                return -99999;
             }
         }
     }

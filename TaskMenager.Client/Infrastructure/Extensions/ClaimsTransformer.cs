@@ -160,7 +160,18 @@ namespace TaskMenager.Client.Infrastructure.Extensions
                     }
 
                 }
-                    resultLocal = await this.tasks.SystemTasksAsync();
+
+                    int systemAccountId = await this.employees.GetSystemAccountId();
+                    if (systemAccountId != 0 && systemAccountId != -99999)
+                    {
+                        result = result + "<  >" + "Зареден системен акаунт с номер: " + systemAccountId;
+                    }
+                    else
+                    {
+                        result = result + "<  >" + "Грешка при зареждане на системен акаунт : " + systemAccountId;
+                    }
+
+                resultLocal = await this.tasks.SystemTasksAsync();
                     if (!resultLocal.Equals("success"))
                     {
                         result = result + "<  >" + "Грешка след опит за инициализиране на системните(отпуски/болничен) задачи : " + resultLocal;

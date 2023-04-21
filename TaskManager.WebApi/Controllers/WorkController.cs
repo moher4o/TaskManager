@@ -30,6 +30,7 @@ namespace TaskManager.WebApi.Controllers
         GetNewCompMessages = 9,
         GetUserMessages = 10,
         GetNewUserMessages = 11,
+        GetTaskName = 12,
         SetWorckedHowers = 21,
         SetUserToken = 22,
         SendMessage = 23,
@@ -87,13 +88,13 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await GetMessagesAsync(userSecretKey, responce);
             }
-            else if (rType == (int)ConnectionType.GetUserMessages)
-            {
-                return await GetMessagesAsync(userSecretKey, senderId, responce);
-            }
             else if (rType == (int)ConnectionType.GetNewMessages)
             {
                 return await GetNewMessagesAsync(userSecretKey, lastMessageId, responce);
+            }
+            else if (rType == (int)ConnectionType.GetUserMessages)
+            {
+                return await GetMessagesAsync(userSecretKey, senderId, responce);
             }
             else if (rType == (int)ConnectionType.GetNewUserMessages)
             {
@@ -119,11 +120,35 @@ namespace TaskManager.WebApi.Controllers
             {
                 return await GetTaskMessagesAsync(userSecretKey, taskId, lastMessageId, responce);
             }
+            else if (rType == (int)ConnectionType.GetTaskName)
+            {
+                return await GetTaskNameAsync(taskId, responce);
+            }
+
 
             else
             {
                 return responce;
             }
+        }
+
+        private async Task<ResponceApiModel> GetTaskNameAsync(int taskId, ResponceApiModel responce)
+        {
+            try
+            {
+                var taskName = await this.tasks.GetTaskNameAsync(taskId);
+                if (!string.IsNullOrWhiteSpace(taskName))
+                {
+                    responce.StringResult = taskName;
+                    responce.ApiResponce = "success";
+                }
+                return responce;
+            }
+            catch (Exception)
+            {
+                return responce;
+            }
+
         }
 
         private async Task<ResponceApiModel> GetCurrentUserName(string userSecretKey, ResponceApiModel responce)
@@ -133,10 +158,10 @@ namespace TaskManager.WebApi.Controllers
 
                 var userId = await this.employees.GetUserIdBySKAsync(userSecretKey);
                 var currentUser = await this.employees.GetEmployeeNameByIdAsync(userId);
-
+                var systemAccountId = await this.employees.GetSystemAccountId();
                 if (userId > 0)
                 {
-                    responce.UserName = currentUser;
+                    responce.StringResult = currentUser + "$" + userId + "$" + systemAccountId;
                     responce.ApiResponce = "success";
                 }
                 return responce;

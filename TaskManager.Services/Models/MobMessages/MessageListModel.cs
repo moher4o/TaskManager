@@ -11,8 +11,10 @@ namespace TaskManager.Services.Models.MobMessages
     {
         public int MessageId { get; set; }
         public string Text { get; set; }
+        public int SenderId { get; set; }
+        public int ReceiverId { get; set; }
+        public int TaskId { get; set; }
         public string User { get; set; }
-
         public string ReceiverName { get; set; }
         public DateTime MessageDate { get; set; }
 

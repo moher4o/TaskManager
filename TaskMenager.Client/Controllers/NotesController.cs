@@ -153,7 +153,7 @@ namespace TaskMenager.Client.Controllers
             if (usersIdList.Count > 0)
             {
                 int systemAccountId = await this.employees.GetSystemAccountId();
-                if (systemAccountId != 0 && systemAccountId != 99999)
+                if (systemAccountId != 0 && systemAccountId != -99999)
                 {
                     await this.mobmessage.SendMessage($"Добавен е коментар по задача с N:{taskId}.", text, usersIdList, systemAccountId);
                 }
