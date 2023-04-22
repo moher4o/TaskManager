@@ -351,3 +351,8 @@ MigrationBackup/
 TaskMenager.Client/appsettings.json
 TaskManager.WebApi/appsettings.json
 TaskMenager.Client/appsettings.json
+TaskManager.WebApi/appsettings.json
+TaskManager.WebApi/private_key.json
+TaskMenager.Client/appsettings.json
+TaskMenager.Client/private_key.json
+TaskMenager.Client/private_key.json

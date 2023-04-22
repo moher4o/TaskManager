@@ -125,15 +125,18 @@ namespace TaskManager.Services.Implementations
             {
                 if (colleagueId.HasValue)
                 {
-                    if (lastMessageId < await this.db.MessagesParticipants.Where(mp => (mp.SenderId == userId && mp.ReceiverId == colleagueId) || (mp.SenderId == colleagueId && mp.ReceiverId == userId)).Select(m => m.Id).LastOrDefaultAsync())
+                    var cIdValue = colleagueId.Value;
+                    var lastMessageIdNR = await this.db.MessagesParticipants.Where(mp => (mp.SenderId == userId && mp.ReceiverId == cIdValue) || (mp.SenderId == cIdValue && mp.ReceiverId == userId)).OrderBy(m => m.MessageId).Select(m => m.MessageId).LastOrDefaultAsync();
+                    if (lastMessageId < lastMessageIdNR)
                     {
                         messages = await this.db.MessagesParticipants
-                             .Where(mp => (mp.SenderId == userId && mp.ReceiverId == colleagueId) || (mp.SenderId == colleagueId && mp.ReceiverId == userId) && mp.MessageId > lastMessageId)
+                             .Where(mp => ((mp.SenderId == userId && mp.ReceiverId == cIdValue) || (mp.SenderId == cIdValue && mp.ReceiverId == userId)) && mp.MessageId > lastMessageId)
                              .OrderByDescending(sr => sr.Message.MessageDate)
                              .ProjectTo<MessageListModel>(new { currentEmployeeId = userId })
                              //.Take(50)    // не е удачно
                              .ToListAsync();
                     }
+                    
                 }
                 else
                 {
@@ -149,7 +152,7 @@ namespace TaskManager.Services.Implementations
                        .Select(x => x.FirstOrDefault())
                        .TakeLast(80)
                        .ToList();
-
+                    
                     //if (lastMessageId < messages.Select(m => m.MessageId).LastOrDefault())
                     //{
                     //}
