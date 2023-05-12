@@ -216,6 +216,14 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Column(column).Width = 10;
                     worksheet.Cells[2, column].Value = "Общо за дата :";
 
+                    /////////
+                    column += 1;
+                    worksheet.Cells[2, column].Style.WrapText = true;
+                    worksheet.Column(column).Width = 160;
+                    worksheet.Cells[2, column].Value = "Коментари по задачата";
+
+                    /////////
+
                     worksheet.Cells[1, 1, 1, column > 20 ? column : 20].Merge = true;
                     worksheet.Row(1).Height = 25;
                     worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -236,9 +244,21 @@ namespace TaskMenager.Client.Controllers
                         worksheet.Cells[row, 1].Value = date.Date.ToString("dd/MM/yyyy") + "г.";
                         worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                         worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
+                        ///
+                        var taskDataForDate = await this.tasks.ExportSingleTaskAsync(employeesList, date, date, model.OnlyApprovedHours, model.taskId);
+                        var allExpertsNotes = string.Empty;
+                        ///
 
                         foreach (var empid in employeesList)
                         {
+                            var curentColegue = taskDataForDate.Colleagues.Where(cl => cl.Id == empid).FirstOrDefault();
+                            if (curentColegue != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари. Оформянето на коментарите се случва в класа ReportServiceModel
+                                {
+                                    allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
+                                }
+                            }
                             var hours = taskReportForPeriod.Where(wh => wh.EmployeeId == empid && wh.WorkDate.Date == date.Date).Sum(wh => wh.HoursSpend);
                             if (hours > 0)
                             {
@@ -267,6 +287,11 @@ namespace TaskMenager.Client.Controllers
                         worksheet.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
                         worksheet.Column(col).Width = 10;
                         worksheet.Cells[row, col].Value = taskReportForPeriod.Where(wh => wh.WorkDate.Date == date.Date).Sum(wh => wh.HoursSpend);
+
+                        worksheet.Column(col+1).Width = 160;
+                        worksheet.Cells[row, col + 1].Style.WrapText = true;
+                        worksheet.Cells[row, col + 1].Value = allExpertsNotes;    //коментарите по задачата
+
                         row += 1;
                     }
 
@@ -296,24 +321,39 @@ namespace TaskMenager.Client.Controllers
                     worksheet.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightSteelBlue);
 
 
-                    var bodyrange = worksheet.Cells[3, 2, row, col];
+                    var bodyrange = worksheet.Cells[3, 2, row, col+1];    // +1 е заради колоната с коментарите
                     bodyrange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.View.ShowGridLines = true;
                     worksheet.PrinterSettings.ShowGridLines = true;
                     worksheet.PrinterSettings.Orientation = eOrientation.Landscape;
 
+
+                    ExcelWorksheet worksheetDrow = package.Workbook.Worksheets.Add("Test");
+                    worksheetDrow.View.ZoomScale = 100;
+                    try
+                    {
+                        worksheetDrow.Name = "Графики за период";
+                    }
+                    catch (Exception)
+                    {
+                        TempData["Error"] = "Грешка при създаването на tab за отчета: " + currentTask.TaskName.Substring(0, 50) + "...";
+                        return RedirectToAction("TasksList", "Tasks");
+                    }
+
                     //create a new piechart of type Doughnut
-                    var doughtnutChart = worksheet.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
+                    var doughtnutChart = worksheetDrow.Drawings.AddChart("crtExtensionCount", eChartType.DoughnutExploded) as ExcelDoughnutChart;
                     //Set position to row 1 column 7 and 16 pixels offset
-                    doughtnutChart.SetPosition(row + 2, 0, 1, 10);
+                    doughtnutChart.SetPosition(2, 0, 1, 10);
                     doughtnutChart.SetSize(600, 500);
-                    doughtnutChart.Series.Add(ExcelRange.GetAddress(row, 2, row, col - 1), ExcelRange.GetAddress(2, 2, 2, col - 1));
+                    var r1 = worksheet.Cells[row, 2, row, col - 1];
+                    var r2 = worksheet.Cells[2, 2, 2, col - 1];
+                    doughtnutChart.Series.Add(r1, r2);
                     doughtnutChart.Title.Text = "ЕКСПЕРТ / ЧАСОВЕ";
                     doughtnutChart.DataLabel.ShowPercent = true;
                     //doughtnutChart.DataLabel.ShowLeaderLines = true;
                     doughtnutChart.Style = eChartStyle.Style26; //3D look
 
-                    ExcelPieChart pieChart = worksheet.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
+                    ExcelPieChart pieChart = worksheetDrow.Drawings.AddChart("pieChart", eChartType.Pie3D) as ExcelPieChart;
                     pieChart.Title.Text = "Дата / Часове";
                     //select the ranges for the pie. First the values, then the header range
                     pieChart.Legend.Position = eLegendPosition.Bottom;
@@ -321,10 +361,14 @@ namespace TaskMenager.Client.Controllers
                     pieChart.DataLabel.ShowLeaderLines = true;
                     pieChart.DataLabel.ShowCategory = true;
                     pieChart.Legend.Remove();
-                    var rangeTitles = ExcelRange.GetAddress(3, 1, row - 1, 1);
-                    pieChart.Series.Add(ExcelRange.GetAddress(3, col, row - 1, col), rangeTitles);
+                    r1 = worksheet.Cells[3, col, row - 1, col];
+                    r2 = worksheet.Cells[3, 1, row - 1, 1];
+                    pieChart.Series.Add(r1, r2);
+                    //var rangeTitles = ExcelRange.GetAddress(3, 1, row - 1, 1);
+                    //pieChart.Series.Add(ExcelRange.GetAddress(3, col, row - 1, col), rangeTitles);
+
                     pieChart.SetSize(600, 500);
-                    pieChart.SetPosition(row + 2, 0, 10, 0);
+                    pieChart.SetPosition(2, 0, 12, 0);
                     pieChart.StyleManager.SetChartStyle(ePresetChartStyle.Pie3dChartStyle8, ePresetChartColors.ColorfulPalette3);
                     pieChart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
                     pieChart.DataLabel.Font.Fill.Color = Color.Black;
@@ -1055,7 +1099,7 @@ namespace TaskMenager.Client.Controllers
                         worksheet.Cells[row, taskExpertsColumn].Style.Font.Size = 12;
                         worksheet.Cells[row, taskExpertsColumn].Style.Font.Bold = true;
                         worksheet.Cells[row, taskExpertsColumn].Value = curentColegue.TaskWorkedHours;
-                        if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари
+                        if (!string.IsNullOrWhiteSpace(curentColegue.UserNotesForPeriod))   //ако има коментари за периода от експерта --> ги добавям към всички коментари. Оформянето на коментарите се случва в класа ReportServiceModel
                         {
                             allExpertsNotes = allExpertsNotes + Environment.NewLine + "*" + curentColegue.FullName.ToUpper() + "*" + Environment.NewLine + curentColegue.UserNotesForPeriod;
                         }
@@ -1075,7 +1119,7 @@ namespace TaskMenager.Client.Controllers
                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 worksheet.Cells[row, taskExpertsColumn + 1].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
 
-                worksheet.Column(taskExpertsColumn + 2).Width = 80;
+                worksheet.Column(taskExpertsColumn + 2).Width = 160;
                 worksheet.Cells[row, taskExpertsColumn + 2].Style.WrapText = true;
                 worksheet.Cells[row, taskExpertsColumn + 2].Value = allExpertsNotes;    //коментарите по задачата
 

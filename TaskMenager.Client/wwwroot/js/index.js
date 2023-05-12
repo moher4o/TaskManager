@@ -85,7 +85,7 @@ function ShowIllWaterMark() {
 }
 
 function CheckMaxHours() {
-    var totalMaxHours = document.getElementById("maxHours") == null ? 16 : parseInt(document.getElementById("maxHours").value);
+    var totalMaxHours = document.getElementById("maxHours") == null ? 12 : parseInt(document.getElementById("maxHours").value);
     //var currentTotal = document.getElementById("totalLabel") == null ? 16 : parseInt(document.getElementById("totalLabel").textContent);
     var sum = parseInt(0);
     $('.PrimeBox3').each(function () {

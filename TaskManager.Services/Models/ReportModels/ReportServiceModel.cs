@@ -58,11 +58,15 @@ namespace TaskManager.Services.Models.ReportModels
                                                                .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date).All(ir => ir.InTimeRecord == true),
                                                                TaskWorkedHours = e.Employee.WorkedHoursByTask
                                                                .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date && (onlyApprovedHours ? t.Approved == true : true)).Sum(wh => wh.HoursSpend),
-                                                               UserNotesForPeriod = string.Join(" | ", e.Employee.WorkedHoursByTask
-                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date && !string.IsNullOrEmpty(t.Text)).Select(wh => wh.Text).ToArray())
+                                                               UserNotesForPeriod = string.Join(Environment.NewLine, e.Employee.WorkedHoursByTask
+                                                               .Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date && !string.IsNullOrEmpty(t.Text)).Select(wh => string.Concat(wh.WorkDate.ToString("dd/MM/yyyy")," - ", wh.Text) ).ToArray())
                                                            })
                                                            .ToList()));
         }
 
     }
 }
+
+
+//UserNotesForPeriod = string.Join(" | ", e.Employee.WorkedHoursByTask
+//.Where(t => t.TaskId == s.Id && !t.isDeleted && t.WorkDate.Date >= startDate.Date && t.WorkDate.Date <= endDate.Date && !string.IsNullOrEmpty(t.Text)).Select(wh => wh.Text).ToArray())

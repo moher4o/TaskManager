@@ -360,7 +360,7 @@ namespace TaskManager.Services.Implementations
                 return false;
             }
         }
-            public async Task<bool> CheckTaskByIdAsync(int taskId)
+        public async Task<bool> CheckTaskByIdAsync(int taskId)
         {
             var taskFromDb = await this.db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
             if (taskFromDb == null)
@@ -657,9 +657,10 @@ namespace TaskManager.Services.Implementations
                 await this.db.Tasks.AddAsync(illTask);
                 await this.db.Tasks.AddAsync(vacationTask);
                 await this.db.SaveChangesAsync();
-                vacationTask.AssignedExperts.Add(new EmployeesTasks { 
-                EmployeeId = admin.Id,
-                TaskId = vacationTask.Id
+                vacationTask.AssignedExperts.Add(new EmployeesTasks
+                {
+                    EmployeeId = admin.Id,
+                    TaskId = vacationTask.Id
                 });
                 illTask.AssignedExperts.Add(new EmployeesTasks
                 {
@@ -702,7 +703,7 @@ namespace TaskManager.Services.Implementations
         public async Task<bool> SetTaskEmpNoteForDateAsync(AddNoteToTaskServiceModel model)
         {
             try
-             {
+            {
                 var employeeDateWork = await this.db.WorkedHours
                     .Where(wh => wh.TaskId == model.TaskId && wh.EmployeeId == model.EmployeeId && wh.WorkDate.Date == model.WorkDate.Date)
                     .FirstOrDefaultAsync();
@@ -1053,9 +1054,20 @@ namespace TaskManager.Services.Implementations
 
         }
 
+        public async Task<ReportServiceModel> ExportSingleTaskAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate, bool onlyApprovedHours, int taskId)
+        {
+                var searchedTasks = await this.db.Tasks
+                    .Where(t => t.Id == taskId)
+                    .OrderBy(t => t.Id)
+                    .ProjectTo<ReportServiceModel>(new { employeesIds = employeesIds.ToArray(), startDate, endDate, onlyApprovedHours })
+                    .ToListAsync();
+
+                return searchedTasks.FirstOrDefault();
+        }
+
         public async Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate, bool onlyApprovedHours)
         {
-            var report = new ReportServiceModel();
+            // var report = new ReportServiceModel();
             var tasksIdList = new List<int>();
             foreach (var employeeId in employeesIds)
             {
@@ -1143,7 +1155,7 @@ namespace TaskManager.Services.Implementations
         public async Task<List<string>> GetHolidayDatesAsync(int userid, string taskName)
         {
             var result = await this.db.WorkedHours
-                .Where(wh => wh.Task.TaskName.ToLower() == taskName.ToLower() && wh.EmployeeId == userid && wh.WorkDate.Date >= DateTime.Now.Date.AddMonths(-12) )
+                .Where(wh => wh.Task.TaskName.ToLower() == taskName.ToLower() && wh.EmployeeId == userid && wh.WorkDate.Date >= DateTime.Now.Date.AddMonths(-12))
                 .Select(wh => wh.WorkDate.Date.ToString("yyyy/MM/dd"))
                 .ToListAsync();
             return result;

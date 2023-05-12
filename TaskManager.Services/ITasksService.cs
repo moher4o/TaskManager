@@ -38,6 +38,7 @@ namespace TaskManager.Services
 
         Task<bool> ReopenTaskAsync(int taskId);
         Task<string> EditTaskAsync(AddNewTaskServiceModel taskToEdit);
+        Task<ReportServiceModel> ExportSingleTaskAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate, bool onlyApprovedHours, int taskId);
         Task<List<ReportServiceModel>> ExportTasksAsync(IList<int> employeesIds, DateTime startDate, DateTime endDate, bool OnlyApprovedHours);
         Task<TaskServiceModel> GetParentTaskAsync(int parentTaskId);
 
