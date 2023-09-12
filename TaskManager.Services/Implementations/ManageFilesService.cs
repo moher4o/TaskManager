@@ -65,6 +65,10 @@ namespace TaskManager.Services.Implementations
 
                 DirectoryInfo dirInfo = new DirectoryInfo(classDirectory);
                 long dirSize = await Task.Run(() => dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length));
+                if ((dirSize / 1048576) > fileConfiguration.TaskDirectorySize)
+                {
+                    return $"Файловото пространство({fileConfiguration.TaskDirectorySize}Mb) заделено за задачата, е изчерпано. Заредените файлове над лимита са  {(dirSize / 1048576) - fileConfiguration.TaskDirectorySize}Mb";
+                }
 
                 var sumSizeMb = (dirSize + file.Length) / 1048576;  //в мегабайти
                 if (sumSizeMb > fileConfiguration.TaskDirectorySize)
@@ -157,7 +161,7 @@ namespace TaskManager.Services.Implementations
                     return fileList;
                 }
 
-
+                
 
                 foreach (var file in Directory.GetFiles(classDirectory))
                 {
